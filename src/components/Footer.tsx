@@ -10,10 +10,10 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">
             <Link to="/" className="flex items-center space-x-2">
-              <span className="text-xl font-bold gradient-text">DevChat</span>
+              <span className="text-xl font-bold gradient-text">Murder Mystery Generator</span>
             </Link>
             <p className="text-muted-foreground">
-              Build beautiful web applications with the power of AI.
+              Craft captivating murder mysteries at the speed of imagination.
             </p>
           </div>
           
@@ -83,7 +83,7 @@ const Footer = () => {
         
         <div className="mt-12 pt-8 border-t flex flex-col md:flex-row justify-between items-center">
           <p className="text-muted-foreground text-sm">
-            &copy; {currentYear} DevChat, Inc. All rights reserved.
+            &copy; {currentYear} Murder Mystery Generator, Inc. All rights reserved.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">

@@ -17,7 +17,7 @@ const Header = () => {
     <header className="py-4 px-4 md:px-8 border-b sticky top-0 bg-background/95 backdrop-blur-sm z-50">
       <div className="container mx-auto flex justify-between items-center">
         <Link to="/" className="flex items-center space-x-2">
-          <span className="text-2xl font-bold gradient-text">DevChat</span>
+          <span className="text-2xl font-bold gradient-text">Murder Mystery Generator</span>
         </Link>
 
         {/* Desktop Navigation */}
