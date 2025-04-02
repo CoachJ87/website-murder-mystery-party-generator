@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { AIInputWithLoading } from "@/components/ui/ai-input-with-loading";
 import { AIInputWithLoadingDemo } from "@/components/AIInputWithLoadingDemo";
 
 // Define all possible mystery themes with their corresponding prompts
