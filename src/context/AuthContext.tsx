@@ -1,18 +1,10 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { createClient } from '@supabase/supabase-js';
-
-// Initialize Supabase client with fallback values for development
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://your-project-url.supabase.co';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key';
+import { supabase } from "@/lib/supabase";
 
 // Console log to debug
-console.log("Supabase URL:", supabaseUrl);
-console.log("Supabase Anon Key:", supabaseAnonKey);
-
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+console.log("Supabase initialized in AuthContext");
 
 type User = {
   id: string;
@@ -42,7 +34,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check for existing session with Supabase
     const checkSession = async () => {
       try {
         const { data, error } = await supabase.auth.getSession();
@@ -73,7 +64,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     checkSession();
 
-    // Subscribe to auth changes
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === 'SIGNED_IN' && session) {

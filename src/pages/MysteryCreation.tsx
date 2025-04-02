@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,12 +7,7 @@ import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MysteryCreator from "@/components/MysteryCreator";
-import { createClient } from '@supabase/supabase-js';
-
-// Initialize Supabase client with fallback values
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://your-project-url.supabase.co';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key';
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { supabase } from "@/lib/supabase";
 
 type Message = {
   id: string;
@@ -28,12 +22,10 @@ const MysteryCreation = () => {
   const { id } = useParams();
   const isEditing = !!id;
   
-  // Handle saving mystery
   const handleSave = async (messages: Message[]) => {
     try {
       setSaving(true);
       
-      // Calculate a title based on the messages
       let title = "Untitled Mystery";
       const firstUserMessage = messages.find(m => m.role === "user");
       if (firstUserMessage) {
@@ -41,22 +33,10 @@ const MysteryCreation = () => {
         title = words + "...";
       }
       
-      // In a real app, save to Supabase
-      // const { data, error } = await supabase.from('mysteries').upsert({
-      //   id: id || undefined,
-      //   title,
-      //   messages: JSON.stringify(messages),
-      //   updated_at: new Date().toISOString(),
-      //   created_at: id ? undefined : new Date().toISOString(),
-      //   status: 'draft'
-      // });
-      
-      // Simulate saving
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       toast.success(`Mystery ${isEditing ? "updated" : "created"} successfully!`);
       
-      // Redirect to dashboard after creating or to the preview page if enough messages
       if (messages.length >= 10) {
         navigate(`/mystery/preview/${id || "new"}`);
       } else if (!isEditing) {
@@ -70,7 +50,6 @@ const MysteryCreation = () => {
     }
   };
 
-  // Get available themes
   const getRandomThemes = () => {
     const themes = [
       "1920s Speakeasy", "Hollywood Murder", "Castle Mystery", "Sci-Fi Mystery",
