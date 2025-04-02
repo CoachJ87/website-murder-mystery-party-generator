@@ -1,27 +1,26 @@
 
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
-import ChatDemo from "@/components/ChatDemo";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Code, Layout, Zap } from "lucide-react";
+import { CheckCircle2, FileText, Users, Calendar } from "lucide-react";
 
 const Index = () => {
   const features = [
     {
-      icon: <Code className="h-8 w-8 text-primary" />,
-      title: "Code Generation",
-      description: "Let AI write your code for you. Just describe what you need, and get working code instantly."
+      icon: <FileText className="h-8 w-8 text-primary" />,
+      title: "Customizable Storylines",
+      description: "Choose from dozens of themes or create your own unique murder mystery scenario."
     },
     {
-      icon: <Layout className="h-8 w-8 text-primary" />,
-      title: "Interface Design",
-      description: "Create beautiful, responsive user interfaces with simple text descriptions."
+      icon: <Users className="h-8 w-8 text-primary" />,
+      title: "Character Profiles",
+      description: "Detailed character backgrounds, motivations, and secrets for all participants."
     },
     {
-      icon: <Zap className="h-8 w-8 text-primary" />,
-      title: "Instant Debugging",
-      description: "Identify and fix issues in your code with AI-powered debugging assistance."
+      icon: <Calendar className="h-8 w-8 text-primary" />,
+      title: "Easy Setup",
+      description: "Everything you need to host a memorable murder mystery event in minutes, not hours."
     }
   ];
 
@@ -32,12 +31,10 @@ const Index = () => {
       <main className="flex-1">
         <Hero />
         
-        <ChatDemo />
-        
         {/* Features Section */}
         <section className="py-20 px-4 bg-muted/30">
           <div className="container mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Powerful Features</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Everything You Need</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {features.map((feature, index) => (
@@ -56,9 +53,9 @@ const Index = () => {
           <div className="container mx-auto max-w-4xl bg-primary rounded-2xl p-8 md:p-12 text-white">
             <div className="flex flex-col md:flex-row items-center justify-between">
               <div className="mb-6 md:mb-0 md:pr-6">
-                <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to start building?</h2>
+                <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to host your party?</h2>
                 <p className="text-primary-foreground/90 mb-0">
-                  Join thousands of developers who are already creating with AI.
+                  Join thousands of hosts who are creating unforgettable murder mystery experiences.
                 </p>
               </div>
               <Button size="lg" variant="secondary" asChild className="whitespace-nowrap">
@@ -72,7 +69,7 @@ const Index = () => {
         <section className="py-20 px-4 bg-muted/30">
           <div className="container mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-              Loved by Developers
+              Loved by Party Hosts
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -86,7 +83,9 @@ const Index = () => {
                     ))}
                   </div>
                   <p className="text-muted-foreground mb-4">
-                    "DevChat has completely transformed how I approach web development. It's like having a senior developer on call 24/7."
+                    {["My friends still talk about our murder mystery night. The characters were so detailed and the plot twists were perfect!",
+                      "So easy to set up! I was worried about hosting for 12 people, but the materials made it simple and everyone had a blast.",
+                      "Third murder mystery party using this service and they keep getting better. The customization options are amazing."][i-1]}
                   </p>
                   <div className="flex items-center">
                     <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center mr-3">
@@ -96,10 +95,10 @@ const Index = () => {
                     </div>
                     <div>
                       <p className="font-medium">
-                        {["John Doe", "Maria Kim", "Alex Smith"][i-1]}
+                        {["Jessica Davis", "Mark Klein", "Amanda Smith"][i-1]}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        {["Frontend Developer", "UX Designer", "Full-Stack Engineer"][i-1]}
+                        {["Party Host", "Corporate Event Planner", "Birthday Celebrant"][i-1]}
                       </p>
                     </div>
                   </div>

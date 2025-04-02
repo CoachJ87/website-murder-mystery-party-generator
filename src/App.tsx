@@ -11,9 +11,6 @@ import SignUp from "./pages/SignUp";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
-// Make Link available globally for components that need it but don't import it directly
-window.Link = Link;
-
 const queryClient = new QueryClient();
 
 const App = () => (
