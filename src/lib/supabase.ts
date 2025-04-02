@@ -7,3 +7,6 @@ export const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbG
 
 // Initialize the Supabase client
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+// Add a console log to confirm supabase is initialized
+console.log('Supabase client initialized in supabase.ts with URL:', supabaseUrl);
