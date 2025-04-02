@@ -1,19 +1,13 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Download, Printer, Send, FileText, Book, PenTool, Users, Clipboard, Calendar } from "lucide-react";
 import { toast } from "sonner";
-import { createClient } from '@supabase/supabase-js';
-
-// Initialize Supabase client
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { supabase } from "@/lib/supabase";
 
 const MysteryView = () => {
   const [loading, setLoading] = useState(true);
@@ -101,14 +95,14 @@ const MysteryView = () => {
         <div className="container mx-auto max-w-6xl">
           <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-              <h1 className="text-3xl font-bold mb-2">{mystery.title}</h1>
+              <h1 className="text-3xl font-bold mb-2">{mystery?.title}</h1>
               <p className="text-muted-foreground">
-                Complete mystery package - {mystery.theme}
+                Complete mystery package - {mystery?.theme}
               </p>
             </div>
             
             <div className="flex flex-wrap gap-2">
-              <Button variant="outline" onClick={handleDownload.bind(null, "all")} className="flex items-center gap-2">
+              <Button variant="outline" onClick={() => handleDownload("all")} className="flex items-center gap-2">
                 <Download className="h-4 w-4" />
                 <span>Download All</span>
               </Button>
@@ -186,7 +180,7 @@ const MysteryView = () => {
                   </div>
                   
                   <div className="flex justify-end">
-                    <Button onClick={handleDownload.bind(null, "host-guide")}>
+                    <Button onClick={() => handleDownload("host-guide")}>
                       <Download className="h-4 w-4 mr-2" />
                       Download Host Guide PDF
                     </Button>
@@ -205,7 +199,7 @@ const MysteryView = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {mystery.characters.map((character: any) => (
+                    {mystery?.characters.map((character: any) => (
                       <div key={character.name} className="border rounded-lg p-4">
                         <h3 className="text-lg font-semibold">{character.name}</h3>
                         <p className="text-sm text-muted-foreground mb-2">{character.role}</p>
@@ -215,7 +209,7 @@ const MysteryView = () => {
                   </div>
                   
                   <div className="flex justify-end mt-6">
-                    <Button onClick={handleDownload.bind(null, "characters")}>
+                    <Button onClick={() => handleDownload("characters")}>
                       <Download className="h-4 w-4 mr-2" />
                       Download Character Sheets
                     </Button>
@@ -248,7 +242,7 @@ const MysteryView = () => {
                         </div>
                         <h3 className="font-medium mb-1">{material.name}</h3>
                         <p className="text-sm text-muted-foreground mb-4">{material.description}</p>
-                        <Button variant="outline" size="sm" onClick={handleDownload.bind(null, material.name)}>
+                        <Button variant="outline" size="sm" onClick={() => handleDownload(material.name)}>
                           Download
                         </Button>
                       </div>
@@ -357,7 +351,7 @@ const MysteryView = () => {
                     </div>
                     
                     <div className="flex justify-end">
-                      <Button onClick={handleDownload.bind(null, "timeline")}>
+                      <Button onClick={() => handleDownload("timeline")}>
                         <Download className="h-4 w-4 mr-2" />
                         Download Timeline PDF
                       </Button>
@@ -372,7 +366,7 @@ const MysteryView = () => {
             <Button variant="outline" onClick={() => navigate("/dashboard")}>
               Back to Dashboard
             </Button>
-            <Button onClick={handleDownload.bind(null, "all")}>
+            <Button onClick={() => handleDownload("all")}>
               Download All Materials
             </Button>
           </div>
