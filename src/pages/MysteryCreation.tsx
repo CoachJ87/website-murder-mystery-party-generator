@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -6,8 +7,8 @@ import { useToast } from "@/components/ui/use-toast";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import MysteryCreator from "@/components/MysteryCreator";
 import { supabase } from "@/lib/supabase";
+import MysteryForm from "@/components/MysteryForm";
 
 type Message = {
   id: string;
@@ -22,40 +23,24 @@ const MysteryCreation = () => {
   const { id } = useParams();
   const isEditing = !!id;
   
-  const handleSave = async (messages: Message[]) => {
+  const handleSave = async (formData: any) => {
     try {
       setSaving(true);
       
-      let title = "Untitled Mystery";
-      const firstUserMessage = messages.find(m => m.role === "user");
-      if (firstUserMessage) {
-        const words = firstUserMessage.content.split(" ").slice(0, 4).join(" ");
-        title = words + "...";
-      }
+      let title = formData.theme || "Untitled Mystery";
       
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       toast.success(`Mystery ${isEditing ? "updated" : "created"} successfully!`);
       
-      if (messages.length >= 10) {
-        navigate(`/mystery/preview/${id || "new"}`);
-      } else if (!isEditing) {
-        navigate("/dashboard");
-      }
+      // Redirect to the AI chat interface
+      navigate(`/mystery/preview/${id || "new"}`);
     } catch (error) {
       console.error("Error saving mystery:", error);
       toast.error(`Failed to ${isEditing ? "update" : "create"} mystery`);
     } finally {
       setSaving(false);
     }
-  };
-
-  const getRandomThemes = () => {
-    const themes = [
-      "1920s Speakeasy", "Hollywood Murder", "Castle Mystery", "Sci-Fi Mystery",
-      "Art Gallery", "Luxury Train", "Mountain Resort"
-    ];
-    return themes[Math.floor(Math.random() * themes.length)];
   };
 
   return (
@@ -69,16 +54,15 @@ const MysteryCreation = () => {
               {isEditing ? "Edit Mystery" : "Create New Mystery"}
             </h1>
             <p className="text-muted-foreground">
-              Use the AI to craft your perfect murder mystery. Start by selecting a theme or typing a prompt.
+              Start your new mystery by selecting from the options below.
             </p>
           </div>
           
           <Card>
             <CardContent className="p-6">
-              <MysteryCreator 
+              <MysteryForm 
                 onSave={handleSave}
-                savedMysteryId={id}
-                initialTheme={getRandomThemes()}
+                isSaving={saving}
               />
             </CardContent>
           </Card>

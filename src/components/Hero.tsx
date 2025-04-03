@@ -1,10 +1,11 @@
 
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { AIInputWithLoading } from "@/components/ui/ai-input-with-loading";
-import { AIInputWithLoadingDemo } from "@/components/AIInputWithLoadingDemo";
+import SignInPrompt from "@/components/SignInPrompt";
+import { useAuth } from "@/context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 // Define all possible mystery themes with their corresponding prompts
 const MYSTERY_THEMES = [
@@ -52,6 +53,9 @@ const Hero = () => {
   // State for holding selected themes and input value
   const [selectedThemes, setSelectedThemes] = useState<typeof MYSTERY_THEMES>([]);
   const [inputValue, setInputValue] = useState("");
+  const [showSignInPrompt, setShowSignInPrompt] = useState(false);
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   // Function to randomly select themes
   const getRandomThemes = () => {
@@ -67,6 +71,14 @@ const Hero = () => {
   // Function to handle button click and set input value
   const handleThemeSelect = (prompt: string) => {
     setInputValue(prompt);
+  };
+
+  const handleSubmit = (value: string) => {
+    if (isAuthenticated) {
+      navigate("/mystery/create");
+    } else {
+      setShowSignInPrompt(true);
+    }
   };
 
   return (
@@ -88,7 +100,7 @@ const Hero = () => {
             placeholder="What kind of murder mystery would you like to host?"
             value={inputValue}
             setValue={setInputValue}
-            onSubmit={(value) => console.log("Submitted:", value)}
+            onSubmit={handleSubmit}
           />
         </div>
         
@@ -105,6 +117,11 @@ const Hero = () => {
             </Button>
           ))}
         </div>
+
+        <SignInPrompt 
+          isOpen={showSignInPrompt} 
+          onClose={() => setShowSignInPrompt(false)} 
+        />
       </div>
     </div>
   );

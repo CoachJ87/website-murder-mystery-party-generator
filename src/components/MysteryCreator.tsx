@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 import { useAutoResizeTextarea } from "@/components/hooks/use-auto-resize-textarea";
+import SignInPrompt from "@/components/SignInPrompt";
 
 const MAX_FREE_MESSAGES = 5;
 
@@ -35,6 +36,7 @@ const MysteryCreator = ({
   const [input, setInput] = useState("");
   const [selectedTheme, setSelectedTheme] = useState(initialTheme);
   const [loading, setLoading] = useState(false);
+  const [showSignInPrompt, setShowSignInPrompt] = useState(false);
   const { isAuthenticated } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { textareaRef, adjustHeight } = useAutoResizeTextarea({
@@ -42,10 +44,43 @@ const MysteryCreator = ({
     maxHeight: 200,
   });
 
-  // Count how many user messages have been sent
-  const userMessageCount = messages.filter(m => m.role === "user").length;
-  const remainingMessages = MAX_FREE_MESSAGES - userMessageCount;
-  const canSendMessage = isAuthenticated || remainingMessages > 0;
+  // Get daily credits from localStorage
+  const getDailyCredits = () => {
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    const storedData = localStorage.getItem('dailyCredits');
+    
+    if (!storedData) {
+      return { date: today, remaining: MAX_FREE_MESSAGES };
+    }
+    
+    const data = JSON.parse(storedData);
+    if (data.date !== today) {
+      // Reset if it's a new day
+      return { date: today, remaining: MAX_FREE_MESSAGES };
+    }
+    
+    return data;
+  };
+
+  // Save daily credits to localStorage
+  const saveDailyCredits = (remaining: number) => {
+    const today = new Date().toISOString().split('T')[0];
+    localStorage.setItem('dailyCredits', JSON.stringify({
+      date: today,
+      remaining
+    }));
+  };
+  
+  // Initialize daily credits
+  const [remainingCredits, setRemainingCredits] = useState(getDailyCredits().remaining);
+  
+  useEffect(() => {
+    const credits = getDailyCredits();
+    setRemainingCredits(credits.remaining);
+  }, []);
+
+  // Check if user can send a message
+  const canSendMessage = isAuthenticated || remainingCredits > 0;
 
   useEffect(() => {
     scrollToBottom();
@@ -55,11 +90,24 @@ const MysteryCreator = ({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const decrementCredits = () => {
+    if (!isAuthenticated) {
+      const newCredits = remainingCredits - 1;
+      setRemainingCredits(newCredits);
+      saveDailyCredits(newCredits);
+    }
+  };
+
   const handleSubmit = async () => {
     if (!input.trim() || loading) return;
     
+    if (!isAuthenticated) {
+      setShowSignInPrompt(true);
+      return;
+    }
+    
     if (!canSendMessage) {
-      toast.error("You've reached the free message limit. Sign in or purchase to continue.");
+      toast.error("You've used all your daily credits. Sign in or purchase to continue.");
       return;
     }
     
@@ -87,6 +135,9 @@ const MysteryCreator = ({
       };
       
       setMessages(prev => [...prev, aiResponse]);
+      
+      // Decrement daily credits after successful exchange
+      decrementCredits();
       
       // Auto-save after each exchange
       onSave([...messages, newUserMessage, aiResponse]);
@@ -128,8 +179,8 @@ const MysteryCreator = ({
     <div className="flex flex-col h-full">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold">Mystery Creator</h2>
-        <Badge variant={remainingMessages > 2 ? "default" : "destructive"}>
-          {isAuthenticated ? "Premium" : `${remainingMessages}/${MAX_FREE_MESSAGES} free messages`}
+        <Badge variant={remainingCredits > 2 ? "default" : "destructive"}>
+          {isAuthenticated ? "Premium" : `${remainingCredits}/${MAX_FREE_MESSAGES} daily credits`}
         </Badge>
       </div>
       
@@ -208,15 +259,20 @@ const MysteryCreator = ({
       
       {!canSendMessage && !isAuthenticated && (
         <p className="text-destructive text-sm mt-2">
-          You've reached the free message limit. Sign in or purchase to continue.
+          You've used all your daily credits. Sign in or purchase to continue.
         </p>
       )}
       
       <div className="mt-4 flex justify-end">
         <Button onClick={() => onSave(messages)}>
-          Save Mystery
+          Generate Mystery
         </Button>
       </div>
+
+      <SignInPrompt 
+        isOpen={showSignInPrompt} 
+        onClose={() => setShowSignInPrompt(false)} 
+      />
     </div>
   );
 };

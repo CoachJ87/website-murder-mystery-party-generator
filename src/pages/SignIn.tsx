@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -7,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { toast } from "sonner";
-import { Mail, Lock, Github, ArrowRight } from "lucide-react";
+import { Mail, Lock, ArrowRight } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 const SignIn = () => {
@@ -33,11 +34,11 @@ const SignIn = () => {
     }
   };
 
-  const handleSocialSignIn = async (provider: 'github' | 'google') => {
+  const handleGoogleSignIn = async () => {
     try {
-      setSocialLoading(provider);
+      setSocialLoading('google');
       const { error } = await supabase.auth.signInWithOAuth({
-        provider,
+        provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/dashboard`,
         },
@@ -45,7 +46,7 @@ const SignIn = () => {
       
       if (error) throw error;
     } catch (error: any) {
-      toast.error(`Failed to sign in with ${provider}: ${error.message}`);
+      toast.error(`Failed to sign in with Google: ${error.message}`);
       console.error(error);
     } finally {
       setSocialLoading(null);
@@ -64,22 +65,8 @@ const SignIn = () => {
             <div className="space-y-4 mb-6">
               <Button 
                 variant="outline" 
-                className="w-full flex items-center justify-center gap-2" 
-                onClick={() => handleSocialSignIn('github')}
-                disabled={!!socialLoading}
-              >
-                {socialLoading === 'github' ? (
-                  <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <Github className="h-4 w-4" />
-                )}
-                <span>Continue with GitHub</span>
-              </Button>
-              
-              <Button 
-                variant="outline" 
                 className="w-full flex items-center justify-center gap-2"
-                onClick={() => handleSocialSignIn('google')}
+                onClick={handleGoogleSignIn}
                 disabled={!!socialLoading}
               >
                 {socialLoading === 'google' ? (

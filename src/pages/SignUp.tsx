@@ -1,14 +1,14 @@
+
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { toast } from "sonner";
-import { Mail, Lock, User, Github, ArrowRight } from "lucide-react";
+import { Mail, User, Lock, ArrowRight } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 const SignUp = () => {
@@ -16,42 +16,35 @@ const SignUp = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [socialLoading, setSocialLoading] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!name || !email || !password || !confirmPassword) {
+    if (!name || !email || !password) {
       toast.error("Please fill in all fields");
       return;
     }
     
-    if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
-      return;
-    }
-    
-    if (!agreedToTerms) {
-      toast.error("Please agree to the terms of service");
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters");
       return;
     }
     
     try {
       await signUp(name, email, password);
-      // Redirect happens in the signUp function
+      // Redirect is handled in the signUp function
     } catch (error) {
       // Error is handled in the signUp function
       console.error(error);
     }
   };
 
-  const handleSocialSignUp = async (provider: 'github' | 'google') => {
+  const handleGoogleSignIn = async () => {
     try {
-      setSocialLoading(provider);
+      setSocialLoading('google');
       const { error } = await supabase.auth.signInWithOAuth({
-        provider,
+        provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/dashboard`,
         },
@@ -59,7 +52,7 @@ const SignUp = () => {
       
       if (error) throw error;
     } catch (error: any) {
-      toast.error(`Failed to sign up with ${provider}: ${error.message}`);
+      toast.error(`Failed to sign in with Google: ${error.message}`);
       console.error(error);
     } finally {
       setSocialLoading(null);
@@ -78,22 +71,8 @@ const SignUp = () => {
             <div className="space-y-4 mb-6">
               <Button 
                 variant="outline" 
-                className="w-full flex items-center justify-center gap-2" 
-                onClick={() => handleSocialSignUp('github')}
-                disabled={!!socialLoading}
-              >
-                {socialLoading === 'github' ? (
-                  <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <Github className="h-4 w-4" />
-                )}
-                <span>Continue with GitHub</span>
-              </Button>
-              
-              <Button 
-                variant="outline" 
                 className="w-full flex items-center justify-center gap-2"
-                onClick={() => handleSocialSignUp('google')}
+                onClick={handleGoogleSignIn}
                 disabled={!!socialLoading}
               >
                 {socialLoading === 'google' ? (
@@ -133,13 +112,13 @@ const SignUp = () => {
             
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
+                <Label htmlFor="name">Name</Label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="name"
                     type="text"
-                    placeholder="John Doe"
+                    placeholder="Your name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="pl-10"
@@ -178,40 +157,9 @@ const SignUp = () => {
                     required
                   />
                 </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    placeholder="••••••••"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="pl-10"
-                    required
-                  />
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="terms" 
-                  checked={agreedToTerms}
-                  onCheckedChange={(checked) => setAgreedToTerms(checked === true)}
-                />
-                <Label htmlFor="terms" className="text-sm leading-none">
-                  I agree to the{" "}
-                  <Link to="/terms" className="text-primary hover:underline">
-                    Terms of Service
-                  </Link>{" "}
-                  and{" "}
-                  <Link to="/privacy" className="text-primary hover:underline">
-                    Privacy Policy
-                  </Link>
-                </Label>
+                <p className="text-xs text-muted-foreground">
+                  Password must be at least 6 characters
+                </p>
               </div>
               
               <Button type="submit" className="w-full" disabled={loading}>
@@ -220,7 +168,7 @@ const SignUp = () => {
                 ) : (
                   <ArrowRight className="h-4 w-4 mr-2" />
                 )}
-                {loading ? "Creating account..." : "Sign Up"}
+                {loading ? "Creating account..." : "Create Account"}
               </Button>
             </form>
             
