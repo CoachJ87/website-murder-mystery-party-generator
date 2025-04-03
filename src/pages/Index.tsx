@@ -45,39 +45,23 @@ const Index = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-[#F1F1F1]">
       <Header />
       
       <main className="flex-1">
         <Hero />
         
-        {/* Custom container div */}
-        <div className="container mx-auto max-w-4xl py-10">
-          <div className="bg-card rounded-xl border shadow-sm p-8">
-            <h2 className="text-2xl font-bold mb-4">Create your first mystery in minutes</h2>
-            <p className="text-muted-foreground">
-              Our AI-powered mystery generator creates custom stories tailored to your preferences. 
-              Choose from a variety of themes or describe your own perfect scenario.
-            </p>
-            <div className="mt-6">
-              <Button asChild>
-                <Link to="/mystery/create">Get Started</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-        
         {/* How It Works Section */}
-        <section className="py-10 px-4 bg-muted/30">
+        <section className="py-10 px-4 bg-[#F1F1F1]">
           <div className="container mx-auto">
             <div className="max-w-6xl mx-auto">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div className="text-center">
                   <div className="relative mx-auto mb-4">
-                    <div className="h-14 w-14 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                    <div className="h-14 w-14 bg-black text-white rounded-full flex items-center justify-center mx-auto">
                       <span className="text-xl font-semibold">1</span>
                     </div>
-                    <div className="hidden md:block absolute top-7 left-full h-0.5 w-full -translate-x-7 bg-primary/30"></div>
+                    <div className="hidden md:block absolute top-7 left-full h-0.5 w-full -translate-x-7 bg-black"></div>
                   </div>
                   <h3 className="font-medium mb-2">Describe ideal murder mystery.</h3>
                   <p className="text-sm text-muted-foreground">Tell us what theme and features you want in your mystery.</p>
@@ -85,10 +69,10 @@ const Index = () => {
                 
                 <div className="text-center">
                   <div className="relative mx-auto mb-4">
-                    <div className="h-14 w-14 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                    <div className="h-14 w-14 bg-black text-white rounded-full flex items-center justify-center mx-auto">
                       <span className="text-xl font-semibold">2</span>
                     </div>
-                    <div className="hidden md:block absolute top-7 left-full h-0.5 w-full -translate-x-7 bg-primary/30"></div>
+                    <div className="hidden md:block absolute top-7 left-full h-0.5 w-full -translate-x-7 bg-black"></div>
                   </div>
                   <h3 className="font-medium mb-2">The Mystery Machine creates your first version instantly.</h3>
                   <p className="text-sm text-muted-foreground">Our AI generates a complete mystery with characters and clues.</p>
@@ -96,10 +80,10 @@ const Index = () => {
                 
                 <div className="text-center">
                   <div className="relative mx-auto mb-4">
-                    <div className="h-14 w-14 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                    <div className="h-14 w-14 bg-black text-white rounded-full flex items-center justify-center mx-auto">
                       <span className="text-xl font-semibold">3</span>
                     </div>
-                    <div className="hidden md:block absolute top-7 left-full h-0.5 w-full -translate-x-7 bg-primary/30"></div>
+                    <div className="hidden md:block absolute top-7 left-full h-0.5 w-full -translate-x-7 bg-black"></div>
                   </div>
                   <h3 className="font-medium mb-2">Talk to the editor to design and perfect your idea.</h3>
                   <p className="text-sm text-muted-foreground">Refine the mystery with the AI assistant until it's perfect.</p>
@@ -107,7 +91,7 @@ const Index = () => {
                 
                 <div className="text-center">
                   <div className="mx-auto mb-4">
-                    <div className="h-14 w-14 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                    <div className="h-14 w-14 bg-black text-white rounded-full flex items-center justify-center mx-auto">
                       <span className="text-xl font-semibold">4</span>
                     </div>
                   </div>
@@ -118,24 +102,9 @@ const Index = () => {
             </div>
           </div>
         </section>
-
-        {/* Custom container div after how it works */}
-        <div className="container mx-auto max-w-4xl py-10">
-          <div className="bg-card rounded-xl border shadow-sm p-8">
-            <h2 className="text-2xl font-bold mb-4">Ready to host your perfect murder mystery?</h2>
-            <p className="text-muted-foreground">
-              Our AI will help you design a unique experience for your guests, customized to your exact needs.
-            </p>
-            <div className="mt-6">
-              <Button asChild>
-                <Link to="/sign-up">Create Your First Mystery</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
         
         {/* Audience Section */}
-        <section className="py-16 px-4 bg-muted/30">
+        <section className="py-16 px-4 bg-[#F1F1F1]">
           <div className="container mx-auto max-w-6xl">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
               Murder Mystery Parties Made Simple
@@ -143,9 +112,9 @@ const Index = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {audiences.map((audience, index) => (
-                <div key={index} className="bg-card rounded-xl p-6 border shadow-sm">
+                <div key={index} className="bg-black text-white rounded-xl p-6 shadow-sm">
                   <h3 className="text-xl font-semibold mb-4">{audience.title}</h3>
-                  <p className="text-muted-foreground">{audience.description}</p>
+                  <p className="text-gray-300">{audience.description}</p>
                 </div>
               ))}
             </div>
@@ -153,16 +122,16 @@ const Index = () => {
         </section>
         
         {/* Features Section */}
-        <section className="py-20 px-4 bg-background">
+        <section className="py-20 px-4 bg-[#F1F1F1]">
           <div className="container mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Everything You Need</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {features.map((feature, index) => (
-                <div key={index} className="bg-card p-6 rounded-xl shadow-sm border">
+                <div key={index} className="bg-black text-white p-6 rounded-xl shadow-sm">
                   <div className="mb-4">{feature.icon}</div>
                   <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                  <p className="text-muted-foreground">{feature.description}</p>
+                  <p className="text-gray-300">{feature.description}</p>
                 </div>
               ))}
             </div>
@@ -170,12 +139,12 @@ const Index = () => {
         </section>
         
         {/* CTA Section */}
-        <section className="py-20 px-4">
-          <div className="container mx-auto max-w-4xl bg-primary rounded-2xl p-8 md:p-12 text-white">
+        <section className="py-20 px-4 bg-[#F1F1F1]">
+          <div className="container mx-auto max-w-4xl bg-black rounded-2xl p-8 md:p-12 text-white">
             <div className="flex flex-col md:flex-row items-center justify-between">
               <div className="mb-6 md:mb-0 md:pr-6">
                 <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to host your party?</h2>
-                <p className="text-primary-foreground/90 mb-0">
+                <p className="text-gray-300 mb-0">
                   Join thousands of hosts who are creating unforgettable murder mystery experiences.
                 </p>
               </div>
@@ -187,7 +156,7 @@ const Index = () => {
         </section>
         
         {/* Testimonials */}
-        <section className="py-20 px-4 bg-muted/30">
+        <section className="py-20 px-4 bg-[#F1F1F1]">
           <div className="container mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
               Loved by Party Hosts
@@ -195,7 +164,7 @@ const Index = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-card rounded-xl p-6 border shadow-sm">
+                <div key={i} className="bg-black text-white rounded-xl p-6 shadow-sm">
                   <div className="flex items-center space-x-1 mb-4">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <svg key={star} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
@@ -203,14 +172,14 @@ const Index = () => {
                       </svg>
                     ))}
                   </div>
-                  <p className="text-muted-foreground mb-4">
+                  <p className="text-gray-300 mb-4">
                     {["My friends still talk about our murder mystery night. The characters were so detailed and the plot twists were perfect!",
                       "So easy to set up! I was worried about hosting for 12 people, but the materials made it simple and everyone had a blast.",
                       "Third murder mystery party using this service and they keep getting better. The customization options are amazing."][i-1]}
                   </p>
                   <div className="flex items-center">
-                    <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center mr-3">
-                      <span className="font-medium text-sm">
+                    <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center mr-3">
+                      <span className="font-medium text-sm text-white">
                         {["JD", "MK", "AS"][i-1]}
                       </span>
                     </div>
@@ -218,7 +187,7 @@ const Index = () => {
                       <p className="font-medium">
                         {["Jessica Davis", "Mark Klein", "Amanda Smith"][i-1]}
                       </p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-gray-400">
                         {["Party Host", "Corporate Event Planner", "Birthday Celebrant"][i-1]}
                       </p>
                     </div>
