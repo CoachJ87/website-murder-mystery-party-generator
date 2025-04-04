@@ -3,26 +3,30 @@ import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, FileText, Users, Calendar, Sparkles, MessageSquare, FileDown } from "lucide-react";
+import { CheckCircle2, Users, Calendar } from "lucide-react";
 import { Link } from "react-router-dom";
+import { FeatureSteps } from "@/components/ui/feature-steps";
 
 const Index = () => {
   const features = [
-    {
-      icon: <FileText className="h-8 w-8 text-primary" />,
-      title: "Customizable Storylines",
-      description: "Choose from dozens of themes or create your own unique murder mystery scenario."
+    { 
+      step: 'Step 1', 
+      title: 'Customizable Storylines',
+      content: 'Choose from dozens of themes or create your own unique murder mystery scenario.', 
+      image: 'https://images.unsplash.com/photo-1723958929247-ef054b525153?q=80&w=2070&auto=format&fit=crop' 
     },
-    {
-      icon: <Users className="h-8 w-8 text-primary" />,
-      title: "Character Profiles",
-      description: "Detailed character backgrounds, motivations, and secrets for all participants."
+    { 
+      step: 'Step 2',
+      title: 'Character Profiles',
+      content: 'Detailed character backgrounds, motivations, and secrets for all participants.',
+      image: 'https://images.unsplash.com/photo-1723931464622-b7df7c71e380?q=80&w=2070&auto=format&fit=crop'
     },
-    {
-      icon: <Calendar className="h-8 w-8 text-primary" />,
-      title: "Easy Setup",
-      description: "Everything you need to host a memorable murder mystery event in minutes, not hours."
-    }
+    { 
+      step: 'Step 3',
+      title: 'Host Guide',
+      content: 'Easy-to-follow step-by-step instructions to host a memorable murder mystery event.',
+      image: 'https://images.unsplash.com/photo-1725961476494-efa87ae3106a?q=80&w=2070&auto=format&fit=crop'
+    },
   ];
 
   const audiences = [
@@ -45,30 +49,14 @@ const Index = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-white">
       <Header />
       
       <main className="flex-1">
         <Hero />
         
-        {/* Custom container div */}
-        <div className="container mx-auto max-w-4xl py-10">
-          <div className="bg-card rounded-xl border shadow-sm p-8">
-            <h2 className="text-2xl font-bold mb-4">Create your first mystery in minutes</h2>
-            <p className="text-muted-foreground">
-              Our AI-powered mystery generator creates custom stories tailored to your preferences. 
-              Choose from a variety of themes or describe your own perfect scenario.
-            </p>
-            <div className="mt-6">
-              <Button asChild>
-                <Link to="/mystery/create">Get Started</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-        
-        {/* How It Works Section */}
-        <section className="py-10 px-4 bg-muted/30">
+        {/* How It Works Section - Updated to remove lines between numbers on mobile */}
+        <section className="py-10 px-4 bg-white">
           <div className="container mx-auto">
             <div className="max-w-6xl mx-auto">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -118,24 +106,17 @@ const Index = () => {
             </div>
           </div>
         </section>
-
-        {/* Custom container div after how it works */}
-        <div className="container mx-auto max-w-4xl py-10">
-          <div className="bg-card rounded-xl border shadow-sm p-8">
-            <h2 className="text-2xl font-bold mb-4">Ready to host your perfect murder mystery?</h2>
-            <p className="text-muted-foreground">
-              Our AI will help you design a unique experience for your guests, customized to your exact needs.
-            </p>
-            <div className="mt-6">
-              <Button asChild>
-                <Link to="/sign-up">Create Your First Mystery</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
+        
+        {/* Feature Steps Component */}
+        <FeatureSteps 
+          features={features}
+          title="Your Journey Starts Here"
+          autoPlayInterval={4000}
+          imageHeight="h-[500px]"
+        />
         
         {/* Audience Section */}
-        <section className="py-16 px-4 bg-muted/30">
+        <section className="py-16 px-4 bg-white">
           <div className="container mx-auto max-w-6xl">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
               Murder Mystery Parties Made Simple
@@ -152,25 +133,8 @@ const Index = () => {
           </div>
         </section>
         
-        {/* Features Section */}
-        <section className="py-20 px-4 bg-background">
-          <div className="container mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Everything You Need</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {features.map((feature, index) => (
-                <div key={index} className="bg-card p-6 rounded-xl shadow-sm border">
-                  <div className="mb-4">{feature.icon}</div>
-                  <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                  <p className="text-muted-foreground">{feature.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-        
         {/* CTA Section */}
-        <section className="py-20 px-4">
+        <section className="py-20 px-4 bg-white">
           <div className="container mx-auto max-w-4xl bg-primary rounded-2xl p-8 md:p-12 text-white">
             <div className="flex flex-col md:flex-row items-center justify-between">
               <div className="mb-6 md:mb-0 md:pr-6">
@@ -180,14 +144,14 @@ const Index = () => {
                 </p>
               </div>
               <Button size="lg" variant="secondary" asChild className="whitespace-nowrap">
-                <a href="/sign-up">Get Started</a>
+                <Link to="/sign-up">Get Started</Link>
               </Button>
             </div>
           </div>
         </section>
         
         {/* Testimonials */}
-        <section className="py-20 px-4 bg-muted/30">
+        <section className="py-20 px-4 bg-white">
           <div className="container mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
               Loved by Party Hosts
