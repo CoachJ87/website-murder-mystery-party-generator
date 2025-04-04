@@ -5,9 +5,9 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { FeatureSteps } from "@/components/ui/feature-steps";
-import { FeaturesSectionWithHoverEffects } from "@/components/ui/features-section-with-hover-effects";
 import { Faq1 } from "@/components/ui/faq1";
 import { HowItWorks } from "@/components/ui/how-it-works";
+import { Separator } from "@/components/ui/separator";
 
 const Index = () => {
   // Feature Steps data
@@ -56,26 +56,6 @@ const Index = () => {
     }
   ];
 
-  // Audience data
-  const audiences = [
-    {
-      title: "Social Hosts and Party Planners",
-      description: "Create exciting mysteries without all the work. Turn any get-together into a thrilling mystery adventure in minutes."
-    },
-    {
-      title: "Friend Groups",
-      description: "Find new mysteries for your game nights. Make unique stories that keep your friends guessing and engaged."
-    },
-    {
-      title: "Family Gatherings",
-      description: "Bring everyone together with mysteries perfect for all ages. Make holiday dinners and reunions more fun without the hassle."
-    },
-    {
-      title: "Special Occasions",
-      description: "Get a complete themed murder mystery for your celebration instantly. We handle the details so you can focus on enjoying the event."
-    }
-  ];
-
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
@@ -83,8 +63,12 @@ const Index = () => {
       <main className="flex-1">
         <Hero />
         
-        {/* How It Works Section - Updated with the new component */}
+        <Separator className="my-8" />
+        
+        {/* How It Works Section */}
         <HowItWorks steps={howItWorksSteps} />
+        
+        <Separator className="my-8" />
         
         {/* Feature Steps Component */}
         <FeatureSteps 
@@ -93,27 +77,10 @@ const Index = () => {
           autoPlayInterval={4000}
           imageHeight="h-[500px]"
         />
-
-        {/* Features Section with Hover Effects */}
-        <FeaturesSectionWithHoverEffects />
         
-        {/* Audience Section */}
-        <section className="py-16 px-4 bg-white">
-          <div className="container mx-auto max-w-6xl">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-              Murder Mystery Parties Made Simple
-            </h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {audiences.map((audience, index) => (
-                <div key={index} className="bg-black text-white rounded-xl p-6 shadow-sm">
-                  <h3 className="text-xl font-semibold mb-4">{audience.title}</h3>
-                  <p className="text-gray-300">{audience.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        <Separator className="my-8" />
+        
+        {/* Removed FeaturesSectionWithHoverEffects as requested */}
         
         {/* Testimonials */}
         <section className="py-20 px-4 bg-white">
@@ -157,6 +124,8 @@ const Index = () => {
             </div>
           </div>
         </section>
+        
+        <Separator className="my-8" />
         
         {/* FAQ Section */}
         <Faq1 />

@@ -5,6 +5,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Separator } from "@/components/ui/separator";
 
 interface FaqItem {
   question: string;
@@ -39,6 +40,26 @@ const Faq1 = ({
       answer:
         "Yes! Our murder mysteries are designed with replayability in mind. The random murderer selection mechanism means that even with the same character set and scenario, you'll get a different experience each time you play. This allows you to host the same mystery multiple times with different groups or even with the same group for a fresh experience.",
     },
+    {
+      question: "How many players do I need for a murder mystery game?",
+      answer:
+        "Our murder mysteries are designed to accommodate various group sizes. We have options for small gatherings (5-6 players), medium-sized events (7-10 players), and larger parties (11+ players). The system will customize the character count and story complexity based on your specified player count.",
+    },
+    {
+      question: "Can I customize the difficulty level of my mystery?",
+      answer:
+        "Absolutely! When creating your mystery, you can choose from three difficulty levels: Easy (perfect for first-time players and casual gatherings), Medium (balanced complexity with moderate sleuthing required), and Hard (intricate plots with complex clues for experienced mystery solvers).",
+    },
+    {
+      question: "Do I need to prepare anything else for my murder mystery party?",
+      answer:
+        "Our packages include everything needed for the game itself. You'll receive a host guide with setup instructions, individual character materials for each player, and all necessary clues and game elements. You may want to plan complementary aspects like themed food, decorations, or costume suggestions, but these are optional enhancements.",
+    },
+    {
+      question: "What if I need to add or remove players at the last minute?",
+      answer:
+        "We understand plans can change! Our system allows you to adjust your player count even after creating your mystery. The AI will intelligently adapt the story and characters to accommodate these changes without compromising the quality or coherence of the mystery.",
+    },
   ],
 }: Faq1Props) => {
   return (
@@ -47,15 +68,19 @@ const Faq1 = ({
         <h1 className="mb-4 text-3xl font-semibold md:mb-11 md:text-5xl">
           {heading}
         </h1>
+        
         {items.map((item, index) => (
-          <Accordion key={index} type="single" collapsible>
-            <AccordionItem value={`item-${index}`}>
-              <AccordionTrigger className="hover:text-foreground/60 hover:no-underline">
-                {item.question}
-              </AccordionTrigger>
-              <AccordionContent>{item.answer}</AccordionContent>
-            </AccordionItem>
-          </Accordion>
+          <React.Fragment key={index}>
+            <Accordion type="single" collapsible>
+              <AccordionItem value={`item-${index}`}>
+                <AccordionTrigger className="hover:text-foreground/60 hover:no-underline">
+                  {item.question}
+                </AccordionTrigger>
+                <AccordionContent>{item.answer}</AccordionContent>
+              </AccordionItem>
+            </Accordion>
+            {index < items.length - 1 && <Separator className="my-2" />}
+          </React.Fragment>
         ))}
       </div>
     </section>

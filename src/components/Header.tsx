@@ -23,9 +23,6 @@ const Header = () => {
 
           {/* Desktop Navigation - Now aligned left */}
           <nav className="hidden md:flex items-center space-x-6">
-            <Link to="/" className="text-foreground/80 hover:text-foreground transition-colors duration-200">
-              Home
-            </Link>
             <Link to="/showcase" className="text-foreground/80 hover:text-foreground transition-colors duration-200">
               Showcase
             </Link>
@@ -78,9 +75,6 @@ const Header = () => {
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="md:hidden absolute top-16 left-0 right-0 bg-background border-b p-4 flex flex-col space-y-4 z-50">
-          <Link to="/" className="text-foreground hover:text-foreground/80 py-2" onClick={toggleMenu}>
-            Home
-          </Link>
           <Link to="/showcase" className="text-foreground hover:text-foreground/80 py-2" onClick={toggleMenu}>
             Showcase
           </Link>
