@@ -16,6 +16,7 @@ const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [socialLoading, setSocialLoading] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,8 +45,7 @@ const SignUp = () => {
       setSocialLoading('google');
       await signInWithGoogle();
     } catch (error: any) {
-      console.error(error);
-      // Error is handled in the signInWithGoogle function
+      console.error("Google sign in error:", error);
     } finally {
       setSocialLoading(null);
     }
