@@ -9,10 +9,9 @@ import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Mail, User, Lock, ArrowRight } from "lucide-react";
-import { supabase } from "@/lib/supabase";
 
 const SignUp = () => {
-  const { signUp, loading } = useAuth();
+  const { signUp, loading, signInWithGoogle } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -43,17 +42,10 @@ const SignUp = () => {
   const handleGoogleSignIn = async () => {
     try {
       setSocialLoading('google');
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/dashboard`,
-        },
-      });
-      
-      if (error) throw error;
+      await signInWithGoogle();
     } catch (error: any) {
-      toast.error(`Failed to sign in with Google: ${error.message}`);
       console.error(error);
+      // Error is handled in the signInWithGoogle function
     } finally {
       setSocialLoading(null);
     }

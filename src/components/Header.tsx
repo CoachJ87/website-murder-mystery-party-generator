@@ -16,25 +16,21 @@ const Header = () => {
   return (
     <header className="py-4 px-4 md:px-8 border-b sticky top-0 bg-background/95 backdrop-blur-sm z-50">
       <div className="container mx-auto flex justify-between items-center">
-        <Link to="/" className="flex items-center space-x-2">
-          <span className="text-2xl font-bold gradient-text">Murder Mystery Generator</span>
-        </Link>
+        <div className="flex items-center">
+          <Link to="/" className="flex items-center space-x-2 mr-8">
+            <span className="text-2xl font-bold gradient-text">Murder Mystery Generator</span>
+          </Link>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-6">
-          <Link to="/" className="text-foreground/80 hover:text-foreground transition-colors duration-200">
-            Home
-          </Link>
-          <Link to="/features" className="text-foreground/80 hover:text-foreground transition-colors duration-200">
-            Features
-          </Link>
-          <Link to="/pricing" className="text-foreground/80 hover:text-foreground transition-colors duration-200">
-            Pricing
-          </Link>
-          <Link to="/docs" className="text-foreground/80 hover:text-foreground transition-colors duration-200">
-            Docs
-          </Link>
-        </nav>
+          {/* Desktop Navigation - Now aligned left */}
+          <nav className="hidden md:flex items-center space-x-6">
+            <Link to="/" className="text-foreground/80 hover:text-foreground transition-colors duration-200">
+              Home
+            </Link>
+            <Link to="/showcase" className="text-foreground/80 hover:text-foreground transition-colors duration-200">
+              Showcase
+            </Link>
+          </nav>
+        </div>
 
         {/* Auth Buttons - Desktop */}
         <div className="hidden md:flex items-center space-x-4">
@@ -85,14 +81,8 @@ const Header = () => {
           <Link to="/" className="text-foreground hover:text-foreground/80 py-2" onClick={toggleMenu}>
             Home
           </Link>
-          <Link to="/features" className="text-foreground hover:text-foreground/80 py-2" onClick={toggleMenu}>
-            Features
-          </Link>
-          <Link to="/pricing" className="text-foreground hover:text-foreground/80 py-2" onClick={toggleMenu}>
-            Pricing
-          </Link>
-          <Link to="/docs" className="text-foreground hover:text-foreground/80 py-2" onClick={toggleMenu}>
-            Docs
+          <Link to="/showcase" className="text-foreground hover:text-foreground/80 py-2" onClick={toggleMenu}>
+            Showcase
           </Link>
           
           {isAuthenticated ? (
