@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Gallery, User } from "lucide-react";
+import { ImageIcon, User } from "lucide-react";
 
 // Mock data for showcase items
 const showcaseItems = [
@@ -133,7 +133,7 @@ const Showcase = () => {
               ))
             ) : (
               <div className="col-span-full flex flex-col items-center justify-center py-12">
-                <Gallery size={48} className="mb-4 text-muted-foreground" />
+                <ImageIcon size={48} className="mb-4 text-muted-foreground" />
                 <h3 className="text-xl font-medium">No mysteries found</h3>
                 <p className="text-muted-foreground">Try adjusting your search terms</p>
               </div>
