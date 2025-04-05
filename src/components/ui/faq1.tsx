@@ -61,6 +61,26 @@ const Faq1 = ({
       answer:
         "We understand plans can change! Our system allows you to adjust your player count even after creating your mystery. The AI will intelligently adapt the story and characters to accommodate these changes without compromising the quality or coherence of the mystery.",
     },
+    {
+      question: "Can I run the same mystery multiple times with different groups?",
+      answer:
+        "Absolutely! Once you've purchased a mystery, it's yours to use as many times as you want. Many hosts find they can run the same mystery with different groups of friends, adding their own spin to it each time.",
+    },
+    {
+      question: "Do you offer themed mysteries for special occasions?",
+      answer:
+        "Yes, we have specially designed themes for holidays, birthdays, corporate events, and more. You can also work with our AI to customize any theme to fit your specific occasion.",
+    },
+    {
+      question: "How long does a typical murder mystery game last?",
+      answer:
+        "Most of our mysteries are designed to run for 2-3 hours, but the timing is flexible. The host guide provides suggestions for pacing, and you can adjust the game length by extending casual conversation periods or shortening them to fit your schedule.",
+    },
+    {
+      question: "Is there an age recommendation for your murder mysteries?",
+      answer:
+        "We offer mysteries appropriate for various age groups. Our standard mysteries are designed for adults and teens (13+), but we also have family-friendly options suitable for players as young as 10. Each mystery listing clearly indicates the recommended minimum age.",
+    },
   ],
 }: Faq1Props) => {
   return (
@@ -70,19 +90,21 @@ const Faq1 = ({
           {heading}
         </h1>
         
-        {items.map((item, index) => (
-          <React.Fragment key={index}>
-            <Accordion type="single" collapsible>
-              <AccordionItem value={`item-${index}`}>
-                <AccordionTrigger className="hover:text-foreground/60 hover:no-underline">
-                  {item.question}
-                </AccordionTrigger>
-                <AccordionContent>{item.answer}</AccordionContent>
-              </AccordionItem>
-            </Accordion>
-            {index < items.length - 1 && <Separator className="my-2" />}
-          </React.Fragment>
-        ))}
+        <div>
+          {items.map((item, index) => (
+            <React.Fragment key={index}>
+              <Accordion type="single" collapsible>
+                <AccordionItem value={`item-${index}`} className="border-none">
+                  <AccordionTrigger className="hover:text-foreground/60 hover:no-underline">
+                    {item.question}
+                  </AccordionTrigger>
+                  <AccordionContent>{item.answer}</AccordionContent>
+                </AccordionItem>
+              </Accordion>
+              {index < items.length - 1 && <Separator className="my-1" />}
+            </React.Fragment>
+          ))}
+        </div>
       </div>
     </section>
   );

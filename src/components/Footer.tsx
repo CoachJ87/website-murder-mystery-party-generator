@@ -25,22 +25,14 @@ const Footer = () => {
                   Home
                 </Link>
               </li>
-              <li>
-                <Link to="/showcase" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Showcase
-                </Link>
-              </li>
+              {/* Showcase link removed */}
             </ul>
           </div>
           
           <div className="space-y-4">
             <h3 className="font-medium text-lg">Company</h3>
             <ul className="space-y-2">
-              <li>
-                <Link to="/about" className="text-muted-foreground hover:text-foreground transition-colors">
-                  About Us
-                </Link>
-              </li>
+              {/* About Us link removed */}
               <li>
                 <Link to="/contact" className="text-muted-foreground hover:text-foreground transition-colors">
                   Contact

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -18,7 +19,6 @@ type Mystery = {
   status: "draft" | "completed" | "purchased";
   created_at: string;
   updated_at: string;
-  thumbnail?: string;
 };
 
 const MysteryDashboard = () => {
@@ -52,7 +52,6 @@ const MysteryDashboard = () => {
           status: "purchased",
           created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
           updated_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-          thumbnail: "https://i.pravatar.cc/150?img=1"
         },
         {
           id: "2",
@@ -61,7 +60,6 @@ const MysteryDashboard = () => {
           status: "completed",
           created_at: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
           updated_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-          thumbnail: "https://i.pravatar.cc/150?img=2"
         },
         {
           id: "3",
@@ -70,7 +68,6 @@ const MysteryDashboard = () => {
           status: "draft",
           created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
           updated_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-          thumbnail: "https://i.pravatar.cc/150?img=3"
         }
       ];
       
@@ -217,50 +214,36 @@ const MysteryDashboard = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredMysteries.map((mystery) => (
-                <Card key={mystery.id} className="overflow-hidden">
-                  <div className="h-40 bg-muted relative">
-                    {mystery.thumbnail ? (
-                      <img 
-                        src={mystery.thumbnail} 
-                        alt={mystery.title}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-primary/10">
-                        <FileText className="h-10 w-10 text-primary/40" />
-                      </div>
-                    )}
-                    <div className="absolute top-3 right-3">
-                      {getStatusBadge(mystery.status)}
-                    </div>
-                  </div>
-                  
+                <Card key={mystery.id}>
                   <CardHeader>
                     <div className="flex justify-between items-start">
                       <CardTitle className="truncate" title={mystery.title}>
                         {mystery.title}
                       </CardTitle>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="-mr-2">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleEdit(mystery.id)}>
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleView(mystery.id)}>
-                            View
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="text-destructive focus:text-destructive"
-                            onClick={() => handleDelete(mystery.id)}
-                          >
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <div className="flex items-center space-x-2">
+                        {getStatusBadge(mystery.status)}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="-mr-2">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleEdit(mystery.id)}>
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleView(mystery.id)}>
+                              View
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="text-destructive focus:text-destructive"
+                              onClick={() => handleDelete(mystery.id)}
+                            >
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
                     </div>
                   </CardHeader>
                   

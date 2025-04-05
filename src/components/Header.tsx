@@ -21,11 +21,9 @@ const Header = () => {
             <span className="text-2xl font-bold gradient-text">Murder Mystery Generator</span>
           </Link>
 
-          {/* Desktop Navigation - Now aligned left */}
+          {/* Desktop Navigation - Now with Showcase hidden */}
           <nav className="hidden md:flex items-center space-x-6">
-            <Link to="/showcase" className="text-foreground/80 hover:text-foreground transition-colors duration-200">
-              Showcase
-            </Link>
+            {/* Showcase link removed */}
           </nav>
         </div>
 
@@ -72,12 +70,10 @@ const Header = () => {
         </button>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu - Now with Showcase hidden */}
       {isMenuOpen && (
         <div className="md:hidden absolute top-16 left-0 right-0 bg-background border-b p-4 flex flex-col space-y-4 z-50">
-          <Link to="/showcase" className="text-foreground hover:text-foreground/80 py-2" onClick={toggleMenu}>
-            Showcase
-          </Link>
+          {/* Showcase link removed */}
           
           {isAuthenticated ? (
             <>

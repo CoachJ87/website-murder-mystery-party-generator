@@ -19,6 +19,8 @@ import MysteryPreview from "./pages/MysteryPreview";
 import MysteryPurchase from "./pages/MysteryPurchase";
 import MysteryView from "./pages/MysteryView";
 import Showcase from "./pages/Showcase";
+import Contact from "./pages/Contact";
+import Privacy from "./pages/Privacy";
 import NotFound from "./pages/NotFound";
 import React from "react";
 
@@ -64,6 +66,8 @@ const AppRoutes = () => (
     <Route path="/reset-password" element={<ResetPassword />} />
     <Route path="/check-email" element={<CheckEmail />} />
     <Route path="/showcase" element={<Showcase />} />
+    <Route path="/contact" element={<Contact />} />
+    <Route path="/privacy" element={<Privacy />} />
     
     {/* Protected routes */}
     <Route 
