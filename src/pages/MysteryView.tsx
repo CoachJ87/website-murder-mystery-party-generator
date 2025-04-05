@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -5,13 +6,15 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Download, Printer, Send, FileText, Book, PenTool, Users, Clipboard, Calendar } from "lucide-react";
+import { Download, Printer, Send, FileText, Book, PenTool, Users, Clipboard } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
+import SendToGuestsDialog from "@/components/SendToGuestsDialog";
 
 const MysteryView = () => {
   const [loading, setLoading] = useState(true);
   const [mystery, setMystery] = useState<any>(null);
+  const [sendDialogOpen, setSendDialogOpen] = useState(false);
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -69,8 +72,7 @@ const MysteryView = () => {
   };
 
   const handleSendToGuests = () => {
-    toast.success("Opening email dialog...");
-    // In a real app, this would open an email sharing dialog
+    setSendDialogOpen(true);
   };
 
   if (loading) {
@@ -118,7 +120,7 @@ const MysteryView = () => {
           </div>
           
           <Tabs defaultValue="host-guide">
-            <TabsList className="mb-8 grid grid-cols-2 md:grid-cols-5 lg:w-auto">
+            <TabsList className="mb-8 grid grid-cols-2 md:grid-cols-4 lg:w-auto">
               <TabsTrigger value="host-guide" className="flex items-center gap-2">
                 <Book className="h-4 w-4" />
                 <span>Host Guide</span>
@@ -134,10 +136,6 @@ const MysteryView = () => {
               <TabsTrigger value="setup" className="flex items-center gap-2">
                 <Clipboard className="h-4 w-4" />
                 <span>Setup</span>
-              </TabsTrigger>
-              <TabsTrigger value="timeline" className="flex items-center gap-2">
-                <Calendar className="h-4 w-4" />
-                <span>Timeline</span>
               </TabsTrigger>
             </TabsList>
             
@@ -372,6 +370,13 @@ const MysteryView = () => {
           </div>
         </div>
       </main>
+      
+      {/* Send to Guests Dialog */}
+      <SendToGuestsDialog 
+        open={sendDialogOpen} 
+        onOpenChange={setSendDialogOpen}
+        characters={mystery?.characters || []}
+      />
       
       <Footer />
     </div>

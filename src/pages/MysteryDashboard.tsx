@@ -217,9 +217,14 @@ const MysteryDashboard = () => {
                 <Card key={mystery.id}>
                   <CardHeader>
                     <div className="flex justify-between items-start">
-                      <CardTitle className="truncate" title={mystery.title}>
-                        {mystery.title}
-                      </CardTitle>
+                      <div className="w-full pr-10">
+                        <CardTitle 
+                          className="line-clamp-2 h-14" 
+                          title={mystery.title}
+                        >
+                          {mystery.title}
+                        </CardTitle>
+                      </div>
                       <div className="flex items-center space-x-2">
                         {getStatusBadge(mystery.status)}
                         <DropdownMenu>
