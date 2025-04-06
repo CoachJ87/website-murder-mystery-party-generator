@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,6 +10,7 @@ import Footer from "@/components/Footer";
 import { supabase } from "@/lib/supabase";
 import MysteryForm from "@/components/MysteryForm";
 import MysteryChat from "@/components/MysteryChat";
+import StreamlitChatbot from "@/components/StreamlitChatbot";
 
 type Message = {
   id: string;
@@ -22,9 +23,34 @@ const MysteryCreation = () => {
   const [saving, setSaving] = useState(false);
   const [showChatUI, setShowChatUI] = useState(false);
   const [formData, setFormData] = useState<any>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditing = !!id;
+  
+  useEffect(() => {
+    // Check if we're returning from preview to edit
+    // In a real app, you would load the chat history from Supabase/API here
+    if (isEditing) {
+      setShowChatUI(true);
+      // Mock loading messages if returning to edit
+      // You would replace this with actual data fetching
+      const loadedMessages = localStorage.getItem(`mystery_messages_${id}`);
+      if (loadedMessages) {
+        setMessages(JSON.parse(loadedMessages));
+      } else {
+        // If no messages found, initialize with a welcome message
+        setMessages([
+          {
+            id: '1',
+            role: 'assistant',
+            content: `Let's continue editing your mystery. What would you like to change?`,
+            timestamp: new Date()
+          }
+        ]);
+      }
+    }
+  }, [id]);
   
   const handleSave = async (data: any) => {
     try {
@@ -32,6 +58,18 @@ const MysteryCreation = () => {
       
       setFormData(data);
       setShowChatUI(true);
+      
+      // If this is a new mystery, set initial message
+      if (!isEditing && messages.length === 0) {
+        setMessages([
+          {
+            id: Date.now().toString(),
+            role: "assistant",
+            content: `Let's create a murder mystery with a ${data.theme} theme! What kind of setting would you like for this mystery?`,
+            timestamp: new Date()
+          }
+        ]);
+      }
       
       await new Promise(resolve => setTimeout(resolve, 500));
     } catch (error) {
@@ -42,7 +80,11 @@ const MysteryCreation = () => {
     }
   };
   
-  const handleChatComplete = (messages: Message[]) => {
+  const handleChatComplete = (updatedMessages: Message[]) => {
+    // Save chat messages to localStorage for persistence between sessions
+    // In a real app, you would save this to your database
+    localStorage.setItem(`mystery_messages_${id || "new"}`, JSON.stringify(updatedMessages));
+    
     toast.success(`Mystery ${isEditing ? "updated" : "created"} successfully!`);
     navigate(`/mystery/preview/${id || "new"}`);
   };
@@ -67,11 +109,9 @@ const MysteryCreation = () => {
           <Card>
             <CardContent className="p-6">
               {showChatUI ? (
-                <MysteryChat
-                  initialTheme={formData?.theme || ""}
-                  onSave={handleChatComplete}
-                  savedMysteryId={id}
-                />
+                <div className="w-full h-full">
+                  <StreamlitChatbot />
+                </div>
               ) : (
                 <MysteryForm 
                   onSave={handleSave}
