@@ -9,6 +9,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { supabase } from "@/lib/supabase";
 import MysteryForm from "@/components/MysteryForm";
+import MysteryChat from "@/components/MysteryChat";
 
 type Message = {
   id: string;
@@ -19,28 +20,31 @@ type Message = {
 
 const MysteryCreation = () => {
   const [saving, setSaving] = useState(false);
+  const [showChatUI, setShowChatUI] = useState(false);
+  const [formData, setFormData] = useState<any>(null);
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditing = !!id;
   
-  const handleSave = async (formData: any) => {
+  const handleSave = async (data: any) => {
     try {
       setSaving(true);
       
-      let title = formData.theme || "Untitled Mystery";
+      setFormData(data);
+      setShowChatUI(true);
       
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast.success(`Mystery ${isEditing ? "updated" : "created"} successfully!`);
-      
-      // Redirect to the AI chat interface
-      navigate(`/mystery/preview/${id || "new"}`);
+      await new Promise(resolve => setTimeout(resolve, 500));
     } catch (error) {
       console.error("Error saving mystery:", error);
       toast.error(`Failed to ${isEditing ? "update" : "create"} mystery`);
     } finally {
       setSaving(false);
     }
+  };
+  
+  const handleChatComplete = (messages: Message[]) => {
+    toast.success(`Mystery ${isEditing ? "updated" : "created"} successfully!`);
+    navigate(`/mystery/preview/${id || "new"}`);
   };
 
   return (
@@ -54,16 +58,26 @@ const MysteryCreation = () => {
               {isEditing ? "Edit Mystery" : "Create New Mystery"}
             </h1>
             <p className="text-muted-foreground">
-              Start your new mystery by selecting from the options below.
+              {showChatUI 
+                ? "Chat with our AI to refine your murder mystery" 
+                : "Start your new mystery by selecting from the options below."}
             </p>
           </div>
           
           <Card>
             <CardContent className="p-6">
-              <MysteryForm 
-                onSave={handleSave}
-                isSaving={saving}
-              />
+              {showChatUI ? (
+                <MysteryChat
+                  initialTheme={formData?.theme || ""}
+                  onSave={handleChatComplete}
+                  savedMysteryId={id}
+                />
+              ) : (
+                <MysteryForm 
+                  onSave={handleSave}
+                  isSaving={saving}
+                />
+              )}
             </CardContent>
           </Card>
           

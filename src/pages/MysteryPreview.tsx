@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -64,9 +65,8 @@ const MysteryPreview = () => {
     }
     
     try {
-      // In a real app, this would redirect to Stripe checkout
-      toast.success("Redirecting to payment...");
-      navigate(`/mystery/purchase/${id}`);
+      // Direct to Stripe payment link
+      window.location.href = "https://buy.stripe.com/7sI8zu7EhecrcuI144";
     } catch (error) {
       console.error("Error initiating purchase:", error);
       toast.error("Failed to start purchase process");
@@ -139,14 +139,6 @@ const MysteryPreview = () => {
                   <div>
                     <h3 className="font-medium">Victim</h3>
                     <p>{mystery.victim}</p>
-                  </div>
-                  <div>
-                    <h3 className="font-medium">Suspects</h3>
-                    <ul className="list-disc pl-5">
-                      {mystery.suspects.map((suspect: string, index: number) => (
-                        <li key={index}>{suspect}</li>
-                      ))}
-                    </ul>
                   </div>
                 </CardContent>
               </Card>

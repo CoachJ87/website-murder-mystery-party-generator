@@ -214,18 +214,21 @@ const MysteryDashboard = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredMysteries.map((mystery) => (
-                <Card key={mystery.id}>
-                  <CardHeader>
+                <Card key={mystery.id} className="flex flex-col h-full">
+                  <CardHeader className="pb-3">
                     <div className="flex justify-between items-start">
-                      <div className="w-full pr-10">
+                      <div className="flex-1">
                         <CardTitle 
-                          className="line-clamp-2 h-14" 
+                          className="line-clamp-2 mb-1" 
                           title={mystery.title}
                         >
                           {mystery.title}
                         </CardTitle>
+                        <div className="text-sm text-muted-foreground">
+                          {mystery.theme}
+                        </div>
                       </div>
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-2 ml-2 shrink-0">
                         {getStatusBadge(mystery.status)}
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -253,10 +256,7 @@ const MysteryDashboard = () => {
                   </CardHeader>
                   
                   <CardContent>
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <span className="truncate">{mystery.theme}</span>
-                    </div>
-                    <div className="flex items-center gap-1 mt-2 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
                       {getStatusIcon(mystery.status)}
                       <span>
                         {mystery.status === "draft"
@@ -269,7 +269,7 @@ const MysteryDashboard = () => {
                     </div>
                   </CardContent>
                   
-                  <CardFooter>
+                  <CardFooter className="mt-auto pt-4">
                     {mystery.status === "draft" ? (
                       <Button 
                         className="w-full" 
@@ -280,7 +280,7 @@ const MysteryDashboard = () => {
                     ) : mystery.status === "completed" ? (
                       <Button 
                         className="w-full" 
-                        onClick={() => navigate(`/mystery/purchase/${mystery.id}`)}
+                        onClick={() => navigate(`/mystery/preview/${mystery.id}`)}
                       >
                         Purchase ($4.99)
                       </Button>

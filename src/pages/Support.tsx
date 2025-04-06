@@ -1,37 +1,26 @@
 
-import React, { useState } from "react";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import { 
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import {
   Accordion,
   AccordionContent,
   AccordionItem,
-  AccordionTrigger 
+  AccordionTrigger,
 } from "@/components/ui/accordion";
-import { 
-  HelpCircle, 
-  Info, 
-  Mail, 
-  Calendar, 
-  Award, 
-  CreditCard, 
-  Users,
-  Search
-} from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { HelpCircle, BookOpen, PenSquare } from "lucide-react";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 const Support = () => {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [activeTab, setActiveTab] = useState("faqs");
   
   const faqCategories = [
     {
       title: "About Murder Mystery Generator",
-      icon: <Info className="h-5 w-5 mr-2" />,
-      questions: [
+      items: [
         {
           question: "What is the Murder Mystery Creator and how does it work?",
           answer: "Murder Mystery Creator is an AI-powered app that designs custom murder mystery party games. You answer a few questions about your preferences (theme, player count), and our AI generates a complete package with character guides, story elements, and game materials—all tailored to your specific event needs."
@@ -48,8 +37,7 @@ const Support = () => {
     },
     {
       title: "Game Mechanics",
-      icon: <Award className="h-5 w-5 mr-2" />,
-      questions: [
+      items: [
         {
           question: "Are these murder mysteries replayable?",
           answer: "Yes! Our murder mysteries are designed with replayability in mind. The random murderer selection mechanism means that even with the same character set and scenario, you'll get a different experience each time you play. This allows you to host the same mystery multiple times with different groups or even with the same group for a fresh experience."
@@ -70,8 +58,7 @@ const Support = () => {
     },
     {
       title: "Hosting & Planning",
-      icon: <Calendar className="h-5 w-5 mr-2" />,
-      questions: [
+      items: [
         {
           question: "Do I need to prepare anything else for my murder mystery party?",
           answer: "Our packages include everything needed for the game itself. You'll receive a host guide with setup instructions, individual character materials for each player, and all necessary clues and game elements. You may want to plan complementary aspects like themed food, decorations, or costume suggestions, but these are optional enhancements."
@@ -88,8 +75,7 @@ const Support = () => {
     },
     {
       title: "Account & Billing",
-      icon: <CreditCard className="h-5 w-5 mr-2" />,
-      questions: [
+      items: [
         {
           question: "What's included in the free version?",
           answer: "Free users can generate unlimited mystery previews, which include the basic story premise and character concepts. This allows you to explore different themes and ideas before committing to a purchase."
@@ -118,130 +104,123 @@ const Support = () => {
     "Consider giving out small prizes for Best Detective, Best Performance, etc."
   ];
 
-  // Filter FAQs based on search term
-  const filteredFaqs = searchTerm 
-    ? faqCategories.map(category => ({
-        ...category,
-        questions: category.questions.filter(q => 
-          q.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          q.answer.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      })).filter(category => category.questions.length > 0)
-    : faqCategories;
-
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
       
       <main className="flex-1 py-12 px-4">
         <div className="container mx-auto max-w-4xl">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold tracking-tight mb-4">Support Center</h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Find answers to frequently asked questions and get help with your murder mystery experience
+          <div className="mb-8 text-center">
+            <h1 className="text-3xl font-bold mb-4">Support Center</h1>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Find answers to common questions, hosting tips, and more to make your murder mystery party a success.
             </p>
-            
-            <div className="relative max-w-md mx-auto mt-6">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Search for answers..."
-                className="pl-10"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
           </div>
           
-          <div className="space-y-12">
-            <section id="faq">
-              <div className="flex items-center mb-6">
-                <HelpCircle className="h-6 w-6 mr-2" />
-                <h2 className="text-2xl font-semibold">Frequently Asked Questions</h2>
-              </div>
-              
-              {filteredFaqs.length > 0 ? (
-                filteredFaqs.map((category, index) => (
-                  category.questions.length > 0 && (
-                    <div key={index} className="mb-8">
-                      <div className="flex items-center mb-4">
-                        {category.icon}
-                        <h3 className="text-xl font-medium">{category.title}</h3>
-                      </div>
-                      
-                      <Accordion type="single" collapsible className="w-full">
-                        {category.questions.map((faq, faqIndex) => (
-                          <AccordionItem key={faqIndex} value={`${index}-${faqIndex}`}>
-                            <AccordionTrigger className="text-left">
-                              {faq.question}
-                            </AccordionTrigger>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="faqs" className="flex items-center gap-2">
+                <HelpCircle className="h-4 w-4" />
+                <span>FAQs</span>
+              </TabsTrigger>
+              <TabsTrigger value="hosting-tips" className="flex items-center gap-2">
+                <BookOpen className="h-4 w-4" />
+                <span>Hosting Tips</span>
+              </TabsTrigger>
+              <TabsTrigger value="contact" className="flex items-center gap-2">
+                <PenSquare className="h-4 w-4" />
+                <span>Contact Us</span>
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="faqs" className="mt-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Frequently Asked Questions</CardTitle>
+                  <CardDescription>Find answers to common questions about our murder mystery generator</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Accordion type="single" collapsible className="w-full">
+                    {faqCategories.map((category, categoryIndex) => (
+                      <div key={categoryIndex} className="mb-6">
+                        <h3 className="text-lg font-semibold mb-2">{category.title}</h3>
+                        {category.items.map((faq, faqIndex) => (
+                          <AccordionItem key={faqIndex} value={`${categoryIndex}-${faqIndex}`}>
+                            <AccordionTrigger>{faq.question}</AccordionTrigger>
                             <AccordionContent>
-                              <p className="text-muted-foreground">{faq.answer}</p>
+                              <p>{faq.answer}</p>
                             </AccordionContent>
                           </AccordionItem>
                         ))}
-                      </Accordion>
-                    </div>
-                  )
-                ))
-              ) : (
-                <p className="text-center py-4 text-muted-foreground">
-                  No results found for "{searchTerm}". Try a different search term.
-                </p>
-              )}
-            </section>
+                      </div>
+                    ))}
+                  </Accordion>
+                </CardContent>
+              </Card>
+            </TabsContent>
             
-            <Separator />
+            <TabsContent value="hosting-tips" className="mt-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Quick Tips for a Successful Murder Mystery Party</CardTitle>
+                  <CardDescription>Follow these tips to ensure your mystery party runs smoothly</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-4">
+                    {hostingTips.map((tip, index) => (
+                      <li key={index} className="flex items-start gap-3">
+                        <div className="bg-primary/10 text-primary font-medium h-6 w-6 rounded-full flex items-center justify-center shrink-0">
+                          {index + 1}
+                        </div>
+                        <p>{tip}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+                <CardFooter>
+                  <p className="text-sm text-muted-foreground">
+                    Remember, the most important thing is to have fun! Don't stress too much about getting every detail perfect.
+                  </p>
+                </CardFooter>
+              </Card>
+            </TabsContent>
             
-            <section id="hosting-tips">
-              <div className="flex items-center mb-6">
-                <Users className="h-6 w-6 mr-2" />
-                <h2 className="text-2xl font-semibold">Hosting Tips</h2>
-              </div>
-              
-              <div className="bg-muted/30 p-6 rounded-lg">
-                <h3 className="text-lg font-medium mb-4">Quick Tips for a Successful Murder Mystery Party</h3>
-                
-                <ul className="space-y-2">
-                  {hostingTips.map((tip, index) => (
-                    <li key={index} className="flex items-start">
-                      <span className="bg-primary text-primary-foreground w-6 h-6 rounded-full flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">
-                        {index + 1}
-                      </span>
-                      <span>{tip}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </section>
-            
-            <Separator />
-            
-            <section id="contact" className="mb-12">
-              <div className="flex items-center mb-6">
-                <Mail className="h-6 w-6 mr-2" />
-                <h2 className="text-2xl font-semibold">Contact Us</h2>
-              </div>
-              
-              <div className="bg-card border rounded-lg p-6 text-center">
-                <p className="mb-4 text-lg">Need more help? Email us at:</p>
-                <a 
-                  href="mailto:info@murder-mystery.party" 
-                  className="text-xl font-semibold text-primary hover:underline"
-                >
-                  info@murder-mystery.party
-                </a>
-                <p className="mt-4 text-muted-foreground">
-                  We typically respond within 24 hours, Monday through Friday.
-                </p>
-                
-                <div className="mt-6">
+            <TabsContent value="contact" className="mt-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Contact Us</CardTitle>
+                  <CardDescription>Need more help? We're here for you</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p>
+                    Our support team is available to help with any questions or issues you might have with your murder mystery experience.
+                  </p>
+                  <div className="bg-muted p-4 rounded-lg">
+                    <p><strong>Email:</strong> info@murder-mystery.party</p>
+                    <p className="text-sm text-muted-foreground mt-1">We typically respond within 24 hours, Monday through Friday.</p>
+                  </div>
+                </CardContent>
+                <CardFooter>
                   <Button asChild>
-                    <Link to="/contact">Contact Form</Link>
+                    <Link to="/contact">Go to Contact Page</Link>
                   </Button>
-                </div>
-              </div>
-            </section>
+                </CardFooter>
+              </Card>
+            </TabsContent>
+          </Tabs>
+          
+          <div className="text-center">
+            <p className="mb-6 text-muted-foreground">
+              Didn't find what you were looking for? Visit our full documentation or contact our support team.
+            </p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Button variant="outline" asChild>
+                <Link to="/">Return to Homepage</Link>
+              </Button>
+              <Button asChild>
+                <Link to="/contact">Contact Support</Link>
+              </Button>
+            </div>
           </div>
         </div>
       </main>

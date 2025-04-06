@@ -71,6 +71,10 @@ const AppRoutes = () => (
     <Route path="/privacy" element={<Privacy />} />
     <Route path="/support" element={<Support />} />
     
+    {/* Payment success and cancel routes */}
+    <Route path="/payment-success" element={<Navigate to="/dashboard" replace />} />
+    <Route path="/payment-canceled" element={<Navigate to="/dashboard" replace />} />
+    
     {/* Protected routes */}
     <Route 
       path="/dashboard" 
