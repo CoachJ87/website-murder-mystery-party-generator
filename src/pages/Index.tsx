@@ -15,8 +15,8 @@ const Index = () => {
     { 
       step: 'Step 1', 
       title: 'Customizable Storylines',
-      content: 'Choose from dozens of themes or create your own unique murder mystery scenario.', 
-      image: 'https://images.unsplash.com/photo-1723958929247-ef054b525153?q=80&w=2070&auto=format&fit=crop' 
+      content: 'Create your own unique murder mystery scenario, from classic themes to dreamed up reality.', 
+      image: 'https://github.com/CoachJ87/murder-mystery-party-generator/blob/main/public/images/custom_themes.png?raw=true'
     },
     { 
       step: 'Step 2',
