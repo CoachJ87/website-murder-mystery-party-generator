@@ -28,7 +28,7 @@ const Index = () => {
       step: 'Step 3',
       title: 'Host Guide',
       content: 'Easy-to-follow step-by-step instructions to host a memorable murder mystery event.',
-      image: 'https://images.unsplash.com/photo-1725961476494-efa87ae3106a?q=80&w=2070&auto=format&fit=crop'
+      image: 'https://github.com/CoachJ87/murder-mystery-party-generator/blob/main/public/images/host_guide.png?raw=true'
     },
   ];
 
