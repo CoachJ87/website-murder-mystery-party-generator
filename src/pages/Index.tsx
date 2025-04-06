@@ -22,7 +22,7 @@ const Index = () => {
       step: 'Step 2',
       title: 'Character Profiles',
       content: 'Detailed character backgrounds, motivations, and secrets for all participants.',
-      image: 'https://images.unsplash.com/photo-1723931464622-b7df7c71e380?q=80&w=2070&auto=format&fit=crop'
+      image: 'https://github.com/CoachJ87/murder-mystery-party-generator/blob/main/public/images/host_guide.png?raw=true'
     },
     { 
       step: 'Step 3',
