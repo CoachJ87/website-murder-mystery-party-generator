@@ -21,6 +21,7 @@ import MysteryView from "./pages/MysteryView";
 import Showcase from "./pages/Showcase";
 import Contact from "./pages/Contact";
 import Privacy from "./pages/Privacy";
+import Support from "./pages/Support";
 import NotFound from "./pages/NotFound";
 import React from "react";
 
@@ -68,6 +69,7 @@ const AppRoutes = () => (
     <Route path="/showcase" element={<Showcase />} />
     <Route path="/contact" element={<Contact />} />
     <Route path="/privacy" element={<Privacy />} />
+    <Route path="/support" element={<Support />} />
     
     {/* Protected routes */}
     <Route 

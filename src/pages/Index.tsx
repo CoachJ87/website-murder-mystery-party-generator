@@ -80,8 +80,6 @@ const Index = () => {
         
         <Separator className="my-8" />
         
-        {/* Removed FeaturesSectionWithHoverEffects as requested */}
-        
         {/* Testimonials */}
         <section className="py-20 px-4 bg-white">
           <div className="container mx-auto">
@@ -129,6 +127,21 @@ const Index = () => {
         
         {/* FAQ Section */}
         <Faq1 />
+        
+        <Separator className="my-8" />
+        
+        {/* Support Link Section */}
+        <section className="py-12 px-4">
+          <div className="container mx-auto text-center">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">Need More Help?</h2>
+            <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
+              Visit our comprehensive support center for FAQs, hosting tips, and more information about using our Murder Mystery Generator.
+            </p>
+            <Button asChild size="lg">
+              <Link to="/support">Visit Support Center</Link>
+            </Button>
+          </div>
+        </section>
       </main>
       
       <Footer />
