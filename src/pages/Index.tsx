@@ -7,7 +7,6 @@ import { Link } from "react-router-dom";
 import { FeatureSteps } from "@/components/ui/feature-steps";
 import { Faq1 } from "@/components/ui/faq1";
 import { HowItWorks } from "@/components/ui/how-it-works";
-import { Separator } from "@/components/ui/separator";
 
 const Index = () => {
   // Feature Steps data
@@ -63,25 +62,23 @@ const Index = () => {
       <main className="flex-1">
         <Hero />
         
-        <Separator className="my-8 bg-[#1D2B35]" />
-        
         {/* How It Works Section */}
-        <HowItWorks steps={howItWorksSteps} />
-        
-        <Separator className="my-8 bg-[#1D2B35]" />
+        <div className="py-8">
+          <HowItWorks steps={howItWorksSteps} />
+        </div>
         
         {/* Feature Steps Component */}
-        <FeatureSteps 
-          features={features}
-          title="Everything You Need Included"
-          autoPlayInterval={4000}
-          imageHeight="h-[500px]"
-        />
-        
-        <Separator className="my-8 bg-[#1D2B35]" />
+        <div className="py-8 bg-card">
+          <FeatureSteps 
+            features={features}
+            title="Everything You Need Included"
+            autoPlayInterval={4000}
+            imageHeight="h-[500px]"
+          />
+        </div>
         
         {/* Testimonials */}
-        <section className="py-20 px-4 bg-card">
+        <section className="py-20 px-4">
           <div className="container mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-black">
               Loved by Party Hosts
@@ -123,14 +120,10 @@ const Index = () => {
           </div>
         </section>
         
-        <Separator className="my-8 bg-[#1D2B35]" />
-        
         {/* FAQ Section */}
-        <div className="bg-card">
+        <div className="py-8 bg-card">
           <Faq1 />
         </div>
-        
-        <Separator className="my-8 bg-[#1D2B35]" />
         
         {/* Support Link Section */}
         <section className="py-12 px-4">
