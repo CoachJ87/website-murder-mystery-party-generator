@@ -85,11 +85,7 @@ export function FeatureSteps({
             ))}
           </div>
 
-          <div
-            className={cn(
-              "order-1 md:order-2 relative h-[200px] md:h-[300px] lg:h-[400px] overflow-hidden rounded-lg"
-            )}
-          >
+          <div className="order-1 md:order-2 relative h-[200px] md:h-[300px] lg:h-[400px] overflow-hidden rounded-lg">
             <AnimatePresence mode="wait">
               {features.map(
                 (feature, index) =>
@@ -97,17 +93,16 @@ export function FeatureSteps({
                     <motion.div
                       key={index}
                       className="absolute inset-0 rounded-lg overflow-hidden"
-                      initial={{ y: 100, opacity: 0, rotateX: -20 }}
-                      animate={{ y: 0, opacity: 1, rotateX: 0 }}
-                      exit={{ y: -100, opacity: 0, rotateX: 20 }}
-                      transition={{ duration: 0.5, ease: "easeInOut" }}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.4, ease: "easeInOut" }}
                     >
                       <img
                         src={feature.image}
                         alt={feature.step}
-                        className="w-full h-full object-cover transition-transform transform"
+                        className="w-full h-full object-cover"
                       />
-                      {/* Removed the fade gradient overlay */}
                     </motion.div>
                   ),
               )}

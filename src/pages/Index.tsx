@@ -81,7 +81,7 @@ const Index = () => {
         <section className="py-20 px-4">
           <div className="container mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-black">
-              Loved by Party Hosts
+              What Others Are Saying
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -132,7 +132,7 @@ const Index = () => {
             <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
               Visit our comprehensive support center for FAQs, hosting tips, and more information about using our Murder Mystery Generator.
             </p>
-            <Button asChild size="lg" className="bg-[#E6A73E] text-[#1D2B35] hover:bg-[#C26E3E] hover:text-white">
+            <Button asChild size="lg" className="bg-[#E6A73E] text-[#1D2B35] hover:bg-[#C26E3E] hover:text-white no-underline">
               <Link to="/support" className="no-underline">Visit Support Center</Link>
             </Button>
           </div>

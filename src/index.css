@@ -56,7 +56,15 @@
   }
 
   a {
-    @apply text-foreground underline decoration-1 hover:text-secondary transition-colors;
+    @apply text-foreground hover:text-secondary transition-colors;
+  }
+  
+  .no-underline {
+    text-decoration: none !important;
+  }
+  
+  button a {
+    text-decoration: none !important;
   }
 }
 
@@ -75,4 +83,3 @@
 .assistant-bubble {
   @apply chat-bubble bg-card text-foreground self-start;
 }
-

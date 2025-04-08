@@ -17,7 +17,7 @@ const Header = () => {
     <header className="py-4 px-4 md:px-8 border-b sticky top-0 bg-background/95 backdrop-blur-sm z-50">
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex items-center">
-          <Link to="/" className="flex items-center space-x-2 mr-8">
+          <Link to="/" className="flex items-center space-x-2 mr-8 no-underline">
             <span className="text-2xl font-bold gradient-text">Murder Mystery Generator</span>
           </Link>
 
@@ -41,19 +41,19 @@ const Header = () => {
                 )}
                 <span className="font-medium">{user?.name}</span>
               </div>
-              <Button variant="outline" onClick={signOut}>
+              <Button variant="outline" onClick={signOut} className="no-underline">
                 Sign Out
               </Button>
-              <Button asChild>
+              <Button asChild className="no-underline">
                 <Link to="/dashboard">Dashboard</Link>
               </Button>
             </div>
           ) : (
             <>
-              <Button asChild variant="outline">
+              <Button asChild variant="outline" className="no-underline">
                 <Link to="/sign-in">Sign In</Link>
               </Button>
-              <Button asChild>
+              <Button asChild className="no-underline">
                 <Link to="/sign-up">Sign Up</Link>
               </Button>
             </>
@@ -87,10 +87,10 @@ const Header = () => {
                 )}
                 <span className="font-medium">{user?.name}</span>
               </div>
-              <Button asChild className="w-full" onClick={toggleMenu}>
+              <Button asChild className="w-full no-underline" onClick={toggleMenu}>
                 <Link to="/dashboard">Dashboard</Link>
               </Button>
-              <Button variant="outline" className="w-full" onClick={() => {
+              <Button variant="outline" className="w-full no-underline" onClick={() => {
                 signOut();
                 toggleMenu();
               }}>
@@ -99,10 +99,10 @@ const Header = () => {
             </>
           ) : (
             <>
-              <Button asChild variant="outline" className="w-full" onClick={toggleMenu}>
+              <Button asChild variant="outline" className="w-full no-underline" onClick={toggleMenu}>
                 <Link to="/sign-in">Sign In</Link>
               </Button>
-              <Button asChild className="w-full" onClick={toggleMenu}>
+              <Button asChild className="w-full no-underline" onClick={toggleMenu}>
                 <Link to="/sign-up">Sign Up</Link>
               </Button>
             </>

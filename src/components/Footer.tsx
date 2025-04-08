@@ -9,7 +9,7 @@ const Footer = () => {
       <div className="container mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="space-y-4">
-            <Link to="/" className="flex items-center space-x-2">
+            <Link to="/" className="flex items-center space-x-2 no-underline">
               <span className="text-xl font-bold gradient-text">Murder Mystery Generator</span>
             </Link>
             <p className="text-muted-foreground">
@@ -21,17 +21,17 @@ const Footer = () => {
             <h3 className="font-medium text-lg">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors no-underline">
                   Home
                 </Link>
               </li>
               <li>
-                <Link to="/support" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link to="/support" className="text-muted-foreground hover:text-foreground transition-colors no-underline">
                   Support
                 </Link>
               </li>
               <li>
-                <Link to="/showcase" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link to="/showcase" className="text-muted-foreground hover:text-foreground transition-colors no-underline">
                   Showcase
                 </Link>
               </li>
@@ -42,12 +42,12 @@ const Footer = () => {
             <h3 className="font-medium text-lg">Company</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/contact" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link to="/contact" className="text-muted-foreground hover:text-foreground transition-colors no-underline">
                   Contact
                 </Link>
               </li>
               <li>
-                <Link to="/privacy" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link to="/privacy" className="text-muted-foreground hover:text-foreground transition-colors no-underline">
                   Privacy Policy
                 </Link>
               </li>

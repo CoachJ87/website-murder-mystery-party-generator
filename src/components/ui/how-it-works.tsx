@@ -31,11 +31,6 @@ export function HowItWorks({ steps, className }: HowItWorksProps) {
                   <h3 className="font-medium mb-2">{step.title}</h3>
                   <p className="text-sm text-muted-foreground">{step.description}</p>
                 </div>
-                
-                {/* Connecting Line (only between items, not after the last) */}
-                {index < steps.length - 1 && (
-                  <div className="hidden md:block absolute top-8 left-[calc(100%_-_8px)] w-full h-[1px] bg-gray-300 -z-10"></div>
-                )}
               </div>
             ))}
           </div>
