@@ -42,9 +42,9 @@ export function FeatureSteps({
   }, [progress, features.length, autoPlayInterval])
 
   return (
-    <div className={cn("p-8 md:p-12", className)}>
+    <div className={cn("p-8 md:p-12 bg-card", className)}>
       <div className="max-w-7xl mx-auto w-full">
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-10 text-center">
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-10 text-center text-black">
           {title}
         </h2>
 
@@ -62,7 +62,7 @@ export function FeatureSteps({
                   className={cn(
                     "w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center border-2",
                     index === currentFeature
-                      ? "bg-primary border-primary text-primary-foreground scale-110"
+                      ? "bg-[#E6A73E] border-[#E6A73E] text-[#1D2B35] scale-110"
                       : "bg-muted border-muted-foreground",
                   )}
                 >
@@ -74,7 +74,7 @@ export function FeatureSteps({
                 </motion.div>
 
                 <div className="flex-1">
-                  <h3 className="text-xl md:text-2xl font-semibold">
+                  <h3 className="text-xl md:text-2xl font-semibold text-[#1D2B35]">
                     {feature.title || feature.step}
                   </h3>
                   <p className="text-sm md:text-lg text-muted-foreground">
@@ -107,7 +107,7 @@ export function FeatureSteps({
                         alt={feature.step}
                         className="w-full h-full object-cover transition-transform transform"
                       />
-                      <div className="absolute bottom-0 left-0 right-0 h-2/3 bg-gradient-to-t from-background via-background/50 to-transparent" />
+                      {/* Removed the fade gradient overlay */}
                     </motion.div>
                   ),
               )}

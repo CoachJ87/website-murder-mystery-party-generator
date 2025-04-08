@@ -5,8 +5,8 @@
 }
 
 body {
-  background-color: #fff;
-  color: #333;
+  background-color: #E9E5DC;
+  color: #1D2B35;
 }
 
 .logo {
@@ -16,10 +16,10 @@ body {
   transition: filter 300ms;
 }
 .logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+  filter: drop-shadow(0 0 2em #E6A73E);
 }
 .logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  filter: drop-shadow(0 0 2em #E6A73E);
 }
 
 @keyframes logo-spin {
@@ -39,8 +39,47 @@ body {
 
 .card {
   padding: 2em;
+  background-color: #F6E8C6;
+  border-radius: 0.5rem;
 }
 
 .read-the-docs {
-  color: #888;
+  color: #1D2B35;
+}
+
+/* Custom button styles */
+.custom-button {
+  background-color: #E6A73E;
+  color: #1D2B35;
+  transition: all 0.3s ease;
+}
+
+.custom-button:hover {
+  background-color: #C26E3E;
+  color: white;
+}
+
+/* Custom link styles */
+.custom-link {
+  color: #1D2B35;
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.custom-link:hover {
+  color: #C26E3E;
+}
+
+/* Section styles */
+.content-section {
+  background-color: #F6E8C6;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.divider {
+  height: 2px;
+  background-color: #1D2B35;
+  margin: 2rem 0;
 }

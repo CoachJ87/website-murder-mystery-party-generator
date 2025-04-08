@@ -5,44 +5,44 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
+    --background: 39 27% 89%;     /* Light gray #E9E5DC */
+    --foreground: 206 29% 16%;    /* Dark blue/navy #1D2B35 */
 
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
+    --card: 43 61% 87%;           /* Cream/beige #F6E8C6 */
+    --card-foreground: 206 29% 16%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
+    --popover: 43 61% 87%;
+    --popover-foreground: 206 29% 16%;
 
-    --primary: 262 83% 58%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 35 76% 57%;        /* Golden yellow #E6A73E */
+    --primary-foreground: 206 29% 16%;
 
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
+    --secondary: 16 52% 50%;      /* Terracotta #C26E3E */
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
+    --muted: 39 27% 80%;
+    --muted-foreground: 206 29% 40%;
 
-    --accent: 262 83% 58%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 35 76% 57%;
+    --accent-foreground: 206 29% 16%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 262 83% 58%;
+    --border: 206 29% 16%;
+    --input: 206 29% 16%;
+    --ring: 35 76% 57%;
 
     --radius: 0.5rem;
 
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 240 10% 3.9%;
-    --sidebar-primary: 262 83% 58%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 240 5.9% 90%;
-    --sidebar-ring: 262 83% 58%;
+    --sidebar-background: 39 27% 89%;
+    --sidebar-foreground: 206 29% 16%;
+    --sidebar-primary: 35 76% 57%;
+    --sidebar-primary-foreground: 206 29% 16%;
+    --sidebar-accent: 43 61% 87%;
+    --sidebar-accent-foreground: 206 29% 16%;
+    --sidebar-border: 206 29% 16%;
+    --sidebar-ring: 35 76% 57%;
   }
 }
 
@@ -54,10 +54,14 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  a {
+    @apply text-foreground underline decoration-1 hover:text-secondary transition-colors;
+  }
 }
 
 .gradient-text {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-blue-500;
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary;
 }
 
 .chat-bubble {
@@ -65,9 +69,10 @@
 }
 
 .user-bubble {
-  @apply chat-bubble bg-primary text-white self-end;
+  @apply chat-bubble bg-primary text-foreground self-end;
 }
 
 .assistant-bubble {
-  @apply chat-bubble bg-gray-100 text-gray-800 self-start;
+  @apply chat-bubble bg-card text-foreground self-start;
 }
+
