@@ -12,9 +12,10 @@ import { Mail, Lock, ArrowRight } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 const SignIn = () => {
-  const { signIn, loading } = useAuth();
+  const { signIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -26,11 +27,13 @@ const SignIn = () => {
     }
     
     try {
+      setIsLoading(true);
       await signIn(email, password);
       // Redirect happens in the signIn function
     } catch (error) {
       // Error is handled in the signIn function
       console.error(error);
+      setIsLoading(false);
     }
   };
 
@@ -48,7 +51,6 @@ const SignIn = () => {
     } catch (error: any) {
       toast.error(`Failed to sign in with Google: ${error.message}`);
       console.error(error);
-    } finally {
       setSocialLoading(null);
     }
   };
@@ -142,13 +144,13 @@ const SignIn = () => {
                 </div>
               </div>
               
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? (
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? (
                   <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
                 ) : (
                   <ArrowRight className="h-4 w-4 mr-2" />
                 )}
-                {loading ? "Signing in..." : "Sign In"}
+                {isLoading ? "Signing in..." : "Sign In"}
               </Button>
             </form>
             
