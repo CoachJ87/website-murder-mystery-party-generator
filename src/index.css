@@ -56,7 +56,7 @@
   }
 
   a {
-    @apply text-foreground hover:text-secondary transition-colors;
+    @apply text-foreground hover:text-secondary transition-colors no-underline;
   }
   
   .no-underline {

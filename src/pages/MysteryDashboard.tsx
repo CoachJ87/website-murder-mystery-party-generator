@@ -16,7 +16,7 @@ type Mystery = {
   id: string;
   title: string;
   theme: string;
-  status: "draft" | "completed" | "purchased";
+  status: "draft" | "purchased";
   created_at: string;
   updated_at: string;
 };
@@ -25,7 +25,7 @@ const MysteryDashboard = () => {
   const [mysteries, setMysteries] = useState<Mystery[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filter, setFilter] = useState<"all" | "draft" | "completed" | "purchased">("all");
+  const [filter, setFilter] = useState<"all" | "draft" | "purchased">("all");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -42,7 +42,7 @@ const MysteryDashboard = () => {
       //   .select('*')
       //   .order('updated_at', { ascending: false });
       
-      // For demo, use mock data
+      // For demo, use mock data - updating to only have "purchased" and "draft" status
       await new Promise(resolve => setTimeout(resolve, 1000));
       const mockMysteries: Mystery[] = [
         {
@@ -57,7 +57,7 @@ const MysteryDashboard = () => {
           id: "2",
           title: "Hollywood Homicide",
           theme: "Hollywood Murder",
-          status: "completed",
+          status: "draft", // Changed from "completed" to "draft"
           created_at: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
           updated_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
         },
@@ -92,6 +92,10 @@ const MysteryDashboard = () => {
     navigate(`/mystery/${id}`);
   };
 
+  const handlePurchase = (id: string) => {
+    navigate(`/mystery/preview/${id}`);
+  };
+
   const handleDelete = async (id: string) => {
     try {
       // In a real app, delete from Supabase
@@ -112,23 +116,19 @@ const MysteryDashboard = () => {
     )
     .filter(mystery => filter === "all" || mystery.status === filter);
 
-  const getStatusIcon = (status: "draft" | "completed" | "purchased") => {
+  const getStatusIcon = (status: "draft" | "purchased") => {
     switch (status) {
       case "draft":
         return <Clock className="h-4 w-4 text-muted-foreground" />;
-      case "completed":
-        return <FileText className="h-4 w-4 text-blue-500" />;
       case "purchased":
         return <Check className="h-4 w-4 text-green-500" />;
     }
   };
 
-  const getStatusBadge = (status: "draft" | "completed" | "purchased") => {
+  const getStatusBadge = (status: "draft" | "purchased") => {
     switch (status) {
       case "draft":
         return <Badge variant="outline">Draft</Badge>;
-      case "completed":
-        return <Badge variant="secondary">Completed</Badge>;
       case "purchased":
         return <Badge variant="default">Purchased</Badge>;
     }
@@ -177,13 +177,6 @@ const MysteryDashboard = () => {
                 onClick={() => setFilter("draft")}
               >
                 Drafts
-              </Button>
-              <Button 
-                variant={filter === "completed" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setFilter("completed")}
-              >
-                Completed
               </Button>
               <Button 
                 variant={filter === "purchased" ? "default" : "outline"}
@@ -240,9 +233,11 @@ const MysteryDashboard = () => {
                             <DropdownMenuItem onClick={() => handleEdit(mystery.id)}>
                               Edit
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleView(mystery.id)}>
-                              View
-                            </DropdownMenuItem>
+                            {mystery.status === "purchased" && (
+                              <DropdownMenuItem onClick={() => handleView(mystery.id)}>
+                                View
+                              </DropdownMenuItem>
+                            )}
                             <DropdownMenuItem
                               className="text-destructive focus:text-destructive"
                               onClick={() => handleDelete(mystery.id)}
@@ -261,29 +256,31 @@ const MysteryDashboard = () => {
                       <span>
                         {mystery.status === "draft"
                           ? "Last edited "
-                          : mystery.status === "completed"
-                          ? "Completed "
-                          : "Purchased "}
+                          : mystery.status === "purchased"
+                          ? "Purchased "
+                          : ""}
                         {new Date(mystery.updated_at).toLocaleDateString()}
                       </span>
                     </div>
                   </CardContent>
                   
-                  <CardFooter className="mt-auto pt-4">
+                  <CardFooter className="mt-auto pt-4 flex flex-col gap-2">
                     {mystery.status === "draft" ? (
-                      <Button 
-                        className="w-full" 
-                        onClick={() => handleEdit(mystery.id)}
-                      >
-                        Continue Editing
-                      </Button>
-                    ) : mystery.status === "completed" ? (
-                      <Button 
-                        className="w-full" 
-                        onClick={() => navigate(`/mystery/preview/${mystery.id}`)}
-                      >
-                        Purchase ($4.99)
-                      </Button>
+                      <>
+                        <Button 
+                          className="w-full" 
+                          onClick={() => handleEdit(mystery.id)}
+                        >
+                          Continue Editing
+                        </Button>
+                        <Button 
+                          className="w-full"
+                          variant="outline"
+                          onClick={() => handlePurchase(mystery.id)}
+                        >
+                          Purchase ($4.99)
+                        </Button>
+                      </>
                     ) : (
                       <Button 
                         className="w-full" 

@@ -85,7 +85,7 @@ const Hero = () => {
     <div className="py-12 md:py-20 px-4 bg-background">
       <div className="container mx-auto text-center">
         <div className="flex justify-center mb-6">
-          <div className="w-24 h-24 bg-[#E6A73E] rounded-full opacity-90 blur-sm"></div>
+          <div className="w-24 h-24 rounded-full bg-gradient-to-r from-primary to-secondary opacity-90 blur-sm"></div>
         </div>
         
         <h1 className="text-5xl md:text-7xl font-bold mb-4 tracking-tight">
