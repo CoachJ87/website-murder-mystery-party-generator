@@ -101,7 +101,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (data.user) {
         toast.success("Signed in successfully!");
-        navigate("/dashboard");
+        // Note: We'll let the component handle navigation
       }
     } catch (error: any) {
       toast.error(`Failed to sign in: ${error.message}`);

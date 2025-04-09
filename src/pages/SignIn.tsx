@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,10 +9,10 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { toast } from "sonner";
 import { Mail, Lock, ArrowRight } from "lucide-react";
-import { supabase } from "@/lib/supabase";
 
 const SignIn = () => {
   const { signIn, signInWithGoogle } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -29,10 +29,12 @@ const SignIn = () => {
     try {
       setIsLoading(true);
       await signIn(email, password);
-      // Redirect happens in the signIn function
+      // After successful sign-in, navigate to dashboard
+      navigate("/dashboard");
     } catch (error) {
       // Error is handled in the signIn function
       console.error(error);
+    } finally {
       setIsLoading(false);
     }
   };

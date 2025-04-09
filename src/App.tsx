@@ -11,7 +11,6 @@ import SignUp from "./pages/SignUp";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import CheckEmail from "./pages/CheckEmail";
-import Dashboard from "./pages/Dashboard";
 import AccountSettings from "./pages/AccountSettings";
 import MysteryDashboard from "./pages/MysteryDashboard";
 import MysteryCreation from "./pages/MysteryCreation";
