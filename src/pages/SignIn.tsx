@@ -12,7 +12,7 @@ import { Mail, Lock, ArrowRight } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 const SignIn = () => {
-  const { signIn } = useAuth();
+  const { signIn, signInWithGoogle } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -40,14 +40,8 @@ const SignIn = () => {
   const handleGoogleSignIn = async () => {
     try {
       setSocialLoading('google');
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/dashboard`,
-        },
-      });
-      
-      if (error) throw error;
+      await signInWithGoogle();
+      // Redirect happens in the signInWithGoogle function
     } catch (error: any) {
       toast.error(`Failed to sign in with Google: ${error.message}`);
       console.error(error);
