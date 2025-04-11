@@ -1,11 +1,13 @@
 
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { AIInputWithLoading } from "@/components/ui/ai-input-with-loading";
 import { MessageCircle } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { supabase } from "@/lib/supabase";
 
 type Message = {
   id: string;
@@ -18,27 +20,121 @@ const StreamlitChatbot = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
   const [input, setInput] = useState("");
+  const [conversationId, setConversationId] = useState<string | null>(null);
   const navigate = useNavigate();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { user, isAuthenticated } = useAuth();
+  const { id } = useParams();
+  const initialDataLoaded = useRef(false);
 
+  // Load or create conversation
   useEffect(() => {
-    // Initialize with a welcome message
-    if (messages.length === 0) {
-      setMessages([
-        {
-          id: "welcome",
-          role: "assistant",
-          content: "Welcome to the Murder Mystery Creator! Describe the type of mystery you'd like to create, or ask me for suggestions.",
-          timestamp: new Date(),
-        },
-      ]);
+    const loadOrCreateConversation = async () => {
+      if (initialDataLoaded.current) return;
+      
+      try {
+        // If we have an ID from URL params, load that conversation
+        if (id && id !== "new") {
+          const { data: existingConversation, error: fetchError } = await supabase
+            .from("conversations")
+            .select("*, messages(*)")
+            .eq("id", id)
+            .single();
+          
+          if (fetchError) {
+            console.error("Error fetching conversation:", fetchError);
+            toast.error("Could not load your previous conversation");
+          } else if (existingConversation) {
+            setConversationId(existingConversation.id);
+            
+            // If there are messages in the conversation, load them
+            if (existingConversation.messages && existingConversation.messages.length > 0) {
+              // Convert the messages from database format to our Message type
+              const formattedMessages = existingConversation.messages.map((msg: any) => ({
+                id: msg.id,
+                role: msg.role,
+                content: msg.content,
+                timestamp: new Date(msg.created_at)
+              }));
+              
+              setMessages(formattedMessages);
+              initialDataLoaded.current = true;
+              return;
+            }
+          }
+        }
+        
+        // Initialize with a welcome message if no messages were loaded
+        if (messages.length === 0) {
+          const welcomeMessage = {
+            id: "welcome",
+            role: "assistant" as const,
+            content: "Welcome to the Murder Mystery Creator! Describe the type of mystery you'd like to create, or ask me for suggestions.",
+            timestamp: new Date(),
+          };
+          
+          setMessages([welcomeMessage]);
+          
+          // If user is authenticated, save this initial conversation
+          if (isAuthenticated && user) {
+            const { data: newConversation, error: createError } = await supabase
+              .from("conversations")
+              .insert({
+                user_id: user.id,
+                title: "New Murder Mystery"
+              })
+              .select()
+              .single();
+              
+            if (createError) {
+              console.error("Error creating conversation:", createError);
+            } else if (newConversation) {
+              setConversationId(newConversation.id);
+              
+              // Save welcome message
+              await supabase
+                .from("messages")
+                .insert({
+                  conversation_id: newConversation.id,
+                  role: welcomeMessage.role,
+                  content: welcomeMessage.content
+                });
+            }
+          }
+        }
+        
+        initialDataLoaded.current = true;
+      } catch (error) {
+        console.error("Error in loadOrCreateConversation:", error);
+      }
+    };
+
+    if (isAuthenticated) {
+      loadOrCreateConversation();
     }
-  }, []);
+  }, [id, isAuthenticated, user, messages.length]);
 
   useEffect(() => {
     // Scroll to bottom when messages change
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // Save message to database
+  const saveMessage = async (message: Message) => {
+    if (!isAuthenticated || !conversationId) return;
+    
+    try {
+      await supabase
+        .from("messages")
+        .insert({
+          conversation_id: conversationId,
+          role: message.role,
+          content: message.content
+        });
+    } catch (error) {
+      console.error("Error saving message:", error);
+    }
+  };
 
   const handleUserMessage = async (content: string) => {
     if (!content.trim()) return;
@@ -54,74 +150,119 @@ const StreamlitChatbot = () => {
     setMessages(prev => [...prev, userMessage]);
     setLoading(true);
     
+    // Save user message to database
+    await saveMessage(userMessage);
+    
     try {
-      // Call Streamlit backend API
-      const response = await fetch("https://murder-mystery-chatbot-ktzf8u5kjbbusakesbyecg.streamlit.app/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          message: content,
-          history: messages.map(msg => ({
-            role: msg.role,
-            content: msg.content,
-          })),
-        }),
-      });
+      // Call chatbot API (using Streamlit or falling back to simulated response)
+      let assistantContent = "";
       
-      // If the API doesn't respond or isn't available, use fallback response
-      if (!response.ok) {
-        throw new Error("Failed to get response from Streamlit API");
+      try {
+        // Attempt to call Streamlit backend API 
+        const response = await fetch("https://murder-mystery-chatbot-ktzf8u5kjbbusakesbyecg.streamlit.app/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            message: content,
+            history: messages.map(msg => ({
+              role: msg.role,
+              content: msg.content,
+            })),
+          }),
+        });
+        
+        // If the API doesn't respond or isn't available, use fallback response
+        if (!response.ok) {
+          throw new Error("Failed to get response from Streamlit API");
+        }
+        
+        const data = await response.json();
+        assistantContent = data.response;
+      } catch (error) {
+        console.error("Error connecting to Streamlit API:", error);
+        
+        // Fallback response if API call fails
+        assistantContent = generateFallbackResponse(content, messages.length);
+        
+        // Optional: Inform user of connection issue
+        toast.info("Using offline mode - some features may be limited");
       }
-      
-      const data = await response.json();
       
       // Add assistant response
       const assistantMessage: Message = {
         id: Date.now().toString() + "-assistant",
         role: "assistant",
-        content: data.response || "I'm thinking about your mystery... Let's develop this further. What specific theme or setting interests you?",
+        content: assistantContent,
         timestamp: new Date(),
       };
       
       setMessages(prev => [...prev, assistantMessage]);
+      
+      // Save assistant message to database
+      await saveMessage(assistantMessage);
     } catch (error) {
-      console.error("Error connecting to Streamlit API:", error);
-      
-      // Fallback response if API call fails
-      const fallbackMessage: Message = {
-        id: Date.now().toString() + "-fallback",
-        role: "assistant",
-        content: "I'm thinking about your mystery... Let's develop this further. What specific theme or setting interests you?",
-        timestamp: new Date(),
-      };
-      
-      setMessages(prev => [...prev, fallbackMessage]);
-      
-      // Optional: Inform user of connection issue
-      toast.info("Using offline mode - some features may be limited");
+      console.error("Error processing message:", error);
+      toast.error("Error processing your request");
     } finally {
       setLoading(false);
     }
   };
 
   const handleGenerateMystery = () => {
-    // Save messages to localStorage for persistence between pages
-    localStorage.setItem(`mystery_messages_${new Date().getTime()}`, JSON.stringify(messages));
+    // Save messages to localStorage as a backup
+    if (conversationId) {
+      localStorage.setItem(`mystery_messages_${conversationId}`, JSON.stringify(messages));
+    } else {
+      localStorage.setItem(`mystery_messages_${new Date().getTime()}`, JSON.stringify(messages));
+    }
+    
     toast.success("Mystery generated successfully!");
-    navigate(`/mystery/preview/${new Date().getTime()}`); // Using timestamp as mock ID
+    navigate(`/mystery/preview/${conversationId || new Date().getTime()}`);
+  };
+
+  // Generate fallback responses when API is unavailable
+  const generateFallbackResponse = (userMessage: string, messageCount: number) => {
+    if (messageCount <= 1) {
+      return "I'd love to help you create a murder mystery. What theme or setting would you like for your mystery?";
+    } else if (messageCount <= 3) {
+      return "That's a great choice! Now, let's think about the victim. Who would you like the victim to be?";
+    } else if (messageCount <= 5) {
+      return "Interesting! Now we need some suspects. Could you describe 2-3 characters who might have motives to commit this crime?";
+    } else if (messageCount <= 7) {
+      return "Those are compelling suspects. Let's add some clues. What kind of evidence might be found at the scene?";
+    } else {
+      return "Your mystery is taking shape! To continue developing the details of your story, let's think about what other elements we might include.";
+    }
+  };
+
+  // Calculate dynamic height based on number of messages
+  const getMessagesHeight = () => {
+    const baseHeight = 400;
+    const additionalHeight = Math.min(messages.length * 30, 200); // Add height for more messages, up to a limit
+    return baseHeight + additionalHeight;
   };
 
   return (
     <div className="flex flex-col space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold">Create Your Murder Mystery</h2>
+        <Button onClick={handleGenerateMystery} disabled={messages.length < 3}>
+          Generate Mystery Preview
+        </Button>
+      </div>
+      
       <Card className="p-4">
         <div className="flex items-center gap-2 mb-4 border-b pb-2">
           <MessageCircle className="h-5 w-5 text-primary" />
           <h3 className="font-medium text-lg">Murder Mystery Creator</h3>
         </div>
         
-        <div className="h-[400px] overflow-y-auto pr-2 mb-4">
+        <div 
+          className="overflow-y-auto pr-2 mb-4" 
+          style={{ height: `${getMessagesHeight()}px` }}
+        >
           {messages.map((message) => (
             <div
               key={message.id}

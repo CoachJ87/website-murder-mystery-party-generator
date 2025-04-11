@@ -78,6 +78,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               avatar: userData.user.user_metadata?.avatar_url,
             };
             setUser(userProfile);
+            
+            // Create or update user profile in Supabase
+            const { error } = await supabase
+              .from('profiles')
+              .upsert({ 
+                id: userData.user.id,
+                updated_at: new Date().toISOString()
+              })
+              .select();
+              
+            if (error) {
+              console.error("Error updating profile:", error);
+            }
           }
         } else if (event === 'SIGNED_OUT') {
           setUser(null);

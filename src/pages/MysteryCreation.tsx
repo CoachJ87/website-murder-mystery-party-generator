@@ -9,46 +9,22 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { supabase } from "@/lib/supabase";
 import MysteryForm from "@/components/MysteryForm";
-import MysteryChat from "@/components/MysteryChat";
 import StreamlitChatbot from "@/components/StreamlitChatbot";
-
-type Message = {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  timestamp: Date;
-};
+import { useAuth } from "@/context/AuthContext";
 
 const MysteryCreation = () => {
   const [saving, setSaving] = useState(false);
   const [showChatUI, setShowChatUI] = useState(false);
   const [formData, setFormData] = useState<any>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditing = !!id;
+  const { isAuthenticated } = useAuth();
   
   useEffect(() => {
     // Check if we're returning from preview to edit
-    // In a real app, you would load the chat history from Supabase/API here
     if (isEditing) {
       setShowChatUI(true);
-      // Mock loading messages if returning to edit
-      // You would replace this with actual data fetching
-      const loadedMessages = localStorage.getItem(`mystery_messages_${id}`);
-      if (loadedMessages) {
-        setMessages(JSON.parse(loadedMessages));
-      } else {
-        // If no messages found, initialize with a welcome message
-        setMessages([
-          {
-            id: '1',
-            role: 'assistant',
-            content: `Let's continue editing your mystery. What would you like to change?`,
-            timestamp: new Date()
-          }
-        ]);
-      }
     }
   }, [id]);
   
@@ -56,19 +32,55 @@ const MysteryCreation = () => {
     try {
       setSaving(true);
       
+      // Store form data
       setFormData(data);
-      setShowChatUI(true);
       
-      // If this is a new mystery, set initial message
-      if (!isEditing && messages.length === 0) {
-        setMessages([
-          {
-            id: Date.now().toString(),
-            role: "assistant",
-            content: `Let's create a murder mystery with a ${data.theme} theme! What kind of setting would you like for this mystery?`,
-            timestamp: new Date()
+      // If user is authenticated, save to database
+      if (isAuthenticated) {
+        let conversationId = id;
+        
+        // If not editing, create a new conversation
+        if (!isEditing) {
+          const { data: newConversation, error } = await supabase
+            .from("conversations")
+            .insert({
+              title: data.title || `${data.theme} Mystery`,
+              mystery_data: data
+            })
+            .select()
+            .single();
+          
+          if (error) {
+            console.error("Error saving mystery:", error);
+            toast.error("Failed to save mystery data");
+          } else if (newConversation) {
+            conversationId = newConversation.id;
           }
-        ]);
+        } else {
+          // Update existing conversation
+          const { error } = await supabase
+            .from("conversations")
+            .update({
+              title: data.title || `${data.theme} Mystery`,
+              mystery_data: data,
+              updated_at: new Date().toISOString()
+            })
+            .eq("id", id);
+          
+          if (error) {
+            console.error("Error updating mystery:", error);
+            toast.error("Failed to update mystery data");
+          }
+        }
+        
+        // Show the chat UI and set ID in URL if we have one
+        setShowChatUI(true);
+        if (conversationId && conversationId !== id) {
+          navigate(`/mystery/edit/${conversationId}`, { replace: true });
+        }
+      } else {
+        // For non-authenticated users, just show chat UI
+        setShowChatUI(true);
       }
       
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -78,15 +90,6 @@ const MysteryCreation = () => {
     } finally {
       setSaving(false);
     }
-  };
-  
-  const handleChatComplete = (updatedMessages: Message[]) => {
-    // Save chat messages to localStorage for persistence between sessions
-    // In a real app, you would save this to your database
-    localStorage.setItem(`mystery_messages_${id || "new"}`, JSON.stringify(updatedMessages));
-    
-    toast.success(`Mystery ${isEditing ? "updated" : "created"} successfully!`);
-    navigate(`/mystery/preview/${id || "new"}`);
   };
 
   return (
