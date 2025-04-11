@@ -21,6 +21,8 @@ const StreamlitChatbot = () => {
   const [loading, setLoading] = useState(false);
   const [input, setInput] = useState("");
   const [conversationId, setConversationId] = useState<string | null>(null);
+  const [chatbotToken, setChatbotToken] = useState<string | null>(null);
+  const [chatbotUrl, setChatbotUrl] = useState<string | null>(null);
   const navigate = useNavigate();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user, isAuthenticated } = useAuth();
@@ -109,8 +111,42 @@ const StreamlitChatbot = () => {
       }
     };
 
+    // Generate chatbot token if authenticated
+    const generateToken = async () => {
+      if (!isAuthenticated || !user) return;
+      
+      try {
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError || !sessionData.session) {
+          console.error("Error getting session:", sessionError);
+          return;
+        }
+
+        const accessToken = sessionData.session.access_token;
+        const response = await fetch(`${window.location.origin}/api/functions/v1/generate-chatbot-token`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${accessToken}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to generate chatbot token");
+        }
+
+        const tokenData = await response.json();
+        setChatbotToken(tokenData.token);
+        setChatbotUrl(tokenData.url);
+        console.log("Chatbot token generated successfully");
+      } catch (error) {
+        console.error("Error generating chatbot token:", error);
+      }
+    };
+
     if (isAuthenticated) {
       loadOrCreateConversation();
+      generateToken();
     }
   }, [id, isAuthenticated, user, messages.length]);
 
@@ -154,15 +190,19 @@ const StreamlitChatbot = () => {
     await saveMessage(userMessage);
     
     try {
-      // Call Vercel chatbot API instead of Streamlit
+      // Call Vercel chatbot API
       let assistantContent = "";
       
       try {
-        // Replace with your Vercel API endpoint
-        const response = await fetch("https://your-vercel-app-url.vercel.app/api/chat/chat", {
+        // Get your Vercel API endpoint
+        // Replace with your actual Vercel app URL
+        const vercelApiUrl = "https://my-awesome-chatbot-nine-sand.vercel.app/api/chat/chat";
+        
+        const response = await fetch(vercelApiUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "Authorization": chatbotToken ? `Bearer ${chatbotToken}` : "",
           },
           body: JSON.stringify({
             id: conversationId || generateId(),
