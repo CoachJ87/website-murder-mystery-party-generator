@@ -154,39 +154,56 @@ const StreamlitChatbot = () => {
     await saveMessage(userMessage);
     
     try {
-      // Call chatbot API (using Streamlit or falling back to simulated response)
+      // Call Vercel chatbot API instead of Streamlit
       let assistantContent = "";
       
       try {
-        // Attempt to call Streamlit backend API 
-        const response = await fetch("https://murder-mystery-chatbot-ktzf8u5kjbbusakesbyecg.streamlit.app/api/chat", {
+        // Replace with your Vercel API endpoint
+        const response = await fetch("https://your-vercel-app-url.vercel.app/api/chat/chat", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            message: content,
-            history: messages.map(msg => ({
+            id: conversationId || generateId(),
+            messages: messages.concat(userMessage).map(msg => ({
+              id: msg.id,
               role: msg.role,
-              content: msg.content,
+              parts: [{ text: msg.content }],
             })),
+            selectedChatModel: "gpt-4",
+            isMurderMystery: true,
           }),
         });
         
         // If the API doesn't respond or isn't available, use fallback response
         if (!response.ok) {
-          throw new Error("Failed to get response from Streamlit API");
+          throw new Error("Failed to get response from Vercel API");
         }
         
         const data = await response.json();
-        assistantContent = data.response;
+        
+        // Extract assistant response based on the API response format
+        if (data.answer && data.answer.parts && data.answer.parts.length > 0) {
+          assistantContent = data.answer.parts[0].text;
+        } else if (data.message) {
+          assistantContent = data.message;
+        } else {
+          assistantContent = generateFallbackResponse(content, messages.length);
+        }
+        
+        // Update conversation ID if new
+        if (data.conversationId && !conversationId) {
+          setConversationId(data.conversationId);
+        }
+        
       } catch (error) {
-        console.error("Error connecting to Streamlit API:", error);
+        console.error("Error connecting to Vercel API:", error);
         
         // Fallback response if API call fails
         assistantContent = generateFallbackResponse(content, messages.length);
         
-        // Optional: Inform user of connection issue
+        // Inform user of connection issue
         toast.info("Using offline mode - some features may be limited");
       }
       
@@ -237,10 +254,15 @@ const StreamlitChatbot = () => {
     }
   };
 
+  // Helper function to generate IDs
+  const generateId = () => {
+    return Math.random().toString(36).substring(2, 15);
+  };
+
   // Calculate dynamic height based on number of messages
   const getMessagesHeight = () => {
     const baseHeight = 400;
-    const additionalHeight = Math.min(messages.length * 30, 200); // Add height for more messages, up to a limit
+    const additionalHeight = Math.min(messages.length * 30, 300); // Increased max height
     return baseHeight + additionalHeight;
   };
 
