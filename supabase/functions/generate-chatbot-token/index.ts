@@ -51,13 +51,25 @@ serve(async (req) => {
         }
       );
     }
+    
+    console.log("Generating token for user:", user.id, user.email);
 
+    // Get prompt type - free or paid based on whether they've purchased
+    const { data: profileData } = await supabaseAdmin
+      .from("profiles")
+      .select("has_purchased")
+      .eq("id", user.id)
+      .single();
+    
+    const isPaid = profileData?.has_purchased || false;
+    
     // Generate JWT token for the chatbot with user metadata
     const payload = {
       userId: user.id,
       email: user.email,
       name: user.user_metadata?.name || user.email?.split("@")[0] || "User",
       source: "murder-mystery-party",
+      promptType: isPaid ? "paid" : "free", 
       // Add an expiration time (e.g., 1 hour)
       exp: Math.floor(Date.now() / 1000) + 60 * 60,
     };
@@ -68,11 +80,14 @@ serve(async (req) => {
     // In a real implementation, you would sign this token with a secret
     // For now, we'll just create a simple encoded token
     const chatbotToken = encodedPayload;
+    
+    // Get the correct chatbot URL based on environment
+    const vercelChatbotUrl = "https://my-awesome-chatbot-nine-sand.vercel.app";
 
     return new Response(
       JSON.stringify({
         token: chatbotToken,
-        url: `https://my-awesome-chatbot-nine-sand.vercel.app?token=${chatbotToken}`,
+        url: `${vercelChatbotUrl}?token=${chatbotToken}`,
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },

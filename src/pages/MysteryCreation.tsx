@@ -3,13 +3,12 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { supabase } from "@/lib/supabase";
 import MysteryForm from "@/components/MysteryForm";
-import StreamlitChatbot from "@/components/StreamlitChatbot";
+import VercelChatbot from "@/components/VercelChatbot";
 import { useAuth } from "@/context/AuthContext";
 
 const MysteryCreation = () => {
@@ -113,7 +112,7 @@ const MysteryCreation = () => {
             <CardContent className="p-6">
               {showChatUI ? (
                 <div className="w-full h-full">
-                  <StreamlitChatbot />
+                  <VercelChatbot />
                 </div>
               ) : (
                 <MysteryForm 

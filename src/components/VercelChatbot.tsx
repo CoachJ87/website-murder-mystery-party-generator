@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { AIInputWithLoading } from "@/components/ui/ai-input-with-loading";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, ExternalLink } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
 
@@ -16,7 +16,7 @@ type Message = {
   timestamp: Date;
 };
 
-const StreamlitChatbot = () => {
+const VercelChatbot = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
   const [input, setInput] = useState("");
@@ -37,6 +37,15 @@ const StreamlitChatbot = () => {
       try {
         // If we have an ID from URL params, load that conversation
         if (id && id !== "new") {
+          // Validate if ID is a valid UUID before querying
+          const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+          
+          if (!uuidRegex.test(id)) {
+            console.error("Invalid conversation ID format");
+            toast.error("Invalid conversation ID");
+            return;
+          }
+          
           const { data: existingConversation, error: fetchError } = await supabase
             .from("conversations")
             .select("*, messages(*)")
@@ -79,28 +88,43 @@ const StreamlitChatbot = () => {
           
           // If user is authenticated, save this initial conversation
           if (isAuthenticated && user) {
-            const { data: newConversation, error: createError } = await supabase
-              .from("conversations")
-              .insert({
-                user_id: user.id,
-                title: "New Murder Mystery"
-              })
-              .select()
-              .single();
+            try {
+              // First ensure the user has a profile
+              const { error: profileError } = await supabase
+                .from("profiles")
+                .upsert({ id: user.id, updated_at: new Date().toISOString() })
+                .select();
+                
+              if (profileError) {
+                console.error("Error upserting profile:", profileError);
+              }
               
-            if (createError) {
-              console.error("Error creating conversation:", createError);
-            } else if (newConversation) {
-              setConversationId(newConversation.id);
-              
-              // Save welcome message
-              await supabase
-                .from("messages")
+              // Then create the conversation
+              const { data: newConversation, error: createError } = await supabase
+                .from("conversations")
                 .insert({
-                  conversation_id: newConversation.id,
-                  role: welcomeMessage.role,
-                  content: welcomeMessage.content
-                });
+                  user_id: user.id,
+                  title: "New Murder Mystery"
+                })
+                .select()
+                .single();
+                
+              if (createError) {
+                console.error("Error creating conversation:", createError);
+              } else if (newConversation) {
+                setConversationId(newConversation.id);
+                
+                // Save welcome message
+                await supabase
+                  .from("messages")
+                  .insert({
+                    conversation_id: newConversation.id,
+                    role: welcomeMessage.role,
+                    content: welcomeMessage.content
+                  });
+              }
+            } catch (err) {
+              console.error("Error in conversation creation:", err);
             }
           }
         }
@@ -123,7 +147,10 @@ const StreamlitChatbot = () => {
         }
 
         const accessToken = sessionData.session.access_token;
-        const response = await fetch(`${window.location.origin}/api/functions/v1/generate-chatbot-token`, {
+        console.log("Making request to generate chatbot token");
+        
+        // Use the fully qualified URL with project ID
+        const response = await fetch("https://mhfikaomkmqcndqfohbp.functions.supabase.co/generate-chatbot-token", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -132,7 +159,8 @@ const StreamlitChatbot = () => {
         });
 
         if (!response.ok) {
-          throw new Error("Failed to generate chatbot token");
+          const errorText = await response.text();
+          throw new Error(`Failed to generate chatbot token: ${response.status} ${errorText}`);
         }
 
         const tokenData = await response.json();
@@ -194,9 +222,31 @@ const StreamlitChatbot = () => {
       let assistantContent = "";
       
       try {
+        if (!chatbotToken) {
+          // Regenerate token if not available
+          if (isAuthenticated) {
+            const { data: sessionData } = await supabase.auth.getSession();
+            const accessToken = sessionData.session?.access_token;
+            
+            if (accessToken) {
+              const response = await fetch("https://mhfikaomkmqcndqfohbp.functions.supabase.co/generate-chatbot-token", {
+                method: "GET",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": `Bearer ${accessToken}`
+                }
+              });
+
+              if (response.ok) {
+                const tokenData = await response.json();
+                setChatbotToken(tokenData.token);
+              }
+            }
+          }
+        }
+        
         // Get your Vercel API endpoint
-        // Replace with your actual Vercel app URL
-        const vercelApiUrl = "https://my-awesome-chatbot-nine-sand.vercel.app/api/chat/chat";
+        const vercelApiUrl = "https://my-awesome-chatbot-nine-sand.vercel.app/api/chat";
         
         const response = await fetch(vercelApiUrl, {
           method: "POST",
@@ -218,16 +268,22 @@ const StreamlitChatbot = () => {
         
         // If the API doesn't respond or isn't available, use fallback response
         if (!response.ok) {
-          throw new Error("Failed to get response from Vercel API");
+          console.error("Vercel API error status:", response.status);
+          const errorText = await response.text();
+          console.error("Vercel API error:", errorText);
+          throw new Error(`Failed to get response from Vercel API: ${response.status}`);
         }
         
         const data = await response.json();
+        console.log("Vercel API response:", data);
         
         // Extract assistant response based on the API response format
         if (data.answer && data.answer.parts && data.answer.parts.length > 0) {
           assistantContent = data.answer.parts[0].text;
         } else if (data.message) {
           assistantContent = data.message;
+        } else if (data.response) {
+          assistantContent = data.response;
         } else {
           assistantContent = generateFallbackResponse(content, messages.length);
         }
@@ -278,6 +334,14 @@ const StreamlitChatbot = () => {
     toast.success("Mystery generated successfully!");
     navigate(`/mystery/preview/${conversationId || new Date().getTime()}`);
   };
+  
+  const openChatbotInNewWindow = () => {
+    if (chatbotUrl) {
+      window.open(chatbotUrl, '_blank', 'noopener,noreferrer');
+    } else {
+      toast.error("Chatbot URL not available yet");
+    }
+  };
 
   // Generate fallback responses when API is unavailable
   const generateFallbackResponse = (userMessage: string, messageCount: number) => {
@@ -310,9 +374,17 @@ const StreamlitChatbot = () => {
     <div className="flex flex-col space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold">Create Your Murder Mystery</h2>
-        <Button onClick={handleGenerateMystery} disabled={messages.length < 3}>
-          Generate Mystery Preview
-        </Button>
+        <div className="flex gap-2">
+          {chatbotUrl && (
+            <Button variant="outline" onClick={openChatbotInNewWindow}>
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Open Full Chatbot
+            </Button>
+          )}
+          <Button onClick={handleGenerateMystery} disabled={messages.length < 3}>
+            Generate Mystery Preview
+          </Button>
+        </div>
       </div>
       
       <Card className="p-4">
@@ -379,4 +451,4 @@ const StreamlitChatbot = () => {
   );
 };
 
-export default StreamlitChatbot;
+export default VercelChatbot;
