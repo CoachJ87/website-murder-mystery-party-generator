@@ -1,22 +1,25 @@
-
+// src/pages/MysteryDashboard.tsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Clock, Check, FileText, Search, MoreVertical } from "lucide-react";
+import { Plus, Clock, Check, Search, MoreVertical, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/context/AuthContext";
+import { generateCompletePackage } from "@/services/mysteryPackageService";
 
 type Mystery = {
   id: string;
   title: string;
   theme: string;
-  status: "draft" | "purchased";
+  has_purchased: boolean;
+  is_generating?: boolean;
   created_at: string;
   updated_at: string;
 };
@@ -26,52 +29,36 @@ const MysteryDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState<"all" | "draft" | "purchased">("all");
+  const [generatingId, setGeneratingId] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
 
   useEffect(() => {
-    loadMysteries();
-  }, []);
+    if (isAuthenticated && user) {
+      loadMysteries();
+    } else {
+      setLoading(false);
+    }
+  }, [isAuthenticated, user]);
 
   const loadMysteries = async () => {
     try {
       setLoading(true);
       
-      // In a real app, this would fetch from Supabase
-      // const { data, error } = await supabase
-      //   .from('mysteries')
-      //   .select('*')
-      //   .order('updated_at', { ascending: false });
+      // Fetch from Supabase
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("updated_at", { ascending: false });
+        
+      if (error) {
+        console.error("Error fetching mysteries:", error);
+        toast.error("Failed to load your mysteries");
+        return;
+      }
       
-      // For demo, use mock data - updating to only have "purchased" and "draft" status
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      const mockMysteries: Mystery[] = [
-        {
-          id: "1",
-          title: "Murder at the Speakeasy",
-          theme: "1920s Speakeasy",
-          status: "purchased",
-          created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-          updated_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-        },
-        {
-          id: "2",
-          title: "Hollywood Homicide",
-          theme: "Hollywood Murder",
-          status: "draft", // Changed from "completed" to "draft"
-          created_at: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
-          updated_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-        },
-        {
-          id: "3",
-          title: "Space Station Sabotage",
-          theme: "Sci-Fi Mystery",
-          status: "draft",
-          created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-          updated_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-        }
-      ];
-      
-      setMysteries(mockMysteries);
+      setMysteries(data || []);
     } catch (error) {
       console.error("Error loading mysteries:", error);
       toast.error("Failed to load your mysteries");
@@ -98,8 +85,16 @@ const MysteryDashboard = () => {
 
   const handleDelete = async (id: string) => {
     try {
-      // In a real app, delete from Supabase
-      // await supabase.from('mysteries').delete().eq('id', id);
+      const { error } = await supabase
+        .from("profiles")
+        .delete()
+        .eq("id", id);
+        
+      if (error) {
+        console.error("Error deleting mystery:", error);
+        toast.error("Failed to delete mystery");
+        return;
+      }
       
       toast.success("Mystery deleted successfully");
       setMysteries(prev => prev.filter(mystery => mystery.id !== id));
@@ -109,30 +104,127 @@ const MysteryDashboard = () => {
     }
   };
 
+  // Function to simulate a successful purchase and generate package
+  const handlePostPurchase = async (id: string) => {
+    try {
+      // First update the mystery status
+      setGeneratingId(id);
+      
+      // Update the mystery as purchased
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({ 
+          has_purchased: true,
+          purchase_date: new Date().toISOString()
+        })
+        .eq("id", id);
+        
+      if (updateError) {
+        console.error("Error updating purchase status:", updateError);
+        toast.error("Failed to update purchase status");
+        return;
+      }
+      
+      // Update local state
+      setMysteries(prev => 
+        prev.map(mystery => 
+          mystery.id === id ? { ...mystery, has_purchased: true, is_generating: true } : mystery
+        )
+      );
+      
+      toast.success("Purchase successful! Generating your complete package...");
+      
+      // Generate the complete package
+      try {
+        await generateCompletePackage(id);
+        
+        // Update local state again to remove generating flag
+        setMysteries(prev => 
+          prev.map(mystery => 
+            mystery.id === id ? { ...mystery, is_generating: false } : mystery
+          )
+        );
+        
+        toast.success("Your mystery package is ready!");
+      } catch (genError) {
+        console.error("Error generating package:", genError);
+        toast.error("Failed to generate your package. You can try again from the dashboard.");
+        
+        // Update local state to remove generating flag but keep purchased status
+        setMysteries(prev => 
+          prev.map(mystery => 
+            mystery.id === id ? { ...mystery, is_generating: false } : mystery
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Error processing purchase:", error);
+      toast.error("Failed to process purchase");
+    } finally {
+      setGeneratingId(null);
+    }
+  };
+
+  // This is just a demo function to test the post-purchase flow
+  const simulatePurchase = async (id: string) => {
+    // In a real application, this would be triggered by a webhook from Stripe
+    // For testing, we'll call it directly
+    await handlePostPurchase(id);
+  };
+
   const filteredMysteries = mysteries
     .filter(mystery => 
-      mystery.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-      mystery.theme.toLowerCase().includes(searchQuery.toLowerCase())
+      mystery.title?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      mystery.theme?.toLowerCase().includes(searchQuery.toLowerCase())
     )
-    .filter(mystery => filter === "all" || mystery.status === filter);
+    .filter(mystery => {
+      if (filter === "all") return true;
+      if (filter === "draft") return !mystery.has_purchased;
+      if (filter === "purchased") return mystery.has_purchased;
+      return true;
+    });
 
-  const getStatusIcon = (status: "draft" | "purchased") => {
-    switch (status) {
-      case "draft":
-        return <Clock className="h-4 w-4 text-muted-foreground" />;
-      case "purchased":
-        return <Check className="h-4 w-4 text-green-500" />;
+  const getStatusIcon = (mystery: Mystery) => {
+    if (mystery.is_generating) {
+      return <Loader2 className="h-4 w-4 animate-spin text-primary" />;
     }
+    
+    return mystery.has_purchased 
+      ? <Check className="h-4 w-4 text-green-500" />
+      : <Clock className="h-4 w-4 text-muted-foreground" />;
   };
 
-  const getStatusBadge = (status: "draft" | "purchased") => {
-    switch (status) {
-      case "draft":
-        return <Badge variant="outline">Draft</Badge>;
-      case "purchased":
-        return <Badge variant="default">Purchased</Badge>;
+  const getStatusBadge = (mystery: Mystery) => {
+    if (mystery.is_generating) {
+      return <Badge variant="outline" className="animate-pulse">Generating</Badge>;
     }
+    
+    return mystery.has_purchased
+      ? <Badge variant="default">Purchased</Badge>
+      : <Badge variant="outline">Draft</Badge>;
   };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        
+        <main className="flex-1 py-12 px-4">
+          <div className="container mx-auto max-w-6xl">
+            <div className="text-center py-12 border rounded-lg bg-card">
+              <h3 className="text-xl font-medium mb-2">Sign in to view your mysteries</h3>
+              <p className="text-muted-foreground mb-6">
+                You need to sign in to create and manage your murder mystery games
+              </p>
+              <Button onClick={() => navigate("/sign-in")}>Sign In</Button>
+            </div>
+          </div>
+        </main>
+        
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -213,16 +305,16 @@ const MysteryDashboard = () => {
                       <div className="flex-1">
                         <CardTitle 
                           className="line-clamp-2 mb-1" 
-                          title={mystery.title}
+                          title={mystery.title || "Untitled Mystery"}
                         >
-                          {mystery.title}
+                          {mystery.title || "Untitled Mystery"}
                         </CardTitle>
                         <div className="text-sm text-muted-foreground">
-                          {mystery.theme}
+                          {mystery.theme || "Mystery Theme"}
                         </div>
                       </div>
                       <div className="flex items-center space-x-2 ml-2 shrink-0">
-                        {getStatusBadge(mystery.status)}
+                        {getStatusBadge(mystery)}
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon" className="-mr-2">
@@ -230,10 +322,12 @@ const MysteryDashboard = () => {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handleEdit(mystery.id)}>
-                              Edit
-                            </DropdownMenuItem>
-                            {mystery.status === "purchased" && (
+                            {!mystery.has_purchased && (
+                              <DropdownMenuItem onClick={() => handleEdit(mystery.id)}>
+                                Edit
+                              </DropdownMenuItem>
+                            )}
+                            {mystery.has_purchased && (
                               <DropdownMenuItem onClick={() => handleView(mystery.id)}>
                                 View
                               </DropdownMenuItem>
@@ -252,20 +346,34 @@ const MysteryDashboard = () => {
                   
                   <CardContent>
                     <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                      {getStatusIcon(mystery.status)}
+                      {getStatusIcon(mystery)}
                       <span>
-                        {mystery.status === "draft"
-                          ? "Last edited "
-                          : mystery.status === "purchased"
-                          ? "Purchased "
-                          : ""}
-                        {new Date(mystery.updated_at).toLocaleDateString()}
+                        {mystery.has_purchased
+                          ? mystery.is_generating 
+                            ? "Generating package..."
+                            : "Purchased " + new Date(mystery.purchase_date || mystery.updated_at).toLocaleDateString()
+                          : "Last edited " + new Date(mystery.updated_at).toLocaleDateString()}
                       </span>
                     </div>
                   </CardContent>
                   
                   <CardFooter className="mt-auto pt-4 flex flex-col gap-2">
-                    {mystery.status === "draft" ? (
+                    {mystery.is_generating ? (
+                      <Button 
+                        className="w-full"
+                        disabled
+                      >
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Generating...
+                      </Button>
+                    ) : mystery.has_purchased ? (
+                      <Button 
+                        className="w-full" 
+                        onClick={() => handleView(mystery.id)}
+                      >
+                        View Materials
+                      </Button>
+                    ) : (
                       <>
                         <Button 
                           className="w-full" 
@@ -280,15 +388,16 @@ const MysteryDashboard = () => {
                         >
                           Purchase ($4.99)
                         </Button>
+                        {/* For testing only - remove in production */}
+                        <Button 
+                          className="w-full mt-2"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => simulatePurchase(mystery.id)}
+                        >
+                          Simulate Purchase (Dev Only)
+                        </Button>
                       </>
-                    ) : (
-                      <Button 
-                        className="w-full" 
-                        variant="outline"
-                        onClick={() => handleView(mystery.id)}
-                      >
-                        View Materials
-                      </Button>
                     )}
                   </CardFooter>
                 </Card>
