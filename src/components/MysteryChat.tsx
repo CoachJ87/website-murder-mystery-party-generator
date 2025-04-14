@@ -9,14 +9,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 import { useAutoResizeTextarea } from "@/components/hooks/use-auto-resize-textarea";
 import { supabase } from "@/lib/supabase";
-import Anthropic from '@anthropic-ai/sdk';
-
-// Initialize Anthropic client
-// In a production app, this would be handled server-side
-const anthropicApiKey = "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";
-const anthropic = new Anthropic({
-  apiKey: anthropicApiKey,
-});
+import { getAIResponse } from "@/services/aiService";
 
 type Message = {
   id: string;
@@ -120,36 +113,23 @@ Help me develop this murder mystery. What setting would work well with this them
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  // Function to call Anthropic API
+  // Function to call the Edge Function via aiService
   const handleAnthropicRequest = async (userInput: string) => {
     setLoading(true);
     
     try {
       // Get existing messages for context
       const contextMessages = messages.map(msg => ({
-        role: msg.role,
+        is_ai: msg.role === "assistant",
         content: msg.content
       }));
       
-      // Prepare the system prompt - ideally this would come from your database
-      const systemPrompt = "You are an AI assistant that helps create murder mystery party games. Create an engaging storyline and suggest character ideas based on the user's preferences.";
+      // Add the current user input
+      const allMessages = [...contextMessages, { is_ai: false, content: userInput }];
       
-      // Call Anthropic API
-      const response = await anthropic.messages.create({
-        model: "claude-3-opus-20240229",
-        system: systemPrompt,
-        messages: [
-          ...contextMessages,
-          { role: "user", content: userInput }
-        ],
-        max_tokens: 1000,
-      });
-      
-      // Extract response text
-      let aiResponseText = "";
-      if (response.content && response.content.length > 0) {
-        aiResponseText = response.content[0].type === 'text' ? response.content[0].text : "I couldn't generate a proper response. Please try again.";
-      }
+      // Use the aiService to call the Edge Function
+      const promptVersion = isAuthenticated ? "paid" : "free";
+      const aiResponseText = await getAIResponse(allMessages, promptVersion);
       
       // Add the AI response to the messages
       const aiResponse: Message = {
@@ -171,7 +151,7 @@ Help me develop this murder mystery. What setting would work well with this them
         });
       }
     } catch (error) {
-      console.error("Error with Anthropic API:", error);
+      console.error("Error with AI request:", error);
       toast.error("Failed to get response from AI. Please try again.");
     } finally {
       setLoading(false);
