@@ -1,6 +1,6 @@
 
 // src/services/mysteryPackageService.ts
-import { getAIResponse } from './aiService';
+import { getAIResponse } from '@/services/aiService';
 import { supabase } from '@/lib/supabase';
 
 // Interface for conversation messages

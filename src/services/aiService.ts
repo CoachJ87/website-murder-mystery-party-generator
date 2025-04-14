@@ -40,7 +40,13 @@ export const getAIResponse = async (messages: Message[], promptVersion: 'free' |
       max_tokens: 1000,
     });
     
-    return response.content[0].text;
+    // Handle the response content properly based on the SDK's structure
+    if (response.content[0].type === 'text') {
+      return response.content[0].text;
+    }
+    
+    // Fallback if the response doesn't have text content
+    return "I couldn't generate a proper response. Please try again.";
   } catch (error) {
     console.error("Error calling Anthropic API:", error);
     // Fallback to mock response if API call fails
