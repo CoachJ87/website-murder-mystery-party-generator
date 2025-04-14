@@ -22,6 +22,7 @@ type Mystery = {
   is_generating?: boolean;
   created_at: string;
   updated_at: string;
+  purchase_date?: string;
 };
 
 const MysteryDashboard = () => {
@@ -104,13 +105,10 @@ const MysteryDashboard = () => {
     }
   };
 
-  // Function to simulate a successful purchase and generate package
   const handlePostPurchase = async (id: string) => {
     try {
-      // First update the mystery status
       setGeneratingId(id);
       
-      // Update the mystery as purchased
       const { error: updateError } = await supabase
         .from("profiles")
         .update({ 
@@ -125,7 +123,6 @@ const MysteryDashboard = () => {
         return;
       }
       
-      // Update local state
       setMysteries(prev => 
         prev.map(mystery => 
           mystery.id === id ? { ...mystery, has_purchased: true, is_generating: true } : mystery
@@ -134,11 +131,9 @@ const MysteryDashboard = () => {
       
       toast.success("Purchase successful! Generating your complete package...");
       
-      // Generate the complete package
       try {
         await generateCompletePackage(id);
         
-        // Update local state again to remove generating flag
         setMysteries(prev => 
           prev.map(mystery => 
             mystery.id === id ? { ...mystery, is_generating: false } : mystery
@@ -150,7 +145,6 @@ const MysteryDashboard = () => {
         console.error("Error generating package:", genError);
         toast.error("Failed to generate your package. You can try again from the dashboard.");
         
-        // Update local state to remove generating flag but keep purchased status
         setMysteries(prev => 
           prev.map(mystery => 
             mystery.id === id ? { ...mystery, is_generating: false } : mystery
@@ -165,10 +159,7 @@ const MysteryDashboard = () => {
     }
   };
 
-  // This is just a demo function to test the post-purchase flow
   const simulatePurchase = async (id: string) => {
-    // In a real application, this would be triggered by a webhook from Stripe
-    // For testing, we'll call it directly
     await handlePostPurchase(id);
   };
 
@@ -388,7 +379,6 @@ const MysteryDashboard = () => {
                         >
                           Purchase ($4.99)
                         </Button>
-                        {/* For testing only - remove in production */}
                         <Button 
                           className="w-full mt-2"
                           variant="outline"
