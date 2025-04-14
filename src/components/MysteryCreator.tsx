@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,6 +8,8 @@ import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 import { useAutoResizeTextarea } from "@/components/hooks/use-auto-resize-textarea";
 import SignInPrompt from "@/components/SignInPrompt";
+import { supabase } from "@/lib/supabase";
+import { getAIResponse } from "@/services/aiService";
 
 const MAX_FREE_MESSAGES = 5;
 
@@ -37,12 +38,14 @@ const MysteryCreator = ({
   const [selectedTheme, setSelectedTheme] = useState(initialTheme);
   const [loading, setLoading] = useState(false);
   const [showSignInPrompt, setShowSignInPrompt] = useState(false);
-  const { isAuthenticated } = useAuth();
+  const [conversationId, setConversationId] = useState<string | null>(null);
+  const { isAuthenticated, user } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { textareaRef, adjustHeight } = useAutoResizeTextarea({
     minHeight: 56,
     maxHeight: 200,
   });
+  const initialLoadComplete = useRef(false);
 
   // Get daily credits from localStorage
   const getDailyCredits = () => {
@@ -82,6 +85,72 @@ const MysteryCreator = ({
   // Check if user can send a message
   const canSendMessage = isAuthenticated || remainingCredits > 0;
 
+  // Load or create conversation in Supabase
+  useEffect(() => {
+    const loadOrCreateConversation = async () => {
+      if (!isAuthenticated || !user || !savedMysteryId || initialLoadComplete.current) return;
+      
+      try {
+        // Look for existing conversation for this mystery
+        const { data: existingConversation, error: fetchError } = await supabase
+          .from("conversations")
+          .select("*, messages(*)")
+          .eq("mystery_id", savedMysteryId)
+          .maybeSingle();
+          
+        if (fetchError && fetchError.code !== 'PGRST116') {
+          console.error("Error fetching conversation:", fetchError);
+          return;
+        }
+        
+        if (existingConversation) {
+          // Existing conversation found
+          setConversationId(existingConversation.id);
+          
+          // If there are messages in the conversation, load them
+          if (existingConversation.messages && existingConversation.messages.length > 0) {
+            // Format messages from database
+            const formattedMessages = existingConversation.messages
+              .sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+              .map((msg: any) => ({
+                id: msg.id,
+                role: msg.is_ai ? "assistant" : "user",
+                content: msg.content,
+                timestamp: new Date(msg.created_at)
+              }));
+              
+            setMessages(formattedMessages);
+          }
+        } else if (savedMysteryId) {
+          // Create new conversation
+          const { data: newConversation, error: createError } = await supabase
+            .from("conversations")
+            .insert({ 
+              mystery_id: savedMysteryId,
+              prompt_version: "free",
+              user_id: user.id,
+              is_completed: false
+            })
+            .select()
+            .single();
+            
+          if (createError) {
+            console.error("Error creating conversation:", createError);
+            return;
+          }
+          
+          setConversationId(newConversation.id);
+        }
+        
+        initialLoadComplete.current = true;
+      } catch (error) {
+        console.error("Error loading conversation:", error);
+      }
+    };
+    
+    loadOrCreateConversation();
+  }, [isAuthenticated, user, savedMysteryId]);
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -101,7 +170,7 @@ const MysteryCreator = ({
   const handleSubmit = async () => {
     if (!input.trim() || loading) return;
     
-    if (!isAuthenticated) {
+    if (!isAuthenticated && !canSendMessage) {
       setShowSignInPrompt(true);
       return;
     }
@@ -124,17 +193,52 @@ const MysteryCreator = ({
     setLoading(true);
     
     try {
-      // In a real implementation, this would call your AI service
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Save user message to database if authenticated
+      if (isAuthenticated && conversationId) {
+        await supabase
+          .from("messages")
+          .insert({
+            conversation_id: conversationId,
+            content: newUserMessage.content,
+            is_ai: false,
+          });
+      }
+      
+      // Get messages in format for AI service
+      const messagesForAI = messages.concat(newUserMessage).map(msg => ({
+        is_ai: msg.role === "assistant",
+        content: msg.content
+      }));
+      
+      // Get AI response using Anthropic
+      let aiResponseContent;
+      try {
+        aiResponseContent = await getAIResponse(messagesForAI, "free");
+      } catch (error) {
+        console.error("Error calling AI service:", error);
+        // Fallback to mock response if AI service fails
+        aiResponseContent = generateMockResponse(input, messages.length, selectedTheme);
+      }
       
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: generateMockResponse(input, messages.length, selectedTheme),
+        content: aiResponseContent,
         timestamp: new Date(),
       };
       
       setMessages(prev => [...prev, aiResponse]);
+      
+      // Save AI message to database if authenticated
+      if (isAuthenticated && conversationId) {
+        await supabase
+          .from("messages")
+          .insert({
+            conversation_id: conversationId,
+            content: aiResponse.content,
+            is_ai: true,
+          });
+      }
       
       // Decrement daily credits after successful exchange
       decrementCredits();
@@ -158,7 +262,7 @@ const MysteryCreator = ({
     }
   };
 
-  // Mock AI response generation - in a real app, this would be your AI service
+  // Mock AI response generation as fallback
   const generateMockResponse = (userMessage: string, messageCount: number, theme: string) => {
     if (messageCount === 0) {
       return `Great choice! Let's develop a murder mystery with a ${theme || "intriguing"} theme. What's the setting or time period you'd like for this mystery?`;
