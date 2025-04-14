@@ -166,27 +166,88 @@ const MysteryView = () => {
     setSendDialogOpen(true);
   };
 
-  // Parse package content into sections
+  // Parse package content into sections with improved robustness
   const parseContent = () => {
     if (!packageContent) return {};
     
-    // Simple parsing - you may need a more sophisticated version based on your AI output format
-    const hostGuide = packageContent.includes('HOST GUIDE') 
-      ? packageContent.split('HOST GUIDE')[1].split('CHARACTER GUIDE')[0]
-      : "Host guide content not found";
+    // More robust section parsing with fallbacks
+    let hostGuide = "Host guide content not found";
+    let characters = "Character guide content not found";
+    let materials = "Materials content not found";
+    let setup = "Setup instructions not found";
+    
+    // Try to extract host guide
+    if (packageContent.includes('HOST GUIDE')) {
+      const hostGuideStart = packageContent.indexOf('HOST GUIDE');
+      const hostGuideEnd = packageContent.indexOf('CHARACTER', hostGuideStart);
+      if (hostGuideEnd > hostGuideStart) {
+        hostGuide = packageContent.substring(hostGuideStart, hostGuideEnd).trim();
+      }
+    } else if (packageContent.includes('Host Guide')) {
+      const hostGuideStart = packageContent.indexOf('Host Guide');
+      const hostGuideEnd = packageContent.indexOf('Character', hostGuideStart);
+      if (hostGuideEnd > hostGuideStart) {
+        hostGuide = packageContent.substring(hostGuideStart, hostGuideEnd).trim();
+      }
+    }
+    
+    // Try to extract character profiles
+    if (packageContent.includes('CHARACTER GUIDE') || packageContent.includes('CHARACTER PROFILES')) {
+      const charactersStart = packageContent.includes('CHARACTER GUIDE') 
+        ? packageContent.indexOf('CHARACTER GUIDE')
+        : packageContent.indexOf('CHARACTER PROFILES');
+      const charactersEnd = packageContent.includes('EVIDENCE')
+        ? packageContent.indexOf('EVIDENCE', charactersStart)
+        : packageContent.includes('MATERIALS')
+          ? packageContent.indexOf('MATERIALS', charactersStart)
+          : packageContent.indexOf('SETUP', charactersStart);
       
-    const characters = packageContent.includes('CHARACTER GUIDE') 
-      ? packageContent.split('CHARACTER GUIDE')[1].split('EVIDENCE CARDS')[0]
-      : "Character guide content not found";
+      if (charactersEnd > charactersStart) {
+        characters = packageContent.substring(charactersStart, charactersEnd).trim();
+      }
+    } else if (packageContent.includes('Character') && packageContent.toLowerCase().includes('profile')) {
+      const charactersStart = packageContent.indexOf('Character');
+      const charactersEnd = packageContent.indexOf('Evidence', charactersStart) || 
+                            packageContent.indexOf('Material', charactersStart) ||
+                            packageContent.indexOf('Setup', charactersStart);
       
-    const materials = packageContent.includes('EVIDENCE CARDS') 
-      ? packageContent.split('EVIDENCE CARDS')[1].split('SETUP INSTRUCTIONS')[0]
-      : "Materials content not found";
+      if (charactersEnd > charactersStart) {
+        characters = packageContent.substring(charactersStart, charactersEnd).trim();
+      }
+    }
+    
+    // Try to extract materials
+    if (packageContent.includes('MATERIALS') || packageContent.includes('EVIDENCE')) {
+      const materialsStart = packageContent.includes('MATERIALS') 
+        ? packageContent.indexOf('MATERIALS')
+        : packageContent.indexOf('EVIDENCE');
+      const materialsEnd = packageContent.indexOf('SETUP', materialsStart);
       
-    const setup = packageContent.includes('SETUP INSTRUCTIONS') 
-      ? packageContent.split('SETUP INSTRUCTIONS')[1]
-      : "Setup instructions not found";
+      if (materialsEnd > materialsStart) {
+        materials = packageContent.substring(materialsStart, materialsEnd).trim();
+      }
+    } else if (packageContent.includes('Materials') || packageContent.includes('Evidence')) {
+      const materialsStart = packageContent.includes('Materials') 
+        ? packageContent.indexOf('Materials')
+        : packageContent.indexOf('Evidence');
+      const materialsEnd = packageContent.indexOf('Setup', materialsStart);
       
+      if (materialsEnd > materialsStart) {
+        materials = packageContent.substring(materialsStart, materialsEnd).trim();
+      }
+    }
+    
+    // Try to extract setup instructions
+    if (packageContent.includes('SETUP INSTRUCTIONS')) {
+      const setupStart = packageContent.indexOf('SETUP INSTRUCTIONS');
+      setup = packageContent.substring(setupStart).trim();
+    } else if (packageContent.includes('Setup Instructions') || packageContent.includes('SETUP')) {
+      const setupStart = packageContent.includes('Setup Instructions')
+        ? packageContent.indexOf('Setup Instructions')
+        : packageContent.indexOf('SETUP');
+      setup = packageContent.substring(setupStart).trim();
+    }
+    
     return { hostGuide, characters, materials, setup };
   };
   
