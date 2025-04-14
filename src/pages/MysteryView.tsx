@@ -180,7 +180,6 @@ const MysteryView = () => {
     setSendDialogOpen(true);
   };
 
-  // Parse package content into sections with improved robustness
   const parseContent = () => {
     if (!packageContent) return {};
     
@@ -264,8 +263,6 @@ const MysteryView = () => {
     
     return { hostGuide, characters, materials, setup };
   };
-  
-  const sections = parseContent();
 
   if (loading) {
     return (

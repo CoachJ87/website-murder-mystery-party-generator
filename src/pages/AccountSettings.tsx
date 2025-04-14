@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -39,6 +40,7 @@ const AccountSettings = () => {
     
     setLoading(true);
     try {
+      // Fix the type error by using user_metadata instead of data
       const { error } = await supabase.auth.updateUser({
         data: { name }
       });
