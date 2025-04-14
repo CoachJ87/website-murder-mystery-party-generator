@@ -16,6 +16,8 @@ export type Database = {
           is_completed: boolean | null
           is_paid: boolean | null
           mystery_data: Json | null
+          mystery_id: string | null
+          prompt_version: string | null
           title: string | null
           updated_at: string | null
           user_id: string
@@ -26,6 +28,8 @@ export type Database = {
           is_completed?: boolean | null
           is_paid?: boolean | null
           mystery_data?: Json | null
+          mystery_id?: string | null
+          prompt_version?: string | null
           title?: string | null
           updated_at?: string | null
           user_id: string
@@ -36,11 +40,20 @@ export type Database = {
           is_completed?: boolean | null
           is_paid?: boolean | null
           mystery_data?: Json | null
+          mystery_id?: string | null
+          prompt_version?: string | null
           title?: string | null
           updated_at?: string | null
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "conversations_mystery_id_fkey"
+            columns: ["mystery_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "conversations_user_id_fkey"
             columns: ["user_id"]
@@ -56,6 +69,7 @@ export type Database = {
           conversation_id: string | null
           created_at: string | null
           id: string
+          is_ai: boolean | null
           role: string
         }
         Insert: {
@@ -63,6 +77,7 @@ export type Database = {
           conversation_id?: string | null
           created_at?: string | null
           id?: string
+          is_ai?: boolean | null
           role: string
         }
         Update: {
@@ -70,6 +85,7 @@ export type Database = {
           conversation_id?: string | null
           created_at?: string | null
           id?: string
+          is_ai?: boolean | null
           role?: string
         }
         Relationships: [
