@@ -8,7 +8,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { supabase } from "@/lib/supabase";
 import MysteryForm from "@/components/MysteryForm";
-import VercelChatbot from "@/components/VercelChatbot";
+import MysteryChat from "@/components/MysteryChat";
 import { useAuth } from "@/context/AuthContext";
 
 const MysteryCreation = () => {
@@ -112,7 +112,11 @@ const MysteryCreation = () => {
             <CardContent className="p-6">
               {showChatUI ? (
                 <div className="w-full h-full">
-                  <VercelChatbot />
+                  <MysteryChat 
+                    initialTheme={formData?.theme || ""}
+                    savedMysteryId={id}
+                    onSave={(messages) => console.log("Saving messages:", messages.length)}
+                  />
                 </div>
               ) : (
                 <MysteryForm 

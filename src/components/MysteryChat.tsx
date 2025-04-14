@@ -8,7 +8,15 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 import { useAutoResizeTextarea } from "@/components/hooks/use-auto-resize-textarea";
-import SignInPrompt from "@/components/SignInPrompt";
+import { supabase } from "@/lib/supabase";
+import Anthropic from '@anthropic-ai/sdk';
+
+// Initialize Anthropic client
+// In a production app, this would be handled server-side
+const anthropicApiKey = "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";
+const anthropic = new Anthropic({
+  apiKey: anthropicApiKey,
+});
 
 type Message = {
   id: string;
@@ -31,6 +39,7 @@ const MysteryChat = ({
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [initialPrompt, setInitialPrompt] = useState<string | null>(null);
   const { isAuthenticated } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { textareaRef, adjustHeight } = useAutoResizeTextarea({
@@ -38,26 +47,149 @@ const MysteryChat = ({
     maxHeight: 200,
   });
   
+  // Fetch initial mystery data and prompts
   useEffect(() => {
-    scrollToBottom();
-    if (initialTheme && messages.length === 0) {
-      // Initialize chat with AI greeting based on theme
-      const initialMessage: Message = {
+    const fetchMysteryData = async () => {
+      if (savedMysteryId) {
+        const { data, error } = await supabase
+          .from("conversations")
+          .select("mystery_data")
+          .eq("id", savedMysteryId)
+          .single();
+        
+        if (!error && data) {
+          // Format the mystery data into a prompt for the AI
+          const mysteryData = data.mystery_data;
+          const formattedPrompt = `I want to create a murder mystery with these details:
+- Theme: ${mysteryData.theme || initialTheme}
+- Number of players: ${mysteryData.playerCount || 8}
+- Include an accomplice: ${mysteryData.hasAccomplice ? 'Yes' : 'No'}
+- Script style: ${mysteryData.scriptType === 'full' ? 'Full scripts' : 'Point form summaries'}
+${mysteryData.additionalDetails ? `- Additional details: ${mysteryData.additionalDetails}` : ''}
+
+Help me develop this murder mystery. What setting would work well with this theme?`;
+          
+          setInitialPrompt(formattedPrompt);
+        }
+      }
+    };
+    
+    // Also fetch the free prompt from the database
+    const fetchFreePrompt = async () => {
+      const { data, error } = await supabase
+        .from("prompts")
+        .select("content")
+        .eq("name", "murder_mystery_free")
+        .single();
+        
+      if (error) {
+        console.error("Error fetching free prompt:", error);
+      }
+      
+      if (data && data.content) {
+        console.log("Using prompt from database:", data.content.substring(0, 50) + "...");
+      }
+    };
+    
+    fetchMysteryData();
+    fetchFreePrompt();
+  }, [savedMysteryId, initialTheme]);
+
+  // Initialize chat with form data
+  useEffect(() => {
+    if (initialPrompt && messages.length === 0) {
+      const userMessage: Message = {
         id: Date.now().toString(),
-        role: "assistant",
-        content: `Let's create a murder mystery with a ${initialTheme} theme! What kind of setting would you like for this mystery?`,
+        role: "user",
+        content: initialPrompt,
         timestamp: new Date(),
       };
-      setMessages([initialMessage]);
+      
+      setMessages([userMessage]);
+      
+      // Immediately get AI response to the initial prompt
+      handleAnthropicRequest(initialPrompt);
     }
-  }, [initialTheme]);
-
+  }, [initialPrompt]);
+  
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  // Function to call Anthropic API
+  const handleAnthropicRequest = async (userInput: string) => {
+    setLoading(true);
+    
+    try {
+      // Get existing messages for context
+      const contextMessages = messages.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      }));
+      
+      // Prepare the system prompt - ideally this would come from your database
+      const systemPrompt = "You are an AI assistant that helps create murder mystery party games. Create an engaging storyline and suggest character ideas based on the user's preferences.";
+      
+      // Call Anthropic API
+      const response = await anthropic.messages.create({
+        model: "claude-3-opus-20240229",
+        system: systemPrompt,
+        messages: [
+          ...contextMessages,
+          { role: "user", content: userInput }
+        ],
+        max_tokens: 1000,
+      });
+      
+      // Extract response text
+      let aiResponseText = "";
+      if (response.content && response.content.length > 0) {
+        aiResponseText = response.content[0].type === 'text' ? response.content[0].text : "I couldn't generate a proper response. Please try again.";
+      }
+      
+      // Add the AI response to the messages
+      const aiResponse: Message = {
+        id: Date.now().toString(),
+        role: "assistant",
+        content: aiResponseText,
+        timestamp: new Date(),
+      };
+      
+      setMessages(prev => [...prev, aiResponse]);
+      
+      // Save to database if authenticated and have a conversation ID
+      if (isAuthenticated && savedMysteryId) {
+        await saveMessageToDatabase({
+          conversation_id: savedMysteryId,
+          role: "assistant",
+          content: aiResponseText,
+          is_ai: true
+        });
+      }
+    } catch (error) {
+      console.error("Error with Anthropic API:", error);
+      toast.error("Failed to get response from AI. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const saveMessageToDatabase = async (messageData: any) => {
+    try {
+      const { error } = await supabase
+        .from("messages")
+        .insert(messageData);
+        
+      if (error) {
+        console.error("Error saving message to database:", error);
+      }
+    } catch (error) {
+      console.error("Error in saveMessageToDatabase:", error);
+    }
   };
 
   const handleSubmit = async () => {
@@ -71,28 +203,23 @@ const MysteryChat = ({
     };
     
     setMessages(prev => [...prev, newUserMessage]);
+    
+    // Save user message to database if authenticated
+    if (isAuthenticated && savedMysteryId) {
+      await saveMessageToDatabase({
+        conversation_id: savedMysteryId,
+        role: "user",
+        content: input,
+        is_ai: false
+      });
+    }
+    
+    const currentInput = input;
     setInput("");
     adjustHeight(true);
-    setLoading(true);
     
-    try {
-      // In a real implementation, this would call your AI service
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      const aiResponse: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: generateMockResponse(input, messages.length, initialTheme),
-        timestamp: new Date(),
-      };
-      
-      setMessages(prev => [...prev, aiResponse]);
-    } catch (error) {
-      console.error("Error generating response:", error);
-      toast.error("Failed to generate response. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+    // Get AI response
+    await handleAnthropicRequest(currentInput);
   };
 
   const handleGenerateMystery = () => {
@@ -102,23 +229,6 @@ const MysteryChat = ({
     }
     
     onSave(messages);
-  };
-
-  // Mock AI response generation - in a real app, this would be your AI service
-  const generateMockResponse = (userMessage: string, messageCount: number, theme: string) => {
-    if (messageCount === 0) {
-      return `Great choice! Let's develop a murder mystery with a ${theme || "intriguing"} theme. What's the setting or time period you'd like for this mystery?`;
-    } else if (messageCount === 2) {
-      return "That sounds perfect. Now, let's think about the victim. Who would be an interesting character to center the mystery around?";
-    } else if (messageCount === 4) {
-      return "Excellent! Now we need some suspects. Could you describe 2-3 potential suspects with interesting motives?";
-    } else if (messageCount === 6) {
-      return "Those are compelling suspects! Let's create a key piece of evidence that will be crucial to solving the mystery. What could it be?";
-    } else if (messageCount === 8) {
-      return "Your murder mystery is starting to take great shape! Would you like to generate the full mystery package now, or continue developing more details?";
-    } else {
-      return "I understand. Let's continue refining your mystery. " + userMessage.split(" ").slice(0, 3).join(" ") + " is an interesting direction. Can you elaborate more on what you're looking for?";
-    }
   };
 
   return (

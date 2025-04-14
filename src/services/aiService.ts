@@ -3,12 +3,12 @@
 import Anthropic from '@anthropic-ai/sdk';
 
 // In Vite, environment variables are available via import.meta.env, not process.env
-const ANTHROPIC_API_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY;
+const ANTHROPIC_API_KEY = "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";
 
-// Initialize Anthropic client if API key is available
-const anthropic = ANTHROPIC_API_KEY ? new Anthropic({
+// Initialize Anthropic client
+const anthropic = new Anthropic({
   apiKey: ANTHROPIC_API_KEY,
-}) : null;
+});
 
 // Interface for conversation messages
 interface Message {
@@ -19,12 +19,6 @@ interface Message {
 // Function to get AI response for your murder mystery chatbot
 export const getAIResponse = async (messages: Message[], promptVersion: 'free' | 'paid'): Promise<string> => {
   try {
-    // Check if Anthropic is configured
-    if (!anthropic) {
-      console.warn("Anthropic API key not configured. Using mock responses instead.");
-      return generateMockResponse(messages, promptVersion);
-    }
-
     // Get the appropriate system prompt based on promptVersion
     const systemPrompt = promptVersion === 'paid' 
       ? "You are an AI assistant that helps create detailed murder mystery party games. Since the user has purchased, provide complete character details, clues, and all game materials."
