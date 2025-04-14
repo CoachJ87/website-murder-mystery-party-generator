@@ -1,3 +1,4 @@
+// src/pages/MysteryView.tsx
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -5,53 +6,85 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Download, Printer, Send, FileText, Book, PenTool, Users, Clipboard, Calendar } from "lucide-react";
+import { Download, Printer, Send, FileText, Book, PenTool, Users, Clipboard, Calendar, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/context/AuthContext";
 import SendToGuestsDialog from "@/components/SendToGuestsDialog";
+import { generateCompletePackage } from "@/services/mysteryPackageService";
 
 const MysteryView = () => {
   const [loading, setLoading] = useState(true);
+  const [generating, setGenerating] = useState(false);
   const [mystery, setMystery] = useState<any>(null);
+  const [packageContent, setPackageContent] = useState<string | null>(null);
   const [sendDialogOpen, setSendDialogOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("host-guide");
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
-    loadMystery();
-  }, [id]);
+    if (user && id) {
+      loadMystery();
+    }
+  }, [id, user]);
 
   const loadMystery = async () => {
     try {
       setLoading(true);
       
-      // In a real app, fetch from Supabase
-      // const { data, error } = await supabase
-      //   .from('mysteries')
-      //   .select('*')
-      //   .eq('id', id)
-      //   .single();
+      // Fetch mystery from Supabase
+      const { data: mysteryData, error: mysteryError } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", id)
+        .eq("user_id", user.id)
+        .single();
+        
+      if (mysteryError || !mysteryData) {
+        console.error("Error loading mystery:", mysteryError);
+        toast.error("Could not load mystery details");
+        navigate("/dashboard");
+        return;
+      }
       
-      // Simulate loading
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (!mysteryData.has_purchased) {
+        toast.error("You need to purchase this mystery to view materials");
+        navigate("/dashboard");
+        return;
+      }
       
-      // Mock data
-      setMystery({
-        id,
-        title: "Murder at the Speakeasy",
-        theme: "1920s Speakeasy",
-        setting: "A hidden speakeasy in Chicago during the prohibition era",
-        victim: "The wealthy club owner who has many powerful enemies",
-        characters: [
-          { name: "Jack 'The Dealer' Thompson", role: "Club Owner (Victim)", description: "A charismatic but ruthless businessman with many enemies" },
-          { name: "Vivian Rose", role: "Lounge Singer", description: "A talented but ambitious singer with her eye on bigger stages" },
-          { name: "Officer Murphy", role: "Corrupt Cop", description: "Takes bribes to look the other way, but demands more than his fair share" },
-          { name: "Gloria Thompson", role: "Jack's Wife", description: "Publicly devoted, but privately resentful of Jack's affairs" },
-          { name: "Frankie 'The Knife' Lorenzo", role: "Local Gangster", description: "Wants to take over the speakeasy for his own operations" },
-          { name: "Dr. Harold Greene", role: "Regular Patron", description: "Respectable doctor with a gambling addiction and mounting debts" }
-        ],
-        status: "purchased"
-      });
+      setMystery(mysteryData);
+      
+      // Load package content if it exists
+      const { data: convData, error: convError } = await supabase
+        .from("conversations")
+        .select("*, messages(*)")
+        .eq("mystery_id", id)
+        .eq("prompt_version", "paid")
+        .eq("is_completed", true)
+        .maybeSingle();
+        
+      if (convError && convError.code !== 'PGRST116') {
+        console.error("Error loading package:", convError);
+      }
+      
+      let foundPackage = false;
+      
+      if (convData && convData.messages && convData.messages.length > 0) {
+        // Find AI message with package content
+        const packageMessage = convData.messages.find(msg => msg.is_ai);
+        if (packageMessage) {
+          setPackageContent(packageMessage.content);
+          foundPackage = true;
+        }
+      }
+      
+      // If no package found, we may need to generate it
+      if (!foundPackage) {
+        await handleGeneratePackage();
+      }
     } catch (error) {
       console.error("Error loading mystery:", error);
       toast.error("Failed to load mystery materials");
@@ -60,19 +93,104 @@ const MysteryView = () => {
     }
   };
 
+  const handleGeneratePackage = async () => {
+    if (!id) return;
+    
+    try {
+      setGenerating(true);
+      const content = await generateCompletePackage(id);
+      setPackageContent(content);
+      toast.success("Murder mystery package generated successfully!");
+    } catch (error) {
+      console.error("Error generating package:", error);
+      toast.error("Failed to generate mystery package. Please try again.");
+    } finally {
+      setGenerating(false);
+    }
+  };
+
   const handleDownload = (section: string) => {
+    if (!packageContent) {
+      toast.error("Package content not available yet");
+      return;
+    }
+    
+    // Create a blob and download link for the entire content
+    const blob = new Blob([packageContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${mystery?.title.replace(/\s+/g, '_')}_${section}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
     toast.success(`Downloading ${section} materials...`);
-    // In a real app, this would generate and download the PDFs
   };
 
   const handlePrint = () => {
-    toast.success("Preparing print version...");
-    // In a real app, this would open the print dialog
+    if (!packageContent) {
+      toast.error("Package content not available yet");
+      return;
+    }
+    
+    // Create a printable version in a new window
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>${mystery?.title} - Murder Mystery Package</title>
+            <style>
+              body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; }
+              h1, h2, h3 { margin-top: 20px; }
+              pre { white-space: pre-wrap; }
+            </style>
+          </head>
+          <body>
+            <h1>${mystery?.title}</h1>
+            <pre>${packageContent}</pre>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+    } else {
+      toast.error("Could not open print window. Check your popup blocker.");
+    }
   };
 
   const handleSendToGuests = () => {
     setSendDialogOpen(true);
   };
+
+  // Parse package content into sections
+  const parseContent = () => {
+    if (!packageContent) return {};
+    
+    // Simple parsing - you may need a more sophisticated version based on your AI output format
+    const hostGuide = packageContent.includes('HOST GUIDE') 
+      ? packageContent.split('HOST GUIDE')[1].split('CHARACTER GUIDE')[0]
+      : "Host guide content not found";
+      
+    const characters = packageContent.includes('CHARACTER GUIDE') 
+      ? packageContent.split('CHARACTER GUIDE')[1].split('EVIDENCE CARDS')[0]
+      : "Character guide content not found";
+      
+    const materials = packageContent.includes('EVIDENCE CARDS') 
+      ? packageContent.split('EVIDENCE CARDS')[1].split('SETUP INSTRUCTIONS')[0]
+      : "Materials content not found";
+      
+    const setup = packageContent.includes('SETUP INSTRUCTIONS') 
+      ? packageContent.split('SETUP INSTRUCTIONS')[1]
+      : "Setup instructions not found";
+      
+    return { hostGuide, characters, materials, setup };
+  };
+  
+  const sections = parseContent();
 
   if (loading) {
     return (
@@ -80,7 +198,66 @@ const MysteryView = () => {
         <Header />
         
         <main className="flex-1 flex items-center justify-center">
-          <div className="h-8 w-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          <div className="flex flex-col items-center">
+            <Loader2 className="h-8 w-8 animate-spin mb-4" />
+            <p>Loading your mystery package...</p>
+          </div>
+        </main>
+        
+        <Footer />
+      </div>
+    );
+  }
+  
+  if (generating) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        
+        <main className="flex-1 flex items-center justify-center">
+          <div className="flex flex-col items-center">
+            <Loader2 className="h-8 w-8 animate-spin mb-4" />
+            <p>Generating your complete murder mystery package...</p>
+            <p className="text-sm text-muted-foreground mt-2">This may take a minute or two.</p>
+          </div>
+        </main>
+        
+        <Footer />
+      </div>
+    );
+  }
+  
+  if (!packageContent) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        
+        <main className="flex-1 flex items-center justify-center">
+          <Card className="max-w-md w-full">
+            <CardHeader>
+              <CardTitle>Generate Your Mystery Package</CardTitle>
+              <CardDescription>
+                Your mystery package needs to be generated before you can view it
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="mb-4">Click the button below to generate your complete murder mystery package with:</p>
+              <ul className="list-disc pl-5 space-y-1 mb-6">
+                <li>Detailed character guides</li>
+                <li>Host instructions</li>
+                <li>Evidence cards and game materials</li>
+                <li>Setup guidance</li>
+              </ul>
+            </CardContent>
+            <CardFooter className="flex justify-between">
+              <Button variant="outline" onClick={() => navigate("/dashboard")}>
+                Back to Dashboard
+              </Button>
+              <Button onClick={handleGeneratePackage}>
+                Generate Package
+              </Button>
+            </CardFooter>
+          </Card>
         </main>
         
         <Footer />
@@ -96,9 +273,9 @@ const MysteryView = () => {
         <div className="container mx-auto max-w-6xl">
           <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-              <h1 className="text-3xl font-bold mb-2">{mystery?.title}</h1>
+              <h1 className="text-3xl font-bold mb-2">{mystery?.title || "Murder Mystery"}</h1>
               <p className="text-muted-foreground">
-                Complete mystery package - {mystery?.theme}
+                Complete mystery package - {mystery?.theme || "Mystery Theme"}
               </p>
             </div>
             
@@ -118,7 +295,7 @@ const MysteryView = () => {
             </div>
           </div>
           
-          <Tabs defaultValue="host-guide">
+          <Tabs defaultValue="host-guide" value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="mb-8 grid grid-cols-2 md:grid-cols-4 lg:w-auto">
               <TabsTrigger value="host-guide" className="flex items-center gap-2">
                 <Book className="h-4 w-4" />
@@ -146,40 +323,17 @@ const MysteryView = () => {
                     <span>Host Guide</span>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                  <div>
-                    <h3 className="text-xl font-semibold mb-2">Introduction</h3>
-                    <p>Welcome to "Murder at the Speakeasy"! This guide will walk you through everything you need to know to host a successful murder mystery party set in 1920s Chicago during the prohibition era.</p>
+                <CardContent>
+                  <div className="prose max-w-none">
+                    <pre className="whitespace-pre-wrap text-sm overflow-auto max-h-[600px] p-4 bg-muted/30 rounded-md">
+                      {sections.hostGuide}
+                    </pre>
                   </div>
                   
-                  <div>
-                    <h3 className="text-xl font-semibold mb-2">Before the Party</h3>
-                    <ol className="list-decimal pl-5 space-y-2">
-                      <li>Send invitations to your guests at least 2-3 weeks before the event</li>
-                      <li>Assign characters to your guests based on their personalities</li>
-                      <li>Encourage guests to dress in 1920s attire (suggestions in the Materials section)</li>
-                      <li>Print all character sheets, clues, and materials</li>
-                      <li>Set up your venue with appropriate decorations (suggestions in the Setup section)</li>
-                    </ol>
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-xl font-semibold mb-2">During the Party</h3>
-                    <ol className="list-decimal pl-5 space-y-2">
-                      <li>Welcome guests and hand out character sheets and name tags</li>
-                      <li>Read the introduction to set the scene</li>
-                      <li>Announce the discovery of Jack Thompson's body</li>
-                      <li>Allow characters to mingle and investigate</li>
-                      <li>Distribute clue cards at appropriate times (see Timeline)</li>
-                      <li>Guide the accusation phase where characters reveal their suspicions</li>
-                      <li>Read the solution reveal script</li>
-                    </ol>
-                  </div>
-                  
-                  <div className="flex justify-end">
+                  <div className="flex justify-end mt-6">
                     <Button onClick={() => handleDownload("host-guide")}>
                       <Download className="h-4 w-4 mr-2" />
-                      Download Host Guide PDF
+                      Download Host Guide
                     </Button>
                   </div>
                 </CardContent>
@@ -195,14 +349,10 @@ const MysteryView = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {mystery?.characters.map((character: any) => (
-                      <div key={character.name} className="border rounded-lg p-4">
-                        <h3 className="text-lg font-semibold">{character.name}</h3>
-                        <p className="text-sm text-muted-foreground mb-2">{character.role}</p>
-                        <p>{character.description}</p>
-                      </div>
-                    ))}
+                  <div className="prose max-w-none">
+                    <pre className="whitespace-pre-wrap text-sm overflow-auto max-h-[600px] p-4 bg-muted/30 rounded-md">
+                      {sections.characters}
+                    </pre>
                   </div>
                   
                   <div className="flex justify-end mt-6">
@@ -224,26 +374,17 @@ const MysteryView = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {[
-                      { name: "Character Name Tags", icon: <FileText className="h-5 w-5" />, description: "Printable badges for each character" },
-                      { name: "Evidence Cards", icon: <FileText className="h-5 w-5" />, description: "Key clues to distribute during the game" },
-                      { name: "Invitations", icon: <FileText className="h-5 w-5" />, description: "Customizable party invites" },
-                      { name: "Speakeasy Menu", icon: <FileText className="h-5 w-5" />, description: "Authentic 1920s cocktail and food ideas" },
-                      { name: "Accusation Sheets", icon: <FileText className="h-5 w-5" />, description: "For guests to write their theories" },
-                      { name: "Decoration Ideas", icon: <FileText className="h-5 w-5" />, description: "Tips for setting the scene" }
-                    ].map((material) => (
-                      <div key={material.name} className="border rounded-lg p-4 flex flex-col items-center text-center">
-                        <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                          {material.icon}
-                        </div>
-                        <h3 className="font-medium mb-1">{material.name}</h3>
-                        <p className="text-sm text-muted-foreground mb-4">{material.description}</p>
-                        <Button variant="outline" size="sm" onClick={() => handleDownload(material.name)}>
-                          Download
-                        </Button>
-                      </div>
-                    ))}
+                  <div className="prose max-w-none">
+                    <pre className="whitespace-pre-wrap text-sm overflow-auto max-h-[600px] p-4 bg-muted/30 rounded-md">
+                      {sections.materials}
+                    </pre>
+                  </div>
+                  
+                  <div className="flex justify-end mt-6">
+                    <Button onClick={() => handleDownload("materials")}>
+                      <Download className="h-4 w-4 mr-2" />
+                      Download Materials
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -257,102 +398,18 @@ const MysteryView = () => {
                     <span>Setup Instructions</span>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                  <div>
-                    <h3 className="text-xl font-semibold mb-2">Venue Decoration</h3>
-                    <p className="mb-4">Transform your space into a 1920s speakeasy with these suggestions:</p>
-                    <ul className="list-disc pl-5 space-y-2">
-                      <li>Dim lighting with table lamps or string lights</li>
-                      <li>Jazz music playing in the background</li>
-                      <li>Vintage posters and black and gold decorations</li>
-                      <li>Password sign on the entry door</li>
-                      <li>Bar area with "bootleg" drinks</li>
-                      <li>Playing cards and fake money on tables</li>
-                    </ul>
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-xl font-semibold mb-2">Costume Ideas</h3>
-                    <p className="mb-4">Encourage guests to dress in 1920s attire:</p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <h4 className="font-medium">For women:</h4>
-                        <ul className="list-disc pl-5">
-                          <li>Flapper dresses with fringe</li>
-                          <li>Long beaded necklaces</li>
-                          <li>Feather headbands</li>
-                          <li>Long gloves</li>
-                          <li>Mary Jane shoes</li>
-                        </ul>
-                      </div>
-                      <div>
-                        <h4 className="font-medium">For men:</h4>
-                        <ul className="list-disc pl-5">
-                          <li>Suits with vests</li>
-                          <li>Fedora or newsboy caps</li>
-                          <li>Suspenders</li>
-                          <li>Bow ties</li>
-                          <li>Wingtip shoes</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-xl font-semibold mb-2">Food & Drink</h3>
-                    <p className="mb-4">Authentic 1920s refreshments:</p>
-                    <ul className="list-disc pl-5 space-y-2">
-                      <li>Deviled eggs</li>
-                      <li>Cheese and crackers</li>
-                      <li>Oysters Rockefeller</li>
-                      <li>Finger sandwiches</li>
-                      <li>Classic cocktails (or mocktails): Gin Rickey, Sidecar, Mint Julep</li>
-                    </ul>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="timeline">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Calendar className="h-5 w-5" />
-                    <span>Event Timeline</span>
-                  </CardTitle>
-                </CardHeader>
                 <CardContent>
-                  <div className="space-y-6">
-                    <div className="relative">
-                      <div className="absolute top-0 bottom-0 left-7 border-l-2 border-dashed border-muted-foreground"></div>
-                      
-                      {[
-                        { time: "7:00 PM", title: "Guest Arrival", description: "Welcome guests, serve drinks, and distribute character sheets" },
-                        { time: "7:30 PM", title: "Introduction", description: "Read the introduction script and set the scene" },
-                        { time: "7:45 PM", title: "Murder Announcement", description: "Announce that Jack Thompson has been found dead" },
-                        { time: "8:00 PM", title: "First Round of Clues", description: "Distribute the first set of clue cards" },
-                        { time: "8:30 PM", title: "Investigation Period", description: "Characters mingle and investigate" },
-                        { time: "9:00 PM", title: "Second Round of Clues", description: "Distribute the second set of clue cards" },
-                        { time: "9:30 PM", title: "Final Investigation", description: "Last chance for characters to gather information" },
-                        { time: "10:00 PM", title: "Accusation Phase", description: "Each character presents their theory" },
-                        { time: "10:30 PM", title: "Solution Reveal", description: "Read the solution script and reveal the murderer" }
-                      ].map((event, index) => (
-                        <div key={index} className="ml-14 mb-10 relative">
-                          <div className="absolute -left-14 mt-1 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
-                            {index + 1}
-                          </div>
-                          <h3 className="text-lg font-medium mb-1">{event.time} - {event.title}</h3>
-                          <p className="text-muted-foreground">{event.description}</p>
-                        </div>
-                      ))}
-                    </div>
-                    
-                    <div className="flex justify-end">
-                      <Button onClick={() => handleDownload("timeline")}>
-                        <Download className="h-4 w-4 mr-2" />
-                        Download Timeline PDF
-                      </Button>
-                    </div>
+                  <div className="prose max-w-none">
+                    <pre className="whitespace-pre-wrap text-sm overflow-auto max-h-[600px] p-4 bg-muted/30 rounded-md">
+                      {sections.setup}
+                    </pre>
+                  </div>
+                  
+                  <div className="flex justify-end mt-6">
+                    <Button onClick={() => handleDownload("setup")}>
+                      <Download className="h-4 w-4 mr-2" />
+                      Download Setup Guide
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
