@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -41,7 +42,7 @@ const AccountSettings = () => {
     try {
       const { error } = await supabase.auth.updateUser({
         data: { 
-          name
+          name: name 
         }
       });
       

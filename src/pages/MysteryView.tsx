@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -36,7 +37,13 @@ const MysteryView = () => {
         return;
       }
 
-      setMystery(conversation);
+      // Convert the mystery_data to ensure it conforms to MysteryData type
+      const mysteryWithTypedData: Conversation = {
+        ...conversation,
+        mystery_data: conversation.mystery_data as MysteryData
+      };
+      
+      setMystery(mysteryWithTypedData);
     };
 
     fetchMystery();

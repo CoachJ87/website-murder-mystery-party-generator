@@ -2,6 +2,7 @@
 // src/services/mysteryPackageService.ts
 import { getAIResponse } from '@/services/aiService';
 import { supabase } from '@/lib/supabase';
+import { MysteryData } from '@/interfaces/mystery';
 
 // Interface for conversation messages
 interface Message {
@@ -18,8 +19,7 @@ export const generateCompletePackage = async (mysteryId: string): Promise<string
     const { data: conversations, error: convError } = await supabase
       .from("conversations")
       .select("*, user_id")
-      .eq("mystery_id", mysteryId)
-      .eq("prompt_version", "free")
+      .eq("id", mysteryId)
       .single();
       
     if (convError) {

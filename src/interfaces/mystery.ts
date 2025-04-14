@@ -18,4 +18,6 @@ export interface Conversation {
   user_id: string;
   is_completed?: boolean;
   is_paid?: boolean;
+  mystery_id?: string;
+  prompt_version?: string;
 }
