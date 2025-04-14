@@ -33,7 +33,7 @@ const MysteryChat = ({
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [initialPrompt, setInitialPrompt] = useState<string | null>(null);
-  const { isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { textareaRef, adjustHeight } = useAutoResizeTextarea({
     minHeight: 56,
@@ -142,7 +142,7 @@ Help me develop this murder mystery. What setting would work well with this them
       setMessages(prev => [...prev, aiResponse]);
       
       // Save to database if authenticated and have a conversation ID
-      if (isAuthenticated && savedMysteryId) {
+      if (isAuthenticated && savedMysteryId && user) {
         await saveMessageToDatabase({
           conversation_id: savedMysteryId,
           role: "assistant",
@@ -185,7 +185,7 @@ Help me develop this murder mystery. What setting would work well with this them
     setMessages(prev => [...prev, newUserMessage]);
     
     // Save user message to database if authenticated
-    if (isAuthenticated && savedMysteryId) {
+    if (isAuthenticated && savedMysteryId && user) {
       await saveMessageToDatabase({
         conversation_id: savedMysteryId,
         role: "user",

@@ -46,9 +46,10 @@ const MysteryDashboard = () => {
     try {
       setLoading(true);
       
-      // Fetch from Supabase
+      // Fetch from Supabase - fix for database schema
+      // Looking at the database, we need to query conversations, not profiles
       const { data, error } = await supabase
-        .from("profiles")
+        .from("conversations")
         .select("*")
         .eq("user_id", user.id)
         .order("updated_at", { ascending: false });
@@ -59,7 +60,18 @@ const MysteryDashboard = () => {
         return;
       }
       
-      setMysteries(data || []);
+      // Convert the conversations data to the Mystery type
+      const formattedMysteries = data?.map(convo => ({
+        id: convo.id,
+        title: convo.title || 'Untitled Mystery',
+        theme: convo.mystery_data?.theme || 'Mystery Theme',
+        has_purchased: convo.is_paid || false,
+        created_at: convo.created_at,
+        updated_at: convo.updated_at,
+        purchase_date: convo.updated_at // Using updated_at as purchase_date for now
+      })) || [];
+      
+      setMysteries(formattedMysteries);
     } catch (error) {
       console.error("Error loading mysteries:", error);
       toast.error("Failed to load your mysteries");
@@ -86,8 +98,9 @@ const MysteryDashboard = () => {
 
   const handleDelete = async (id: string) => {
     try {
+      // Update to use conversations table instead of profiles
       const { error } = await supabase
-        .from("profiles")
+        .from("conversations")
         .delete()
         .eq("id", id);
         
@@ -105,7 +118,6 @@ const MysteryDashboard = () => {
     }
   };
 
-  // Function to simulate a successful purchase and generate package
   const handlePostPurchase = async (id: string) => {
     try {
       // First update the mystery status
@@ -113,9 +125,9 @@ const MysteryDashboard = () => {
       
       // Update the mystery as purchased
       const { error: updateError } = await supabase
-        .from("profiles")
+        .from("conversations")
         .update({ 
-          has_purchased: true,
+          is_paid: true,
           purchase_date: new Date().toISOString()
         })
         .eq("id", id);
@@ -166,7 +178,6 @@ const MysteryDashboard = () => {
     }
   };
 
-  // This is just a demo function to test the post-purchase flow
   const simulatePurchase = async (id: string) => {
     // In a real application, this would be triggered by a webhook from Stripe
     // For testing, we'll call it directly
@@ -239,7 +250,7 @@ const MysteryDashboard = () => {
               <p className="text-muted-foreground">Create, manage, and access your murder mysteries</p>
             </div>
             
-            <Button onClick={handleCreateNew} className="shrink-0">
+            <Button onClick={() => navigate("/mystery/create")} className="shrink-0">
               <Plus className="h-4 w-4 mr-2" />
               Create New Mystery
             </Button>
@@ -294,7 +305,7 @@ const MysteryDashboard = () => {
                   : "Create your first murder mystery to get started"}
               </p>
               {!searchQuery && filter === "all" && (
-                <Button onClick={handleCreateNew}>Create New Mystery</Button>
+                <Button onClick={() => navigate("/mystery/create")}>Create New Mystery</Button>
               )}
             </div>
           ) : (
