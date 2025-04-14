@@ -50,15 +50,17 @@ const MysteryChat = ({
           .eq("id", savedMysteryId)
           .single();
         
-        if (!error && data) {
-          // Format the mystery data into a prompt for the AI
-          const mysteryData = data.mystery_data;
+        if (!error && data && data.mystery_data) {
+          // Safely access the mystery data with type checking
+          const mysteryData = typeof data.mystery_data === 'object' ? data.mystery_data : {};
+          
+          // Use optional chaining and nullish coalescing for safe access
           const formattedPrompt = `I want to create a murder mystery with these details:
-- Theme: ${mysteryData.theme || initialTheme}
-- Number of players: ${mysteryData.playerCount || 8}
-- Include an accomplice: ${mysteryData.hasAccomplice ? 'Yes' : 'No'}
-- Script style: ${mysteryData.scriptType === 'full' ? 'Full scripts' : 'Point form summaries'}
-${mysteryData.additionalDetails ? `- Additional details: ${mysteryData.additionalDetails}` : ''}
+- Theme: ${(mysteryData as any)?.theme || initialTheme || 'Mystery Theme'}
+- Number of players: ${(mysteryData as any)?.playerCount || 8}
+- Include an accomplice: ${(mysteryData as any)?.hasAccomplice ? 'Yes' : 'No'}
+- Script style: ${(mysteryData as any)?.scriptType === 'full' ? 'Full scripts' : 'Point form summaries'}
+${(mysteryData as any)?.additionalDetails ? `- Additional details: ${(mysteryData as any).additionalDetails}` : ''}
 
 Help me develop this murder mystery. What setting would work well with this theme?`;
           
@@ -145,9 +147,9 @@ Help me develop this murder mystery. What setting would work well with this them
       if (isAuthenticated && savedMysteryId && user) {
         await saveMessageToDatabase({
           conversation_id: savedMysteryId,
-          role: "assistant",
           content: aiResponseText,
-          is_ai: true
+          is_ai: true,
+          role: "assistant"
         });
       }
     } catch (error) {
@@ -188,9 +190,9 @@ Help me develop this murder mystery. What setting would work well with this them
     if (isAuthenticated && savedMysteryId && user) {
       await saveMessageToDatabase({
         conversation_id: savedMysteryId,
-        role: "user",
         content: input,
-        is_ai: false
+        is_ai: false,
+        role: "user"
       });
     }
     

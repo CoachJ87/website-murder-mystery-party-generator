@@ -1,3 +1,4 @@
+
 // src/pages/MysteryDashboard.tsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -61,15 +62,20 @@ const MysteryDashboard = () => {
       }
       
       // Convert the conversations data to the Mystery type
-      const formattedMysteries = data?.map(convo => ({
-        id: convo.id,
-        title: convo.title || 'Untitled Mystery',
-        theme: convo.mystery_data?.theme || 'Mystery Theme',
-        has_purchased: convo.is_paid || false,
-        created_at: convo.created_at,
-        updated_at: convo.updated_at,
-        purchase_date: convo.updated_at // Using updated_at as purchase_date for now
-      })) || [];
+      const formattedMysteries = data?.map(convo => {
+        // Safely extract theme from mystery_data
+        const mysteryData = typeof convo.mystery_data === 'object' ? convo.mystery_data : {};
+        
+        return {
+          id: convo.id,
+          title: convo.title || 'Untitled Mystery',
+          theme: (mysteryData as any)?.theme || 'Mystery Theme',
+          has_purchased: convo.is_paid || false,
+          created_at: convo.created_at,
+          updated_at: convo.updated_at,
+          purchase_date: convo.updated_at // Using updated_at as purchase_date for now
+        };
+      }) || [];
       
       setMysteries(formattedMysteries);
     } catch (error) {

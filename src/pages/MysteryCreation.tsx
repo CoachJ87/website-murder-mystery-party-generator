@@ -18,7 +18,7 @@ const MysteryCreation = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditing = !!id;
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   
   useEffect(() => {
     // Check if we're returning from preview to edit
@@ -35,7 +35,7 @@ const MysteryCreation = () => {
       setFormData(data);
       
       // If user is authenticated, save to database
-      if (isAuthenticated) {
+      if (isAuthenticated && user) {
         let conversationId = id;
         
         // If not editing, create a new conversation
@@ -44,7 +44,8 @@ const MysteryCreation = () => {
             .from("conversations")
             .insert({
               title: data.title || `${data.theme} Mystery`,
-              mystery_data: data
+              mystery_data: data,
+              user_id: user.id
             })
             .select()
             .single();

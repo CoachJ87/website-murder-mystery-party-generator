@@ -2,6 +2,7 @@
 // src/services/mysteryPackageService.ts
 import { getAIResponse } from '@/services/aiService';
 import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/context/AuthContext';
 
 // Interface for conversation messages
 interface Message {
@@ -17,7 +18,7 @@ export const generateCompletePackage = async (mysteryId: string): Promise<string
     // 1. Fetch the original conversation
     const { data: conversations, error: convError } = await supabase
       .from("conversations")
-      .select("*")
+      .select("*, user_id")
       .eq("mystery_id", mysteryId)
       .eq("prompt_version", "free")
       .single();
@@ -60,7 +61,8 @@ export const generateCompletePackage = async (mysteryId: string): Promise<string
       .insert({
         mystery_id: mysteryId,
         prompt_version: "paid",
-        is_completed: true
+        is_completed: true,
+        user_id: conversations.user_id  // Use the user_id from the original conversation
       })
       .select()
       .single();
@@ -76,12 +78,14 @@ export const generateCompletePackage = async (mysteryId: string): Promise<string
           {
             conversation_id: newConv.id,
             content: transitionPrompt.content,
-            is_ai: false
+            is_ai: false,
+            role: "user"
           },
           {
             conversation_id: newConv.id,
             content: packageContent,
-            is_ai: true
+            is_ai: true,
+            role: "assistant"
           }
         ]);
     }

@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -104,7 +105,7 @@ const MysteryCreator = ({
               .sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
               .map((msg: any) => ({
                 id: msg.id,
-                role: msg.is_ai ? "assistant" : "user",
+                role: msg.is_ai ? "assistant" as const : "user" as const,
                 content: msg.content,
                 timestamp: new Date(msg.created_at)
               }));
@@ -189,6 +190,7 @@ const MysteryCreator = ({
             conversation_id: conversationId,
             content: newUserMessage.content,
             is_ai: false,
+            role: "user"
           });
       }
       
@@ -221,6 +223,7 @@ const MysteryCreator = ({
             conversation_id: conversationId,
             content: aiResponse.content,
             is_ai: true,
+            role: "assistant"
           });
       }
       
