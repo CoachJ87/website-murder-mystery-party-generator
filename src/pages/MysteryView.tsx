@@ -1,3 +1,4 @@
+
 // src/pages/MysteryView.tsx
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -181,7 +182,12 @@ const MysteryView = () => {
   };
 
   const parseContent = () => {
-    if (!packageContent) return {};
+    if (!packageContent) return {
+      hostGuide: "Host guide content not found",
+      characters: "Character guide content not found",
+      materials: "Materials content not found",
+      setup: "Setup instructions not found"
+    };
     
     // More robust section parsing with fallbacks
     let hostGuide = "Host guide content not found";
@@ -263,6 +269,9 @@ const MysteryView = () => {
     
     return { hostGuide, characters, materials, setup };
   };
+  
+  // Make sure sections is defined for all parts of the component
+  const sections = parseContent();
 
   if (loading) {
     return (

@@ -42,7 +42,9 @@ const AccountSettings = () => {
     try {
       // Fix the type error by using user_metadata instead of data
       const { error } = await supabase.auth.updateUser({
-        data: { name }
+        data: { 
+          user_metadata: { name } 
+        }
       });
       
       if (error) throw error;
