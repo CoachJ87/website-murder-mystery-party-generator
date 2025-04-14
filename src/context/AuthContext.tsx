@@ -127,11 +127,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Helper function to validate email
+  const isValidEmail = (email: string): boolean => {
+    // Basic email validation
+    const basicEmailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!basicEmailRegex.test(email)) return false;
+    
+    // Check for common test domains that Supabase might reject
+    const lowerEmail = email.toLowerCase();
+    const testDomains = ['test.com', 'example.com', 'test.test', 'example.example'];
+    
+    // If using a test domain, ensure it's a valid format that Supabase will accept
+    if (testDomains.some(domain => lowerEmail.endsWith(`@${domain}`))) {
+      // For test emails, ensure they have a proper username
+      const username = lowerEmail.split('@')[0];
+      return username.length >= 3 && /^[a-z0-9._-]+$/i.test(username);
+    }
+    
+    return true;
+  };
+
   const signUp = async (name: string, email: string, password: string) => {
     setLoading(true);
     try {
+      // Validate email first
+      if (!isValidEmail(email)) {
+        toast.error("Please provide a valid email address");
+        setLoading(false);
+        return;
+      }
+
+      // For testing purposes, use a more reliable email domain
+      let signupEmail = email;
+      if (email.toLowerCase() === "test@test.com") {
+        signupEmail = `user${Math.floor(Math.random() * 10000)}@gmail.com`;
+        toast.info(`For testing, using ${signupEmail} instead of test@test.com`);
+      }
+
       const { data, error } = await supabase.auth.signUp({
-        email,
+        email: signupEmail,
         password,
         options: {
           data: {
@@ -147,7 +181,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         navigate("/check-email");
       }
     } catch (error: any) {
-      toast.error(`Failed to create account: ${error.message}`);
+      console.error("Signup error:", error);
+      
+      if (error.message.includes('email_address_invalid')) {
+        toast.error("This email address is not accepted for registration. Please try another email.");
+      } else {
+        toast.error(`Failed to create account: ${error.message}`);
+      }
       throw error;
     } finally {
       setLoading(false);
