@@ -1,15 +1,4 @@
-
-// src/services/aiService.ts
-import Anthropic from '@anthropic-ai/sdk';
-
-// In Vite, environment variables are available via import.meta.env, not process.env
-const ANTHROPIC_API_KEY = "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";
-
-// Initialize Anthropic client with the dangerouslyAllowBrowser flag set to true
-const anthropic = new Anthropic({
-  apiKey: ANTHROPIC_API_KEY,
-  dangerouslyAllowBrowser: true, // Add this flag to explicitly allow browser usage
-});
+import { supabase } from "@/integrations/supabase/client";
 
 // Interface for conversation messages
 interface Message {
@@ -20,31 +9,22 @@ interface Message {
 // Function to get AI response for your murder mystery chatbot
 export const getAIResponse = async (messages: Message[], promptVersion: 'free' | 'paid'): Promise<string> => {
   try {
-    // Get the appropriate system prompt based on promptVersion
-    const systemPrompt = promptVersion === 'paid' 
-      ? "You are an AI assistant that helps create detailed murder mystery party games. Since the user has purchased, provide complete character details, clues, and all game materials."
-      : "You are an AI assistant that helps create murder mystery party games. Create an engaging storyline and suggest character ideas, but don't provide complete details as this is a preview.";
-    
-    const response = await anthropic.messages.create({
-      model: "claude-3-opus-20240229", // Or a more cost-effective model like claude-3-haiku
-      system: systemPrompt,
-      messages: messages.map(msg => ({
-        role: msg.is_ai ? "assistant" : "user",
-        content: msg.content
-      })),
-      max_tokens: 1000,
+    const { data, error } = await supabase.functions.invoke('mystery-ai', {
+      body: { messages, promptVersion }
     });
-    
-    // Handle the response content properly based on the SDK's structure
-    if (response.content[0].type === 'text') {
-      return response.content[0].text;
+
+    if (error) {
+      console.error("Error calling Edge Function:", error);
+      return generateMockResponse(messages, promptVersion);
     }
-    
-    // Fallback if the response doesn't have text content
+
+    if (data.content && data.content[0].type === 'text') {
+      return data.content[0].text;
+    }
+
     return "I couldn't generate a proper response. Please try again.";
   } catch (error) {
-    console.error("Error calling Anthropic API:", error);
-    // Fallback to mock response if API call fails
+    console.error("Error calling Edge Function:", error);
     return generateMockResponse(messages, promptVersion);
   }
 };

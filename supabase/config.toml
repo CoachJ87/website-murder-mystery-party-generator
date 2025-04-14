@@ -37,5 +37,8 @@ enabled = true
 port = 54328
 vector_port = 54329
 
+[functions.mystery-ai]
+verify_jwt = true
+
 [functions.generate-chatbot-token]
 verify_jwt = true
