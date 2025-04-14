@@ -62,43 +62,9 @@ const MysteryPreview = () => {
       navigate("/sign-in");
       return;
     }
-    
-    try {
-      setPurchasing(true);
-      
-      // Here you would typically redirect to Stripe
-      // For example:
-      // 1. Create a Stripe checkout session
-      const response = await fetch('https://your-stripe-function-url.com/create-checkout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          mysteryId: id,
-          userId: user.id,
-          productName: mystery.title || "Murder Mystery Package",
-          price: 499, // $4.99 in cents
-        }),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to create checkout session');
-      }
-      
-      const { url } = await response.json();
-      
-      // 2. Redirect to Stripe checkout
-      window.location.href = url;
-      
-      // Note: After successful payment, Stripe will redirect back to your site
-      // You'll need a webhook to handle successful payments
-      
-    } catch (error) {
-      console.error("Error initiating purchase:", error);
-      toast.error("Failed to start purchase process");
-      setPurchasing(false);
-    }
+
+    // Navigate to the dedicated purchase page
+    navigate(`/mystery/purchase/${id}`);
   };
 
   // For testing only - in development
