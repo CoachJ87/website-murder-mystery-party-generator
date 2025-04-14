@@ -29,11 +29,10 @@ const SignIn = () => {
     try {
       setIsLoading(true);
       await signIn(email, password);
-      // After successful sign-in, navigate to dashboard
-      navigate("/dashboard");
+      // Navigation is handled inside signIn function
     } catch (error) {
-      // Error is handled in the signIn function
       console.error(error);
+      // Error is handled in the signIn function
     } finally {
       setIsLoading(false);
     }
@@ -44,9 +43,9 @@ const SignIn = () => {
       setSocialLoading('google');
       await signInWithGoogle();
       // Redirect happens in the signInWithGoogle function
+      // Not setting socialLoading to null here as the page will redirect
     } catch (error: any) {
-      toast.error(`Failed to sign in with Google: ${error.message}`);
-      console.error(error);
+      console.error("Google sign in error:", error);
       setSocialLoading(null);
     }
   };

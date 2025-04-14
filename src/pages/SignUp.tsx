@@ -11,10 +11,11 @@ import Footer from "@/components/Footer";
 import { Mail, User, Lock, ArrowRight } from "lucide-react";
 
 const SignUp = () => {
-  const { signUp, loading, signInWithGoogle } = useAuth();
+  const { signUp, signInWithGoogle } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState<string | null>(null);
   const navigate = useNavigate();
 
@@ -32,11 +33,14 @@ const SignUp = () => {
     }
     
     try {
+      setIsLoading(true);
       await signUp(name, email, password);
-      // Redirect is handled in the signUp function
+      // Navigation handled in signUp function
     } catch (error) {
-      // Error is handled in the signUp function
       console.error(error);
+      // Error handling is done in the signUp function
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -44,9 +48,9 @@ const SignUp = () => {
     try {
       setSocialLoading('google');
       await signInWithGoogle();
+      // Not setting socialLoading to null here as the page will redirect
     } catch (error: any) {
       console.error("Google sign in error:", error);
-    } finally {
       setSocialLoading(null);
     }
   };
@@ -154,13 +158,13 @@ const SignUp = () => {
                 </p>
               </div>
               
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? (
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? (
                   <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
                 ) : (
                   <ArrowRight className="h-4 w-4 mr-2" />
                 )}
-                {loading ? "Creating account..." : "Create Account"}
+                {isLoading ? "Creating account..." : "Create Account"}
               </Button>
             </form>
             

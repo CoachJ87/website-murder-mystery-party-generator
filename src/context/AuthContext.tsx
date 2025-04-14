@@ -68,6 +68,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log("Auth state changed:", event);
+        
         if (event === 'SIGNED_IN' && session) {
           const { data: userData } = await supabase.auth.getUser();
           if (userData.user) {
@@ -105,6 +107,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signIn = async (email: string, password: string) => {
     try {
+      setLoading(true);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -114,11 +117,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (data.user) {
         toast.success("Signed in successfully!");
-        // Note: We'll let the component handle navigation
+        navigate("/dashboard");
       }
     } catch (error: any) {
       toast.error(`Failed to sign in: ${error.message}`);
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -155,7 +160,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/dashboard`,
-          scopes: 'email profile',
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          }
         }
       });
       
