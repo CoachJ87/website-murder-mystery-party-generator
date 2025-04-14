@@ -5,9 +5,10 @@ import Anthropic from '@anthropic-ai/sdk';
 // In Vite, environment variables are available via import.meta.env, not process.env
 const ANTHROPIC_API_KEY = "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";
 
-// Initialize Anthropic client
+// Initialize Anthropic client with the dangerouslyAllowBrowser flag set to true
 const anthropic = new Anthropic({
   apiKey: ANTHROPIC_API_KEY,
+  dangerouslyAllowBrowser: true, // Add this flag to explicitly allow browser usage
 });
 
 // Interface for conversation messages
