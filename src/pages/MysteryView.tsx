@@ -13,10 +13,21 @@ import { useAuth } from "@/context/AuthContext";
 import SendToGuestsDialog from "@/components/SendToGuestsDialog";
 import { generateCompletePackage } from "@/services/mysteryPackageService";
 
+// Define interface for mystery data to prevent excessive type recursion
+interface MysteryData {
+  id: string;
+  title: string;
+  theme?: string;
+  characters?: any[];
+  has_purchased?: boolean;
+  user_id?: string;
+  [key: string]: any; // Allow additional properties
+}
+
 const MysteryView = () => {
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
-  const [mystery, setMystery] = useState<any>(null);
+  const [mystery, setMystery] = useState<MysteryData | null>(null);
   const [packageContent, setPackageContent] = useState<string | null>(null);
   const [sendDialogOpen, setSendDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("host-guide");

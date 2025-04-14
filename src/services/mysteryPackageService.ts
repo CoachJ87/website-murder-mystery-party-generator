@@ -2,7 +2,6 @@
 // src/services/mysteryPackageService.ts
 import { getAIResponse } from '@/services/aiService';
 import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/context/AuthContext';
 
 // Interface for conversation messages
 interface Message {

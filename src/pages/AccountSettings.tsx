@@ -69,7 +69,6 @@ const AccountSettings = () => {
     
     setPasswordLoading(true);
     try {
-      // First verify the old password by attempting to sign in
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email: user?.email || "",
         password: oldPassword,
@@ -77,7 +76,6 @@ const AccountSettings = () => {
       
       if (signInError) throw new Error("Current password is incorrect");
       
-      // Then update to the new password
       const { error } = await supabase.auth.updateUser({
         password: newPassword,
       });
@@ -99,8 +97,6 @@ const AccountSettings = () => {
   const handleAccountDelete = async () => {
     try {
       setLoading(true);
-      // Note: Account deletion usually requires admin rights in Supabase
-      // This is a simplified implementation
       const { error } = await supabase.rpc('delete_user_account');
       
       if (error) throw error;
