@@ -21,6 +21,9 @@ interface MysteryData {
   characters?: any[];
   has_purchased?: boolean;
   user_id?: string;
+  created_at?: string;
+  updated_at?: string;
+  free_prompts_used?: number;
   [key: string]: any; // Allow additional properties
 }
 
@@ -60,13 +63,13 @@ const MysteryView = () => {
         return;
       }
       
-      if (!mysteryData.has_purchased) {
-        toast.error("You need to purchase this mystery to view materials");
-        navigate("/dashboard");
-        return;
-      }
+      // Ensure the mysteryData has a title field, even if it's just a default value
+      const processedData: MysteryData = {
+        ...mysteryData,
+        title: mysteryData.title || "Untitled Mystery"
+      };
       
-      setMystery(mysteryData);
+      setMystery(processedData);
       
       // Load package content if it exists
       const { data: convData, error: convError } = await supabase
