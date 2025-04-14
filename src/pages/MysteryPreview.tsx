@@ -1,9 +1,9 @@
-
+// src/pages/MysteryPreview.tsx
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, Loader2 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { toast } from "sonner";
@@ -13,42 +13,41 @@ import { supabase } from "@/lib/supabase";
 const MysteryPreview = () => {
   const [loading, setLoading] = useState(true);
   const [mystery, setMystery] = useState<any>(null);
+  const [purchasing, setPurchasing] = useState(false);
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   useEffect(() => {
-    loadMystery();
+    if (id) {
+      loadMystery();
+    }
   }, [id]);
 
   const loadMystery = async () => {
     try {
       setLoading(true);
       
-      // In a real app, fetch from Supabase
-      // const { data, error } = await supabase
-      //   .from('mysteries')
-      //   .select('*')
-      //   .eq('id', id)
-      //   .single();
+      // Fetch mystery from Supabase
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", id)
+        .single();
+        
+      if (error) {
+        console.error("Error loading mystery:", error);
+        toast.error("Failed to load mystery details");
+        return;
+      }
       
-      // Simulate loading
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // If already purchased, redirect to view page
+      if (data.has_purchased) {
+        navigate(`/mystery/${id}`);
+        return;
+      }
       
-      // Mock data
-      setMystery({
-        id: id,
-        title: "Murder at the Speakeasy",
-        theme: "1920s Speakeasy",
-        setting: "A hidden speakeasy in Chicago during the prohibition era",
-        victim: "The wealthy club owner who has many powerful enemies",
-        suspects: [
-          "The jealous business partner",
-          "The spurned lover and lounge singer",
-          "The corrupt police officer on the take"
-        ],
-        status: "completed"
-      });
+      setMystery(data);
     } catch (error) {
       console.error("Error loading mystery:", error);
       toast.error("Failed to load mystery details");
@@ -65,11 +64,76 @@ const MysteryPreview = () => {
     }
     
     try {
-      // Direct to Stripe payment link
-      window.location.href = "https://buy.stripe.com/7sI8zu7EhecrcuI144";
+      setPurchasing(true);
+      
+      // Here you would typically redirect to Stripe
+      // For example:
+      // 1. Create a Stripe checkout session
+      const response = await fetch('https://your-stripe-function-url.com/create-checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          mysteryId: id,
+          userId: user.id,
+          productName: mystery.title || "Murder Mystery Package",
+          price: 499, // $4.99 in cents
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to create checkout session');
+      }
+      
+      const { url } = await response.json();
+      
+      // 2. Redirect to Stripe checkout
+      window.location.href = url;
+      
+      // Note: After successful payment, Stripe will redirect back to your site
+      // You'll need a webhook to handle successful payments
+      
     } catch (error) {
       console.error("Error initiating purchase:", error);
       toast.error("Failed to start purchase process");
+      setPurchasing(false);
+    }
+  };
+
+  // For testing only - in development
+  const handleSimulatePurchase = async () => {
+    if (!isAuthenticated) {
+      toast.error("Please sign in to purchase this mystery");
+      navigate("/sign-in");
+      return;
+    }
+    
+    try {
+      setPurchasing(true);
+      
+      // Update the mystery as purchased
+      const { error } = await supabase
+        .from("profiles")
+        .update({ 
+          has_purchased: true,
+          purchase_date: new Date().toISOString()
+        })
+        .eq("id", id);
+        
+      if (error) {
+        throw new Error("Failed to update purchase status");
+      }
+      
+      toast.success("Purchase simulated successfully!");
+      
+      // Navigate to dashboard where generation will happen
+      navigate("/dashboard");
+      
+    } catch (error) {
+      console.error("Error simulating purchase:", error);
+      toast.error("Failed to simulate purchase");
+      setPurchasing(false);
     }
   };
 
@@ -79,7 +143,7 @@ const MysteryPreview = () => {
         <Header />
         
         <main className="flex-1 flex items-center justify-center">
-          <div className="h-8 w-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          <Loader2 className="h-8 w-8 animate-spin" />
         </main>
         
         <Footer />
@@ -114,9 +178,9 @@ const MysteryPreview = () => {
       <main className="flex-1 py-12 px-4">
         <div className="container mx-auto max-w-4xl">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">{mystery.title}</h1>
+            <h1 className="text-3xl font-bold mb-2">{mystery.title || "Mystery Preview"}</h1>
             <p className="text-muted-foreground">
-              Preview of your {mystery.theme} murder mystery
+              Preview of your {mystery.theme || "murder mystery"}
             </p>
           </div>
           
@@ -130,15 +194,15 @@ const MysteryPreview = () => {
                 <CardContent className="space-y-4">
                   <div>
                     <h3 className="font-medium">Theme</h3>
-                    <p>{mystery.theme}</p>
+                    <p>{mystery.theme || "Not specified"}</p>
                   </div>
                   <div>
                     <h3 className="font-medium">Setting</h3>
-                    <p>{mystery.setting}</p>
+                    <p>{mystery.setting || "Custom setting"}</p>
                   </div>
                   <div>
                     <h3 className="font-medium">Victim</h3>
-                    <p>{mystery.victim}</p>
+                    <p>{mystery.victim || "Custom victim"}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -168,9 +232,31 @@ const MysteryPreview = () => {
                     ))}
                   </div>
                 </CardContent>
-                <CardFooter>
-                  <Button className="w-full" onClick={handlePurchase}>
-                    Purchase Now
+                <CardFooter className="flex flex-col gap-3">
+                  <Button 
+                    className="w-full" 
+                    onClick={handlePurchase} 
+                    disabled={purchasing}
+                  >
+                    {purchasing ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      "Purchase Now"
+                    )}
+                  </Button>
+                  
+                  {/* For development testing only - remove in production */}
+                  <Button 
+                    className="w-full" 
+                    variant="outline"
+                    size="sm"
+                    onClick={handleSimulatePurchase} 
+                    disabled={purchasing}
+                  >
+                    Simulate Purchase (Dev Only)
                   </Button>
                 </CardFooter>
               </Card>
