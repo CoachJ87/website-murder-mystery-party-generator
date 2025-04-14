@@ -22,6 +22,7 @@ type Mystery = {
   is_generating?: boolean;
   created_at: string;
   updated_at: string;
+  purchase_date?: string;
 };
 
 const MysteryDashboard = () => {

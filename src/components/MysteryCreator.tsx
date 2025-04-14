@@ -47,9 +47,8 @@ const MysteryCreator = ({
   });
   const initialLoadComplete = useRef(false);
 
-  // Get daily credits from localStorage
   const getDailyCredits = () => {
-    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    const today = new Date().toISOString().split('T')[0];
     const storedData = localStorage.getItem('dailyCredits');
     
     if (!storedData) {
@@ -58,14 +57,12 @@ const MysteryCreator = ({
     
     const data = JSON.parse(storedData);
     if (data.date !== today) {
-      // Reset if it's a new day
       return { date: today, remaining: MAX_FREE_MESSAGES };
     }
     
     return data;
   };
 
-  // Save daily credits to localStorage
   const saveDailyCredits = (remaining: number) => {
     const today = new Date().toISOString().split('T')[0];
     localStorage.setItem('dailyCredits', JSON.stringify({
@@ -74,7 +71,6 @@ const MysteryCreator = ({
     }));
   };
   
-  // Initialize daily credits
   const [remainingCredits, setRemainingCredits] = useState(getDailyCredits().remaining);
   
   useEffect(() => {
@@ -82,16 +78,13 @@ const MysteryCreator = ({
     setRemainingCredits(credits.remaining);
   }, []);
 
-  // Check if user can send a message
   const canSendMessage = isAuthenticated || remainingCredits > 0;
 
-  // Load or create conversation in Supabase
   useEffect(() => {
     const loadOrCreateConversation = async () => {
       if (!isAuthenticated || !user || !savedMysteryId || initialLoadComplete.current) return;
       
       try {
-        // Look for existing conversation for this mystery
         const { data: existingConversation, error: fetchError } = await supabase
           .from("conversations")
           .select("*, messages(*)")
@@ -104,12 +97,9 @@ const MysteryCreator = ({
         }
         
         if (existingConversation) {
-          // Existing conversation found
           setConversationId(existingConversation.id);
           
-          // If there are messages in the conversation, load them
           if (existingConversation.messages && existingConversation.messages.length > 0) {
-            // Format messages from database
             const formattedMessages = existingConversation.messages
               .sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
               .map((msg: any) => ({
@@ -122,7 +112,6 @@ const MysteryCreator = ({
             setMessages(formattedMessages);
           }
         } else if (savedMysteryId) {
-          // Create new conversation
           const { data: newConversation, error: createError } = await supabase
             .from("conversations")
             .insert({ 
@@ -193,7 +182,6 @@ const MysteryCreator = ({
     setLoading(true);
     
     try {
-      // Save user message to database if authenticated
       if (isAuthenticated && conversationId) {
         await supabase
           .from("messages")
@@ -204,19 +192,16 @@ const MysteryCreator = ({
           });
       }
       
-      // Get messages in format for AI service
       const messagesForAI = messages.concat(newUserMessage).map(msg => ({
         is_ai: msg.role === "assistant",
         content: msg.content
       }));
       
-      // Get AI response using Anthropic
       let aiResponseContent;
       try {
         aiResponseContent = await getAIResponse(messagesForAI, "free");
       } catch (error) {
         console.error("Error calling AI service:", error);
-        // Fallback to mock response if AI service fails
         aiResponseContent = generateMockResponse(input, messages.length, selectedTheme);
       }
       
@@ -229,7 +214,6 @@ const MysteryCreator = ({
       
       setMessages(prev => [...prev, aiResponse]);
       
-      // Save AI message to database if authenticated
       if (isAuthenticated && conversationId) {
         await supabase
           .from("messages")
@@ -240,10 +224,8 @@ const MysteryCreator = ({
           });
       }
       
-      // Decrement daily credits after successful exchange
       decrementCredits();
       
-      // Auto-save after each exchange
       onSave([...messages, newUserMessage, aiResponse]);
       
     } catch (error) {
@@ -262,7 +244,6 @@ const MysteryCreator = ({
     }
   };
 
-  // Mock AI response generation as fallback
   const generateMockResponse = (userMessage: string, messageCount: number, theme: string) => {
     if (messageCount === 0) {
       return `Great choice! Let's develop a murder mystery with a ${theme || "intriguing"} theme. What's the setting or time period you'd like for this mystery?`;
@@ -288,7 +269,6 @@ const MysteryCreator = ({
         </Badge>
       </div>
       
-      {/* Theme selection */}
       {messages.length === 0 && (
         <div className="mb-6">
           <p className="text-muted-foreground mb-3">Select a theme to get started:</p>
@@ -307,7 +287,6 @@ const MysteryCreator = ({
         </div>
       )}
       
-      {/* Messages container */}
       <div className="flex-1 overflow-y-auto mb-4 space-y-4 p-4 border rounded-lg bg-background/50">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
@@ -328,7 +307,6 @@ const MysteryCreator = ({
         <div ref={messagesEndRef} />
       </div>
       
-      {/* Input area */}
       <div className="relative">
         <Textarea
           ref={textareaRef}

@@ -1,3 +1,4 @@
+
 // src/services/mysteryPackageService.ts
 import { getAIResponse } from './aiService';
 import { supabase } from '@/lib/supabase';
