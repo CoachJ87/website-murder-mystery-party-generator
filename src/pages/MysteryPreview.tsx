@@ -28,6 +28,7 @@ const MysteryPreview = () => {
     try {
       setLoading(true);
       
+      // Fetch mystery from Supabase
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
@@ -40,6 +41,7 @@ const MysteryPreview = () => {
         return;
       }
       
+      // If already purchased, redirect to view page
       if (data.has_purchased) {
         navigate(`/mystery/${id}`);
         return;
@@ -64,15 +66,33 @@ const MysteryPreview = () => {
     try {
       setPurchasing(true);
       
-      const { data, error } = await supabase.functions.invoke('create-payment', {
-        body: { mysteryId: id }
+      // Here you would typically redirect to Stripe
+      // For example:
+      // 1. Create a Stripe checkout session
+      const response = await fetch('https://your-stripe-function-url.com/create-checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          mysteryId: id,
+          userId: user.id,
+          productName: mystery.title || "Murder Mystery Package",
+          price: 499, // $4.99 in cents
+        }),
       });
       
-      if (error) {
+      if (!response.ok) {
         throw new Error('Failed to create checkout session');
       }
       
-      window.location.href = data.url;
+      const { url } = await response.json();
+      
+      // 2. Redirect to Stripe checkout
+      window.location.href = url;
+      
+      // Note: After successful payment, Stripe will redirect back to your site
+      // You'll need a webhook to handle successful payments
       
     } catch (error) {
       console.error("Error initiating purchase:", error);
@@ -81,6 +101,7 @@ const MysteryPreview = () => {
     }
   };
 
+  // For testing only - in development
   const handleSimulatePurchase = async () => {
     if (!isAuthenticated) {
       toast.error("Please sign in to purchase this mystery");
@@ -91,6 +112,7 @@ const MysteryPreview = () => {
     try {
       setPurchasing(true);
       
+      // Update the mystery as purchased
       const { error } = await supabase
         .from("profiles")
         .update({ 
@@ -105,6 +127,7 @@ const MysteryPreview = () => {
       
       toast.success("Purchase simulated successfully!");
       
+      // Navigate to dashboard where generation will happen
       navigate("/dashboard");
       
     } catch (error) {
@@ -225,6 +248,7 @@ const MysteryPreview = () => {
                     )}
                   </Button>
                   
+                  {/* For development testing only - remove in production */}
                   <Button 
                     className="w-full" 
                     variant="outline"
