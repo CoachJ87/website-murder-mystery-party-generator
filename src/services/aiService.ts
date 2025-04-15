@@ -56,4 +56,62 @@ Background: Wealthy socialite, known for her extravagant parties and philanthrop
 Secret: Was blackmailing several guests over their dark secrets.
 
 ### Suspect 1 - Professor James Hawthorne
-Background: Renowned historian and academic, Elizabeth's former
+Background: Renowned historian and academic, Elizabeth's former business partner.
+Motive: Elizabeth threatened to reveal his academic fraud.
+Secret: Has been falsifying research for years to maintain his reputation.
+
+### Suspect 2 - Victoria Blackwood
+Background: Elizabeth's personal assistant and distant cousin.
+Motive: Recently discovered she was cut out of Elizabeth's will.
+Secret: Has been embezzling small amounts from Elizabeth's accounts.
+
+## Host Instructions
+
+1. Send invitations 2 weeks before the event
+2. Prepare the venue with 1920s decorations
+3. Distribute character packets on arrival
+4. Guide players through the 3 rounds of investigation
+
+## Game Materials
+
+* 6 Evidence cards
+* Character name tags
+* Case file documents
+* Final accusation forms
+
+## Timeline of Events
+
+7:00 PM - Guests arrive, introductions
+8:00 PM - Murder is discovered
+8:15 PM - Round 1 investigation
+9:00 PM - Round 2 investigation
+9:45 PM - Final accusations and reveal`;
+  }
+  
+  if (messageCount <= 1) {
+    return `Great! I'd be happy to help you create a murder mystery game. Let's think about what kind of theme you're interested in. Would you prefer a classic whodunit in a mansion, a historical setting like the 1920s, or perhaps something more unusual like a sci-fi or fantasy murder mystery?
+
+Your input: "${lastUserMessage.substring(0, 100)}${lastUserMessage.length > 100 ? '...' : ''}"`;
+  } else if (messageCount <= 3) {
+    return `That's a great direction! Now let's think about our cast of characters. A good murder mystery typically needs:
+
+1. A victim (who will be murdered)
+2. 4-8 suspects (one being the actual murderer)
+3. Perhaps a detective character
+
+What kind of characters would fit well in your setting? Think about their relationships, potential motives, and interesting backgrounds.
+
+Your latest message: "${lastUserMessage.substring(0, 100)}${lastUserMessage.length > 100 ? '...' : ''}"`;
+  } else {
+    return `You're making excellent progress on your murder mystery! Let's develop this further based on what you've shared:
+
+"${lastUserMessage.substring(0, 100)}${lastUserMessage.length > 100 ? '...' : ''}"
+
+Here are some ideas to consider:
+- What kind of clues would lead the players to the murderer?
+- How will you reveal information gradually throughout the game?
+- What red herrings might you include to keep players guessing?
+
+To create a complete package with all character details, clues, and game materials, you'll want to purchase the premium version.`;
+  }
+};
