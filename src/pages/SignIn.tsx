@@ -38,20 +38,6 @@ const SignIn = () => {
     }
   };
 
-  // Quick login for test account
-  const handleTestLogin = async () => {
-    try {
-      setIsLoading(true);
-      console.log("Using test account login with test@test.com");
-      await signIn("test@test.com", "123123");
-    } catch (error) {
-      // Error is handled in the signIn function
-      console.error("Test account login error:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleGoogleSignIn = async () => {
     try {
       setSocialLoading('google');
@@ -103,20 +89,6 @@ const SignIn = () => {
                   </svg>
                 )}
                 <span>Continue with Google</span>
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                className="w-full flex items-center justify-center gap-2 bg-blue-50 hover:bg-blue-100"
-                onClick={handleTestLogin}
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <Mail className="h-4 w-4" />
-                )}
-                <span>Use Test Account</span>
               </Button>
             </div>
             

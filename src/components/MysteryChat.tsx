@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -32,6 +33,7 @@ const MysteryChat = ({
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [initialPrompt, setInitialPrompt] = useState<string | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
   const { user, isAuthenticated } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { textareaRef, adjustHeight } = useAutoResizeTextarea({
@@ -39,22 +41,47 @@ const MysteryChat = ({
     maxHeight: 200,
   });
   
-  // Fetch initial mystery data and prompts
+  // Fetch initial mystery data, prompts and existing messages
   useEffect(() => {
     const fetchMysteryData = async () => {
       if (savedMysteryId) {
-        const { data, error } = await supabase
-          .from("conversations")
-          .select("mystery_data")
-          .eq("id", savedMysteryId)
-          .single();
-        
-        if (!error && data && data.mystery_data) {
-          // Safely access the mystery data with type checking
-          const mysteryData = typeof data.mystery_data === 'object' ? data.mystery_data : {};
+        try {
+          // First, fetch existing messages if any
+          const { data: existingMessages, error: messagesError } = await supabase
+            .from("messages")
+            .select("*")
+            .eq("conversation_id", savedMysteryId)
+            .order("created_at", { ascending: true });
           
-          // Use optional chaining and nullish coalescing for safe access
-          const formattedPrompt = `I want to create a murder mystery with these details:
+          if (!messagesError && existingMessages && existingMessages.length > 0) {
+            console.log("Found existing messages:", existingMessages.length);
+            
+            // Format existing messages
+            const formattedMessages: Message[] = existingMessages.map(msg => ({
+              id: msg.id,
+              role: msg.is_ai ? "assistant" : "user",
+              content: msg.content,
+              timestamp: new Date(msg.created_at)
+            }));
+            
+            setMessages(formattedMessages);
+            setIsInitialized(true);
+            return; // Exit early since we have existing messages
+          }
+
+          // If no messages found, fetch mystery data to build initial prompt
+          const { data, error } = await supabase
+            .from("conversations")
+            .select("mystery_data")
+            .eq("id", savedMysteryId)
+            .single();
+          
+          if (!error && data && data.mystery_data) {
+            // Safely access the mystery data with type checking
+            const mysteryData = typeof data.mystery_data === 'object' ? data.mystery_data : {};
+            
+            // Use optional chaining and nullish coalescing for safe access
+            const formattedPrompt = `I want to create a murder mystery with these details:
 - Theme: ${(mysteryData as any)?.theme || initialTheme || 'Mystery Theme'}
 - Number of players: ${(mysteryData as any)?.playerCount || 8}
 - Include an accomplice: ${(mysteryData as any)?.hasAccomplice ? 'Yes' : 'No'}
@@ -62,8 +89,11 @@ const MysteryChat = ({
 ${(mysteryData as any)?.additionalDetails ? `- Additional details: ${(mysteryData as any).additionalDetails}` : ''}
 
 Help me develop this murder mystery.`;
-          
-          setInitialPrompt(formattedPrompt);
+            
+            setInitialPrompt(formattedPrompt);
+          }
+        } catch (error) {
+          console.error("Error fetching mystery data:", error);
         }
       }
     };
@@ -97,9 +127,9 @@ Help me develop this murder mystery.`;
     fetchFreePrompt();
   }, [savedMysteryId, initialTheme]);
 
-  // Initialize chat with form data
+  // Initialize chat with form data only if no existing messages were found
   useEffect(() => {
-    if (initialPrompt && messages.length === 0) {
+    if (initialPrompt && messages.length === 0 && !isInitialized) {
       const userMessage: Message = {
         id: Date.now().toString(),
         role: "user",
@@ -111,8 +141,9 @@ Help me develop this murder mystery.`;
       
       // Immediately get AI response to the initial prompt
       handleAnthropicRequest(initialPrompt);
+      setIsInitialized(true);
     }
-  }, [initialPrompt]);
+  }, [initialPrompt, messages.length, isInitialized]);
   
   useEffect(() => {
     scrollToBottom();
