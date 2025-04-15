@@ -69,22 +69,32 @@ Help me develop this murder mystery.`;
       }
     };
     
-    // Also fetch the free prompt from the database
-    const fetchFreePrompt = async () => {
-      const { data, error } = await supabase
-        .from("prompts")
-        .select("content")
-        .eq("name", "murder_mystery_free")
-        .single();
-        
-      if (error) {
-        console.error("Error fetching free prompt:", error);
-      }
-      
-      if (data && data.content) {
-        console.log("Using prompt from database:", data.content.substring(0, 50) + "...");
-      }
-    };
+// Also fetch the free prompt from the database
+const fetchFreePrompt = async () => {
+  console.log("Attempting to fetch free prompt from database...");
+  
+  const { data, error } = await supabase
+    .from("prompts")
+    .select("content")
+    .eq("name", "murder_mystery_free")
+    .single();
+    
+  if (error) {
+    console.error("Error fetching free prompt:", error);
+    console.error("Error details:", JSON.stringify(error));
+    return;
+  }
+  
+  if (data && data.content) {
+    console.log("Successfully fetched free prompt from database!");
+    console.log("Prompt preview:", data.content.substring(0, 100) + "...");
+    console.log("Prompt length:", data.content.length);
+  } else {
+    console.error("No prompt data found in the database");
+  }
+};
+
+fetchFreePrompt();
     
     fetchMysteryData();
     fetchFreePrompt();
