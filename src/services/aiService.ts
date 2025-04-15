@@ -1,4 +1,3 @@
-
 // src/services/aiService.ts
 import { supabase } from "@/lib/supabase";
 
@@ -111,34 +110,39 @@ const generateMockResponse = (messages: Message[], promptVersion: 'free' | 'paid
   const messageCount = messages.length;
   
   if (promptVersion === 'paid') {
-    return `Unfortunately the AI is not connected at the moment. Your paid mystery package will include detailed character guides, host instructions, and all game materials when the connection is restored.`;
+    return `## Premium Murder Mystery Package
+Unfortunately the AI is not connected at the moment. Your paid mystery package will include:
+
+- [ ] Detailed character guides
+- [ ] Host instructions
+- [ ] Game materials
+- [ ] Props list
+- [x] Premium support
+
+### Next Steps
+1. Reconnect to the AI service
+2. Generate your custom mystery
+3. Download your materials`;
   }
   
   if (messageCount <= 1) {
-    return `# "SECRETS OF THE SAPPHIRE SEAS" - A CRUISE SHIP MURDER MYSTERY
+    return `## "SECRETS OF THE SAPPHIRE SEAS"
+### A Cruise Ship Murder Mystery
 
-## PREMISE
-The luxury cruise liner "Sapphire Seas" is on the final night of its 7-day Caribbean voyage. The ship's wealthy owner, Elijah Blackwood, has gathered the passengers in the grand ballroom for a farewell gala dinner. As champagne flows and the orchestra plays, Elijah takes to the stage to make an announcement - but before he can speak, the lights flicker off. When they come back on seconds later, Elijah lies dead on the stage, a jeweled letter opener protruding from his chest.
+The luxury cruise liner "Sapphire Seas" is on the final night of its 7-day Caribbean voyage. The ship's wealthy owner, **Elijah Blackwood**, has gathered the passengers in the grand ballroom for a farewell gala dinner.
 
-The ship is still hours from port, and with a storm raging outside, there's no way for police to board or for anyone to leave. The ship's security officer has gathered the most likely suspects - all with reasons to want Elijah dead - to determine who committed the murder before the killer can strike again.
+### The Victim
+**Elijah Blackwood** - A ruthless, self-made shipping magnate with a reputation for crushing competitors and betraying allies.
 
-## VICTIM
-**Elijah Blackwood** - A ruthless, self-made shipping magnate with a reputation for crushing competitors and betraying allies. Behind his charming public persona was a calculating manipulator who collected people's secrets as leverage. Many passengers and crew members had fallen victim to his schemes, blackmail, or unwanted advances over the years.
-
-## CHARACTER LIST (8 PLAYERS)
-1. **Victoria/Victor Blackwood** - Elijah's ambitious spouse who recently discovered they were being written out of the will in favor of a secret lover.
-2. **Morgan Reynolds** - Elijah's business partner who discovered Elijah was embezzling funds and planning to frame them for it.
-3. **Dr. Alex Thornton** - The ship's physician who previously refused to falsify medical reports for one of Elijah's insurance scams.
-4. **Taylor Jenkins** - A celebrated chef whose restaurant was ruined after Elijah pulled investment funding at the critical moment.
-5. **Jordan Winters** - A former employee seeking revenge after Elijah stole their groundbreaking cruise ship design and claimed it as his own.
-6. **Casey Monroe** - A private investigator hired by one of Elijah's many enemies to gather compromising information.
-7. **Riley Donovan** - A wealthy passenger who lost millions in one of Elijah's fraudulent investment schemes.
-8. **Avery Martinez** - The cruise entertainment director who rejected Elijah's advances and was threatened with career ruin.
-
-## MURDER METHOD
-Elijah was killed with his own prized letter opener, a gift from a Russian business associate that he always kept in his inside jacket pocket. The killer managed to remove it during the brief blackout, stab him precisely in the heart, and disappear back into the crowd before the lights returned. Only someone familiar with Elijah's habits and with access to the electrical systems could have timed it so perfectly. The ship's security cameras were mysteriously disabled three minutes before the murder, and a single set of gloves with traces of Elijah's blood was found hidden in an air vent near the ballroom.
-
-Would this cruise ship murder mystery work for your event? I can create a complete game package with detailed character guides, host instructions, and all the game materials you'll need if you choose to purchase the full version!`;
+### Character List (8 Players)
+1. **Victoria/Victor Blackwood** - Elijah's ambitious spouse
+2. **Morgan Reynolds** - Elijah's business partner
+3. **Dr. Alex Thornton** - The ship's physician
+4. **Taylor Jenkins** - A celebrated chef
+5. **Jordan Winters** - A former employee
+6. **Casey Monroe** - A private investigator
+7. **Riley Donovan** - A wealthy passenger
+8. **Avery Martinez** - The cruise entertainment director`;
   } else if (messageCount <= 3) {
     return `That's a great direction! Now let's think about our cast of characters. A good murder mystery typically needs:
 

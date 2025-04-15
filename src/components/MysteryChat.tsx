@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -24,7 +23,18 @@ type MysteryChatProps = {
   savedMysteryId?: string;
 };
 
-const MysteryChat = ({ 
+const formatMessageContent = (content: string) => {
+  return content
+    .replace(/^## (.*$)/gm, '<h2 class="text-xl font-bold my-3">$1</h2>')
+    .replace(/^### (.*$)/gm, '<h3 class="text-lg font-semibold my-2">$1</h3>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/- \[ \] (.*$)/gm, '<div class="flex items-center gap-2 my-1"><input type="checkbox" disabled class="form-checkbox h-4 w-4" /><span>$1</span></div>')
+    .replace(/- \[x\] (.*$)/gm, '<div class="flex items-center gap-2 my-1"><input type="checkbox" checked disabled class="form-checkbox h-4 w-4" /><span>$1</span></div>')
+    .replace(/^\d+\. (.*$)/gm, '<ol class="list-decimal list-inside my-1"><li>$1</li></ol>')
+    .split('\n').join('<br />');
+};
+
+const MysteryChat = ({
   initialTheme = "",
   onSave,
   savedMysteryId,
@@ -41,12 +51,10 @@ const MysteryChat = ({
     maxHeight: 200,
   });
   
-  // Fetch initial mystery data, prompts and existing messages
   useEffect(() => {
     const fetchMysteryData = async () => {
       if (savedMysteryId) {
         try {
-          // First, fetch existing messages if any
           const { data: existingMessages, error: messagesError } = await supabase
             .from("messages")
             .select("*")
@@ -56,7 +64,6 @@ const MysteryChat = ({
           if (!messagesError && existingMessages && existingMessages.length > 0) {
             console.log("Found existing messages:", existingMessages.length);
             
-            // Format existing messages
             const formattedMessages: Message[] = existingMessages.map(msg => ({
               id: msg.id,
               role: msg.is_ai ? "assistant" : "user",
@@ -66,10 +73,9 @@ const MysteryChat = ({
             
             setMessages(formattedMessages);
             setIsInitialized(true);
-            return; // Exit early since we have existing messages
+            return;
           }
 
-          // If no messages found, fetch mystery data to build initial prompt
           const { data, error } = await supabase
             .from("conversations")
             .select("mystery_data")
@@ -77,10 +83,8 @@ const MysteryChat = ({
             .single();
           
           if (!error && data && data.mystery_data) {
-            // Safely access the mystery data with type checking
             const mysteryData = typeof data.mystery_data === 'object' ? data.mystery_data : {};
             
-            // Use optional chaining and nullish coalescing for safe access
             const formattedPrompt = `I want to create a murder mystery with these details:
 - Theme: ${(mysteryData as any)?.theme || initialTheme || 'Mystery Theme'}
 - Number of players: ${(mysteryData as any)?.playerCount || 8}
@@ -98,7 +102,6 @@ Help me develop this murder mystery.`;
       }
     };
     
-    // Also fetch the free prompt from the database
     const fetchFreePrompt = async () => {
       console.log("Attempting to fetch free prompt from database...");
       
@@ -127,7 +130,6 @@ Help me develop this murder mystery.`;
     fetchFreePrompt();
   }, [savedMysteryId, initialTheme]);
 
-  // Initialize chat with form data only if no existing messages were found
   useEffect(() => {
     if (initialPrompt && messages.length === 0 && !isInitialized) {
       const userMessage: Message = {
@@ -139,7 +141,6 @@ Help me develop this murder mystery.`;
       
       setMessages([userMessage]);
       
-      // Immediately get AI response to the initial prompt
       handleAnthropicRequest(initialPrompt);
       setIsInitialized(true);
     }
@@ -153,29 +154,23 @@ Help me develop this murder mystery.`;
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  // Function to call the Edge Function via aiService
   const handleAnthropicRequest = async (userInput: string) => {
     setLoading(true);
     
     try {
-      // Get existing messages for context
       const contextMessages = messages.map(msg => ({
         is_ai: msg.role === "assistant",
         content: msg.content
       }));
       
-      // Add the current user input
       const allMessages = [...contextMessages, { is_ai: false, content: userInput }];
       
-      // Use the aiService to call the Edge Function
       const promptVersion = isAuthenticated ? "paid" : "free";
       
-      // Log which prompt version we're using
       console.log(`Using ${promptVersion} prompt version for request`);
       
       const aiResponseText = await getAIResponse(allMessages, promptVersion);
       
-      // Add the AI response to the messages
       const aiResponse: Message = {
         id: Date.now().toString(),
         role: "assistant",
@@ -185,7 +180,6 @@ Help me develop this murder mystery.`;
       
       setMessages(prev => [...prev, aiResponse]);
       
-      // Save to database if authenticated and have a conversation ID
       if (isAuthenticated && savedMysteryId && user) {
         await saveMessageToDatabase({
           conversation_id: savedMysteryId,
@@ -228,7 +222,6 @@ Help me develop this murder mystery.`;
     
     setMessages(prev => [...prev, newUserMessage]);
     
-    // Save user message to database if authenticated
     if (isAuthenticated && savedMysteryId && user) {
       await saveMessageToDatabase({
         conversation_id: savedMysteryId,
@@ -242,7 +235,6 @@ Help me develop this murder mystery.`;
     setInput("");
     adjustHeight(true);
     
-    // Get AI response
     await handleAnthropicRequest(currentInput);
   };
 
@@ -264,7 +256,6 @@ Help me develop this murder mystery.`;
         </Badge>
       </div>
       
-      {/* Messages container */}
       <div className="flex-1 overflow-y-auto mb-4 space-y-4 p-4 border rounded-lg bg-background/50 min-h-[400px] max-h-[500px]">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
@@ -274,7 +265,12 @@ Help me develop this murder mystery.`;
           messages.map((message) => (
             <Card key={message.id} className={`max-w-[80%] ${message.role === "user" ? "ml-auto bg-primary text-primary-foreground" : "mr-auto"}`}>
               <CardContent className="p-4">
-                <p>{message.content}</p>
+                <div 
+                  dangerouslySetInnerHTML={{ 
+                    __html: formatMessageContent(message.content) 
+                  }}
+                  className="prose prose-sm dark:prose-invert max-w-none"
+                />
                 <div className="text-xs opacity-70 mt-2">
                   {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </div>
@@ -285,7 +281,6 @@ Help me develop this murder mystery.`;
         <div ref={messagesEndRef} />
       </div>
       
-      {/* Input area */}
       <div className="relative">
         <Textarea
           ref={textareaRef}
