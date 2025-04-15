@@ -9,7 +9,7 @@ interface Message {
 // Function to get AI response for your murder mystery chatbot
 export const getAIResponse = async (messages: Message[], promptVersion: 'free' | 'paid'): Promise<string> => {
   try {
-    console.log("Calling mystery-ai Edge Function with:", { messages: messages.length, promptVersion });
+    console.log("Calling mystery-ai Edge Function with:", { messageCount: messages.length, promptVersion });
     
     const { data, error } = await supabase.functions.invoke('mystery-ai', {
       body: { messages, promptVersion }
@@ -20,14 +20,16 @@ export const getAIResponse = async (messages: Message[], promptVersion: 'free' |
       throw new Error(`Edge Function error: ${error.message}`);
     }
 
-    console.log("Edge Function response:", data);
+    console.log("Edge Function response received:", data);
     
     // Extract the response content from the Anthropic API response
     if (data && data.content && data.content.length > 0 && data.content[0].type === 'text') {
+      console.log("Returning text from Edge Function");
       return data.content[0].text;
     }
 
-    return "I couldn't generate a proper response. Please try again.";
+    console.error("Invalid response format from Edge Function:", data);
+    throw new Error("Invalid response format from Edge Function");
   } catch (error) {
     console.error("Error calling Edge Function:", error);
     throw error;
