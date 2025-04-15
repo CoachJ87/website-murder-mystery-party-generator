@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -99,6 +100,7 @@ const AccountSettings = () => {
   const handleAccountDelete = async () => {
     try {
       setLoading(true);
+      // Fix: Call delete_user_account without any parameters
       const { error } = await supabase.rpc('delete_user_account');
       
       if (error) throw error;
