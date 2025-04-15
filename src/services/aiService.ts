@@ -7,53 +7,64 @@ interface Message {
   content: string;
 }
 
-// Cache to store prompts after fetching to avoid repeated database calls
-const promptCache: Record<string, string> = {};
-
-// Function to fetch the appropriate prompt from Supabase
-async function getPromptFromSupabase(version: 'free' | 'paid'): Promise<string> {
-  // Check cache first
-  const cacheKey = `murder_mystery_${version}`;
-  if (promptCache[cacheKey]) {
-    console.log(`Using cached ${version} prompt`);
-    return promptCache[cacheKey];
-  }
-
-  console.log(`Fetching ${version} prompt from Supabase...`);
+// Function to get AI response for your murder mystery chatbot
+export const getAIResponse = async (messages: Message[], promptVersion: 'free' | 'paid'): Promise<string> => {
   try {
-    const { data, error } = await supabase
-      .from("prompts")
-      .select("content")
-      .eq("name", `murder_mystery_${version}`)
-      .single();
+    console.log("Attempting to call Vercel serverless function proxy...");
+    console.log(`Using ${promptVersion} prompt version for request`);
     
-    if (error) {
-      console.error(`Error fetching ${version} prompt:`, error);
-      return getFallbackPrompt(version);
-    }
+    // Set a timeout to avoid hanging if there's an issue
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error("Request timed out")), 15000)
+    );
     
-    if (data && data.content) {
-      // Store in cache
-      promptCache[cacheKey] = data.content;
-      console.log(`Successfully fetched ${version} prompt (${data.content.length} chars)`);
-      console.log(`Prompt starts with: "${data.content.substring(0, 100)}..."`);
-      return data.content;
-    }
+    // Your Vercel deployed URL - replace with your actual domain
+    const apiUrl = 'https://website-murder-mystery-party-generator.vercel.app/api/proxy-anthropic';
     
-    console.error(`No ${version} prompt found in database`);
-    return getFallbackPrompt(version);
-  } catch (error) {
-    console.error(`Error in getPromptFromSupabase for ${version}:`, error);
-    return getFallbackPrompt(version);
-  }
-}
+    // Prepare the request to the Anthropic API through our proxy
+    const requestBody = {
+      model: "claude-3-haiku-20240307",
+      max_tokens: 1000,
+      messages: messages.map(msg => ({
+        role: msg.is_ai ? "assistant" : "user",
+        content: msg.content
+      })),
+      system: promptVersion === 'free' 
+        ? FREE_SYSTEM_PROMPT  // We'll define this constant below
+        : `You are a Murder Mystery Creator assistant. The user has purchased the full package, so provide detailed character guides, host instructions, and all game materials needed to run a complete murder mystery party.`
+    };
+    
+    const responsePromise = fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody)
+    }).then(response => response.json());
+    
+    // Race between the actual request and the timeout
+    const data = await Promise.race([responsePromise, timeoutPromise]) as any;
 
-// Fallback prompts in case database fetch fails
-function getFallbackPrompt(version: 'free' | 'paid'): string {
-  if (version === 'paid') {
-    return "You are a Murder Mystery Creator assistant. The user has purchased the full package, so provide detailed character guides, host instructions, and all game materials needed to run a complete murder mystery party.";
-  } else {
-    return `# MURDER MYSTERY PARTY GAME CREATOR
+    if (!data || data.error) {
+      console.error("Error calling proxy function:", data?.error || "Unknown error");
+      return generateMockResponse(messages, promptVersion);
+    }
+
+    // Extract the response content from the Anthropic API response
+    if (data && data.content && data.content.length > 0 && data.content[0].type === 'text') {
+      return data.content[0].text;
+    }
+
+    console.error("Invalid response format from proxy function:", data);
+    return generateMockResponse(messages, promptVersion);
+  } catch (error) {
+    console.error("Error in getAIResponse:", error);
+    return generateMockResponse(messages, promptVersion);
+  }
+};
+
+// Define the free system prompt directly in the code
+const FREE_SYSTEM_PROMPT = `# MURDER MYSTERY PARTY GAME CREATOR
 
 ## ROLE AND CONTEXT
 You are an expert murder mystery party game designer helping the user create a custom, detailed murder mystery game for their event.
@@ -83,74 +94,15 @@ Present your mystery preview in an engaging, dramatic format that will excite th
 ## MURDER METHOD
 [Paragraph describing how the murder was committed, interesting details about the method, and what clues might be found]
 
-[After presenting the mystery concept, ask if the concept works for them and explain that you can create a complete game package with detailed character guides, host instructions, and game materials if they choose to purchase.]`;
-  }
-}
+[After presenting the mystery concept, ask if the concept works for them and explain that you can create a complete game package with detailed character guides, host instructions, and game materials if they choose to purchase.]
 
-// Function to get AI response for your murder mystery chatbot
-export const getAIResponse = async (messages: Message[], promptVersion: 'free' | 'paid'): Promise<string> => {
-  try {
-    console.log("Attempting to call Vercel serverless function proxy...");
-    console.log("Message count:", messages.length);
-    console.log("Last user message:", messages.filter(m => !m.is_ai).pop()?.content.substring(0, 50) + "...");
-    
-    // Fetch the appropriate prompt from Supabase
-    const systemPrompt = await getPromptFromSupabase(promptVersion);
-    console.log(`Using ${promptVersion} prompt (length: ${systemPrompt.length} chars)`);
-    
-    // Set a timeout to avoid hanging if there's an issue
-    const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error("Request timed out")), 15000)
-    );
-    
-    // Your Vercel deployed URL - replace with your actual domain
-    const apiUrl = 'https://website-murder-mystery-party-generator.vercel.app/api/proxy-anthropic';
-    
-    // Prepare the request to the Anthropic API through our proxy
-    const requestBody = {
-      model: "claude-3-haiku-20240307",
-      max_tokens: 1000,
-      messages: messages.map(msg => ({
-        role: msg.is_ai ? "assistant" : "user",
-        content: msg.content
-      })),
-      system: systemPrompt
-    };
-    
-    console.log("Sending request to proxy with system prompt length:", systemPrompt.length);
-    
-    const responsePromise = fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestBody)
-    }).then(response => {
-      console.log("Received response from proxy, status:", response.status);
-      return response.json();
-    });
-    
-    // Race between the actual request and the timeout
-    const data = await Promise.race([responsePromise, timeoutPromise]) as any;
+## CONSTRAINTS AND FINAL VERIFICATION
+- Ensure the preview is exciting and engaging enough to make the user want the full package
+- Create characters with clear potential for interesting secrets and motivations
+- Keep the concept accessible for casual players while offering intrigue
+- Make sure gender-neutral options are available for all characters
 
-    if (!data || data.error) {
-      console.error("Error calling proxy function:", data?.error || "Unknown error");
-      return generateMockResponse(messages, promptVersion);
-    }
-
-    // Extract the response content from the Anthropic API response
-    if (data && data.content && data.content.length > 0 && data.content[0].type === 'text') {
-      console.log("Successfully received AI response, length:", data.content[0].text.length);
-      return data.content[0].text;
-    }
-
-    console.error("Invalid response format from proxy function:", data);
-    return generateMockResponse(messages, promptVersion);
-  } catch (error) {
-    console.error("Error in getAIResponse:", error);
-    return generateMockResponse(messages, promptVersion);
-  }
-};
+IMPORTANT: Always follow this exact format for your response. Begin with a creative title, then provide sections for premise, victim, character list, and murder method in exactly this order.`;
 
 // Generate helpful mock responses when API is not available
 const generateMockResponse = (messages: Message[], promptVersion: 'free' | 'paid'): string => {
