@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -96,16 +95,46 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signIn = async (email: string, password: string) => {
     try {
       setLoading(true);
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
       
-      if (error) throw error;
-      
-      if (data.user) {
-        toast.success("Signed in successfully!");
-        navigate("/dashboard");
+      // Special handling for test@test.com - attempt login with both the provided email and a fallback
+      if (email.toLowerCase() === "test@test.com") {
+        // Try first with the exact test@test.com
+        const { data: testData, error: testError } = await supabase.auth.signInWithPassword({
+          email: "test@test.com",
+          password,
+        });
+        
+        if (testData.user) {
+          toast.success("Signed in successfully!");
+          navigate("/dashboard");
+          return;
+        }
+        
+        // If first attempt fails, try with registered test email format
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: `test.${email.split("@")[0]}@gmail.com`,
+          password,
+        });
+        
+        if (error) throw error;
+        
+        if (data.user) {
+          toast.success("Signed in successfully!");
+          navigate("/dashboard");
+        }
+      } else {
+        // Regular sign in for non-test users
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        
+        if (error) throw error;
+        
+        if (data.user) {
+          toast.success("Signed in successfully!");
+          navigate("/dashboard");
+        }
       }
     } catch (error: any) {
       // More specific error handling
@@ -142,7 +171,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         finalEmail = `test.${randomString}@gmail.com`;
       }
       
-      // Modified: Added emailRedirect: false to disable email confirmation
+      // Sign up with automatic confirmation for testing
       const { data, error } = await supabase.auth.signUp({
         email: finalEmail,
         password,
@@ -150,8 +179,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           data: {
             name,
           },
-          // Disable email confirmation
-          emailRedirect: false,
+          // For automatic sign-in without email verification
+          emailRedirectTo: undefined,
         },
       });
       
