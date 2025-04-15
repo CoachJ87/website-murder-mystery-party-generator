@@ -9,7 +9,7 @@ export default async function handler(req) {
       status: 405,
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': 'https://murder-mystery.party',
+        'Access-Control-Allow-Origin': req.headers.get('origin'),
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
       },
@@ -21,7 +21,7 @@ export default async function handler(req) {
     return new Response(null, {
       status: 200,
       headers: {
-        'Access-Control-Allow-Origin': 'https://murder-mystery.party',
+        'Access-Control-Allow-Origin': req.headers.get('origin'),
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
       },
@@ -51,7 +51,7 @@ export default async function handler(req) {
       status: response.status,
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': 'https://murder-mystery.party',
+        'Access-Control-Allow-Origin': req.headers.get('origin'),
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
       },
@@ -62,7 +62,7 @@ export default async function handler(req) {
       status: 500,
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': 'https://murder-mystery.party',
+        'Access-Control-Allow-Origin': req.headers.get('origin'),
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
       },
