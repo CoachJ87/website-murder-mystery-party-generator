@@ -35,7 +35,8 @@ async function getPromptFromSupabase(version: 'free' | 'paid'): Promise<string> 
     if (data && data.content) {
       // Store in cache
       promptCache[cacheKey] = data.content;
-      console.log(`Successfully fetched ${version} prompt`);
+      console.log(`Successfully fetched ${version} prompt (${data.content.length} chars)`);
+      console.log(`Prompt starts with: "${data.content.substring(0, 100)}..."`);
       return data.content;
     }
     
@@ -52,7 +53,37 @@ function getFallbackPrompt(version: 'free' | 'paid'): string {
   if (version === 'paid') {
     return "You are a Murder Mystery Creator assistant. The user has purchased the full package, so provide detailed character guides, host instructions, and all game materials needed to run a complete murder mystery party.";
   } else {
-    return "You are a Murder Mystery Creator assistant. This is the free preview version, so give helpful but limited responses about creating a murder mystery. Mention that the complete package with all character details, clues, and game materials is available with the premium version.";
+    return `# MURDER MYSTERY PARTY GAME CREATOR
+
+## ROLE AND CONTEXT
+You are an expert murder mystery party game designer helping the user create a custom, detailed murder mystery game for their event.
+
+## TASK DESCRIPTION
+Guide the user through creating a complete murder mystery party game package by:
+1. Collecting their preferences through specific questions
+2. Creating a compelling murder scenario based on their answers
+3. Developing engaging character concepts that will intrigue potential players
+
+## OUTPUT FORMAT
+Present your mystery preview in an engaging, dramatic format that will excite the user. Include:
+
+# "[CREATIVE TITLE]" - A [THEME] MURDER MYSTERY
+
+## PREMISE
+[2-3 paragraphs setting the scene, describing the event where the murder takes place, and creating dramatic tension]
+
+## VICTIM
+**[Victim Name]** - [Vivid description of the victim, their role in the story, personality traits, and why they might have made enemies]
+
+## CHARACTER LIST ([PLAYER COUNT] PLAYERS)
+1. **[Character 1 Name]** - [Engaging one-sentence description including profession and connection to victim]
+2. **[Character 2 Name]** - [Engaging one-sentence description including profession and connection to victim]
+[Continue for all characters]
+
+## MURDER METHOD
+[Paragraph describing how the murder was committed, interesting details about the method, and what clues might be found]
+
+[After presenting the mystery concept, ask if the concept works for them and explain that you can create a complete game package with detailed character guides, host instructions, and game materials if they choose to purchase.]`;
   }
 }
 
@@ -60,10 +91,12 @@ function getFallbackPrompt(version: 'free' | 'paid'): string {
 export const getAIResponse = async (messages: Message[], promptVersion: 'free' | 'paid'): Promise<string> => {
   try {
     console.log("Attempting to call Vercel serverless function proxy...");
+    console.log("Message count:", messages.length);
+    console.log("Last user message:", messages.filter(m => !m.is_ai).pop()?.content.substring(0, 50) + "...");
     
     // Fetch the appropriate prompt from Supabase
     const systemPrompt = await getPromptFromSupabase(promptVersion);
-    console.log(`Using ${promptVersion} prompt (first 50 chars): ${systemPrompt.substring(0, 50)}...`);
+    console.log(`Using ${promptVersion} prompt (length: ${systemPrompt.length} chars)`);
     
     // Set a timeout to avoid hanging if there's an issue
     const timeoutPromise = new Promise((_, reject) => 
@@ -84,13 +117,18 @@ export const getAIResponse = async (messages: Message[], promptVersion: 'free' |
       system: systemPrompt
     };
     
+    console.log("Sending request to proxy with system prompt length:", systemPrompt.length);
+    
     const responsePromise = fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(requestBody)
-    }).then(response => response.json());
+    }).then(response => {
+      console.log("Received response from proxy, status:", response.status);
+      return response.json();
+    });
     
     // Race between the actual request and the timeout
     const data = await Promise.race([responsePromise, timeoutPromise]) as any;
@@ -102,6 +140,7 @@ export const getAIResponse = async (messages: Message[], promptVersion: 'free' |
 
     // Extract the response content from the Anthropic API response
     if (data && data.content && data.content.length > 0 && data.content[0].type === 'text') {
+      console.log("Successfully received AI response, length:", data.content[0].text.length);
       return data.content[0].text;
     }
 
@@ -123,9 +162,30 @@ const generateMockResponse = (messages: Message[], promptVersion: 'free' | 'paid
   }
   
   if (messageCount <= 1) {
-    return `Great! I'd be happy to help you create a murder mystery game. Let's think about what kind of theme you're interested in. Would you prefer a classic whodunit in a mansion, a historical setting like the 1920s, or perhaps something more unusual like a sci-fi or fantasy murder mystery?
+    return `# "SECRETS OF THE SAPPHIRE SEAS" - A CRUISE SHIP MURDER MYSTERY
 
-Your input: "${lastUserMessage.substring(0, 100)}${lastUserMessage.length > 100 ? '...' : ''}"`;
+## PREMISE
+The luxury cruise liner "Sapphire Seas" is on the final night of its 7-day Caribbean voyage. The ship's wealthy owner, Elijah Blackwood, has gathered the passengers in the grand ballroom for a farewell gala dinner. As champagne flows and the orchestra plays, Elijah takes to the stage to make an announcement - but before he can speak, the lights flicker off. When they come back on seconds later, Elijah lies dead on the stage, a jeweled letter opener protruding from his chest.
+
+The ship is still hours from port, and with a storm raging outside, there's no way for police to board or for anyone to leave. The ship's security officer has gathered the most likely suspects - all with reasons to want Elijah dead - to determine who committed the murder before the killer can strike again.
+
+## VICTIM
+**Elijah Blackwood** - A ruthless, self-made shipping magnate with a reputation for crushing competitors and betraying allies. Behind his charming public persona was a calculating manipulator who collected people's secrets as leverage. Many passengers and crew members had fallen victim to his schemes, blackmail, or unwanted advances over the years.
+
+## CHARACTER LIST (8 PLAYERS)
+1. **Victoria/Victor Blackwood** - Elijah's ambitious spouse who recently discovered they were being written out of the will in favor of a secret lover.
+2. **Morgan Reynolds** - Elijah's business partner who discovered Elijah was embezzling funds and planning to frame them for it.
+3. **Dr. Alex Thornton** - The ship's physician who previously refused to falsify medical reports for one of Elijah's insurance scams.
+4. **Taylor Jenkins** - A celebrated chef whose restaurant was ruined after Elijah pulled investment funding at the critical moment.
+5. **Jordan Winters** - A former employee seeking revenge after Elijah stole their groundbreaking cruise ship design and claimed it as his own.
+6. **Casey Monroe** - A private investigator hired by one of Elijah's many enemies to gather compromising information.
+7. **Riley Donovan** - A wealthy passenger who lost millions in one of Elijah's fraudulent investment schemes.
+8. **Avery Martinez** - The cruise entertainment director who rejected Elijah's advances and was threatened with career ruin.
+
+## MURDER METHOD
+Elijah was killed with his own prized letter opener, a gift from a Russian business associate that he always kept in his inside jacket pocket. The killer managed to remove it during the brief blackout, stab him precisely in the heart, and disappear back into the crowd before the lights returned. Only someone familiar with Elijah's habits and with access to the electrical systems could have timed it so perfectly. The ship's security cameras were mysteriously disabled three minutes before the murder, and a single set of gloves with traces of Elijah's blood was found hidden in an air vent near the ballroom.
+
+Would this cruise ship murder mystery work for your event? I can create a complete game package with detailed character guides, host instructions, and all the game materials you'll need if you choose to purchase the full version!`;
   } else if (messageCount <= 3) {
     return `That's a great direction! Now let's think about our cast of characters. A good murder mystery typically needs:
 
