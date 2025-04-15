@@ -62,7 +62,7 @@ const MysteryChat = ({
 - Script style: ${(mysteryData as any)?.scriptType === 'full' ? 'Full scripts' : 'Point form summaries'}
 ${(mysteryData as any)?.additionalDetails ? `- Additional details: ${(mysteryData as any).additionalDetails}` : ''}
 
-Help me develop this murder mystery. What setting would work well with this theme?`;
+Help me develop this murder mystery.`;
           
           setInitialPrompt(formattedPrompt);
         }
