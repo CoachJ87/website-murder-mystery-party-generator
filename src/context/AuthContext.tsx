@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -94,48 +95,49 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Sign in with email and password
   const signIn = async (email: string, password: string) => {
     try {
+      console.log("Attempting to sign in with:", email);
       setLoading(true);
       
-      // Special handling for test@test.com - attempt login with both the provided email and a fallback
-      if (email.toLowerCase() === "test@test.com") {
-        // Try first with the exact test@test.com
-        const { data: testData, error: testError } = await supabase.auth.signInWithPassword({
-          email: "test@test.com",
+      // Try direct sign in first with the exact email
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      // If successful, navigate to dashboard
+      if (data?.user) {
+        toast.success("Signed in successfully!");
+        navigate("/dashboard");
+        return;
+      }
+      
+      // For test@test.com specifically, try alternate formats if first attempt failed
+      if (email.toLowerCase() === "test@test.com" && error) {
+        console.log("First attempt failed, trying alternate test account format");
+        
+        // Try with test.test@gmail.com (common format we use for test accounts)
+        const { data: altData, error: altError } = await supabase.auth.signInWithPassword({
+          email: "test.test@gmail.com",
           password,
         });
         
-        if (testData.user) {
-          toast.success("Signed in successfully!");
+        if (altData?.user) {
+          toast.success("Signed in successfully with test account!");
           navigate("/dashboard");
           return;
         }
         
-        // If first attempt fails, try with registered test email format
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: `test.${email.split("@")[0]}@gmail.com`,
-          password,
-        });
-        
-        if (error) throw error;
-        
-        if (data.user) {
-          toast.success("Signed in successfully!");
-          navigate("/dashboard");
-        }
-      } else {
-        // Regular sign in for non-test users
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        
-        if (error) throw error;
-        
-        if (data.user) {
-          toast.success("Signed in successfully!");
-          navigate("/dashboard");
+        if (altError) {
+          // If both attempts failed, show a specific message for test accounts
+          console.error("Both login attempts failed:", error, altError);
+          toast.error("Test account login failed. Please contact support.");
+          throw new Error("Test account authentication failed");
         }
       }
+      
+      // If we got here with an error from the first attempt, throw it
+      if (error) throw error;
+      
     } catch (error: any) {
       // More specific error handling
       if (error.message.includes('Invalid login credentials')) {

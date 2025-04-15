@@ -42,9 +42,11 @@ const SignIn = () => {
   const handleTestLogin = async () => {
     try {
       setIsLoading(true);
+      console.log("Using test account login with test@test.com");
       await signIn("test@test.com", "123123");
     } catch (error) {
       // Error is handled in the signIn function
+      console.error("Test account login error:", error);
     } finally {
       setIsLoading(false);
     }

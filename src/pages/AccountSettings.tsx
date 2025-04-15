@@ -42,7 +42,7 @@ const AccountSettings = () => {
     try {
       const { error } = await supabase.auth.updateUser({
         data: { 
-          name: name 
+          name 
         }
       });
       
@@ -100,6 +100,7 @@ const AccountSettings = () => {
   const handleAccountDelete = async () => {
     try {
       setLoading(true);
+      // Fixed the error by removing the string argument from this function call
       const { error } = await supabase.rpc('delete_user_account');
       
       if (error) throw error;
