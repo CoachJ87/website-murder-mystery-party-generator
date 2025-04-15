@@ -1,13 +1,69 @@
+// src/services/aiService.ts
+import { supabase } from "@/lib/supabase";
+
 // Interface for conversation messages
 interface Message {
   is_ai: boolean;
   content: string;
 }
 
+// Cache to store prompts after fetching to avoid repeated database calls
+const promptCache: Record<string, string> = {};
+
+// Function to fetch the appropriate prompt from Supabase
+async function getPromptFromSupabase(version: 'free' | 'paid'): Promise<string> {
+  // Check cache first
+  const cacheKey = `murder_mystery_${version}`;
+  if (promptCache[cacheKey]) {
+    console.log(`Using cached ${version} prompt`);
+    return promptCache[cacheKey];
+  }
+
+  console.log(`Fetching ${version} prompt from Supabase...`);
+  try {
+    const { data, error } = await supabase
+      .from("prompts")
+      .select("content")
+      .eq("name", `murder_mystery_${version}`)
+      .single();
+    
+    if (error) {
+      console.error(`Error fetching ${version} prompt:`, error);
+      return getFallbackPrompt(version);
+    }
+    
+    if (data && data.content) {
+      // Store in cache
+      promptCache[cacheKey] = data.content;
+      console.log(`Successfully fetched ${version} prompt`);
+      return data.content;
+    }
+    
+    console.error(`No ${version} prompt found in database`);
+    return getFallbackPrompt(version);
+  } catch (error) {
+    console.error(`Error in getPromptFromSupabase for ${version}:`, error);
+    return getFallbackPrompt(version);
+  }
+}
+
+// Fallback prompts in case database fetch fails
+function getFallbackPrompt(version: 'free' | 'paid'): string {
+  if (version === 'paid') {
+    return "You are a Murder Mystery Creator assistant. The user has purchased the full package, so provide detailed character guides, host instructions, and all game materials needed to run a complete murder mystery party.";
+  } else {
+    return "You are a Murder Mystery Creator assistant. This is the free preview version, so give helpful but limited responses about creating a murder mystery. Mention that the complete package with all character details, clues, and game materials is available with the premium version.";
+  }
+}
+
 // Function to get AI response for your murder mystery chatbot
 export const getAIResponse = async (messages: Message[], promptVersion: 'free' | 'paid'): Promise<string> => {
   try {
     console.log("Attempting to call Vercel serverless function proxy...");
+    
+    // Fetch the appropriate prompt from Supabase
+    const systemPrompt = await getPromptFromSupabase(promptVersion);
+    console.log(`Using ${promptVersion} prompt (first 50 chars): ${systemPrompt.substring(0, 50)}...`);
     
     // Set a timeout to avoid hanging if there's an issue
     const timeoutPromise = new Promise((_, reject) => 
@@ -25,9 +81,7 @@ export const getAIResponse = async (messages: Message[], promptVersion: 'free' |
         role: msg.is_ai ? "assistant" : "user",
         content: msg.content
       })),
-      system: promptVersion === 'paid' 
-        ? "You are a Murder Mystery Creator assistant. The user has purchased the full package, so provide detailed character guides, host instructions, and all game materials needed to run a complete murder mystery party."
-        : "You are a Murder Mystery Creator assistant. This is the free preview version, so give helpful but limited responses about creating a murder mystery. Mention that the complete package with all character details, clues, and game materials is available with the premium version."
+      system: systemPrompt
     };
     
     const responsePromise = fetch(apiUrl, {
@@ -65,8 +119,7 @@ const generateMockResponse = (messages: Message[], promptVersion: 'free' | 'paid
   const messageCount = messages.length;
   
   if (promptVersion === 'paid') {
-    return `Unfortunately the AI is not connected
-    `;
+    return `Unfortunately the AI is not connected at the moment. Your paid mystery package will include detailed character guides, host instructions, and all game materials when the connection is restored.`;
   }
   
   if (messageCount <= 1) {
