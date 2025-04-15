@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -69,32 +68,30 @@ Help me develop this murder mystery.`;
       }
     };
     
-// Also fetch the free prompt from the database
-const fetchFreePrompt = async () => {
-  console.log("Attempting to fetch free prompt from database...");
-  
-  const { data, error } = await supabase
-    .from("prompts")
-    .select("content")
-    .eq("name", "murder_mystery_free")
-    .single();
-    
-  if (error) {
-    console.error("Error fetching free prompt:", error);
-    console.error("Error details:", JSON.stringify(error));
-    return;
-  }
-  
-  if (data && data.content) {
-    console.log("Successfully fetched free prompt from database!");
-    console.log("Prompt preview:", data.content.substring(0, 100) + "...");
-    console.log("Prompt length:", data.content.length);
-  } else {
-    console.error("No prompt data found in the database");
-  }
-};
-
-fetchFreePrompt();
+    // Also fetch the free prompt from the database
+    const fetchFreePrompt = async () => {
+      console.log("Attempting to fetch free prompt from database...");
+      
+      const { data, error } = await supabase
+        .from("prompts")
+        .select("content")
+        .eq("name", "murder_mystery_free")
+        .single();
+        
+      if (error) {
+        console.error("Error fetching free prompt:", error);
+        console.error("Error details:", JSON.stringify(error));
+        return;
+      }
+      
+      if (data && data.content) {
+        console.log("Successfully fetched free prompt from database!");
+        console.log("Prompt preview:", data.content.substring(0, 100) + "...");
+        console.log("Prompt length:", data.content.length);
+      } else {
+        console.error("No prompt data found in the database");
+      }
+    };
     
     fetchMysteryData();
     fetchFreePrompt();
@@ -141,6 +138,10 @@ fetchFreePrompt();
       
       // Use the aiService to call the Edge Function
       const promptVersion = isAuthenticated ? "paid" : "free";
+      
+      // Log which prompt version we're using
+      console.log(`Using ${promptVersion} prompt version for request`);
+      
       const aiResponseText = await getAIResponse(allMessages, promptVersion);
       
       // Add the AI response to the messages
