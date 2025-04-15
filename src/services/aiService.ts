@@ -1,5 +1,3 @@
-import { supabase } from "@/lib/supabase";
-
 // Interface for conversation messages
 interface Message {
   is_ai: boolean;
@@ -9,22 +7,42 @@ interface Message {
 // Function to get AI response for your murder mystery chatbot
 export const getAIResponse = async (messages: Message[], promptVersion: 'free' | 'paid'): Promise<string> => {
   try {
-    console.log("Attempting to call mystery-ai Edge Function...");
+    console.log("Attempting to call Vercel serverless function proxy...");
     
-    // Set a timeout to avoid hanging if the CORS issue blocks the request
+    // Set a timeout to avoid hanging if there's an issue
     const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error("Request timed out")), 5000)
+      setTimeout(() => reject(new Error("Request timed out")), 15000)
     );
     
-    const responsePromise = supabase.functions.invoke('mystery-ai', {
-      body: { messages, promptVersion }
-    });
+    // Your Vercel deployed URL - replace with your actual domain
+    const apiUrl = 'https://website-murder-mystery-party-generator.vercel.app/api/proxy-anthropic';
+    
+    // Prepare the request to the Anthropic API through our proxy
+    const requestBody = {
+      model: "claude-3-haiku-20240307",
+      max_tokens: 1000,
+      messages: messages.map(msg => ({
+        role: msg.is_ai ? "assistant" : "user",
+        content: msg.content
+      })),
+      system: promptVersion === 'paid' 
+        ? "You are a Murder Mystery Creator assistant. The user has purchased the full package, so provide detailed character guides, host instructions, and all game materials needed to run a complete murder mystery party."
+        : "You are a Murder Mystery Creator assistant. This is the free preview version, so give helpful but limited responses about creating a murder mystery. Mention that the complete package with all character details, clues, and game materials is available with the premium version."
+    };
+    
+    const responsePromise = fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody)
+    }).then(response => response.json());
     
     // Race between the actual request and the timeout
-    const { data, error } = await Promise.race([responsePromise, timeoutPromise]) as any;
+    const data = await Promise.race([responsePromise, timeoutPromise]) as any;
 
-    if (error) {
-      console.error("Error calling Edge Function:", error);
+    if (!data || data.error) {
+      console.error("Error calling proxy function:", data?.error || "Unknown error");
       return generateMockResponse(messages, promptVersion);
     }
 
@@ -33,7 +51,7 @@ export const getAIResponse = async (messages: Message[], promptVersion: 'free' |
       return data.content[0].text;
     }
 
-    console.error("Invalid response format from Edge Function:", data);
+    console.error("Invalid response format from proxy function:", data);
     return generateMockResponse(messages, promptVersion);
   } catch (error) {
     console.error("Error in getAIResponse:", error);
@@ -47,45 +65,8 @@ const generateMockResponse = (messages: Message[], promptVersion: 'free' | 'paid
   const messageCount = messages.length;
   
   if (promptVersion === 'paid') {
-    return `# Complete Murder Mystery Package
-
-## Character Guides
-
-### The Victim - Elizabeth Montgomery
-Background: Wealthy socialite, known for her extravagant parties and philanthropy.
-Secret: Was blackmailing several guests over their dark secrets.
-
-### Suspect 1 - Professor James Hawthorne
-Background: Renowned historian and academic, Elizabeth's former business partner.
-Motive: Elizabeth threatened to reveal his academic fraud.
-Secret: Has been falsifying research for years to maintain his reputation.
-
-### Suspect 2 - Victoria Blackwood
-Background: Elizabeth's personal assistant and distant cousin.
-Motive: Recently discovered she was cut out of Elizabeth's will.
-Secret: Has been embezzling small amounts from Elizabeth's accounts.
-
-## Host Instructions
-
-1. Send invitations 2 weeks before the event
-2. Prepare the venue with 1920s decorations
-3. Distribute character packets on arrival
-4. Guide players through the 3 rounds of investigation
-
-## Game Materials
-
-* 6 Evidence cards
-* Character name tags
-* Case file documents
-* Final accusation forms
-
-## Timeline of Events
-
-7:00 PM - Guests arrive, introductions
-8:00 PM - Murder is discovered
-8:15 PM - Round 1 investigation
-9:00 PM - Round 2 investigation
-9:45 PM - Final accusations and reveal`;
+    return `Unfortunately the AI is not connected
+    `;
   }
   
   if (messageCount <= 1) {
