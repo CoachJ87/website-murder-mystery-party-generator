@@ -142,6 +142,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         finalEmail = `test.${randomString}@gmail.com`;
       }
       
+      // Modified: Added emailRedirect: false to disable email confirmation
       const { data, error } = await supabase.auth.signUp({
         email: finalEmail,
         password,
@@ -149,21 +150,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           data: {
             name,
           },
+          // Disable email confirmation
+          emailRedirect: false,
         },
       });
       
       if (error) throw error;
       
+      // Auto sign-in after successful sign-up
       if (data.user) {
-        if (data.session) {
-          // User is auto-confirmed (e.g. if email confirmation is disabled in Supabase)
-          toast.success("Signed up successfully! You're now logged in.");
-          navigate("/dashboard");
-        } else {
-          // User needs to confirm email
-          toast.success("Please check your email to confirm your account.");
-          navigate("/check-email");
+        toast.success("Account created successfully! You're now logged in.");
+        
+        // Automatically sign the user in
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: finalEmail,
+          password,
+        });
+        
+        if (signInError) {
+          throw signInError;
         }
+        
+        navigate("/dashboard");
       }
     } catch (error: any) {
       if (error.message.includes("already registered")) {
