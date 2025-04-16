@@ -1,11 +1,8 @@
-// api/proxy-with-prompts.js
 export const config = {
   runtime: 'edge',
 };
 
 export default async function handler(req) {
-  console.log(`Handler started at ${new Date().toISOString()}`);
-  
   // Handle OPTIONS request for CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, {
@@ -19,61 +16,30 @@ export default async function handler(req) {
     });
   }
   
-  // Only allow POST requests
-  if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-      status: 405,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
-    });
-  }
-  
   try {
-    console.log(`Parsing request body at ${new Date().toISOString()}`);
     // Parse the request body
     const requestData = await req.json();
     
     // Check which prompt to use
     const promptVersion = requestData.promptVersion || 'free';
-    console.log(`Using ${promptVersion} prompt version`);
     
-    // Get appropriate prompt from environment variables
-    let systemPrompt;
-    if (promptVersion === 'paid') {
-      systemPrompt = process.env.MURDER_MYSTERY_PAID_PROMPT;
-    } else {
-      systemPrompt = process.env.MURDER_MYSTERY_FREE_PROMPT;
-    }
+    // Use a simplified test prompt first to verify basic Claude integration
+    const testPrompt = "You are a murder mystery creator. Keep your response very brief - under 200 characters. Just say 'Successfully connected to Claude API with the " + promptVersion + " version.'";
     
-    // Check if prompts are available
-    if (!systemPrompt) {
-      console.error(`${promptVersion.toUpperCase()} prompt is not defined in environment variables`);
-      return new Response(JSON.stringify({ 
-        error: `${promptVersion.toUpperCase()} prompt is not available` 
-      }), {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-        },
-      });
-    }
-    
-    console.log(`Prompt length: ${systemPrompt.length} characters`);
-    console.log(`Message count: ${requestData.messages?.length || 0}`);
-    
-    // Prepare Anthropic API request
+    // Prepare Anthropic API request with simplified prompt
     const anthropicRequest = {
-      model: "claude-3-7-sonnet-20250219",
-      max_tokens: 1000,
-      messages: requestData.messages || [],
-      system: systemPrompt
+      model: "claude-3-opus-20240229",
+      max_tokens: 200,
+      messages: [
+        {
+          role: "user",
+          content: "Hello Claude, this is a test message. Please confirm you received it."
+        }
+      ],
+      system: testPrompt
     };
     
     // Forward the request to Anthropic API
-    console.log(`Calling Anthropic API at ${new Date().toISOString()}`);
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -84,28 +50,8 @@ export default async function handler(req) {
       body: JSON.stringify(anthropicRequest),
     });
     
-    console.log(`Anthropic API responded at ${new Date().toISOString()} with status: ${response.status}`);
-    
-    // Check if the response was successful
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Anthropic API error:", JSON.stringify(errorData));
-      return new Response(JSON.stringify({ 
-        error: "Error from Anthropic API", 
-        details: errorData 
-      }), {
-        status: response.status,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-        },
-      });
-    }
-    
     // Get the response data
-    console.log(`Parsing Anthropic response at ${new Date().toISOString()}`);
     const data = await response.json();
-    console.log(`Anthropic response parsed at ${new Date().toISOString()}`);
     
     // Return the Anthropic API response
     return new Response(JSON.stringify(data), {
@@ -116,12 +62,11 @@ export default async function handler(req) {
       },
     });
   } catch (error) {
-    console.error(`Error in handler at ${new Date().toISOString()}:`, error);
+    console.error("Error in proxy-with-prompts:", error);
     return new Response(JSON.stringify({ 
       error: error.message,
       stack: error.stack,
-      name: error.name,
-      time: new Date().toISOString()
+      name: error.name 
     }), {
       status: 500,
       headers: {
