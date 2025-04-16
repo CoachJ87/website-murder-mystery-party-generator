@@ -34,4 +34,4 @@ jobs:
         with:
           commit_message: "Automated update of browserslist-db"
           push_options: '--force'
-          repository: https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          repository: .  # Change: Use "." for the current repository
