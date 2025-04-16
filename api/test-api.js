@@ -5,9 +5,8 @@ export const config = {
 export default async function handler(req) {
   return new Response(JSON.stringify({ 
     success: true, 
-    message: "API endpoint is working",
-    time: new Date().toISOString(),
-    env: process.env.ANTHROPIC_API_KEY ? "API key exists" : "No API key found"
+    message: "Test API endpoint is working",
+    timestamp: new Date().toISOString(),
   }), {
     status: 200,
     headers: {
