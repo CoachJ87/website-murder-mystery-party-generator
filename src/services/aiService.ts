@@ -12,7 +12,7 @@ export const getAIResponse = async (messages: Message[], promptVersion: 'free' |
     console.log(`Using test endpoint instead of regular proxy`);
     
     // Use the direct test endpoint
-    const apiUrl = 'https://website-murder-mystery-party-generator.vercel.app/api/direct-test';
+    const apiUrl = 'https://website-murder-mystery-party-generator.vercel.app/api/proxy-with-prompts';
     
     // Make the API request
     const response = await fetch(apiUrl, {
