@@ -18,6 +18,7 @@ export type Database = {
           mystery_data: Json | null
           mystery_id: string | null
           prompt_version: string | null
+          purchase_date: string | null
           title: string | null
           updated_at: string | null
           user_id: string
@@ -30,6 +31,7 @@ export type Database = {
           mystery_data?: Json | null
           mystery_id?: string | null
           prompt_version?: string | null
+          purchase_date?: string | null
           title?: string | null
           updated_at?: string | null
           user_id: string
@@ -42,6 +44,7 @@ export type Database = {
           mystery_data?: Json | null
           mystery_id?: string | null
           prompt_version?: string | null
+          purchase_date?: string | null
           title?: string | null
           updated_at?: string | null
           user_id?: string

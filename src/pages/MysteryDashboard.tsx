@@ -1,5 +1,3 @@
-
-// src/pages/MysteryDashboard.tsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,12 +6,21 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Clock, Check, Search, MoreVertical, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
-import { generateCompletePackage } from "@/services/mysteryPackageService";
 
 type Mystery = {
   id: string;
@@ -32,6 +39,7 @@ const MysteryDashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState<"all" | "draft" | "purchased">("all");
   const [generatingId, setGeneratingId] = useState<string | null>(null);
+  const [mysteryToDelete, setMysteryToDelete] = useState<string | null>(null);
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
 
@@ -47,8 +55,6 @@ const MysteryDashboard = () => {
     try {
       setLoading(true);
       
-      // Fetch from Supabase - fix for database schema
-      // Looking at the database, we need to query conversations, not profiles
       const { data, error } = await supabase
         .from("conversations")
         .select("*")
@@ -61,9 +67,7 @@ const MysteryDashboard = () => {
         return;
       }
       
-      // Convert the conversations data to the Mystery type
       const formattedMysteries = data?.map(convo => {
-        // Safely extract theme from mystery_data
         const mysteryData = typeof convo.mystery_data === 'object' ? convo.mystery_data : {};
         
         return {
@@ -73,7 +77,7 @@ const MysteryDashboard = () => {
           has_purchased: convo.is_paid || false,
           created_at: convo.created_at,
           updated_at: convo.updated_at,
-          purchase_date: convo.updated_at // Using updated_at as purchase_date for now
+          purchase_date: convo.updated_at
         };
       }) || [];
       
@@ -103,12 +107,17 @@ const MysteryDashboard = () => {
   };
 
   const handleDelete = async (id: string) => {
+    setMysteryToDelete(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!mysteryToDelete) return;
+    
     try {
-      // Update to use conversations table instead of profiles
       const { error } = await supabase
         .from("conversations")
         .delete()
-        .eq("id", id);
+        .eq("id", mysteryToDelete);
         
       if (error) {
         console.error("Error deleting mystery:", error);
@@ -117,19 +126,19 @@ const MysteryDashboard = () => {
       }
       
       toast.success("Mystery deleted successfully");
-      setMysteries(prev => prev.filter(mystery => mystery.id !== id));
+      setMysteries(prev => prev.filter(mystery => mystery.id !== mysteryToDelete));
     } catch (error) {
       console.error("Error deleting mystery:", error);
       toast.error("Failed to delete mystery");
+    } finally {
+      setMysteryToDelete(null);
     }
   };
 
   const handlePostPurchase = async (id: string) => {
     try {
-      // First update the mystery status
       setGeneratingId(id);
       
-      // Update the mystery as purchased
       const { error: updateError } = await supabase
         .from("conversations")
         .update({ 
@@ -144,7 +153,6 @@ const MysteryDashboard = () => {
         return;
       }
       
-      // Update local state
       setMysteries(prev => 
         prev.map(mystery => 
           mystery.id === id ? { ...mystery, has_purchased: true, is_generating: true } : mystery
@@ -153,11 +161,9 @@ const MysteryDashboard = () => {
       
       toast.success("Purchase successful! Generating your complete package...");
       
-      // Generate the complete package
       try {
         await generateCompletePackage(id);
         
-        // Update local state again to remove generating flag
         setMysteries(prev => 
           prev.map(mystery => 
             mystery.id === id ? { ...mystery, is_generating: false } : mystery
@@ -169,7 +175,6 @@ const MysteryDashboard = () => {
         console.error("Error generating package:", genError);
         toast.error("Failed to generate your package. You can try again from the dashboard.");
         
-        // Update local state to remove generating flag but keep purchased status
         setMysteries(prev => 
           prev.map(mystery => 
             mystery.id === id ? { ...mystery, is_generating: false } : mystery
@@ -185,8 +190,6 @@ const MysteryDashboard = () => {
   };
 
   const simulatePurchase = async (id: string) => {
-    // In a real application, this would be triggered by a webhook from Stripe
-    // For testing, we'll call it directly
     await handlePostPurchase(id);
   };
 
@@ -377,10 +380,7 @@ const MysteryDashboard = () => {
                   
                   <CardFooter className="mt-auto pt-4 flex flex-col gap-2">
                     {mystery.is_generating ? (
-                      <Button 
-                        className="w-full"
-                        disabled
-                      >
+                      <Button className="w-full" disabled>
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                         Generating...
                       </Button>
@@ -406,15 +406,6 @@ const MysteryDashboard = () => {
                         >
                           Purchase ($4.99)
                         </Button>
-                        {/* For testing only - remove in production */}
-                        <Button 
-                          className="w-full mt-2"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => simulatePurchase(mystery.id)}
-                        >
-                          Simulate Purchase (Dev Only)
-                        </Button>
                       </>
                     )}
                   </CardFooter>
@@ -424,6 +415,22 @@ const MysteryDashboard = () => {
           )}
         </div>
       </main>
+      
+      <AlertDialog open={!!mysteryToDelete} onOpenChange={() => setMysteryToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete your mystery
+              and remove all associated data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       
       <Footer />
     </div>
