@@ -13,6 +13,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         name: Checkout code
+        with:
+          fetch-depth: 0  # Crucial: Fetch the full history
 
       - uses: oven-sh/setup-bun@v1
         name: Setup Bun
@@ -32,4 +34,3 @@ jobs:
         with:
           commit_message: "Automated update of browserslist-db"
           push_options: '--force'
-          github_token: ${{ secrets.ACTIONS_ACCESS_TOKEN }}  # Use the secret here
