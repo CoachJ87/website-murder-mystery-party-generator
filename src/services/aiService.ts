@@ -9,14 +9,14 @@ interface Message {
 // Function to get AI response for your murder mystery chatbot
 export const getAIResponse = async (messages: Message[], promptVersion: 'free' | 'paid'): Promise<string> => {
   try {
-    console.log(`Calling proxy with ${promptVersion} prompt version`);
+    console.log(`Calling proxy with ${promptVersion} prompt version at ${new Date().toISOString()}`);
     
-    // Set a timeout to avoid hanging if there's an issue
+    // Increase timeout to 30 seconds
     const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error("Request timed out")), 15000)
+      setTimeout(() => reject(new Error("Request timed out after 30 seconds")), 30000)
     );
     
-    // Your Vercel deployed URL - this is correct, no .js extension needed for API routes
+    // Your Vercel deployed URL
     const apiUrl = 'https://website-murder-mystery-party-generator.vercel.app/api/proxy-with-prompts';
     
     // Prepare the request with messages and prompt version
@@ -28,27 +28,37 @@ export const getAIResponse = async (messages: Message[], promptVersion: 'free' |
       promptVersion: promptVersion
     };
     
-    console.log("Request payload:", JSON.stringify(requestBody, null, 2));
+    console.log(`Sending request to ${apiUrl} at ${new Date().toISOString()}`);
     
-    const responsePromise = fetch(apiUrl, {
+    const fetchPromise = fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(requestBody)
-    }).then(async response => {
+    });
+    
+    // Add timing logs around the fetch operation
+    const responsePromise = fetchPromise.then(async response => {
+      console.log(`Received initial response at ${new Date().toISOString()}, status: ${response.status}`);
+      
       if (!response.ok) {
         const errorText = await response.text();
         console.error(`API returned ${response.status}: ${errorText}`);
         throw new Error(`API returned ${response.status}: ${errorText}`);
       }
-      return response.json();
+      
+      console.log(`Starting to parse JSON at ${new Date().toISOString()}`);
+      const jsonData = await response.json();
+      console.log(`JSON parsing complete at ${new Date().toISOString()}`);
+      
+      return jsonData;
     });
     
     // Race between the actual request and the timeout
+    console.log(`Waiting for response or timeout at ${new Date().toISOString()}`);
     const data = await Promise.race([responsePromise, timeoutPromise]) as any;
-
-    console.log("Response data received:", data ? "YES" : "NO");
+    console.log(`Race completed at ${new Date().toISOString()}`);
 
     if (!data || data.error) {
       console.error("Error calling proxy function:", data?.error || "Unknown error", data?.details || "");
@@ -57,7 +67,7 @@ export const getAIResponse = async (messages: Message[], promptVersion: 'free' |
 
     // Extract the response content
     if (data && data.content && data.content.length > 0) {
-      console.log("Content type:", data.content[0]?.type);
+      console.log("Content received, type:", data.content[0]?.type);
       if (data.content[0].type === 'text') {
         return data.content[0].text;
       }
