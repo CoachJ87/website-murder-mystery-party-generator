@@ -45,17 +45,15 @@ export const getAIResponse = async (messages: Message[], promptVersion: 'free' |
     }
 
     // Extract the response content
-    let responseText = "";
     if (data && data.content && data.content.length > 0 && data.content[0].type === 'text') {
-      responseText = data.content[0].text;
+      let text = data.content[0].text;
       
-      // Only process free version responses
+      // Post-process free version responses
       if (promptVersion === 'free') {
-        // Post-process to fix formatting issues
-        responseText = postProcessFreeResponse(responseText);
+        text = cleanupResponse(text);
       }
       
-      return responseText;
+      return text;
     }
 
     console.error("Invalid response format from proxy function:", data);
@@ -66,93 +64,109 @@ export const getAIResponse = async (messages: Message[], promptVersion: 'free' |
   }
 };
 
-// Post-process the Claude response to fix formatting issues
-function postProcessFreeResponse(text: string): string {
-  console.log("Post-processing free response");
-  
-  // Remove all $2 markers
+// Function to clean up the response text
+function cleanupResponse(text: string): string {
+  // Remove $2 markers
   text = text.replace(/\$2|\*\*\$2\*\*/g, '');
   
-  // Make sure we have the right section headers
-  if (!text.includes("# \"")) {
-    // Extract a title if possible
-    const titleMatch = text.match(/\*\*([^*]+)\*\*/);
-    const title = titleMatch ? titleMatch[1] : "MYSTERY TITLE";
-    text = `# "${title}" - A MURDER MYSTERY\n\n` + text;
-  }
+  // Replace any double line breaks with single line breaks to normalize spacing
+  text = text.replace(/\n\s*\n/g, '\n\n');
   
-  // Fix character list numbering
-  const characterListRegex = /## CHARACTER LIST|## THE CHARACTERS|## CHARACTERS/i;
-  if (text.match(characterListRegex)) {
-    // Split the text at the character list section
-    const [before, after] = text.split(characterListRegex);
-    
-    // Extract the character section and everything after it
-    let characterSection = after;
-    let remainder = "";
-    
-    // Find where the character section ends (at the next ## or at "Would this")
-    const nextSectionMatch = characterSection.match(/\n##|\nWould this/);
-    if (nextSectionMatch) {
-      const splitIndex = nextSectionMatch.index;
-      remainder = characterSection.substring(splitIndex);
-      characterSection = characterSection.substring(0, splitIndex);
+  // Create our ideal output structure
+  let output = '';
+  
+  // Extract title
+  const titleMatch = text.match(/(?:\*\*|# "|#"\s*)([^*"]+)(?:\*\*|")/);
+  const title = titleMatch ? titleMatch[1].trim() : "MYSTERY TITLE";
+  
+  // Add formatted title
+  output += `# "${title}" - A MURDER MYSTERY\n\n`;
+  
+  // Add premise section
+  output += "## PREMISE\n";
+  // Try to find premise content
+  let premiseMatch = text.match(/(?:## PREMISE|## THE PREMISE)[^#]*(?=##|$)/i);
+  if (!premiseMatch) {
+    // Look for paragraphs that might be the premise
+    const paragraphs = text.split('\n\n');
+    for (const p of paragraphs) {
+      if (p.length > 100 && !p.includes('#') && !p.includes('**') && 
+          !p.includes('Would this') && !p.includes('Let me develop')) {
+        premiseMatch = [p];
+        break;
+      }
     }
-    
-    // Extract all character entries (looking for patterns like "Name - Description" or "**Name** - Description")
-    const characterEntries = characterSection.match(/\*\*[^*]+\*\*[^\n]+/g) || 
-                           characterSection.match(/[^\n:]+(-|–)[^\n]+/g) || [];
-    
-    // Renumber them
-    let numberedCharacters = "";
-    characterEntries.forEach((entry, index) => {
-      // Check if it already starts with a number and remove it
-      entry = entry.replace(/^\d+\.?\s+/, '');
-      numberedCharacters += `${index + 1}. ${entry}\n\n`;
-    });
-    
-    // Rebuild the text with proper headings and numbering
-    text = before + "## CHARACTER LIST\n\n" + numberedCharacters + remainder;
   }
   
-  // Make sure we have all required sections in the right order
-  let finalText = "";
-  
-  // Extract existing sections
-  const titleMatch = text.match(/# "[^"]+"/);
-  const premiseMatch = text.match(/## PREMISE[\s\S]*?(?=##|$)/i) || 
-                     text.match(/## THE PREMISE[\s\S]*?(?=##|$)/i);
-  const victimMatch = text.match(/## VICTIM[\s\S]*?(?=##|$)/i) || 
-                    text.match(/## THE VICTIM[\s\S]*?(?=##|$)/i) ||
-                    text.match(/## MURDER VICTIM[\s\S]*?(?=##|$)/i);
-  const murderMatch = text.match(/## MURDER METHOD[\s\S]*?(?=##|$)/i) || 
-                    text.match(/## THE MURDER[\s\S]*?(?=##|$)/i);
-  const characterMatch = text.match(/## CHARACTER LIST[\s\S]*?(?=##|Would this|$)/i) || 
-                       text.match(/## THE CHARACTERS[\s\S]*?(?=##|Would this|$)/i) ||
-                       text.match(/## CHARACTERS[\s\S]*?(?=##|Would this|$)/i);
-  
-  // Build the text in the correct order
-  if (titleMatch) finalText += titleMatch[0] + "\n\n";
-  if (premiseMatch) finalText += premiseMatch[0] + "\n\n";
-  if (victimMatch) finalText += victimMatch[0] + "\n\n";
-  if (murderMatch) finalText += murderMatch[0] + "\n\n";
-  if (characterMatch) finalText += characterMatch[0] + "\n\n";
-  
-  // If we successfully parsed and rebuilt the text, use it
-  if (finalText) {
-    text = finalText;
+  if (premiseMatch) {
+    const premiseContent = premiseMatch[0]
+      .replace(/## PREMISE|## THE PREMISE/i, '')
+      .trim();
+    output += premiseContent + "\n\n";
+  } else {
+    output += "A thrilling murder mystery awaits...\n\n";
   }
   
-  // Ensure the closing text is correct
-  if (!text.includes('Would this murder mystery concept work for your event?')) {
-    text = text.replace(/Let me develop this[\s\S]*$/, '');
-    text = text.replace(/I'll expand this concept[\s\S]*$/, '');
-    text = text.replace(/Would you like me to[\s\S]*$/, '');
+  // Add victim section
+  output += "## VICTIM\n";
+  let victimMatch = text.match(/(?:## VICTIM|## THE VICTIM|## MURDER VICTIM)[^#]*(?=##|$)/i);
+  if (victimMatch) {
+    const victimContent = victimMatch[0]
+      .replace(/## VICTIM|## THE VICTIM|## MURDER VICTIM/i, '')
+      .trim();
+    output += victimContent + "\n\n";
+  } else {
+    // Try to extract victim information from text
+    const victimNameMatch = text.match(/\*\*([^*]+)\*\*\s*-\s*([^\n]+)/);
+    if (victimNameMatch) {
+      output += `**${victimNameMatch[1]}** - ${victimNameMatch[2]}\n\n`;
+    } else {
+      output += "The victim's details are still being uncovered...\n\n";
+    }
+  }
+  
+  // Add murder method section
+  output += "## MURDER METHOD\n";
+  let methodMatch = text.match(/(?:## MURDER METHOD|## THE MURDER)[^#]*(?=##|$)/i);
+  if (methodMatch) {
+    const methodContent = methodMatch[0]
+      .replace(/## MURDER METHOD|## THE MURDER/i, '')
+      .trim();
+    output += methodContent + "\n\n";
+  } else {
+    output += "The details of the murder are still being investigated...\n\n";
+  }
+  
+  // Add character list section
+  output += "## CHARACTER LIST (8 PLAYERS)\n";
+  
+  // Find character list section
+  let characterListMatch = text.match(/(?:## CHARACTER LIST|## THE CHARACTERS|## CHARACTERS)[^#]*(?=##|Would this|$)/i);
+  
+  if (characterListMatch) {
+    const characterSection = characterListMatch[0]
+      .replace(/## CHARACTER LIST|## THE CHARACTERS|## CHARACTERS/i, '')
+      .trim();
     
-    text += '\n\nWould this murder mystery concept work for your event? You can continue to make edits, and once you\'re satisfied, press the \'Generate Mystery\' button to create a complete game package with detailed character guides, host instructions, and all the game materials you\'ll need if you choose to purchase the full version!';
+    // Find all character entries
+    const characterEntries = characterSection.match(/(?:\d+\.?\s*)?\*\*[^*]+\*\*[^\n]+/g) || 
+                           characterSection.match(/(?:\d+\.?\s*)?[^\n:]+(-|–)[^\n]+/g) || [];
+    
+    // Add numbered character entries
+    for (let i = 0; i < characterEntries.length; i++) {
+      let entry = characterEntries[i];
+      // Remove any existing numbering
+      entry = entry.replace(/^\d+\.?\s*/, '');
+      output += `${i+1}. ${entry}\n`;
+    }
+  } else {
+    output += "Character details are being developed...\n";
   }
   
-  return text;
+  // Add closing text
+  output += "\n\nWould this murder mystery concept work for your event? You can continue to make edits, and once you're satisfied, press the 'Generate Mystery' button to create a complete game package with detailed character guides, host instructions, and all the game materials you'll need if you choose to purchase the full version!";
+  
+  return output;
 }
 
 // Generate mock responses when API is not available
