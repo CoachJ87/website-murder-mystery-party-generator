@@ -16,10 +16,10 @@ export const getAIResponse = async (messages: Message[], promptVersion: 'free' |
 
     // Prepare the request
     const requestBody = {
-      messages: messages.map(msg => ({
-        is_ai: msg.is_ai,
-        content: msg.content
-      })),
+        messages: messages.map(msg => ({
+          role: msg.is_ai ? "assistant" : "user",  // CORRECT: Use 'role'
+          content: msg.content
+        })),
       promptVersion: promptVersion
     };
 
