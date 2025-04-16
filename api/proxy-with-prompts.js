@@ -28,7 +28,7 @@ export default async function handler(req) {
     
     // Prepare Anthropic API request with simplified prompt
     const anthropicRequest = {
-      model: "claude-3-opus-20240229",
+      model: "claude-3-7-sonnet-20250219",
       max_tokens: 200,
       messages: [
         {
