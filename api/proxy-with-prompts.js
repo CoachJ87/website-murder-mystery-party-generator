@@ -45,8 +45,32 @@ export default async function handler(req) {
       // Always default to free version otherwise
       systemPrompt = process.env.MURDER_MYSTERY_FREE_PROMPT;
       
-      // Add specific formatting instructions for free version
-      systemPrompt += "\n\nIMPORTANT: Your output MUST follow this exact format with NO additional symbols or markers:\n\n# \"[CREATIVE TITLE]\" - A [THEME] MURDER MYSTERY\n\n## PREMISE\n[2-3 paragraphs setting the scene]\n\n## VICTIM\n**[Victim Name]** - [Description]\n\n## CHARACTER LIST ([PLAYER COUNT] PLAYERS)\n[Create numbered character list based on the player count the user requested (between 2-40). Exactly follow this format for each character:]\n1. **[Character 1 Name]** - [Description]\n2. **[Character 2 Name]** - [Description]\n[Continue sequential numbering for each character]\n\n## MURDER METHOD\n[Paragraph describing the murder method and clues]\n\nWould this murder mystery concept work for your event? You can continue to make edits, and once you're satisfied, press the 'Generate Mystery' button to create a complete game package with detailed character guides, host instructions, and all the game materials you'll need if you choose to purchase the full version!";
+      // Use a completely overriding format instruction that enforces exact structure
+      systemPrompt += `
+
+CRITICAL INSTRUCTIONS FOR OUTPUT FORMAT:
+You MUST generate your response using EXACTLY the following template structure with these exact headings and order - do not deviate in any way:
+
+# "[TITLE]" - A [THEME] MURDER MYSTERY
+
+## PREMISE
+[2-3 paragraphs setting the scene]
+
+## VICTIM
+**[Victim Name]** - [Description]
+
+## MURDER METHOD
+[Paragraph describing the murder method and clues]
+
+## CHARACTER LIST ([X] PLAYERS)
+[For each character, use this exact format with sequential numbering:]
+1. **[Character 1 Name]** - [Description]
+2. **[Character 2 Name]** - [Description]
+[Continue with exact sequential numbering until you've created all characters]
+
+Would this murder mystery concept work for your event? You can continue to make edits, and once you're satisfied, press the 'Generate Mystery' button to create a complete game package with detailed character guides, host instructions, and all the game materials you'll need if you choose to purchase the full version!
+
+DO NOT include any other symbols, markers (like $2), or additional headings in your response.`;
     }
     
     // Now use the actual user messages
