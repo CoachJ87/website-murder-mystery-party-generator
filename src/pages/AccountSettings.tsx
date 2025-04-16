@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -97,19 +96,17 @@ const AccountSettings = () => {
     }
   };
 
-  const handleAccountDelete = async () => {
+  const handleDeleteAccount = async () => {
     try {
       setLoading(true);
-      // Fix: Call delete_user_account without any parameters
-      const { error } = await supabase.rpc('delete_user_account');
       
-      if (error) throw error;
+      await supabase.rpc('delete_user_account');
       
       await signOut();
       toast.success("Your account has been deleted");
-    } catch (error: any) {
-      toast.error(`Failed to delete account: ${error.message}`);
-      console.error(error);
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      toast.error("Failed to delete account");
     } finally {
       setLoading(false);
     }
@@ -256,7 +253,7 @@ const AccountSettings = () => {
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
                           <AlertDialogAction 
-                            onClick={handleAccountDelete}
+                            onClick={handleDeleteAccount}
                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                           >
                             {loading ? "Deleting..." : "Delete Account"}
