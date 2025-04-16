@@ -24,14 +24,44 @@ type MysteryChatProps = {
 };
 
 const formatMessageContent = (content: string) => {
-  return content
-    .replace(/^## (.*$)/gm, '<h2 class="text-xl font-bold my-3">$1</h2>')
+  let formattedContent = content
+    .replace(/^# (.*$)/gm, '<h1 class="text-2xl font-bold my-4">$1</h1>')
+    .replace(/^## (.*$)/gm, '<h2 class="text-xl font-bold my-3">$2</h2>')
     .replace(/^### (.*$)/gm, '<h3 class="text-lg font-semibold my-2">$1</h3>')
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/- \[ \] (.*$)/gm, '<div class="flex items-center gap-2 my-1"><input type="checkbox" disabled class="form-checkbox h-4 w-4" /><span>$1</span></div>')
-    .replace(/- \[x\] (.*$)/gm, '<div class="flex items-center gap-2 my-1"><input type="checkbox" checked disabled class="form-checkbox h-4 w-4" /><span>$1</span></div>')
-    .replace(/^\d+\. (.*$)/gm, '<ol class="list-decimal list-inside my-1"><li>$1</li></ol>')
-    .split('\n').join('<br />');
+    .replace(/- \[x\] (.*$)/gm, '<div class="flex items-center gap-2 my-1"><input type="checkbox" checked disabled class="form-checkbox h-4 w-4" /><span>$1</span></div>');
+
+  const lines = formattedContent.split('\n');
+  let inOrderedList = false;
+  let listItems: string[] = [];
+
+  const processedLines = lines.map((line, index) => {
+    const listItemMatch = line.match(/^(\d+)\. (.*$)/);
+
+    if (listItemMatch) {
+      if (!inOrderedList) {
+        inOrderedList = true;
+        listItems = [];
+      }
+      listItems.push(listItemMatch[2]);
+      return null;
+    } else if (inOrderedList) {
+      const listHtml = `<ol class="list-decimal list-inside my-2 pl-2">${listItems.map(item => `<li class="my-1">${item}</li>`).join('')}</ol>`;
+      inOrderedList = false;
+      return listHtml + line;
+    } else {
+      return line;
+    }
+  });
+
+  if (inOrderedList) {
+    processedLines.push(`<ol class="list-decimal list-inside my-2 pl-2">${listItems.map(item => `<li class="my-1">${item}</li>`).join('')}</ol>`);
+  }
+
+  return processedLines
+    .filter(line => line !== null)
+    .join('<br class="my-1" />');
 };
 
 const MysteryChat = ({
@@ -50,7 +80,7 @@ const MysteryChat = ({
     minHeight: 56,
     maxHeight: 200,
   });
-  
+
   useEffect(() => {
     const fetchMysteryData = async () => {
       if (savedMysteryId) {
@@ -60,17 +90,17 @@ const MysteryChat = ({
             .select("*")
             .eq("conversation_id", savedMysteryId)
             .order("created_at", { ascending: true });
-          
+
           if (!messagesError && existingMessages && existingMessages.length > 0) {
             console.log("Found existing messages:", existingMessages.length);
-            
+
             const formattedMessages: Message[] = existingMessages.map(msg => ({
               id: msg.id,
               role: msg.is_ai ? "assistant" : "user",
               content: msg.content,
               timestamp: new Date(msg.created_at)
             }));
-            
+
             setMessages(formattedMessages);
             setIsInitialized(true);
             return;
@@ -81,10 +111,10 @@ const MysteryChat = ({
             .select("mystery_data")
             .eq("id", savedMysteryId)
             .single();
-          
+
           if (!error && data && data.mystery_data) {
             const mysteryData = typeof data.mystery_data === 'object' ? data.mystery_data : {};
-            
+
             const formattedPrompt = `I want to create a murder mystery with these details:
 - Theme: ${(mysteryData as any)?.theme || initialTheme || 'Mystery Theme'}
 - Number of players: ${(mysteryData as any)?.playerCount || 8}
@@ -93,7 +123,7 @@ const MysteryChat = ({
 ${(mysteryData as any)?.additionalDetails ? `- Additional details: ${(mysteryData as any).additionalDetails}` : ''}
 
 Help me develop this murder mystery.`;
-            
+
             setInitialPrompt(formattedPrompt);
           }
         } catch (error) {
@@ -101,22 +131,22 @@ Help me develop this murder mystery.`;
         }
       }
     };
-    
+
     const fetchFreePrompt = async () => {
       console.log("Attempting to fetch free prompt from database...");
-      
+
       const { data, error } = await supabase
         .from("prompts")
         .select("content")
         .eq("name", "murder_mystery_free")
         .single();
-        
+
       if (error) {
         console.error("Error fetching free prompt:", error);
         console.error("Error details:", JSON.stringify(error));
         return;
       }
-      
+
       if (data && data.content) {
         console.log("Successfully fetched free prompt from database!");
         console.log("Prompt preview:", data.content.substring(0, 100) + "...");
@@ -125,7 +155,7 @@ Help me develop this murder mystery.`;
         console.error("No prompt data found in the database");
       }
     };
-    
+
     fetchMysteryData();
     fetchFreePrompt();
   }, [savedMysteryId, initialTheme]);
@@ -138,14 +168,14 @@ Help me develop this murder mystery.`;
         content: initialPrompt,
         timestamp: new Date(),
       };
-      
+
       setMessages([userMessage]);
-      
+
       handleAnthropicRequest(initialPrompt);
       setIsInitialized(true);
     }
   }, [initialPrompt, messages.length, isInitialized]);
-  
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -156,30 +186,30 @@ Help me develop this murder mystery.`;
 
   const handleAnthropicRequest = async (userInput: string) => {
     setLoading(true);
-    
+
     try {
       const contextMessages = messages.map(msg => ({
         is_ai: msg.role === "assistant",
         content: msg.content
       }));
-      
+
       const allMessages = [...contextMessages, { is_ai: false, content: userInput }];
-      
+
       const promptVersion = isAuthenticated ? "paid" : "free";
-      
+
       console.log(`Using ${promptVersion} prompt version for request`);
-      
+
       const aiResponseText = await getAIResponse(allMessages, promptVersion);
-      
+
       const aiResponse: Message = {
         id: Date.now().toString(),
         role: "assistant",
         content: aiResponseText,
         timestamp: new Date(),
       };
-      
+
       setMessages(prev => [...prev, aiResponse]);
-      
+
       if (isAuthenticated && savedMysteryId && user) {
         await saveMessageToDatabase({
           conversation_id: savedMysteryId,
@@ -201,7 +231,7 @@ Help me develop this murder mystery.`;
       const { error } = await supabase
         .from("messages")
         .insert(messageData);
-        
+
       if (error) {
         console.error("Error saving message to database:", error);
       }
@@ -212,16 +242,16 @@ Help me develop this murder mystery.`;
 
   const handleSubmit = async () => {
     if (!input.trim() || loading) return;
-    
+
     const newUserMessage: Message = {
       id: Date.now().toString(),
       role: "user",
       content: input,
       timestamp: new Date(),
     };
-    
+
     setMessages(prev => [...prev, newUserMessage]);
-    
+
     if (isAuthenticated && savedMysteryId && user) {
       await saveMessageToDatabase({
         conversation_id: savedMysteryId,
@@ -230,11 +260,11 @@ Help me develop this murder mystery.`;
         role: "user"
       });
     }
-    
+
     const currentInput = input;
     setInput("");
     adjustHeight(true);
-    
+
     await handleAnthropicRequest(currentInput);
   };
 
@@ -243,7 +273,7 @@ Help me develop this murder mystery.`;
       toast.warning("Please chat a bit more to develop your mystery further.");
       return;
     }
-    
+
     onSave(messages);
   };
 
@@ -255,7 +285,7 @@ Help me develop this murder mystery.`;
           {isAuthenticated ? "Premium" : "Free Preview"}
         </Badge>
       </div>
-      
+
       <div className="flex-1 overflow-y-auto mb-4 space-y-4 p-4 border rounded-lg bg-background/50 min-h-[400px] max-h-[500px]">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
@@ -280,7 +310,7 @@ Help me develop this murder mystery.`;
         )}
         <div ref={messagesEndRef} />
       </div>
-      
+
       <div className="relative">
         <Textarea
           ref={textareaRef}
@@ -312,7 +342,7 @@ Help me develop this murder mystery.`;
           )}
         </Button>
       </div>
-      
+
       <div className="mt-4 flex justify-end">
         <Button onClick={handleGenerateMystery} disabled={messages.length < 3}>
           Generate Mystery
