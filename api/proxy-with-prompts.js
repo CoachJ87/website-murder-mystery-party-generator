@@ -38,9 +38,28 @@ export default async function handler(req) {
     let systemPrompt;
     if (promptVersion === 'paid') {
       systemPrompt = process.env.MURDER_MYSTERY_PAID_PROMPT;
+      console.log("Using PAID prompt. First 100 chars:", systemPrompt?.substring(0, 100));
     } else {
       systemPrompt = process.env.MURDER_MYSTERY_FREE_PROMPT;
+      console.log("Using FREE prompt. First 100 chars:", systemPrompt?.substring(0, 100));
     }
+    
+    // Check if prompts are available
+    if (!systemPrompt) {
+      console.error(`${promptVersion.toUpperCase()} prompt is not defined in environment variables`);
+      return new Response(JSON.stringify({ 
+        error: `${promptVersion.toUpperCase()} prompt is not available` 
+      }), {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+      });
+    }
+    
+    // Log message structure for debugging
+    console.log(`Request messages count: ${requestData.messages?.length || 0}`);
     
     // Prepare Anthropic API request
     const anthropicRequest = {
@@ -49,9 +68,6 @@ export default async function handler(req) {
       messages: requestData.messages || [],
       system: systemPrompt
     };
-    
-    // Log which prompt version we're using (only visible in Vercel logs)
-    console.log(`Using ${promptVersion} prompt version`);
     
     // Forward the request to Anthropic API
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -63,6 +79,22 @@ export default async function handler(req) {
       },
       body: JSON.stringify(anthropicRequest),
     });
+    
+    // Check if the response was successful
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Anthropic API error:", JSON.stringify(errorData));
+      return new Response(JSON.stringify({ 
+        error: "Error from Anthropic API", 
+        details: errorData 
+      }), {
+        status: response.status,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+      });
+    }
     
     // Get the response data
     const data = await response.json();
@@ -76,8 +108,12 @@ export default async function handler(req) {
       },
     });
   } catch (error) {
-    // Handle errors
-    return new Response(JSON.stringify({ error: error.message }), {
+    console.error("Detailed error in proxy-with-prompts:", error);
+    return new Response(JSON.stringify({ 
+      error: error.message,
+      stack: error.stack,
+      name: error.name 
+    }), {
       status: 500,
       headers: {
         'Content-Type': 'application/json',
