@@ -25,32 +25,20 @@ export default async function handler(req) {
     
     // Get appropriate prompt from environment variables
     let systemPrompt;
+    
+    // Only use the paid prompt if explicitly requested and verified as paid
     if (promptVersion === 'paid') {
+      // Here we assume the frontend has already verified purchase status
       systemPrompt = process.env.MURDER_MYSTERY_PAID_PROMPT;
     } else {
+      // Always default to free version otherwise
       systemPrompt = process.env.MURDER_MYSTERY_FREE_PROMPT;
+      
+      // Add specific formatting instructions for free version
+      systemPrompt += "\n\nIMPORTANT: Your output MUST follow this exact format with minimal spacing:\n\n# \"[CREATIVE TITLE]\" - A [THEME] MURDER MYSTERY\n\n## PREMISE\n[2-3 paragraphs setting the scene]\n\n## VICTIM\n**[Victim Name]** - [Description]\n\n## CHARACTER LIST ([PLAYER COUNT] PLAYERS)\n1. **[Character 1 Name]** - [Description]\n2. **[Character 2 Name]** - [Description]\n3. **[Character 3 Name]** - [Description]\n[Continue numbering each character sequentially]\n\n## MURDER METHOD\n[Paragraph describing the murder method and clues]\n\nWould this murder mystery concept work for your event? You can continue to make edits, and once you're satisfied, press the 'Generate Mystery' button to create a complete game package with detailed character guides, host instructions, and all the game materials you'll need if you choose to purchase the full version!";
     }
     
-    // Check if prompts are available
-    if (!systemPrompt) {
-      console.error(`${promptVersion.toUpperCase()} prompt is not defined in environment variables`);
-      return new Response(JSON.stringify({ 
-        error: `${promptVersion.toUpperCase()} prompt is not available` 
-      }), {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-        },
-      });
-    }
-    
-    // Add specific formatting instructions for free version
-    if (promptVersion === 'free') {
-      systemPrompt += "\n\nIMPORTANT: Your output MUST follow this exact format with minimal spacing:\n\n# \"[CREATIVE TITLE]\" - A [THEME] MURDER MYSTERY\n\n## PREMISE\n[2-3 paragraphs setting the scene]\n\n## VICTIM\n**[Victim Name]** - [Description]\n\n## CHARACTER LIST ([PLAYER COUNT] PLAYERS)\n1. **[Character 1 Name]** - [Description]\n2. **[Character 2 Name]** - [Description]\n3. **[Character 3 Name]** - [Description]\n[Continue numbering each character sequentially]\n\n## MURDER METHOD\n[Paragraph describing the murder method and clues]\n\nWould this murder mystery concept work for your event? I can create a complete game package with detailed character guides, host instructions, and all the game materials you'll need if you choose to purchase the full version!";
-    }
-    
-    // Now use the actual user messages rather than a fixed test message
+    // Now use the actual user messages
     const anthropicRequest = {
       model: "claude-3-7-sonnet-20250219",
       max_tokens: 1500,
