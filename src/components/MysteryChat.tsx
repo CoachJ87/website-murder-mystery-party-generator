@@ -79,6 +79,8 @@ const MysteryChat = ({ initialTheme = "", savedMysteryId, onSave }: MysteryChatP
         content: m.content
       }));
 
+      console.log("Frontend - anthropicMessages being sent:", JSON.stringify(anthropicMessages, null, 2)); // ADD THIS LINE
+
       const response = await getAIResponse(
         anthropicMessages, // Use the correctly formatted messages
         'free'
