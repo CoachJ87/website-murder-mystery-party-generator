@@ -32,7 +32,8 @@ jobs:
       - run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://CoachJ87:${{ secrets.ACTIONS_ACCESS_TOKEN }}@github.com/CoachJ87/website-murder-mystery-party-generator.git  # Set remote URL with PAT
           git add .
           git commit -m "Automated update of browserslist-db"
           git push origin main --force
-        name: Commit and push changes (Direct Git)
+        name: Commit and push changes (Direct Git with PAT)
