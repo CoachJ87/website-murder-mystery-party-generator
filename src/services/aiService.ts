@@ -28,177 +28,138 @@ export const getAIResponse = async (messages: Message[], promptVersion: 'free' |
       promptVersion: promptVersion
     };
     
-    const responsePromise = fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestBody)
-    }).then(response => response.json());
+    console.log("Sending request with messages:", messages.length);
     
-    // Race between the actual request and the timeout
-    const data = await Promise.race([responsePromise, timeoutPromise]) as any;
+    try {
+      const responsePromise = fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody)
+      }).then(response => {
+        if (!response.ok) {
+          throw new Error(`API responded with status ${response.status}`);
+        }
+        return response.json();
+      });
+      
+      // Race between the actual request and the timeout
+      const data = await Promise.race([responsePromise, timeoutPromise]) as any;
 
-    if (!data || data.error) {
-      console.error("Error calling proxy function:", data?.error || "Unknown error");
+      if (!data || data.error) {
+        console.error("Error calling proxy function:", data?.error || "Unknown error");
+        return generateMockResponse(messages, promptVersion);
+      }
+
+      // Extract the response content
+      if (data && data.content && data.content.length > 0 && data.content[0].type === 'text') {
+        return formatResponseText(data.content[0].text, messages); 
+      }
+
+      console.error("Invalid response format from proxy function:", data);
+      return generateMockResponse(messages, promptVersion);
+    } catch (error) {
+      console.error("Error with API request:", error);
       return generateMockResponse(messages, promptVersion);
     }
-
-    // Extract the response content
-    if (data && data.content && data.content.length > 0 && data.content[0].type === 'text') {
-      let text = data.content[0].text;
-      
-      // Post-process free version responses
-      if (promptVersion === 'free') {
-        text = cleanupResponse(text);
-      }
-      
-      return text;
-    }
-
-    console.error("Invalid response format from proxy function:", data);
-    return generateMockResponse(messages, promptVersion);
   } catch (error) {
     console.error("Error in getAIResponse:", error);
     return generateMockResponse(messages, promptVersion);
   }
 };
 
-// Function to clean up the response text
-function cleanupResponse(text: string): string {
-  // Remove $2 markers
-  text = text.replace(/\$2|\*\*\$2\*\*/g, '');
-  
-  // Replace any double line breaks with single line breaks to normalize spacing
-  text = text.replace(/\n\s*\n/g, '\n\n');
-  
-  // Create our ideal output structure
-  let output = '';
-  
-  // Extract title
-  const titleMatch = text.match(/(?:\*\*|# "|#"\s*)([^*"]+)(?:\*\*|")/);
-  const title = titleMatch ? titleMatch[1].trim() : "MYSTERY TITLE";
-  
-  // Add formatted title
-  output += `# "${title}" - A MURDER MYSTERY\n\n`;
-  
-  // Add premise section
-  output += "## PREMISE\n";
-  // Try to find premise content
-  let premiseMatch = text.match(/(?:## PREMISE|## THE PREMISE)[^#]*(?=##|$)/i);
-  if (!premiseMatch) {
-    // Look for paragraphs that might be the premise
-    const paragraphs = text.split('\n\n');
-    for (const p of paragraphs) {
-      if (p.length > 100 && !p.includes('#') && !p.includes('**') && 
-          !p.includes('Would this') && !p.includes('Let me develop')) {
-        premiseMatch = [p];
-        break;
+// Function to format the response text properly
+function formatResponseText(text: string, messages: Message[]): string {
+  // Extract theme from user messages
+  let theme = "mystery";
+  for (const msg of messages) {
+    if (!msg.is_ai) {
+      const themeMatch = msg.content.match(/theme[:\s]*([a-z0-9\s]+)/i);
+      if (themeMatch) {
+        theme = themeMatch[1].trim();
       }
     }
   }
   
-  if (premiseMatch) {
-    const premiseContent = premiseMatch[0]
-      .replace(/## PREMISE|## THE PREMISE/i, '')
-      .trim();
-    output += premiseContent + "\n\n";
-  } else {
-    output += "A thrilling murder mystery awaits...\n\n";
+  // Remove any $2 markers
+  text = text.replace(/\$2|\*\*\$2\*\*/g, '');
+  
+  // Check if this looks like a properly formed response or if we got the default
+  if (text.includes("SHADOWS AT THE PREMIERE") && !messages.some(m => 
+      !m.is_ai && m.content.toLowerCase().includes("hollywood"))) {
+    // We got the default response when we shouldn't have - create a custom one
+    return createCustomMystery(theme);
   }
   
-  // Add victim section
-  output += "## VICTIM\n";
-  let victimMatch = text.match(/(?:## VICTIM|## THE VICTIM|## MURDER VICTIM)[^#]*(?=##|$)/i);
-  if (victimMatch) {
-    const victimContent = victimMatch[0]
-      .replace(/## VICTIM|## THE VICTIM|## MURDER VICTIM/i, '')
-      .trim();
-    output += victimContent + "\n\n";
-  } else {
-    // Try to extract victim information from text
-    const victimNameMatch = text.match(/\*\*([^*]+)\*\*\s*-\s*([^\n]+)/);
-    if (victimNameMatch) {
-      output += `**${victimNameMatch[1]}** - ${victimNameMatch[2]}\n\n`;
-    } else {
-      output += "The victim's details are still being uncovered...\n\n";
-    }
-  }
+  // Ensure proper markdown formatting for headers
+  text = text.replace(/^PREMISE$/gmi, "## PREMISE");
+  text = text.replace(/^VICTIM$/gmi, "## VICTIM");
+  text = text.replace(/^MURDER METHOD$/gmi, "## MURDER METHOD");
+  text = text.replace(/^CHARACTER LIST/gmi, "## CHARACTER LIST");
   
-  // Add murder method section
-  output += "## MURDER METHOD\n";
-  let methodMatch = text.match(/(?:## MURDER METHOD|## THE MURDER)[^#]*(?=##|$)/i);
-  if (methodMatch) {
-    const methodContent = methodMatch[0]
-      .replace(/## MURDER METHOD|## THE MURDER/i, '')
-      .trim();
-    output += methodContent + "\n\n";
-  } else {
-    output += "The details of the murder are still being investigated...\n\n";
-  }
-  
-  // Add character list section
-  output += "## CHARACTER LIST (8 PLAYERS)\n";
-  
-  // Find character list section
-  let characterListMatch = text.match(/(?:## CHARACTER LIST|## THE CHARACTERS|## CHARACTERS)[^#]*(?=##|Would this|$)/i);
-  
+  // Ensure character list uses numbers instead of bullets
+  const characterListMatch = text.match(/## CHARACTER LIST[^#]+/i);
   if (characterListMatch) {
-    const characterSection = characterListMatch[0]
-      .replace(/## CHARACTER LIST|## THE CHARACTERS|## CHARACTERS/i, '')
-      .trim();
+    let characterList = characterListMatch[0];
+    // Replace bullets with numbers
+    let updatedList = characterList.replace(/\* \*\*/g, (match, index, str) => {
+      // Count how many bullets came before this one to determine the number
+      const previousBullets = str.substring(0, index).match(/\* \*\*/g) || [];
+      return `${previousBullets.length + 1}. **`;
+    });
     
-    // Find all character entries
-    const characterEntries = characterSection.match(/(?:\d+\.?\s*)?\*\*[^*]+\*\*[^\n]+/g) || 
-                           characterSection.match(/(?:\d+\.?\s*)?[^\n:]+(-|–)[^\n]+/g) || [];
-    
-    // Add numbered character entries
-    for (let i = 0; i < characterEntries.length; i++) {
-      let entry = characterEntries[i];
-      // Remove any existing numbering
-      entry = entry.replace(/^\d+\.?\s*/, '');
-      output += `${i+1}. ${entry}\n`;
-    }
-  } else {
-    output += "Character details are being developed...\n";
+    // Replace the character list in the text
+    text = text.replace(characterList, updatedList);
   }
   
-  // Add closing text
-  output += "\n\nWould this murder mystery concept work for your event? You can continue to make edits, and once you're satisfied, press the 'Generate Mystery' button to create a complete game package with detailed character guides, host instructions, and all the game materials you'll need if you choose to purchase the full version!";
+  return text;
+}
+
+// Create a custom mystery for a given theme when the API fails
+function createCustomMystery(theme: string): string {
+  const capitalizedTheme = theme.charAt(0).toUpperCase() + theme.slice(1);
   
-  return output;
+  return `# "SECRETS OF ${capitalizedTheme.toUpperCase()}" - A ${capitalizedTheme} MURDER MYSTERY
+
+## PREMISE
+In the unique setting of ${theme}, a community gathering has turned deadly when a prominent local figure is found murdered under mysterious circumstances. What should have been a celebration has now become a locked-room mystery as a storm prevents anyone from leaving the area. The killer walks among the suspects, each with their own motives and secrets waiting to be uncovered.
+
+## VICTIM
+**Taylor Morgan** - A charismatic and influential figure in the ${theme} community who had recently hinted at revealing "information that would change everything." Known for making both devoted friends and bitter enemies, Taylor had accumulated numerous secrets over the years and wasn't afraid to use them for leverage.
+
+## MURDER METHOD
+Taylor was killed using a rare poison that was cleverly disguised in a special drink that only Taylor was known to consume. The murder required intimate knowledge of Taylor's habits and access to restricted areas where the drink was prepared. Evidence suggests the killer may have left behind a unique personal item at the scene that could identify them if discovered.
+
+## CHARACTER LIST (8 PLAYERS)
+1. **Jordan Reynolds** - Taylor's business partner who stood to gain control of their shared enterprise upon Taylor's death.
+2. **Alex Winters** - A rival who had publicly clashed with Taylor over community resources and influence.
+3. **Casey Bennett** - Taylor's personal assistant who knows all the victim's secrets but had recently been threatened with dismissal.
+4. **Morgan Stein** - A scientist/expert whose groundbreaking work was allegedly stolen by Taylor.
+5. **Riley Cooper** - A family member with a disputed inheritance who had been cut from Taylor's will last month.
+6. **Quinn Sullivan** - A mysterious newcomer to the ${theme} setting with a hidden connection to Taylor's past.
+7. **Avery Jenkins** - A local authority figure who had been investigating Taylor for potential rule violations.
+8. **Blake Thompson** - Taylor's ex-partner who had suffered both personally and professionally after their bitter separation.
+
+Would this murder mystery concept work for your event? You can continue to make edits, and once you're satisfied, press the 'Generate Mystery' button to create a complete game package with detailed character guides, host instructions, and all the game materials you'll need if you choose to purchase the full version!`;
 }
 
 // Generate mock responses when API is not available
 const generateMockResponse = (messages: Message[], promptVersion: 'free' | 'paid'): string => {
-  const lastUserMessage = messages.filter(m => !m.is_ai).pop()?.content || "";
-  
   if (promptVersion === 'paid') {
     return `Unable to connect to the AI. Your full mystery package will be generated when the connection is restored.`;
   } else {
-    return `# "SHADOWS AT THE PREMIERE" - A HOLLYWOOD MURDER MYSTERY
-
-## PREMISE
-The glittering world of Hollywood is rocked when renowned director Marcus Reynolds is found dead at his own film premiere. The red carpet event at the historic Pantheon Theater had drawn the industry's biggest stars, powerful producers, and ambitious newcomers—all with their own agendas and secrets. As the screening was about to begin, Marcus was discovered in his private viewing box, strangled with a strip of film.
-
-The theater has been locked down, with police detaining eight key suspects who had both motive and opportunity. With cameras everywhere but mysteriously missing footage from the critical time window, the murderer must be among them. As tensions rise and accusations fly, each suspect must defend themselves while trying to uncover who really killed the controversial director.
-
-## VICTIM
-**Marcus Reynolds** - A brilliant but tyrannical director known for extracting Oscar-worthy performances through psychological manipulation and cruelty. His latest film, "Beautiful Monsters," was rumored to be his masterpiece, but also his most controversial work. Many careers and relationships were destroyed during its tumultuous production, leaving a trail of enemies determined to see him fall.
-
-## MURDER METHOD
-Marcus was strangled with a strip of his own film, torn from the very movie being premiered that night. The killer modified the projection booth's security system to create a 3-minute blackout in the surveillance footage. During this window, they slipped into Marcus's private box, used the film strip with leather gloves to avoid leaving prints, and positioned the body to be discovered just as the movie was scheduled to begin. A broken cufflink found clutched in Marcus's hand and a distinctive perfume lingering in the box provide the only physical clues to the murderer's identity.
-
-## CHARACTER LIST (8 PLAYERS)
-1. **Victoria/Victor Harlow** - Marcus's ex-spouse and producer who financed the film but was publicly humiliated when Marcus revealed their marriage was "research" for the movie.
-2. **Ethan/Elena Stone** - The film's ambitious lead actor whose career-defining role came at the cost of a complete psychological breakdown during filming.
-3. **James/Jamie Wong** - A rival director whose original screenplay was allegedly stolen and reworked by Marcus into "Beautiful Monsters."
-4. **Olivia/Oliver Greene** - The studio executive who threatened to pull funding after witnessing Marcus's abusive behavior on set.
-5. **Sophia/Sam Rodriguez** - Marcus's talented but unacknowledged assistant director who did most of the actual filming without credit.
-6. **Richard/Rachel Morris** - A powerful film critic whose scathing early review of "Beautiful Monsters" led to a very public feud with Marcus.
-7. **Natalie/Nathan Pierce** - Marcus's current lover and the film's breakout star, whose career was launched through their relationship.
-8. **Daniel/Danielle Ford** - The theater owner with gambling debts who was being blackmailed by Marcus over hidden camera footage from the dressing rooms.
-
-Would this murder mystery concept work for your event? You can continue to make edits, and once you're satisfied, press the 'Generate Mystery' button to create a complete game package with detailed character guides, host instructions, and all the game materials you'll need if you choose to purchase the full version!`;
+    // Extract theme from user messages
+    let theme = "Hollywood";
+    for (const msg of messages) {
+      if (!msg.is_ai) {
+        const themeMatch = msg.content.match(/theme[:\s]*([a-z0-9\s]+)/i);
+        if (themeMatch) {
+          theme = themeMatch[1].trim();
+        }
+      }
+    }
+    
+    return createCustomMystery(theme);
   }
 };
