@@ -1,6 +1,7 @@
 export const config = {
   runtime: 'edge',
 };
+
 export default async function handler(req) {
   // Handle OPTIONS request for CORS preflight
   if (req.method === 'OPTIONS') {
@@ -14,6 +15,7 @@ export default async function handler(req) {
       },
     });
   }
+  
   // Only allow POST requests
   if (req.method !== 'POST') {
     return new Response(JSON.stringify({ error: 'Method not allowed' }), {
@@ -24,9 +26,32 @@ export default async function handler(req) {
       },
     });
   }
+  
   try {
     // Parse the request body
     const requestData = await req.json();
+    
+    // Check which prompt to use
+    const promptVersion = requestData.promptVersion || 'free';
+    
+    // Get appropriate prompt from environment variables
+    let systemPrompt;
+    if (promptVersion === 'paid') {
+      systemPrompt = process.env.MURDER_MYSTERY_PAID_PROMPT;
+    } else {
+      systemPrompt = process.env.MURDER_MYSTERY_FREE_PROMPT;
+    }
+    
+    // Prepare Anthropic API request
+    const anthropicRequest = {
+      model: "claude-3-7-sonnet-20250219", // Using the latest model
+      max_tokens: 1000,
+      messages: requestData.messages || [],
+      system: systemPrompt
+    };
+    
+    // Log which prompt version we're using (only visible in Vercel logs)
+    console.log(`Using ${promptVersion} prompt version`);
     
     // Forward the request to Anthropic API
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -36,10 +61,12 @@ export default async function handler(req) {
         'x-api-key': process.env.ANTHROPIC_API_KEY,
         'anthropic-version': '2023-06-01'
       },
-      body: JSON.stringify(requestData),
+      body: JSON.stringify(anthropicRequest),
     });
+    
     // Get the response data
     const data = await response.json();
+    
     // Return the Anthropic API response
     return new Response(JSON.stringify(data), {
       status: response.status,
