@@ -17,7 +17,7 @@ export const getAIResponse = async (messages: Message[], promptVersion: 'free' |
     );
     
     // Your Vercel deployed URL
-    const apiUrl = 'https://website-murder-mystery-party-generator.vercel.app/api/proxy-with-prompts';
+    const apiUrl = 'https://website-murder-mystery-party-generator.vercel.app/api/proxy-with-prompts.js';
     
     // Prepare the request with messages and prompt version
     const requestBody = {
