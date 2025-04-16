@@ -65,17 +65,22 @@ const MysteryChat = ({ initialTheme = "", savedMysteryId, onSave }: MysteryChatP
   const handleAIResponse = async (userMessage: string) => {
     try {
       setLoading(true);
-      
-      // Include the new user message in the messages array passed to getAIResponse
+
+      // Include the new user message in the messages array
       const updatedMessages = [...messages, {
         id: Date.now().toString(),
         content: userMessage,
         is_ai: false,
         timestamp: new Date()
       }];
-      
+
+      const anthropicMessages = updatedMessages.map(m => ({
+        role: m.is_ai ? "assistant" : "user", // Map is_ai to role
+        content: m.content
+      }));
+
       const response = await getAIResponse(
-        updatedMessages.map(m => ({ is_ai: m.is_ai, content: m.content })),
+        anthropicMessages, // Use the correctly formatted messages
         'free'
       );
 
@@ -85,7 +90,6 @@ const MysteryChat = ({ initialTheme = "", savedMysteryId, onSave }: MysteryChatP
         is_ai: true,
         timestamp: new Date(),
       };
-
       setMessages(prev => [...prev, aiMessage]);
       if (onSave) {
         onSave([...updatedMessages, aiMessage]);
@@ -107,15 +111,15 @@ const MysteryChat = ({ initialTheme = "", savedMysteryId, onSave }: MysteryChatP
           </div>
         ) : (
           messages.map((message) => (
-            <Card 
-              key={message.id} 
+            <Card
+              key={message.id}
               className={`max-w-[80%] ${message.is_ai ? 'ml-0' : 'ml-auto'} ${
                 message.is_ai ? 'bg-background' : 'bg-primary text-primary-foreground'
               }`}
             >
               <CardContent className="p-4">
                 <div className="prose prose-sm dark:prose-invert max-w-none">
-                  <div dangerouslySetInnerHTML={{ 
+                  <div dangerouslySetInnerHTML={{
                     __html: message.content
                       .replace(/^# (.*$)/gm, '<h1 class="text-2xl font-bold my-2">$1</h1>')
                       .replace(/^## (.*$)/gm, '<h2 class="text-xl font-semibold my-2">$1</h2>')
