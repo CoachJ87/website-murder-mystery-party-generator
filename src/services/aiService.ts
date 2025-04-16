@@ -1,5 +1,4 @@
 // src/services/aiService.ts
-import { supabase } from "@/lib/supabase";
 
 // Interface for conversation messages
 interface Message {
@@ -10,28 +9,23 @@ interface Message {
 // Function to get AI response for your murder mystery chatbot
 export const getAIResponse = async (messages: Message[], promptVersion: 'free' | 'paid'): Promise<string> => {
   try {
-    console.log("Attempting to call Vercel serverless function proxy...");
-    console.log(`Using ${promptVersion} prompt version for request`);
+    console.log(`Calling proxy with ${promptVersion} prompt version`);
     
     // Set a timeout to avoid hanging if there's an issue
     const timeoutPromise = new Promise((_, reject) => 
       setTimeout(() => reject(new Error("Request timed out")), 15000)
     );
     
-    // Your Vercel deployed URL - replace with your actual domain
-    const apiUrl = 'https://website-murder-mystery-party-generator.vercel.app/api/proxy-anthropic';
+    // Your Vercel deployed URL
+    const apiUrl = 'https://website-murder-mystery-party-generator.vercel.app/api/proxy-with-prompts';
     
-    // Prepare the request to the Anthropic API through our proxy
+    // Prepare the request with messages and prompt version
     const requestBody = {
-      model: "claude-3-haiku-20240307",
-      max_tokens: 1000,
       messages: messages.map(msg => ({
         role: msg.is_ai ? "assistant" : "user",
         content: msg.content
       })),
-      system: promptVersion === 'free' 
-        ? FREE_SYSTEM_PROMPT  // We'll define this constant below
-        : `You are a Murder Mystery Creator assistant. The user has purchased the full package, so provide detailed character guides, host instructions, and all game materials needed to run a complete murder mystery party.`
+      promptVersion: promptVersion
     };
     
     const responsePromise = fetch(apiUrl, {
@@ -50,7 +44,7 @@ export const getAIResponse = async (messages: Message[], promptVersion: 'free' |
       return generateMockResponse(messages, promptVersion);
     }
 
-    // Extract the response content from the Anthropic API response
+    // Extract the response content
     if (data && data.content && data.content.length > 0 && data.content[0].type === 'text') {
       return data.content[0].text;
     }
@@ -63,106 +57,36 @@ export const getAIResponse = async (messages: Message[], promptVersion: 'free' |
   }
 };
 
-// Define the free system prompt directly in the code
-const FREE_SYSTEM_PROMPT = `# MURDER MYSTERY PARTY GAME CREATOR
-
-## ROLE AND CONTEXT
-You are an expert murder mystery party game designer helping the user create a custom, detailed murder mystery game for their event.
-
-## TASK DESCRIPTION
-Guide the user through creating a complete murder mystery party game package by:
-1. Collecting their preferences through specific questions
-2. Creating a compelling murder scenario based on their answers
-3. Developing engaging character concepts that will intrigue potential players
-
-## OUTPUT FORMAT
-Present your mystery preview in an engaging, dramatic format that will excite the user. Include:
-
-# "[CREATIVE TITLE]" - A [THEME] MURDER MYSTERY
-
-## PREMISE
-[2-3 paragraphs setting the scene, describing the event where the murder takes place, and creating dramatic tension]
-
-## VICTIM
-**[Victim Name]** - [Vivid description of the victim, their role in the story, personality traits, and why they might have made enemies]
-
-## CHARACTER LIST ([PLAYER COUNT] PLAYERS)
-1. **[Character 1 Name]** - [Engaging one-sentence description including profession and connection to victim]
-2. **[Character 2 Name]** - [Engaging one-sentence description including profession and connection to victim]
-[Continue for all characters]
-
-## MURDER METHOD
-[Paragraph describing how the murder was committed, interesting details about the method, and what clues might be found]
-
-[After presenting the mystery concept, ask if the concept works for them and explain that you can create a complete game package with detailed character guides, host instructions, and game materials if they choose to purchase.]
-
-## CONSTRAINTS AND FINAL VERIFICATION
-- Ensure the preview is exciting and engaging enough to make the user want the full package
-- Create characters with clear potential for interesting secrets and motivations
-- Keep the concept accessible for casual players while offering intrigue
-- Make sure gender-neutral options are available for all characters
-
-IMPORTANT: Always follow this exact format for your response. Begin with a creative title, then provide sections for premise, victim, character list, and murder method in exactly this order.`;
-
-// Generate helpful mock responses when API is not available
+// Generate mock responses when API is not available
 const generateMockResponse = (messages: Message[], promptVersion: 'free' | 'paid'): string => {
   const lastUserMessage = messages.filter(m => !m.is_ai).pop()?.content || "";
-  const messageCount = messages.length;
   
   if (promptVersion === 'paid') {
-    return `## Premium Murder Mystery Package
-Unfortunately the AI is not connected at the moment. Your paid mystery package will include:
-
-- [ ] Detailed character guides
-- [ ] Host instructions
-- [ ] Game materials
-- [ ] Props list
-- [x] Premium support
-
-### Next Steps
-1. Reconnect to the AI service
-2. Generate your custom mystery
-3. Download your materials`;
-  }
-  
-  if (messageCount <= 1) {
-    return `## "SECRETS OF THE SAPPHIRE SEAS"
-### A Cruise Ship Murder Mystery
-
-The luxury cruise liner "Sapphire Seas" is on the final night of its 7-day Caribbean voyage. The ship's wealthy owner, **Elijah Blackwood**, has gathered the passengers in the grand ballroom for a farewell gala dinner.
-
-### The Victim
-**Elijah Blackwood** - A ruthless, self-made shipping magnate with a reputation for crushing competitors and betraying allies.
-
-### Character List (8 Players)
-1. **Victoria/Victor Blackwood** - Elijah's ambitious spouse
-2. **Morgan Reynolds** - Elijah's business partner
-3. **Dr. Alex Thornton** - The ship's physician
-4. **Taylor Jenkins** - A celebrated chef
-5. **Jordan Winters** - A former employee
-6. **Casey Monroe** - A private investigator
-7. **Riley Donovan** - A wealthy passenger
-8. **Avery Martinez** - The cruise entertainment director`;
-  } else if (messageCount <= 3) {
-    return `That's a great direction! Now let's think about our cast of characters. A good murder mystery typically needs:
-
-1. A victim (who will be murdered)
-2. 4-8 suspects (one being the actual murderer)
-3. Perhaps a detective character
-
-What kind of characters would fit well in your setting? Think about their relationships, potential motives, and interesting backgrounds.
-
-Your latest message: "${lastUserMessage.substring(0, 100)}${lastUserMessage.length > 100 ? '...' : ''}"`;
+    return `Unable to connect to the AI. Your full mystery package will be generated when the connection is restored.`;
   } else {
-    return `You're making excellent progress on your murder mystery! Let's develop this further based on what you've shared:
+    return `# "SHADOWS AT THE PREMIERE" - A HOLLYWOOD MURDER MYSTERY
 
-"${lastUserMessage.substring(0, 100)}${lastUserMessage.length > 100 ? '...' : ''}"
+## PREMISE
+The glittering world of Hollywood is rocked when renowned director Marcus Reynolds is found dead at his own film premiere. The red carpet event at the historic Pantheon Theater had drawn the industry's biggest stars, powerful producers, and ambitious newcomers—all with their own agendas and secrets. As the screening was about to begin, Marcus was discovered in his private viewing box, strangled with a strip of film.
 
-Here are some ideas to consider:
-- What kind of clues would lead the players to the murderer?
-- How will you reveal information gradually throughout the game?
-- What red herrings might you include to keep players guessing?
+The theater has been locked down, with police detaining eight key suspects who had both motive and opportunity. With cameras everywhere but mysteriously missing footage from the critical time window, the murderer must be among them. As tensions rise and accusations fly, each suspect must defend themselves while trying to uncover who really killed the controversial director.
 
-To create a complete package with all character details, clues, and game materials, you'll want to purchase the premium version.`;
+## VICTIM
+**Marcus Reynolds** - A brilliant but tyrannical director known for extracting Oscar-worthy performances through psychological manipulation and cruelty. His latest film, "Beautiful Monsters," was rumored to be his masterpiece, but also his most controversial work. Many careers and relationships were destroyed during its tumultuous production, leaving a trail of enemies determined to see him fall.
+
+## CHARACTER LIST (8 PLAYERS)
+1. **Victoria/Victor Harlow** - Marcus's ex-spouse and producer who financed the film but was publicly humiliated when Marcus revealed their marriage was "research" for the movie.
+2. **Ethan/Elena Stone** - The film's ambitious lead actor whose career-defining role came at the cost of a complete psychological breakdown during filming.
+3. **James/Jamie Wong** - A rival director whose original screenplay was allegedly stolen and reworked by Marcus into "Beautiful Monsters."
+4. **Olivia/Oliver Greene** - The studio executive who threatened to pull funding after witnessing Marcus's abusive behavior on set.
+5. **Sophia/Sam Rodriguez** - Marcus's talented but unacknowledged assistant director who did most of the actual filming without credit.
+6. **Richard/Rachel Morris** - A powerful film critic whose scathing early review of "Beautiful Monsters" led to a very public feud with Marcus.
+7. **Natalie/Nathan Pierce** - Marcus's current lover and the film's breakout star, whose career was launched through their relationship.
+8. **Daniel/Danielle Ford** - The theater owner with gambling debts who was being blackmailed by Marcus over hidden camera footage from the dressing rooms.
+
+## MURDER METHOD
+Marcus was strangled with a strip of his own film, torn from the very movie being premiered that night. The killer modified the projection booth's security system to create a 3-minute blackout in the surveillance footage. During this window, they slipped into Marcus's private box, used the film strip with leather gloves to avoid leaving prints, and positioned the body to be discovered just as the movie was scheduled to begin. A broken cufflink found clutched in Marcus's hand and a distinctive perfume lingering in the box provide the only physical clues to the murderer's identity.
+
+Would this Hollywood murder mystery concept work for your event? I can create a complete game package with detailed character guides, host instructions, and all the game materials you'll need if you choose to purchase the full version!`;
   }
 };
