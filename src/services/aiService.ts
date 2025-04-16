@@ -6,42 +6,61 @@ interface Message {
   content: string;
 }
 
-// Function to get AI response for your murder mystery chatbot
 export const getAIResponse = async (messages: Message[], promptVersion: 'free' | 'paid'): Promise<string> => {
   try {
-    console.log(`Using test endpoint instead of regular proxy`);
-    
-    // Use the direct test endpoint
+    console.log(`Starting getAIResponse with ${messages.length} messages`);
+    console.log(`Prompt version: ${promptVersion}`);
+
+    // Your Vercel deployed URL - ensure this is correct
     const apiUrl = 'https://website-murder-mystery-party-generator.vercel.app/api/proxy-with-prompts';
-    
+
+    // Prepare the request
+    const requestBody = {
+      messages: messages.map(msg => ({
+        is_ai: msg.is_ai,
+        content: msg.content
+      })),
+      promptVersion: promptVersion
+    };
+
+    console.log(`Prepared request with ${requestBody.messages.length} messages`);
+    console.log(`Calling API at ${apiUrl}`);
+    console.log("Request Body:", JSON.stringify(requestBody)); // Log the request body
+
     // Make the API request
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ test: true })
+      body: JSON.stringify(requestBody)
     });
-    
-    console.log(`Test API response status: ${response.status}`);
-    
+
+    console.log(`API Response Status: ${response.status}`);
+
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`Test API error: ${response.status} - ${errorText}`);
-      throw new Error(`API returned status ${response.status}`);
+      console.error(`API Error: ${response.status} - ${errorText}`);
+      throw new Error(`API returned status ${response.status}: ${errorText}`);
     }
-    
+
     const data = await response.json();
-    console.log(`Successfully parsed test response JSON`);
-    
+    console.log("API Response Data:", JSON.stringify(data));
+
     // Extract the response content
-    if (data && data.content && data.content.length > 0 && data.content[0].type === 'text') {
-      console.log(`Got valid test text response`);
-      return data.content[0].text;
+    if (data && data.choices && data.choices.length > 0 && data.choices[0].message && data.choices[0].message.content) {
+      console.log("Successfully extracted AI response content");
+      return data.choices[0].message.content;
+    } else if (data && data.content && data.content.length > 0 && data.content[0].type === 'text') {
+        // Fallback for older Claude API response structure
+        console.log("Successfully extracted (older format) AI response content");
+        return data.content[0].text;
+    } else {
+      console.error("Invalid API response format");
+      console.error("Response Data:", JSON.stringify(data));
+      throw new Error("Invalid response format from API");
     }
-    
-    console.error(`Invalid test response format`);
-    throw new Error("Invalid response format from test API");
+
   } catch (error) {
     console.error(`Error in getAIResponse: ${error.message}`);
     return `# "ERROR OCCURRED" - A MURDER MYSTERY\n\nThere was an error: ${error.message}`;
