@@ -29,9 +29,10 @@ jobs:
       - run: npx update-browserslist-db@latest
         name: Update browserslist-db
 
-      - uses: stefanzweifel/git-auto-commit-action@v5
-        name: Commit and push changes
-        with:
-          commit_message: "Automated update of browserslist-db"
-          push_options: '--force'
-          repository: .  # Change: Use "." for the current repository
+      - run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Automated update of browserslist-db"
+          git push origin main --force
+        name: Commit and push changes (Direct Git)
