@@ -1,0 +1,30 @@
+name: Update Browserslist DB
+
+on:
+  # You can trigger this on a schedule (e.g., weekly) or on push events
+  schedule:
+    - cron: '0 0 * * 0'  # Runs every Sunday at midnight UTC
+  push:
+    branches:
+      - main
+
+jobs:
+  update-db:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout code
+
+      - uses: actions/setup-node@v4
+        name: Setup Node.js
+        with:
+          node-version: 20  # Or your preferred Node.js version
+
+      - run: npx update-browserslist-db@latest
+        name: Update browserslist-db
+
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        name: Commit and push changes
+        with:
+          commit_message: "Automated update of browserslist-db"
+          push_options: '--force' # Add --force if needed, but be cautious
