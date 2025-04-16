@@ -16,8 +16,8 @@ export const getAIResponse = async (messages: Message[], promptVersion: 'free' |
       setTimeout(() => reject(new Error("Request timed out")), 15000)
     );
     
-    // Your Vercel deployed URL
-    const apiUrl = 'https://website-murder-mystery-party-generator.vercel.app/api/proxy-with-prompts.js';
+    // Your Vercel deployed URL - this is correct, no .js extension needed for API routes
+    const apiUrl = 'https://website-murder-mystery-party-generator.vercel.app/api/proxy-with-prompts';
     
     // Prepare the request with messages and prompt version
     const requestBody = {
@@ -28,31 +28,51 @@ export const getAIResponse = async (messages: Message[], promptVersion: 'free' |
       promptVersion: promptVersion
     };
     
+    console.log("Request payload:", JSON.stringify(requestBody, null, 2));
+    
     const responsePromise = fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(requestBody)
-    }).then(response => response.json());
+    }).then(async response => {
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`API returned ${response.status}: ${errorText}`);
+        throw new Error(`API returned ${response.status}: ${errorText}`);
+      }
+      return response.json();
+    });
     
     // Race between the actual request and the timeout
     const data = await Promise.race([responsePromise, timeoutPromise]) as any;
 
+    console.log("Response data received:", data ? "YES" : "NO");
+
     if (!data || data.error) {
-      console.error("Error calling proxy function:", data?.error || "Unknown error");
+      console.error("Error calling proxy function:", data?.error || "Unknown error", data?.details || "");
       return generateMockResponse(messages, promptVersion);
     }
 
     // Extract the response content
-    if (data && data.content && data.content.length > 0 && data.content[0].type === 'text') {
-      return data.content[0].text;
+    if (data && data.content && data.content.length > 0) {
+      console.log("Content type:", data.content[0]?.type);
+      if (data.content[0].type === 'text') {
+        return data.content[0].text;
+      }
     }
 
-    console.error("Invalid response format from proxy function:", data);
+    console.error("Invalid response format from proxy function:", JSON.stringify(data, null, 2));
     return generateMockResponse(messages, promptVersion);
   } catch (error) {
     console.error("Error in getAIResponse:", error);
+    // Additional error details
+    if (error instanceof Error) {
+      console.error("Error name:", error.name);
+      console.error("Error message:", error.message);
+      console.error("Error stack:", error.stack);
+    }
     return generateMockResponse(messages, promptVersion);
   }
 };
