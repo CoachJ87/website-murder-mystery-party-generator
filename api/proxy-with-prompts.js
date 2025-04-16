@@ -86,7 +86,7 @@ export default async function handler(req) {
         content: [
           {
             type: "text",
-            text: "# \"DEBUGGING MODE\" - A MURDER MYSTERY\n\n## PREMISE\nThis is a debug response to verify the API endpoint is being called correctly.\n\n## VICTIM\n**The API** - Mysteriously not showing any logs or errors.\n\n## MURDER METHOD\nThe murderer silently intercepted requests without leaving any trace in the Vercel logs.\n\n## CHARACTER LIST (4 PLAYERS)\n1. **The Frontend** - Sends requests but doesn't see proper responses.\n2. **The Backend** - Processes requests but might have issues.\n3. **The Environment Variables** - Might be missing or invalid.\n4. **The Claude API** - The external service that might be rejecting our calls.\n\nWould this murder mystery concept work for your event? You can continue to make edits, and once you're satisfied, press the 'Generate Mystery' button to create a complete game package with detailed character guides, host instructions, and all the game materials you'll need if you choose to purchase the full version!"
+            text: "# \"DEBUGGING MODE\" - A MURDER MYSTERY\n\n## PREMISE\nThis is a debug response to verify the API endpoint is being called correctly.\n\n## VICTIM\n**The API** - Mysteriously not showing any logs or errors.\n\n## CHARACTER LIST (4 PLAYERS)\n1. **The Frontend** - Sends requests but doesn't see proper responses.\n2. **The Backend** - Processes requests but might have issues.\n3. **The Environment Variables** - Might be missing or invalid.\n4. **The Claude API** - The external service that might be rejecting our calls.\n\nWould this murder mystery concept work for your event? You can continue to make edits, and once you're satisfied, press the 'Generate Mystery' button to create a complete game package with detailed character guides, host instructions, and all the game materials you'll need if you choose to purchase the full version!"
           }
         ],
         model: "claude-3-7-sonnet-20250219",
@@ -113,10 +113,12 @@ export default async function handler(req) {
     // Prepare Anthropic API request
     const anthropicRequest = {
       model: "claude-3-7-sonnet-20250219",
-      max_tokens: 2000, // Increased max_tokens
+      max_tokens: 2000,
       messages: requestBody.messages || [],
       system: systemPrompt
     };
+
+    console.log("Backend - anthropicRequest.messages:", JSON.stringify(anthropicRequest.messages, null, 2)); // ADD THIS LINE
 
     console.log("Calling Anthropic API with request:", JSON.stringify(anthropicRequest));
 
