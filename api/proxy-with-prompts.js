@@ -1,8 +1,11 @@
+// api/proxy-with-prompts.js
 export const config = {
   runtime: 'edge',
 };
 
 export default async function handler(req) {
+  console.log(`Handler started at ${new Date().toISOString()}`);
+  
   // Handle OPTIONS request for CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, {
@@ -28,20 +31,20 @@ export default async function handler(req) {
   }
   
   try {
+    console.log(`Parsing request body at ${new Date().toISOString()}`);
     // Parse the request body
     const requestData = await req.json();
     
     // Check which prompt to use
     const promptVersion = requestData.promptVersion || 'free';
+    console.log(`Using ${promptVersion} prompt version`);
     
     // Get appropriate prompt from environment variables
     let systemPrompt;
     if (promptVersion === 'paid') {
       systemPrompt = process.env.MURDER_MYSTERY_PAID_PROMPT;
-      console.log("Using PAID prompt. First 100 chars:", systemPrompt?.substring(0, 100));
     } else {
       systemPrompt = process.env.MURDER_MYSTERY_FREE_PROMPT;
-      console.log("Using FREE prompt. First 100 chars:", systemPrompt?.substring(0, 100));
     }
     
     // Check if prompts are available
@@ -58,18 +61,19 @@ export default async function handler(req) {
       });
     }
     
-    // Log message structure for debugging
-    console.log(`Request messages count: ${requestData.messages?.length || 0}`);
+    console.log(`Prompt length: ${systemPrompt.length} characters`);
+    console.log(`Message count: ${requestData.messages?.length || 0}`);
     
     // Prepare Anthropic API request
     const anthropicRequest = {
-      model: "claude-3-7-sonnet-20250219", // Using the latest model
+      model: "claude-3-7-sonnet-20250219",
       max_tokens: 1000,
       messages: requestData.messages || [],
       system: systemPrompt
     };
     
     // Forward the request to Anthropic API
+    console.log(`Calling Anthropic API at ${new Date().toISOString()}`);
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -79,6 +83,8 @@ export default async function handler(req) {
       },
       body: JSON.stringify(anthropicRequest),
     });
+    
+    console.log(`Anthropic API responded at ${new Date().toISOString()} with status: ${response.status}`);
     
     // Check if the response was successful
     if (!response.ok) {
@@ -97,7 +103,9 @@ export default async function handler(req) {
     }
     
     // Get the response data
+    console.log(`Parsing Anthropic response at ${new Date().toISOString()}`);
     const data = await response.json();
+    console.log(`Anthropic response parsed at ${new Date().toISOString()}`);
     
     // Return the Anthropic API response
     return new Response(JSON.stringify(data), {
@@ -108,11 +116,12 @@ export default async function handler(req) {
       },
     });
   } catch (error) {
-    console.error("Detailed error in proxy-with-prompts:", error);
+    console.error(`Error in handler at ${new Date().toISOString()}:`, error);
     return new Response(JSON.stringify({ 
       error: error.message,
       stack: error.stack,
-      name: error.name 
+      name: error.name,
+      time: new Date().toISOString()
     }), {
       status: 500,
       headers: {
