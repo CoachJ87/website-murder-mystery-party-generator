@@ -7,6 +7,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: ${{ github.ref }}  # Ensure only one run per branch
+  cancel-in-progress: true  # Cancel any in-progress jobs
+
 jobs:
   update-db:
     runs-on: ubuntu-latest
