@@ -45,16 +45,16 @@ export default async function handler(req) {
       });
     }
     
-    // Keep the simplified message for now
+    // Add specific formatting instructions for free version
+    if (promptVersion === 'free') {
+      systemPrompt += "\n\nIMPORTANT: Your output MUST follow this exact format:\n\n# \"[CREATIVE TITLE]\" - A [THEME] MURDER MYSTERY\n\n## PREMISE\n[2-3 paragraphs setting the scene]\n\n## VICTIM\n**[Victim Name]** - [Description]\n\n## CHARACTER LIST ([PLAYER COUNT] PLAYERS)\n1. **[Character 1 Name]** - [Description]\n2. **[Character 2 Name]** - [Description]\n[Continue for all characters]\n\n## MURDER METHOD\n[Paragraph describing the murder method and clues]\n\nWould this murder mystery concept work for your event? I can create a complete game package with detailed character guides, host instructions, and all the game materials you'll need if you choose to purchase the full version!";
+    }
+    
+    // Now use the actual user messages rather than a fixed test message
     const anthropicRequest = {
       model: "claude-3-7-sonnet-20250219",
-      max_tokens: 1000,
-      messages: [
-        {
-          role: "user",
-          content: "Hello Claude, please create a short murder mystery premise based on a Hollywood theme."
-        }
-      ],
+      max_tokens: 1500,
+      messages: requestData.messages || [],
       system: systemPrompt
     };
     
