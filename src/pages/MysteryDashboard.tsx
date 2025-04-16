@@ -1,132 +1,131 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Clock, Check, Search, MoreVertical, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { Label } from "@/components/ui/label";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
+import { PlusCircle, Search, Calendar, Clock, Filter, Trash, Archive, Edit } from "lucide-react";
+import SignInPrompt from "@/components/SignInPrompt";
 
-type Mystery = {
+interface Mystery {
   id: string;
   title: string;
-  theme: string;
-  has_purchased: boolean;
-  is_generating?: boolean;
   created_at: string;
   updated_at: string;
-  purchase_date?: string;
-};
+  status: "draft" | "published" | "archived";
+  theme?: string;
+  guests?: number;
+  is_purchased?: boolean;
+}
 
 const MysteryDashboard = () => {
-  const [mysteries, setMysteries] = useState<Mystery[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filter, setFilter] = useState<"all" | "draft" | "purchased">("all");
-  const [generatingId, setGeneratingId] = useState<string | null>(null);
-  const [mysteryToDelete, setMysteryToDelete] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+  const [mysteries, setMysteries] = useState<Mystery[]>([]);
+  const [filteredMysteries, setFilteredMysteries] = useState<Mystery[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [sortOrder, setSortOrder] = useState<"newest" | "oldest" | "lastUpdated">("newest");
+  const [loading, setLoading] = useState(true);
+  const [mysteryToDelete, setMysteryToDelete] = useState<string | null>(null);
 
   useEffect(() => {
-    if (isAuthenticated && user) {
-      loadMysteries();
+    if (isAuthenticated) {
+      fetchUserMysteries();
     } else {
       setLoading(false);
     }
   }, [isAuthenticated, user]);
 
-  const loadMysteries = async () => {
+  useEffect(() => {
+    applyFiltersAndSort();
+  }, [mysteries, searchTerm, statusFilter, sortOrder]);
+
+  const fetchUserMysteries = async () => {
     try {
       setLoading(true);
-      
+      if (!user?.id) return;
+
       const { data, error } = await supabase
         .from("conversations")
-        .select("*")
+        .select("id, title, created_at, updated_at, status, mystery_data, is_purchased")
         .eq("user_id", user.id)
-        .order("updated_at", { ascending: false });
-        
-      if (error) {
-        console.error("Error fetching mysteries:", error);
-        toast.error("Failed to load your mysteries");
-        return;
-      }
-      
-      const formattedMysteries = data?.map(convo => {
-        const mysteryData = typeof convo.mystery_data === 'object' ? convo.mystery_data : {};
-        
-        return {
-          id: convo.id,
-          title: convo.title || 'Untitled Mystery',
-          theme: (mysteryData as any)?.theme || 'Mystery Theme',
-          has_purchased: convo.is_paid || false,
-          created_at: convo.created_at,
-          updated_at: convo.updated_at,
-          purchase_date: convo.updated_at
-        };
-      }) || [];
-      
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      // Format the data to match our Mystery interface
+      const formattedMysteries: Mystery[] = data.map((item) => ({
+        id: item.id,
+        title: item.title || "Untitled Mystery",
+        created_at: item.created_at,
+        updated_at: item.updated_at || item.created_at,
+        status: item.status || "draft",
+        theme: item.mystery_data?.theme,
+        guests: item.mystery_data?.numberOfGuests,
+        is_purchased: item.is_purchased || false,
+      }));
+
       setMysteries(formattedMysteries);
     } catch (error) {
-      console.error("Error loading mysteries:", error);
+      console.error("Error fetching mysteries:", error);
       toast.error("Failed to load your mysteries");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCreateNew = () => {
-    navigate("/mystery/create");
+  const applyFiltersAndSort = () => {
+    let filtered = [...mysteries];
+
+    // Apply search filter
+    if (searchTerm) {
+      filtered = filtered.filter(
+        (mystery) =>
+          mystery.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (mystery.theme && mystery.theme.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+    }
+
+    // Apply status filter
+    if (statusFilter !== "all") {
+      filtered = filtered.filter((mystery) => mystery.status === statusFilter);
+    }
+
+    // Apply sorting
+    if (sortOrder === "newest") {
+      filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    } else if (sortOrder === "oldest") {
+      filtered.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+    } else if (sortOrder === "lastUpdated") {
+      filtered.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+    }
+
+    setFilteredMysteries(filtered);
   };
 
-  const handleEdit = (id: string) => {
-    navigate(`/mystery/edit/${id}`);
-  };
-
-  const handleView = (id: string) => {
-    navigate(`/mystery/${id}`);
-  };
-
-  const handlePurchase = (id: string) => {
-    navigate(`/mystery/preview/${id}`);
-  };
-
-  const handleDelete = async (id: string) => {
-    setMysteryToDelete(id);
-  };
-
-  const confirmDelete = async () => {
-    if (!mysteryToDelete) return;
-    
+  const handleDeleteMystery = async (id: string) => {
     try {
+      if (!id) return;
+      
       const { error } = await supabase
         .from("conversations")
         .delete()
-        .eq("id", mysteryToDelete);
-        
-      if (error) {
-        console.error("Error deleting mystery:", error);
-        toast.error("Failed to delete mystery");
-        return;
-      }
+        .eq("id", id);
+
+      if (error) throw error;
       
+      setMysteries(mysteries.filter(mystery => mystery.id !== id));
       toast.success("Mystery deleted successfully");
-      setMysteries(prev => prev.filter(mystery => mystery.id !== mysteryToDelete));
+      
     } catch (error) {
       console.error("Error deleting mystery:", error);
       toast.error("Failed to delete mystery");
@@ -135,303 +134,222 @@ const MysteryDashboard = () => {
     }
   };
 
-  const handlePostPurchase = async (id: string) => {
+  const handleStatusChange = async (id: string, newStatus: "draft" | "published" | "archived") => {
     try {
-      setGeneratingId(id);
-      
-      const { error: updateError } = await supabase
+      const { error } = await supabase
         .from("conversations")
-        .update({ 
-          is_paid: true,
-          purchase_date: new Date().toISOString()
+        .update({
+          status: newStatus,
+          updated_at: new Date().toISOString(),
         })
         .eq("id", id);
-        
-      if (updateError) {
-        console.error("Error updating purchase status:", updateError);
-        toast.error("Failed to update purchase status");
-        return;
-      }
-      
-      setMysteries(prev => 
-        prev.map(mystery => 
-          mystery.id === id ? { ...mystery, has_purchased: true, is_generating: true } : mystery
+
+      if (error) throw error;
+
+      setMysteries(
+        mysteries.map((mystery) =>
+          mystery.id === id
+            ? { ...mystery, status: newStatus, updated_at: new Date().toISOString() }
+            : mystery
         )
       );
-      
-      toast.success("Purchase successful! Generating your complete package...");
-      
-      try {
-        await generateCompletePackage(id);
-        
-        setMysteries(prev => 
-          prev.map(mystery => 
-            mystery.id === id ? { ...mystery, is_generating: false } : mystery
-          )
-        );
-        
-        toast.success("Your mystery package is ready!");
-      } catch (genError) {
-        console.error("Error generating package:", genError);
-        toast.error("Failed to generate your package. You can try again from the dashboard.");
-        
-        setMysteries(prev => 
-          prev.map(mystery => 
-            mystery.id === id ? { ...mystery, is_generating: false } : mystery
-          )
-        );
-      }
+
+      toast.success(`Mystery ${newStatus === "archived" ? "archived" : "updated"} successfully`);
     } catch (error) {
-      console.error("Error processing purchase:", error);
-      toast.error("Failed to process purchase");
-    } finally {
-      setGeneratingId(null);
+      console.error(`Error updating mystery status:`, error);
+      toast.error("Failed to update mystery");
     }
   };
 
-  const simulatePurchase = async (id: string) => {
-    await handlePostPurchase(id);
+  const generateLoremIpsum = () => {
+    // This is a placeholder for generating content for demo purposes
+    toast.success("Sample mystery content generated");
+    navigate("/mystery/view/sample");
   };
-
-  const filteredMysteries = mysteries
-    .filter(mystery => 
-      mystery.title?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-      mystery.theme?.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-    .filter(mystery => {
-      if (filter === "all") return true;
-      if (filter === "draft") return !mystery.has_purchased;
-      if (filter === "purchased") return mystery.has_purchased;
-      return true;
-    });
-
-  const getStatusIcon = (mystery: Mystery) => {
-    if (mystery.is_generating) {
-      return <Loader2 className="h-4 w-4 animate-spin text-primary" />;
-    }
-    
-    return mystery.has_purchased 
-      ? <Check className="h-4 w-4 text-green-500" />
-      : <Clock className="h-4 w-4 text-muted-foreground" />;
-  };
-
-  const getStatusBadge = (mystery: Mystery) => {
-    if (mystery.is_generating) {
-      return <Badge variant="outline" className="animate-pulse">Generating</Badge>;
-    }
-    
-    return mystery.has_purchased
-      ? <Badge variant="default">Purchased</Badge>
-      : <Badge variant="outline">Draft</Badge>;
-  };
-
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        
-        <main className="flex-1 py-12 px-4">
-          <div className="container mx-auto max-w-6xl">
-            <div className="text-center py-12 border rounded-lg bg-card">
-              <h3 className="text-xl font-medium mb-2">Sign in to view your mysteries</h3>
-              <p className="text-muted-foreground mb-6">
-                You need to sign in to create and manage your murder mystery games
-              </p>
-              <Button onClick={() => navigate("/sign-in")}>Sign In</Button>
-            </div>
-          </div>
-        </main>
-        
-        <Footer />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      
+
       <main className="flex-1 py-12 px-4">
-        <div className="container mx-auto max-w-6xl">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div className="container mx-auto max-w-5xl">
+          <div className="mb-8 flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold">Your Mysteries</h1>
-              <p className="text-muted-foreground">Create, manage, and access your murder mysteries</p>
+              <h1 className="text-3xl font-bold mb-2">Mystery Dashboard</h1>
+              <p className="text-muted-foreground">
+                Manage your created mysteries, start new ones, or explore sample content.
+              </p>
             </div>
-            
-            <Button onClick={() => navigate("/mystery/create")} className="shrink-0">
-              <Plus className="h-4 w-4 mr-2" />
-              Create New Mystery
+            <Button onClick={() => navigate("/mystery/create")}><PlusCircle className="mr-2 h-4 w-4" /> Create New Mystery</Button>
+          </div>
+
+          {isAuthenticated ? (
+            <>
+              <Tabs defaultValue="all" className="space-y-4">
+                <TabsList>
+                  <TabsTrigger value="all">All</TabsTrigger>
+                  <TabsTrigger value="draft">Drafts</TabsTrigger>
+                  <TabsTrigger value="published">Published</TabsTrigger>
+                  <TabsTrigger value="archived">Archived</TabsTrigger>
+                </TabsList>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Label htmlFor="search">
+                      <Search className="h-4 w-4 mr-2" />
+                    </Label>
+                    <Input
+                      id="search"
+                      placeholder="Search by title or theme..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-2">
+                      <Label htmlFor="sort">Sort by:</Label>
+                      <select
+                        id="sort"
+                        className="rounded-md border border-input bg-background px-2 py-1 text-sm"
+                        value={sortOrder}
+                        onChange={(e) => setSortOrder(e.target.value as "newest" | "oldest" | "lastUpdated")}
+                      >
+                        <option value="newest">Newest</option>
+                        <option value="oldest">Oldest</option>
+                        <option value="lastUpdated">Last Updated</option>
+                      </select>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Label htmlFor="status">Filter by Status:</Label>
+                      <select
+                        id="status"
+                        className="rounded-md border border-input bg-background px-2 py-1 text-sm"
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                      >
+                        <option value="all">All</option>
+                        <option value="draft">Draft</option>
+                        <option value="published">Published</option>
+                        <option value="archived">Archived</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {loading ? (
+                  <p>Loading mysteries...</p>
+                ) : filteredMysteries.length === 0 ? (
+                  <p>No mysteries found.</p>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredMysteries.map((mystery) => (
+                      <Card key={mystery.id} className="bg-card text-card-foreground">
+                        <CardHeader>
+                          <CardTitle className="flex justify-between items-start">
+                            {mystery.title}
+                            <div>
+                              {mystery.status === "draft" && <Badge variant="secondary">Draft</Badge>}
+                              {mystery.status === "published" && <Badge>Published</Badge>}
+                              {mystery.status === "archived" && <Badge variant="outline">Archived</Badge>}
+                            </div>
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-2">
+                          <p className="text-sm text-muted-foreground">
+                            Created: <Calendar className="inline-block h-4 w-4 mr-1" />
+                            {new Date(mystery.created_at).toLocaleDateString()}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            Updated: <Clock className="inline-block h-4 w-4 mr-1" />
+                            {new Date(mystery.updated_at).toLocaleDateString()}
+                          </p>
+                          {mystery.theme && (
+                            <p className="text-sm text-muted-foreground">
+                              Theme: {mystery.theme}
+                            </p>
+                          )}
+                          {mystery.guests && (
+                            <p className="text-sm text-muted-foreground">
+                              Guests: {mystery.guests}
+                            </p>
+                          )}
+                          <div className="flex justify-end space-x-2">
+                            <Button
+                              size="sm"
+                              variant="secondary"
+                              onClick={() => navigate(`/mystery/edit/${mystery.id}`)}
+                            >
+                              <Edit className="h-4 w-4 mr-2" />
+                              Edit
+                            </Button>
+                            {mystery.status !== "archived" ? (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleStatusChange(mystery.id, "archived")}
+                              >
+                                <Archive className="h-4 w-4 mr-2" />
+                                Archive
+                              </Button>
+                            ) : (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleStatusChange(mystery.id, "draft")}
+                              >
+                                <Edit className="h-4 w-4 mr-2" />
+                                Unarchive
+                              </Button>
+                            )}
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button size="sm" variant="destructive">
+                                  <Trash className="h-4 w-4 mr-2" />
+                                  Delete
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This action cannot be undone. This will permanently delete your mystery from our
+                                    servers.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => {
+                                      setMysteryToDelete(mystery.id);
+                                      handleDeleteMystery(mystery.id);
+                                    }}
+                                  >
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </Tabs>
+            </>
+          ) : (
+            <SignInPrompt />
+          )}
+
+          <div className="mt-8 text-center">
+            <Button variant="secondary" onClick={generateLoremIpsum}>
+              Generate Sample Mystery
             </Button>
           </div>
-          
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search mysteries..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            
-            <div className="flex gap-2">
-              <Button 
-                variant={filter === "all" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setFilter("all")}
-              >
-                All
-              </Button>
-              <Button 
-                variant={filter === "draft" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setFilter("draft")}
-              >
-                Drafts
-              </Button>
-              <Button 
-                variant={filter === "purchased" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setFilter("purchased")}
-              >
-                Purchased
-              </Button>
-            </div>
-          </div>
-          
-          {loading ? (
-            <div className="flex justify-center items-center py-12">
-              <div className="h-8 w-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-            </div>
-          ) : filteredMysteries.length === 0 ? (
-            <div className="text-center py-12 border rounded-lg bg-card">
-              <h3 className="text-lg font-medium mb-2">No mysteries found</h3>
-              <p className="text-muted-foreground mb-6">
-                {searchQuery || filter !== "all"
-                  ? "Try adjusting your search or filter"
-                  : "Create your first murder mystery to get started"}
-              </p>
-              {!searchQuery && filter === "all" && (
-                <Button onClick={() => navigate("/mystery/create")}>Create New Mystery</Button>
-              )}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredMysteries.map((mystery) => (
-                <Card key={mystery.id} className="flex flex-col h-full">
-                  <CardHeader className="pb-3">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <CardTitle 
-                          className="line-clamp-2 mb-1" 
-                          title={mystery.title || "Untitled Mystery"}
-                        >
-                          {mystery.title || "Untitled Mystery"}
-                        </CardTitle>
-                        <div className="text-sm text-muted-foreground">
-                          {mystery.theme || "Mystery Theme"}
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2 ml-2 shrink-0">
-                        {getStatusBadge(mystery)}
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="-mr-2">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            {!mystery.has_purchased && (
-                              <DropdownMenuItem onClick={() => handleEdit(mystery.id)}>
-                                Edit
-                              </DropdownMenuItem>
-                            )}
-                            {mystery.has_purchased && (
-                              <DropdownMenuItem onClick={() => handleView(mystery.id)}>
-                                View
-                              </DropdownMenuItem>
-                            )}
-                            <DropdownMenuItem
-                              className="text-destructive focus:text-destructive"
-                              onClick={() => handleDelete(mystery.id)}
-                            >
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  
-                  <CardContent>
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                      {getStatusIcon(mystery)}
-                      <span>
-                        {mystery.has_purchased
-                          ? mystery.is_generating 
-                            ? "Generating package..."
-                            : "Purchased " + new Date(mystery.purchase_date || mystery.updated_at).toLocaleDateString()
-                          : "Last edited " + new Date(mystery.updated_at).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </CardContent>
-                  
-                  <CardFooter className="mt-auto pt-4 flex flex-col gap-2">
-                    {mystery.is_generating ? (
-                      <Button className="w-full" disabled>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Generating...
-                      </Button>
-                    ) : mystery.has_purchased ? (
-                      <Button 
-                        className="w-full" 
-                        onClick={() => handleView(mystery.id)}
-                      >
-                        View Materials
-                      </Button>
-                    ) : (
-                      <>
-                        <Button 
-                          className="w-full" 
-                          onClick={() => handleEdit(mystery.id)}
-                        >
-                          Continue Editing
-                        </Button>
-                        <Button 
-                          className="w-full"
-                          variant="outline"
-                          onClick={() => handlePurchase(mystery.id)}
-                        >
-                          Purchase ($4.99)
-                        </Button>
-                      </>
-                    )}
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
-          )}
         </div>
       </main>
-      
-      <AlertDialog open={!!mysteryToDelete} onOpenChange={() => setMysteryToDelete(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete your mystery
-              and remove all associated data.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete}>Delete</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-      
+
       <Footer />
     </div>
   );

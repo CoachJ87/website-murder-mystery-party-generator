@@ -1,10 +1,11 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { getAIResponse } from "@/services/aiService";
-import ReactMarkdown from 'react-markdown'; // Import react-markdown
+import ReactMarkdown from 'react-markdown'; 
 
 interface Message {
   id: string;
@@ -66,7 +67,7 @@ const MysteryChat = ({ initialTheme = "", savedMysteryId, onSave }: MysteryChatP
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
-      handleSubmit(event);
+      handleSubmit(event as unknown as React.FormEvent);
     }
   };
 
@@ -83,14 +84,14 @@ const MysteryChat = ({ initialTheme = "", savedMysteryId, onSave }: MysteryChatP
       }];
 
       const anthropicMessages = updatedMessages.map(m => ({
-        role: m.is_ai ? "assistant" : "user", // Map is_ai to role
+        role: m.is_ai ? "assistant" : "user",
         content: m.content
       }));
 
       console.log("Frontend - anthropicMessages being sent:", JSON.stringify(anthropicMessages, null, 2));
 
       const response = await getAIResponse(
-        anthropicMessages, // Use the correctly formatted messages
+        anthropicMessages,
         'free'
       );
 
@@ -129,7 +130,7 @@ const MysteryChat = ({ initialTheme = "", savedMysteryId, onSave }: MysteryChatP
             >
               <CardContent className="p-4">
                 <div className="prose prose-sm dark:prose-invert max-w-none">
-                  <ReactMarkdown children={message.content} />
+                  <ReactMarkdown>{message.content}</ReactMarkdown>
                 </div>
                 <div className="text-xs opacity-70 mt-2">
                   {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -145,7 +146,7 @@ const MysteryChat = ({ initialTheme = "", savedMysteryId, onSave }: MysteryChatP
         <Textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown} // ADDED
+          onKeyDown={handleKeyDown}
           placeholder="Type your message here..."
           className="flex-1 min-h-[80px]"
           disabled={loading}
