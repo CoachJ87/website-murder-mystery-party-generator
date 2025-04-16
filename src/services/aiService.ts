@@ -10,57 +10,66 @@ interface Message {
 export const getAIResponse = async (messages: Message[], promptVersion: 'free' | 'paid'): Promise<string> => {
   try {
     console.log(`Calling proxy with ${promptVersion} prompt version`);
+    console.log(`Sending ${messages.length} messages`);
     
     // Set a timeout to avoid hanging if there's an issue
     const timeoutPromise = new Promise((_, reject) => 
       setTimeout(() => reject(new Error("Request timed out")), 30000)
     );
     
+    // Format messages for API
+    const formattedMessages = messages.map(msg => ({
+      role: msg.is_ai ? "assistant" : "user",
+      content: msg.content
+    }));
+    
     // Your Vercel deployed URL
     const apiUrl = 'https://website-murder-mystery-party-generator.vercel.app/api/proxy-with-prompts';
     
     // Prepare the request with messages and prompt version
     const requestBody = {
-      messages: messages.map(msg => ({
-        role: msg.is_ai ? "assistant" : "user",
-        content: msg.content
-      })),
+      messages: formattedMessages,
       promptVersion: promptVersion
     };
     
-    console.log("Sending request with messages:", messages.length);
+    console.log("Request payload:", JSON.stringify(requestBody));
     
     try {
-      const responsePromise = fetch(apiUrl, {
+      // Make the API request
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(requestBody)
-      }).then(response => {
-        if (!response.ok) {
-          throw new Error(`API responded with status ${response.status}`);
-        }
-        return response.json();
       });
       
-      // Race between the actual request and the timeout
-      const data = await Promise.race([responsePromise, timeoutPromise]) as any;
-
-      if (!data || data.error) {
-        console.error("Error calling proxy function:", data?.error || "Unknown error");
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`API error: ${response.status} - ${errorText}`);
+        // Return mock response if API fails
         return generateMockResponse(messages, promptVersion);
       }
-
+      
+      const data = await response.json();
+      console.log("API response received:", data ? "success" : "empty");
+      
+      if (!data || data.error) {
+        console.error("Error in API response:", data?.error || "Unknown error");
+        return generateMockResponse(messages, promptVersion);
+      }
+      
       // Extract the response content
       if (data && data.content && data.content.length > 0 && data.content[0].type === 'text') {
-        return formatResponseText(data.content[0].text, messages); 
+        let text = data.content[0].text;
+        // Ensure proper markdown formatting
+        return formatResponseText(text, messages);
       }
-
-      console.error("Invalid response format from proxy function:", data);
+      
+      console.error("Invalid response format:", data);
       return generateMockResponse(messages, promptVersion);
     } catch (error) {
-      console.error("Error with API request:", error);
+      console.error("API request error:", error);
       return generateMockResponse(messages, promptVersion);
     }
   } catch (error) {
@@ -69,54 +78,84 @@ export const getAIResponse = async (messages: Message[], promptVersion: 'free' |
   }
 };
 
-// Function to format the response text properly
+// Function to format response text
 function formatResponseText(text: string, messages: Message[]): string {
   // Extract theme from user messages
-  let theme = "mystery";
-  for (const msg of messages) {
-    if (!msg.is_ai) {
-      const themeMatch = msg.content.match(/theme[:\s]*([a-z0-9\s]+)/i);
-      if (themeMatch) {
-        theme = themeMatch[1].trim();
-      }
-    }
-  }
+  let theme = extractThemeFromMessages(messages);
   
   // Remove any $2 markers
   text = text.replace(/\$2|\*\*\$2\*\*/g, '');
   
-  // Check if this looks like a properly formed response or if we got the default
-  if (text.includes("SHADOWS AT THE PREMIERE") && !messages.some(m => 
-      !m.is_ai && m.content.toLowerCase().includes("hollywood"))) {
-    // We got the default response when we shouldn't have - create a custom one
+  // If we got the default response for a non-default theme, use a custom one
+  if (text.includes("SHADOWS AT THE PREMIERE") && theme.toLowerCase() !== "hollywood") {
     return createCustomMystery(theme);
   }
   
-  // Ensure proper markdown formatting for headers
-  text = text.replace(/^PREMISE$/gmi, "## PREMISE");
-  text = text.replace(/^VICTIM$/gmi, "## VICTIM");
-  text = text.replace(/^MURDER METHOD$/gmi, "## MURDER METHOD");
-  text = text.replace(/^CHARACTER LIST/gmi, "## CHARACTER LIST");
+  // Ensure proper markdown formatting
+  if (!text.startsWith('# "')) {
+    // Try to extract a title
+    const titleMatch = text.match(/\*\*([^*]+)\*\*/);
+    const title = titleMatch ? titleMatch[1].toUpperCase() : theme.toUpperCase();
+    text = `# "${title}" - A ${theme.toUpperCase()} MURDER MYSTERY\n\n` + text;
+  }
   
-  // Ensure character list uses numbers instead of bullets
-  const characterListMatch = text.match(/## CHARACTER LIST[^#]+/i);
-  if (characterListMatch) {
-    let characterList = characterListMatch[0];
-    // Replace bullets with numbers
-    let updatedList = characterList.replace(/\* \*\*/g, (match, index, str) => {
-      // Count how many bullets came before this one to determine the number
-      const previousBullets = str.substring(0, index).match(/\* \*\*/g) || [];
-      return `${previousBullets.length + 1}. **`;
-    });
-    
-    // Replace the character list in the text
-    text = text.replace(characterList, updatedList);
+  // Ensure headers are properly formatted
+  text = text.replace(/^PREMISE\n/mi, "## PREMISE\n");
+  text = text.replace(/^VICTIM\n/mi, "## VICTIM\n");
+  text = text.replace(/^MURDER METHOD\n/mi, "## MURDER METHOD\n");
+  text = text.replace(/^CHARACTER LIST/mi, "## CHARACTER LIST");
+  
+  // Ensure characters are properly numbered
+  if (text.includes("CHARACTER LIST")) {
+    const parts = text.split(/## CHARACTER LIST[^#]*/i);
+    if (parts.length > 1) {
+      const beforeList = parts[0];
+      let characterList = text.match(/## CHARACTER LIST[^#]*/i)?.[0] || "";
+      const afterList = parts.slice(1).join("");
+      
+      // Replace * with numbered list
+      let characterLines = characterList.split('\n');
+      let numberedList = characterLines[0] + '\n'; // Keep the header
+      
+      let counter = 1;
+      for (let i = 1; i < characterLines.length; i++) {
+        const line = characterLines[i];
+        if (line.trim().startsWith('*') || line.trim().startsWith('1.')) {
+          numberedList += line.replace(/^[\s*\d.]+/, `${counter}. `) + '\n';
+          counter++;
+        } else if (line.trim()) {
+          numberedList += line + '\n';
+        }
+      }
+      
+      text = beforeList + numberedList + afterList;
+    }
+  }
+  
+  // Ensure the closing text is present
+  if (!text.includes("Would this murder mystery concept work for your event?")) {
+    text += "\n\nWould this murder mystery concept work for your event? You can continue to make edits, and once you're satisfied, press the 'Generate Mystery' button to create a complete game package with detailed character guides, host instructions, and all the game materials you'll need if you choose to purchase the full version!";
   }
   
   return text;
 }
 
-// Create a custom mystery for a given theme when the API fails
+// Extract theme from messages
+function extractThemeFromMessages(messages: Message[]): string {
+  for (const msg of messages) {
+    if (!msg.is_ai) {
+      // Look for theme in message content
+      const themeMatch = msg.content.match(/theme[:\s]*([a-z0-9\s]+)/i) ||
+                         msg.content.match(/with a ([a-z0-9\s]+) theme/i);
+      if (themeMatch) {
+        return themeMatch[1].trim();
+      }
+    }
+  }
+  return "Mystery";
+}
+
+// Create custom murder mystery
 function createCustomMystery(theme: string): string {
   const capitalizedTheme = theme.charAt(0).toUpperCase() + theme.slice(1);
   
@@ -144,22 +183,12 @@ Taylor was killed using a rare poison that was cleverly disguised in a special d
 Would this murder mystery concept work for your event? You can continue to make edits, and once you're satisfied, press the 'Generate Mystery' button to create a complete game package with detailed character guides, host instructions, and all the game materials you'll need if you choose to purchase the full version!`;
 }
 
-// Generate mock responses when API is not available
+// Generate mock response
 const generateMockResponse = (messages: Message[], promptVersion: 'free' | 'paid'): string => {
   if (promptVersion === 'paid') {
     return `Unable to connect to the AI. Your full mystery package will be generated when the connection is restored.`;
   } else {
-    // Extract theme from user messages
-    let theme = "Hollywood";
-    for (const msg of messages) {
-      if (!msg.is_ai) {
-        const themeMatch = msg.content.match(/theme[:\s]*([a-z0-9\s]+)/i);
-        if (themeMatch) {
-          theme = themeMatch[1].trim();
-        }
-      }
-    }
-    
+    const theme = extractThemeFromMessages(messages);
     return createCustomMystery(theme);
   }
 };
