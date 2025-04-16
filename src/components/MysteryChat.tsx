@@ -109,11 +109,12 @@ const MysteryChat = ({ initialTheme = "", savedMysteryId, onSave }: MysteryChatP
                 <div className="prose prose-sm dark:prose-invert max-w-none">
                   <div dangerouslySetInnerHTML={{ 
                     __html: message.content
-                      .replace(/^# (.*$)/gm, '<h1>$1</h1>')
-                      .replace(/^## (.*$)/gm, '<h2>$1</h2>')
-                      .replace(/^### (.*$)/gm, '<h3>$1</h3>')
-                      .replace(/^\d+\. (.*$)/gm, '<li>$1</li>')
+                      .replace(/^# (.*$)/gm, '<h1 class="text-2xl font-bold">$1</h1>')
+                      .replace(/^## (.*$)/gm, '<h2 class="text-xl font-semibold mt-4">$1</h2>')
+                      .replace(/^### (.*$)/gm, '<h3 class="text-lg font-medium mt-3">$1</h3>')
+                      .replace(/^\d+\. (.*$)/gm, '<div class="ml-5 mb-2"><span class="mr-2 font-bold">$0</span></div>')
                       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                      .split('\n').join('<br>')
                   }} />
                 </div>
                 <div className="text-xs opacity-70 mt-2">
