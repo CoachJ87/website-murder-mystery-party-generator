@@ -16,6 +16,17 @@ export default async function handler(req) {
     });
   }
   
+  // Only allow POST requests
+  if (req.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      },
+    });
+  }
+  
   try {
     // Parse the request body
     const requestData = await req.json();
@@ -35,7 +46,7 @@ export default async function handler(req) {
       systemPrompt = process.env.MURDER_MYSTERY_FREE_PROMPT;
       
       // Add specific formatting instructions for free version
-      systemPrompt += "\n\nIMPORTANT: Your output MUST follow this exact format with minimal spacing:\n\n# \"[CREATIVE TITLE]\" - A [THEME] MURDER MYSTERY\n\n## PREMISE\n[2-3 paragraphs setting the scene]\n\n## VICTIM\n**[Victim Name]** - [Description]\n\n## CHARACTER LIST ([PLAYER COUNT] PLAYERS)\n1. **[Character 1 Name]** - [Description]\n2. **[Character 2 Name]** - [Description]\n3. **[Character 3 Name]** - [Description]\n[Continue numbering each character sequentially]\n\n## MURDER METHOD\n[Paragraph describing the murder method and clues]\n\nWould this murder mystery concept work for your event? You can continue to make edits, and once you're satisfied, press the 'Generate Mystery' button to create a complete game package with detailed character guides, host instructions, and all the game materials you'll need if you choose to purchase the full version!";
+      systemPrompt += "\n\nIMPORTANT: Your output MUST follow this exact format with NO additional symbols or markers:\n\n# \"[CREATIVE TITLE]\" - A [THEME] MURDER MYSTERY\n\n## PREMISE\n[2-3 paragraphs setting the scene]\n\n## VICTIM\n**[Victim Name]** - [Description]\n\n## CHARACTER LIST ([PLAYER COUNT] PLAYERS)\n1. **[Character 1 Name]** - [Description]\n2. **[Character 2 Name]** - [Description]\n3. **[Character 3 Name]** - [Description]\n4. **[Character 4 Name]** - [Description]\n5. **[Character 5 Name]** - [Description]\n6. **[Character 6 Name]** - [Description]\n7. **[Character 7 Name]** - [Description]\n8. **[Character 8 Name]** - [Description]\n\n## MURDER METHOD\n[Paragraph describing the murder method and clues]\n\nWould this murder mystery concept work for your event? You can continue to make edits, and once you're satisfied, press the 'Generate Mystery' button to create a complete game package with detailed character guides, host instructions, and all the game materials you'll need if you choose to purchase the full version!";
     }
     
     // Now use the actual user messages
