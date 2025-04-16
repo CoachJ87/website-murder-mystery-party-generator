@@ -28,10 +28,12 @@ export default async function handler(req) {
   }
   
   try {
-    // Parse the request body
+    // STEP 1: Parse and validate the request body
     let requestData;
     try {
-      requestData = await req.json();
+      const text = await req.text();
+      console.log("Raw request body:", text.substring(0, 100) + "...");
+      requestData = JSON.parse(text);
     } catch (e) {
       return new Response(JSON.stringify({ 
         error: "Invalid JSON in request body", 
@@ -45,21 +47,37 @@ export default async function handler(req) {
       });
     }
     
-    // Check which prompt to use
+    // STEP 2: Check prompt version
     const promptVersion = requestData.promptVersion || 'free';
+    console.log("Prompt version:", promptVersion);
     
-    // Get appropriate prompt from environment variables
+    // STEP 3: Get prompt from environment variables
     let systemPrompt;
-    if (promptVersion === 'paid') {
-      systemPrompt = process.env.MURDER_MYSTERY_PAID_PROMPT;
-    } else {
-      systemPrompt = process.env.MURDER_MYSTERY_FREE_PROMPT;
-    }
-    
-    // Make sure we have a valid prompt
-    if (!systemPrompt) {
+    try {
+      if (promptVersion === 'paid') {
+        systemPrompt = process.env.MURDER_MYSTERY_PAID_PROMPT;
+      } else {
+        systemPrompt = process.env.MURDER_MYSTERY_FREE_PROMPT;
+      }
+      
+      if (!systemPrompt) {
+        return new Response(JSON.stringify({ 
+          error: `${promptVersion.toUpperCase()} prompt is not defined in environment variables`,
+          envVars: Object.keys(process.env).filter(key => !key.toLowerCase().includes('key')).join(', ')
+        }), {
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
+        });
+      }
+      
+      console.log("System prompt length:", systemPrompt.length);
+    } catch (e) {
       return new Response(JSON.stringify({ 
-        error: `${promptVersion.toUpperCase()} prompt is not defined in environment variables` 
+        error: "Error accessing environment variables",
+        details: e.message
       }), {
         status: 500,
         headers: {
@@ -69,14 +87,12 @@ export default async function handler(req) {
       });
     }
     
-    // Validate messages
-    let messages = requestData.messages || [];
-    if (!Array.isArray(messages)) {
+    // STEP 4: Verify API key
+    if (!process.env.ANTHROPIC_API_KEY) {
       return new Response(JSON.stringify({ 
-        error: "Messages must be an array",
-        receivedType: typeof messages
+        error: "Anthropic API key not found in environment variables"
       }), {
-        status: 400,
+        status: 500,
         headers: {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*',
@@ -84,29 +100,15 @@ export default async function handler(req) {
       });
     }
     
-    // Format messages for Claude API
-    const formattedMessages = [];
+    console.log("API key exists:", !!process.env.ANTHROPIC_API_KEY);
     
-    for (const msg of messages) {
-      // Skip empty or invalid messages
-      if (!msg || typeof msg !== 'object') continue;
-      
-      let role;
-      if ('role' in msg) {
-        role = msg.role;
-      } else if ('is_ai' in msg) {
-        role = msg.is_ai ? "assistant" : "user";
-      } else {
-        continue; // Skip messages without role or is_ai
-      }
-      
-      const content = msg.content || "";
-      
-      if (typeof content !== 'string') {
+    // STEP 5: Format messages
+    let messages = [];
+    try {
+      if (!Array.isArray(requestData.messages)) {
         return new Response(JSON.stringify({ 
-          error: "Message content must be a string",
-          receivedType: typeof content,
-          messageObject: JSON.stringify(msg)
+          error: "Messages must be an array",
+          received: typeof requestData.messages
         }), {
           status: 400,
           headers: {
@@ -116,34 +118,57 @@ export default async function handler(req) {
         });
       }
       
-      formattedMessages.push({ role, content });
-    }
-    
-    // Ensure we have at least one message
-    if (formattedMessages.length === 0) {
-      // Add a default message if none provided
-      formattedMessages.push({
-        role: "user",
-        content: "Create a murder mystery game."
+      // Format messages for Claude API
+      for (const msg of requestData.messages) {
+        if (!msg || typeof msg !== 'object') continue;
+        
+        let role;
+        if ('role' in msg) {
+          role = msg.role;
+        } else if ('is_ai' in msg) {
+          role = msg.is_ai ? "assistant" : "user";
+        } else {
+          continue;
+        }
+        
+        const content = typeof msg.content === 'string' ? msg.content : '';
+        messages.push({ role, content });
+      }
+      
+      // Add default message if empty
+      if (messages.length === 0) {
+        messages.push({
+          role: "user",
+          content: "Create a murder mystery game."
+        });
+      }
+      
+      console.log("Formatted messages count:", messages.length);
+    } catch (e) {
+      return new Response(JSON.stringify({ 
+        error: "Error formatting messages",
+        details: e.message
+      }), {
+        status: 400,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
       });
     }
     
-    // Prepare Anthropic API request
+    // STEP 6: Create Anthropic request
     const anthropicRequest = {
       model: "claude-3-7-sonnet-20250219",
       max_tokens: 1500,
-      messages: formattedMessages,
+      messages: messages,
       system: systemPrompt
     };
     
-    // Log the request for debugging
-    console.log("Sending to Claude API:", JSON.stringify({
-      modelName: anthropicRequest.model,
-      messageCount: anthropicRequest.messages.length,
-      systemPromptLength: systemPrompt.length,
-    }));
+    console.log("Anthropic request prepared");
     
-    // Forward the request to Anthropic API
+    // STEP 7: Call Anthropic API
+    console.log("Calling Anthropic API...");
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -154,7 +179,9 @@ export default async function handler(req) {
       body: JSON.stringify(anthropicRequest),
     });
     
-    // Check if the response was successful
+    // STEP 8: Process response
+    console.log("Received response from Anthropic API:", response.status);
+    
     if (!response.ok) {
       let errorText;
       try {
@@ -164,7 +191,6 @@ export default async function handler(req) {
         errorText = await response.text();
       }
       
-      console.error(`Anthropic API error: ${response.status} - ${errorText}`);
       return new Response(JSON.stringify({ 
         error: "Error from Anthropic API", 
         status: response.status,
@@ -178,10 +204,10 @@ export default async function handler(req) {
       });
     }
     
-    // Get the response data
+    // STEP 9: Return successful response
     const data = await response.json();
+    console.log("Successfully processed Anthropic response");
     
-    // Return the Anthropic API response
     return new Response(JSON.stringify(data), {
       status: 200,
       headers: {
@@ -190,9 +216,10 @@ export default async function handler(req) {
       },
     });
   } catch (error) {
-    console.error("Error in proxy-with-prompts:", error);
+    console.error("Unhandled error in proxy-with-prompts:", error);
     return new Response(JSON.stringify({ 
-      error: error.message,
+      error: "Unhandled server error",
+      message: error.message,
       stack: error.stack,
       name: error.name 
     }), {
