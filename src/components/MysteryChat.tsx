@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
-import { ArrowRight, MessageCircle } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
@@ -25,25 +25,13 @@ type MysteryChatProps = {
 
 const formatMessageContent = (content: string) => {
   return content
-    // Headers with appropriate spacing
-    .replace(/^# (.*$)/gm, '<h1 class="text-2xl font-bold my-4">$1</h1>')
     .replace(/^## (.*$)/gm, '<h2 class="text-xl font-bold my-3">$1</h2>')
     .replace(/^### (.*$)/gm, '<h3 class="text-lg font-semibold my-2">$1</h3>')
-    // Bold text
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    // Checkboxes with reduced spacing
     .replace(/- \[ \] (.*$)/gm, '<div class="flex items-center gap-2 my-1"><input type="checkbox" disabled class="form-checkbox h-4 w-4" /><span>$1</span></div>')
     .replace(/- \[x\] (.*$)/gm, '<div class="flex items-center gap-2 my-1"><input type="checkbox" checked disabled class="form-checkbox h-4 w-4" /><span>$1</span></div>')
-    // Numbered lists with proper incrementing and spacing
-    .replace(/^\d+\. (.*$)/gm, '<li>$1</li>')
-    .split('\n')
-    .map(line => {
-      if (line.startsWith('<li>')) {
-        return `<ol class="list-decimal list-inside my-1">${line}</ol>`;
-      }
-      return line;
-    })
-    .join('<br />');
+    .replace(/^\d+\. (.*$)/gm, '<ol class="list-decimal list-inside my-1"><li>$1</li></ol>')
+    .split('\n').join('<br />');
 };
 
 const MysteryChat = ({
@@ -259,14 +247,8 @@ Help me develop this murder mystery.`;
     onSave(messages);
   };
 
-  const getMessagesHeight = () => {
-    const baseHeight = 400;
-    const additionalHeight = Math.min(messages.length * 30, 300);
-    return baseHeight + additionalHeight;
-  };
-
   return (
-    <div className="flex flex-col space-y-4">
+    <div className="flex flex-col h-full">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold">Mystery Creator AI</h2>
         <Badge variant="outline">
@@ -274,78 +256,62 @@ Help me develop this murder mystery.`;
         </Badge>
       </div>
       
-      <Card className="p-4">
-        <div className="flex items-center gap-2 mb-2">
-          <MessageCircle className="h-5 w-5 text-primary" />
-          <h3 className="font-medium text-lg">Murder Mystery Creator</h3>
-        </div>
-        
-        <div 
-          className="overflow-y-auto pr-2 mb-2 space-y-2"
-          style={{ height: `${getMessagesHeight()}px` }}
+      <div className="flex-1 overflow-y-auto mb-4 space-y-4 p-4 border rounded-lg bg-background/50 min-h-[400px] max-h-[500px]">
+        {messages.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
+            <p>Start creating your murder mystery by sending your first message.</p>
+          </div>
+        ) : (
+          messages.map((message) => (
+            <Card key={message.id} className={`max-w-[80%] ${message.role === "user" ? "ml-auto bg-primary text-primary-foreground" : "mr-auto"}`}>
+              <CardContent className="p-4">
+                <div 
+                  dangerouslySetInnerHTML={{ 
+                    __html: formatMessageContent(message.content) 
+                  }}
+                  className="prose prose-sm dark:prose-invert max-w-none"
+                />
+                <div className="text-xs opacity-70 mt-2">
+                  {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+      
+      <div className="relative">
+        <Textarea
+          ref={textareaRef}
+          value={input}
+          onChange={(e) => {
+            setInput(e.target.value);
+            adjustHeight();
+          }}
+          placeholder="Type your message..."
+          className="resize-none pr-12"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              handleSubmit();
+            }
+          }}
+          disabled={loading}
+        />
+        <Button
+          size="icon"
+          className="absolute right-2 bottom-2"
+          onClick={handleSubmit}
+          disabled={!input.trim() || loading}
         >
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`p-3 rounded-lg ${
-                message.role === "user"
-                  ? "bg-primary text-primary-foreground ml-auto max-w-[80%] text-right"
-                  : "bg-muted max-w-[80%]"
-              }`}
-            >
-              <div 
-                dangerouslySetInnerHTML={{ __html: formatMessageContent(message.content) }}
-                className="prose prose-sm dark:prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0"
-              />
-              <div className="text-xs opacity-70 mt-1">
-                {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-              </div>
-            </div>
-          ))}
-          {loading && (
-            <div className="bg-muted p-3 rounded-lg max-w-[80%] animate-pulse">
-              <div className="flex space-x-2">
-                <div className="h-2 w-2 bg-current rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                <div className="h-2 w-2 bg-current rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                <div className="h-2 w-2 bg-current rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
-              </div>
-            </div>
+          {loading ? (
+            <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+          ) : (
+            <ArrowRight className="h-4 w-4" />
           )}
-          <div ref={messagesEndRef} />
-        </div>
-        
-        <div className="relative">
-          <Textarea
-            ref={textareaRef}
-            value={input}
-            onChange={(e) => {
-              setInput(e.target.value);
-              adjustHeight();
-            }}
-            placeholder="Type your message..."
-            className="resize-none pr-12"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSubmit();
-              }
-            }}
-            disabled={loading}
-          />
-          <Button
-            size="icon"
-            className="absolute right-2 bottom-2"
-            onClick={handleSubmit}
-            disabled={!input.trim() || loading}
-          >
-            {loading ? (
-              <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <ArrowRight className="h-4 w-4" />
-            )}
-          </Button>
-        </div>
-      </Card>
+        </Button>
+      </div>
       
       <div className="mt-4 flex justify-end">
         <Button onClick={handleGenerateMystery} disabled={messages.length < 3}>
