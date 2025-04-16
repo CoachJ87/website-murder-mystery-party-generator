@@ -29,7 +29,21 @@ export default async function handler(req) {
   
   try {
     // Parse the request body
-    const requestData = await req.json();
+    let requestData;
+    try {
+      requestData = await req.json();
+    } catch (e) {
+      return new Response(JSON.stringify({ 
+        error: "Invalid JSON in request body", 
+        details: e.message 
+      }), {
+        status: 400,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+      });
+    }
     
     // Check which prompt to use
     const promptVersion = requestData.promptVersion || 'free';
@@ -44,9 +58,8 @@ export default async function handler(req) {
     
     // Make sure we have a valid prompt
     if (!systemPrompt) {
-      console.error(`${promptVersion.toUpperCase()} prompt is not defined in environment variables`);
       return new Response(JSON.stringify({ 
-        error: `${promptVersion.toUpperCase()} prompt is not available` 
+        error: `${promptVersion.toUpperCase()} prompt is not defined in environment variables` 
       }), {
         status: 500,
         headers: {
@@ -56,11 +69,12 @@ export default async function handler(req) {
       });
     }
     
-    // Validate messages to prevent common errors
-    const messages = requestData.messages || [];
+    // Validate messages
+    let messages = requestData.messages || [];
     if (!Array.isArray(messages)) {
       return new Response(JSON.stringify({ 
-        error: "Messages must be an array" 
+        error: "Messages must be an array",
+        receivedType: typeof messages
       }), {
         status: 400,
         headers: {
@@ -71,13 +85,43 @@ export default async function handler(req) {
     }
     
     // Format messages for Claude API
-    const formattedMessages = messages.map(msg => ({
-      role: msg.role || (msg.is_ai ? "assistant" : "user"),
-      content: msg.content || ""
-    }));
+    const formattedMessages = [];
     
-    // Make sure we have at least one message
+    for (const msg of messages) {
+      // Skip empty or invalid messages
+      if (!msg || typeof msg !== 'object') continue;
+      
+      let role;
+      if ('role' in msg) {
+        role = msg.role;
+      } else if ('is_ai' in msg) {
+        role = msg.is_ai ? "assistant" : "user";
+      } else {
+        continue; // Skip messages without role or is_ai
+      }
+      
+      const content = msg.content || "";
+      
+      if (typeof content !== 'string') {
+        return new Response(JSON.stringify({ 
+          error: "Message content must be a string",
+          receivedType: typeof content,
+          messageObject: JSON.stringify(msg)
+        }), {
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
+        });
+      }
+      
+      formattedMessages.push({ role, content });
+    }
+    
+    // Ensure we have at least one message
     if (formattedMessages.length === 0) {
+      // Add a default message if none provided
       formattedMessages.push({
         role: "user",
         content: "Create a murder mystery game."
@@ -92,6 +136,13 @@ export default async function handler(req) {
       system: systemPrompt
     };
     
+    // Log the request for debugging
+    console.log("Sending to Claude API:", JSON.stringify({
+      modelName: anthropicRequest.model,
+      messageCount: anthropicRequest.messages.length,
+      systemPromptLength: systemPrompt.length,
+    }));
+    
     // Forward the request to Anthropic API
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -105,7 +156,14 @@ export default async function handler(req) {
     
     // Check if the response was successful
     if (!response.ok) {
-      const errorText = await response.text();
+      let errorText;
+      try {
+        const errorData = await response.json();
+        errorText = JSON.stringify(errorData);
+      } catch (e) {
+        errorText = await response.text();
+      }
+      
       console.error(`Anthropic API error: ${response.status} - ${errorText}`);
       return new Response(JSON.stringify({ 
         error: "Error from Anthropic API", 
