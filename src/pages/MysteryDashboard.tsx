@@ -68,16 +68,22 @@ const MysteryDashboard = () => {
         return;
       }
 
-      const formattedMysteries: Mystery[] = data.map((item: any) => ({
-        id: item.id,
-        title: item.title || "Untitled Mystery",
-        created_at: item.created_at,
-        updated_at: item.updated_at || item.created_at,
-        status: item.mystery_data?.status || "draft",
-        theme: item.mystery_data?.theme,
-        guests: item.mystery_data?.numberOfGuests,
-        is_purchased: false
-      }));
+      const formattedMysteries: Mystery[] = data.map((item: any) => {
+        const mysteryData = item.mystery_data || {};
+        const theme = mysteryData.theme || 'Unknown';
+        const title = item.title || `${theme} Mystery`;
+        
+        return {
+          id: item.id,
+          title: title,
+          created_at: item.created_at,
+          updated_at: item.updated_at || item.created_at,
+          status: mysteryData.status || "draft",
+          theme: theme,
+          guests: mysteryData.playerCount || mysteryData.numberOfGuests,
+          is_purchased: false
+        };
+      });
 
       setMysteries(formattedMysteries);
     } catch (error) {
