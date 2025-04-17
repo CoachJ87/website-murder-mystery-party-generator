@@ -116,7 +116,7 @@ const MysteryPreview = () => {
         title: title || data.title || `${theme || "Mystery"} Adventure`,
         premise,
         mystery_data: {
-          ...(data.mystery_data || {}),
+          ...(typeof data.mystery_data === 'object' && data.mystery_data !== null ? data.mystery_data : {}),
           playerCount: playerCount || 0
         }
       };
