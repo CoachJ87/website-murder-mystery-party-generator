@@ -1,6 +1,5 @@
 {
   "dependencies": {
- HEAD
     "@anthropic-ai/sdk": "^0.39.0",
     "@hookform/resolvers": "^3.9.0",
     "@radix-ui/react-accordion": "^1.2.0",
@@ -72,9 +71,7 @@
     "tailwindcss": "^3.4.11",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
-    "vite": "^5.4.1"
-
+    "vite": "^5.4.1",
     "rehype-raw": "^7.0.0"
- 658475c (Install rehype-raw)
   }
 }
