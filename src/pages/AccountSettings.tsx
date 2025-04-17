@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -13,9 +14,6 @@ interface UserMetadata {
   name?: string;
   [key: string]: any;
 }
-
-// Define the accepted function names for RPC calls
-type RpcFunction = 'delete_user_account';
 
 const AccountSettings = () => {
   const { user, signOut } = useAuth();
@@ -33,9 +31,10 @@ const AccountSettings = () => {
 
   const handleDeleteAccount = async () => {
     try {
-      // Fixed: use a simpler approach without generics to avoid TypeScript constraints
-      const { error } = await supabase.rpc('delete_user_account', {}, {
-        count: 'exact'
+      // The issue is here - let's fix it by removing the type annotation
+      // and letting TypeScript infer the types automatically
+      const { error } = await supabase.functions.invoke('delete_user_account', {
+        body: {}
       });
       
       if (error) throw error;
