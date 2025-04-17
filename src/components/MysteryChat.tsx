@@ -36,6 +36,7 @@ const MysteryChat = ({
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [initialMessageSent, setInitialMessageSent] = useState(false);
     const messagesInitialized = useRef(false);
+    const aiHasRespondedRef = useRef(false);
 
     // Initialize messages from props
     useEffect(() => {
@@ -43,6 +44,13 @@ const MysteryChat = ({
         if (initialMessages.length > 0 && !messagesInitialized.current) {
             console.log("Setting initial messages:", initialMessages);
             setMessages(initialMessages);
+            
+            // Check if the last message is from AI to determine if we need to send an initial message
+            if (initialMessages.length > 0) {
+                const lastMessage = initialMessages[initialMessages.length - 1];
+                aiHasRespondedRef.current = lastMessage.is_ai;
+            }
+            
             setInitialMessageSent(true);
             messagesInitialized.current = true;
         }
@@ -50,10 +58,6 @@ const MysteryChat = ({
 
     // Handle creating initial prompt if no messages exist
     useEffect(() => {
-        console.log("initialHasAccomplice in Chat:", initialHasAccomplice);
-        console.log("Initial messages state:", messages.length);
-        console.log("initialMessageSent:", initialMessageSent);
-
         // Skip if we already have messages or already sent initial message
         if ((messages.length > 0 || initialMessageSent) || messagesInitialized.current) {
             console.log("Skipping initial message creation");
@@ -91,7 +95,11 @@ const MysteryChat = ({
             setMessages([initialMessage]);
             setInitialMessageSent(true);
             messagesInitialized.current = true;
-            handleAIResponse(initialMessage.content);
+            
+            // Don't send AI response if there was already an AI response as the last message
+            if (!aiHasRespondedRef.current) {
+                handleAIResponse(initialMessage.content);
+            }
         }
     }, [initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails, messages.length, initialMessageSent]);
 
@@ -114,8 +122,15 @@ const MysteryChat = ({
             timestamp: new Date(),
         };
 
-        setMessages(prev => [...prev, userMessage]);
+        const updatedMessages = [...messages, userMessage];
+        setMessages(updatedMessages);
         setInput("");
+        
+        // Save user message immediately
+        if (onSave) {
+            onSave(updatedMessages);
+        }
+        
         await handleAIResponse(userMessage.content);
     };
 
@@ -154,6 +169,8 @@ const MysteryChat = ({
                 timestamp: new Date(),
             };
 
+            aiHasRespondedRef.current = true;
+            
             setMessages(prev => {
                 const updatedMessages = [...prev, aiMessage];
                 

@@ -24,7 +24,7 @@ export const ConversationManager = ({
   const [initialDataLoaded, setInitialDataLoaded] = useState(false);
 
   useEffect(() => {
-    if (isEditing && conversationId && !initialDataLoaded) {
+    if (conversationId && !initialDataLoaded) {
       loadExistingConversation(conversationId);
       setInitialDataLoaded(true);
     }
@@ -32,11 +32,12 @@ export const ConversationManager = ({
 
   const loadExistingConversation = async (id: string) => {
     try {
+      console.log("Loading conversation with ID:", id);
       const { data, error } = await supabase
         .from("messages")
         .select("*")
         .eq("conversation_id", id)
-        .order("created_at");
+        .order("created_at", { ascending: true });
 
       if (error) {
         console.error("Error loading messages:", error);
@@ -44,7 +45,8 @@ export const ConversationManager = ({
         return;
       }
 
-      if (data) {
+      if (data && data.length > 0) {
+        console.log("Loaded messages:", data.length);
         const formattedMessages = data.map((msg: any) => ({
           id: msg.id,
           content: msg.content,
@@ -52,6 +54,8 @@ export const ConversationManager = ({
           timestamp: new Date(msg.created_at)
         }));
         setMessages(formattedMessages);
+      } else {
+        console.log("No messages found for conversation:", id);
       }
     } catch (error) {
       console.error("Error:", error);

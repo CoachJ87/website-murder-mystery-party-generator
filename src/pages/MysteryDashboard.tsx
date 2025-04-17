@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -37,42 +38,92 @@ const MysteryDashboard = () => {
     applyFiltersAndSort();
   }, [mysteries, searchTerm, statusFilter, sortOrder]);
 
+  const extractTitleFromMessages = (messages: any[]) => {
+    if (!messages || messages.length === 0) return null;
+    
+    // Look through AI messages for titles
+    const titlePattern = /#\s*["']?([^"'\n#]+)["']?(?:\s*-\s*A MURDER MYSTERY)?/i;
+    const alternativeTitlePattern = /title:\s*["']?([^"'\n]+)["']?/i;
+    
+    for (const message of messages) {
+      if (message.role === 'assistant' || message.is_ai) {
+        const content = message.content || '';
+        
+        // Try to find title in markdown format
+        const titleMatch = content.match(titlePattern);
+        if (titleMatch && titleMatch[1]) {
+          return formatTitle(titleMatch[1]);
+        }
+        
+        // Try alternative format
+        const altMatch = content.match(alternativeTitlePattern);
+        if (altMatch && altMatch[1]) {
+          return formatTitle(altMatch[1]);
+        }
+      }
+    }
+    
+    return null;
+  };
+  
+  const formatTitle = (title: string) => {
+    // Convert to title case (first letter of each word capitalized)
+    return title
+      .trim()
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  };
+
   const fetchUserMysteries = async () => {
     try {
       setLoading(true);
       if (!user?.id) return;
 
-      const { data, error } = await supabase
+      const { data: conversationsData, error: conversationsError } = await supabase
         .from("conversations")
         .select("id, title, created_at, updated_at, mystery_data")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (conversationsError) throw conversationsError;
 
-      if (!data) {
+      if (!conversationsData) {
         setMysteries([]);
         return;
       }
 
-      const formattedMysteries: Mystery[] = data.map((item: any) => {
-        const mysteryData = item.mystery_data || {};
-        const theme = mysteryData.theme || 'Unknown';
-        const title = item.title || `${theme} Mystery`;
-        
-        return {
-          id: item.id,
-          title: title,
-          created_at: item.created_at,
-          updated_at: item.updated_at || item.created_at,
-          status: mysteryData.status || "draft",
-          theme: theme,
-          guests: mysteryData.playerCount || mysteryData.numberOfGuests,
-          is_purchased: false
-        };
-      });
+      // Fetch messages for each conversation to extract titles
+      const mysteriesWithMessages = await Promise.all(
+        conversationsData.map(async (conversation: any) => {
+          const { data: messagesData } = await supabase
+            .from("messages")
+            .select("*")
+            .eq("conversation_id", conversation.id)
+            .order("created_at", { ascending: true });
+          
+          const aiTitle = extractTitleFromMessages(messagesData || []);
+          const mysteryData = conversation.mystery_data || {};
+          const theme = mysteryData.theme || 'Unknown';
+          
+          // Use AI extracted title, or fall back to conversation title, or theme + Mystery
+          const title = aiTitle || conversation.title || `${theme} Mystery`;
+          
+          return {
+            id: conversation.id,
+            title: title,
+            created_at: conversation.created_at,
+            updated_at: conversation.updated_at || conversation.created_at,
+            status: mysteryData.status || "draft",
+            theme: theme,
+            guests: mysteryData.playerCount || mysteryData.numberOfGuests,
+            is_purchased: false,
+            ai_title: aiTitle
+          };
+        })
+      );
 
-      setMysteries(formattedMysteries);
+      setMysteries(mysteriesWithMessages);
     } catch (error) {
       console.error("Error fetching mysteries:", error);
       toast.error("Failed to load your mysteries");
@@ -236,12 +287,6 @@ const MysteryDashboard = () => {
               onClose={() => setShowSignInPrompt(false)} 
             />
           )}
-
-          <div className="mt-8 text-center">
-            <Button variant="secondary" onClick={() => navigate("/mystery/view/sample")}>
-              Generate Sample Mystery
-            </Button>
-          </div>
         </div>
       </main>
       <Footer />

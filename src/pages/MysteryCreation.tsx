@@ -29,6 +29,43 @@ const MysteryCreation = () => {
     }
   }, [id]);
 
+  const extractTitleFromMessages = (messages: any[]) => {
+    if (!messages || messages.length === 0) return null;
+    
+    // Look through AI messages for titles
+    const titlePattern = /#\s*["']?([^"'\n#]+)["']?(?:\s*-\s*A MURDER MYSTERY)?/i;
+    const alternativeTitlePattern = /title:\s*["']?([^"'\n]+)["']?/i;
+    
+    for (const message of messages) {
+      if (message.role === 'assistant' || message.is_ai) {
+        const content = message.content || '';
+        
+        // Try to find title in markdown format
+        const titleMatch = content.match(titlePattern);
+        if (titleMatch && titleMatch[1]) {
+          return formatTitle(titleMatch[1]);
+        }
+        
+        // Try alternative format
+        const altMatch = content.match(alternativeTitlePattern);
+        if (altMatch && altMatch[1]) {
+          return formatTitle(altMatch[1]);
+        }
+      }
+    }
+    
+    return null;
+  };
+  
+  const formatTitle = (title: string) => {
+    // Convert to title case (first letter of each word capitalized)
+    return title
+      .trim()
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  };
+
   const loadExistingConversation = async (conversationId: string) => {
     try {
       console.log("Loading conversation with ID:", conversationId);
@@ -53,18 +90,22 @@ const MysteryCreation = () => {
           setFormData(data.mystery_data as FormValues);
         }
         
+        // If this conversation has messages, we can also try to extract a title
         if (data.messages && data.messages.length > 0) {
-          console.log("Found messages in conversation:", data.messages.length);
-          // We don't need to set messages here - the ConversationManager will handle it
-          return data.messages.map((msg: any) => ({
-            id: msg.id,
-            content: msg.content,
-            is_ai: msg.role === "assistant",
-            timestamp: new Date(msg.created_at)
-          }));
-        } else {
-          console.log("No messages found in conversation");
+          const aiTitle = extractTitleFromMessages(data.messages);
+          if (aiTitle) {
+            // Update the conversation with the AI-generated title
+            await supabase
+              .from("conversations")
+              .update({
+                title: aiTitle,
+                updated_at: new Date().toISOString()
+              })
+              .eq("id", conversationId);
+          }
         }
+        
+        return [];
       } else {
         console.log("No conversation data found");
       }
@@ -169,24 +210,23 @@ const MysteryCreation = () => {
   const handleSaveMessages = async (messages: Message[]) => {
     console.log("Saving messages:", messages.length);
     
-    if (messages.length > 0) {
-      const latestMessage = messages[messages.length - 1];
-      await saveMessage(latestMessage);
-      
-      const latestThemeMessage = messages.find(m => m.content.includes("theme"));
-      if (latestThemeMessage) {
-        const extractedTheme = latestThemeMessage.content.split("theme").pop()?.trim().replace(".", "");
-        if (extractedTheme) {
-          await new Promise<void>((resolve) => {
-            setFormData(prevData => {
-              if (prevData) {
-                return { ...prevData, theme: extractedTheme };
-              }
-              return prevData;
-            });
-            resolve();
-          });
-        }
+    if (!messages.length) return;
+    
+    // Find the latest message that hasn't been saved yet
+    const latestMessage = messages[messages.length - 1];
+    await saveMessage(latestMessage);
+    
+    // Look for title in AI messages and update conversation title if found
+    if (conversationId) {
+      const aiTitle = extractTitleFromMessages(messages);
+      if (aiTitle) {
+        await supabase
+          .from("conversations")
+          .update({
+            title: aiTitle,
+            updated_at: new Date().toISOString()
+          })
+          .eq("id", conversationId);
       }
     }
   };
