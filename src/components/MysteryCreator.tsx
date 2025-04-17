@@ -32,13 +32,15 @@ const MysteryChat = ({
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        console.log("initialHasAccomplice in Chat:", initialHasAccomplice); // Troubleshooting log
+        console.log("initialHasAccomplice in Chat:", initialHasAccomplice); // Keep this log
+
+        let initialChatMessage = "";
         if (initialTheme) {
-            let initialChatMessage = `Let's create a murder mystery with a ${initialTheme} theme`;
+            initialChatMessage = `Let's create a murder mystery with a ${initialTheme} theme`;
             if (initialPlayerCount) {
                 initialChatMessage += ` for ${initialPlayerCount} players`;
             }
-            if (initialHasAccomplice !== undefined) { // Handle boolean value correctly
+            if (initialHasAccomplice !== undefined) {
                 initialChatMessage += initialHasAccomplice ? ", including an accomplice" : ", without an accomplice";
             }
             if (initialScriptType) {
@@ -48,16 +50,19 @@ const MysteryChat = ({
                 initialChatMessage += `. Additional details: ${initialAdditionalDetails}`;
             }
             initialChatMessage += ".";
-
-            const initialMessage: Message = {
-                id: Date.now().toString(),
-                content: initialChatMessage,
-                is_ai: false,
-                timestamp: new Date(),
-            };
-            setMessages([initialMessage]);
-            handleAIResponse(initialMessage.content);
+        } else {
+            initialChatMessage = "Let's create a murder mystery."; // Add a default message.
         }
+
+        const initialMessage: Message = {
+            id: Date.now().toString(),
+            content: initialChatMessage,
+            is_ai: false,
+            timestamp: new Date(),
+        };
+        setMessages([initialMessage]);
+        handleAIResponse(initialMessage.content);
+
     }, [initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails]);
 
     const scrollToBottom = () => {
