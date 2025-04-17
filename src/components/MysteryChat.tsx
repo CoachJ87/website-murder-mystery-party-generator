@@ -32,31 +32,35 @@ const MysteryChat = ({
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if (initialTheme) {
-            let initialChatMessage = `Let's create a murder mystery with a ${initialTheme} theme`;
-            if (initialPlayerCount) {
-                initialChatMessage += ` for ${initialPlayerCount} players`;
-            }
-            if (initialHasAccomplice) {
-                initialChatMessage += ", including an accomplice";
-            }
-            if (initialScriptType) {
-                initialChatMessage += ` with ${initialScriptType} scripts`;
-            }
-            if (initialAdditionalDetails) {
-                initialChatMessage += `. Additional details: ${initialAdditionalDetails}`;
-            }
-            initialChatMessage += ".";
+        console.log("initialHasAccomplice in Chat:", initialHasAccomplice); // Keep this log
 
-            const initialMessage: Message = {
-                id: Date.now().toString(),
-                content: initialChatMessage,
-                is_ai: false,
-                timestamp: new Date(),
-            };
-            setMessages([initialMessage]);
-            handleAIResponse(initialMessage.content);
+        let initialChatMessage = `Let's create a murder mystery`;
+        if (initialTheme) {
+            initialChatMessage += ` with a ${initialTheme} theme`;
         }
+        if (initialPlayerCount) {
+            initialChatMessage += ` for ${initialPlayerCount} players`;
+        }
+        if (initialHasAccomplice !== undefined) {
+            initialChatMessage += initialHasAccomplice ? `, including an accomplice` : `, without an accomplice`;
+        }
+        if (initialScriptType) {
+            initialChatMessage += ` with ${initialScriptType} scripts`;
+        }
+        if (initialAdditionalDetails) {
+            initialChatMessage += `. Additional details: ${initialAdditionalDetails}`;
+        }
+        initialChatMessage += ".";
+
+        const initialMessage: Message = {
+            id: Date.now().toString(),
+            content: initialChatMessage,
+            is_ai: false,
+            timestamp: new Date(),
+        };
+        setMessages([initialMessage]);
+        handleAIResponse(initialMessage.content);
+
     }, [initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails]);
 
     const scrollToBottom = () => {
@@ -182,3 +186,4 @@ const MysteryChat = ({
 };
 
 export default MysteryChat;
+
