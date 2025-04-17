@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -100,20 +101,17 @@ const MysteryChat = ({
     const handleAIResponse = async (userMessage: string) => {
         try {
             setLoading(true);
-
-            const newUserMessage: Message = {
-                id: Date.now().toString(),
-                content: userMessage,
-                is_ai: false,
-                timestamp: new Date()
-            };
-
-            const updatedMessages = [...messages, newUserMessage];
-
-            const anthropicMessages = updatedMessages.map(m => ({
+            
+            const anthropicMessages = messages.map(m => ({
                 role: m.is_ai ? "assistant" : "user",
                 content: m.content,
             }));
+
+            // Add the new user message to the array
+            anthropicMessages.push({
+                role: "user",
+                content: userMessage,
+            });
 
             console.log("Frontend - anthropicMessages being sent:", JSON.stringify(anthropicMessages, null, 2));
 
@@ -132,7 +130,7 @@ const MysteryChat = ({
             setMessages(prev => [...prev, aiMessage]);
 
             if (onSave) {
-                onSave([...updatedMessages, aiMessage]);
+                onSave([...messages, aiMessage]);
             }
         } catch (error) {
             console.error("Error getting AI response:", error);
@@ -159,9 +157,13 @@ const MysteryChat = ({
                         >
                             <CardContent className="p-4">
                                 <div className="prose prose-sm dark:prose-invert max-w-none">
-                                    <ReactMarkdown>
-                                        {message.content}  {/* Render the message content as Markdown */}
-                                    </ReactMarkdown>
+                                    {message.content && typeof message.content === 'string' ? (
+                                        <ReactMarkdown>
+                                            {message.content}
+                                        </ReactMarkdown>
+                                    ) : (
+                                        <p>Unable to display message</p>
+                                    )}
                                 </div>
                                 <div className="text-xs opacity-70 mt-2">
                                     {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -191,4 +193,3 @@ const MysteryChat = ({
 };
 
 export default MysteryChat;
-
