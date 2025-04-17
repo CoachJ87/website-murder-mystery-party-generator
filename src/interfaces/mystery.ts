@@ -1,6 +1,6 @@
 
 export interface MysteryData {
-  title: string;
+  title?: string; // Making title optional to fix the type error
   theme?: string;
   playerCount?: number;
   hasAccomplice?: boolean;

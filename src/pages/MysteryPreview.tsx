@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,7 @@ import Footer from "@/components/Footer";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
-import { Conversation } from "@/interfaces/mystery";
+import { Conversation, MysteryData } from "@/interfaces/mystery";
 
 const MysteryPreview = () => {
   const [loading, setLoading] = useState(true);
@@ -110,18 +111,23 @@ const MysteryPreview = () => {
         }
       }
 
-      const mysteryData = {
+      // Create a proper MysteryData object with all required fields
+      const mysteryDataObj: MysteryData = {
+        ...(typeof data.mystery_data === 'object' && data.mystery_data !== null ? data.mystery_data as MysteryData : {}),
+        title: data.title || title || `${theme || "Mystery"} Adventure`,  // Ensure title is always set
+        playerCount: playerCount || 0
+      };
+
+      // Create the mystery object with proper typing
+      const mysteryObj: Partial<Conversation> = {
         ...data,
         theme,
         title: title || data.title || `${theme || "Mystery"} Adventure`,
         premise,
-        mystery_data: {
-          ...(typeof data.mystery_data === 'object' && data.mystery_data !== null ? data.mystery_data : {}),
-          playerCount: playerCount || 0
-        }
+        mystery_data: mysteryDataObj
       };
 
-      setMystery(mysteryData);
+      setMystery(mysteryObj);
     } catch (error) {
       console.error("Error loading mystery:", error);
       toast.error("Failed to load mystery details");
