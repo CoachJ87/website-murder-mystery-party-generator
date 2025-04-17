@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { getAIResponse } from "@/services/aiService";
-import ReactMarkdown from 'react-markdown';
+import ReactMarkdown from 'react-markdown';  // Import ReactMarkdown
 import { Message } from "@/components/types";
 
 interface MysteryChatProps {
@@ -30,12 +30,12 @@ const MysteryChat = ({
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const [initialMessageSent, setInitialMessageSent] = useState(false); // Track initial message
+    const [initialMessageSent, setInitialMessageSent] = useState(false);
 
     useEffect(() => {
         console.log("initialHasAccomplice in Chat:", initialHasAccomplice);
 
-        if (initialTheme && !initialMessageSent) { // Only run if initial message not sent
+        if (initialTheme && !initialMessageSent) {
             let initialChatMessage = `Let's create a murder mystery`;
             if (initialTheme) {
                 initialChatMessage += ` with a ${initialTheme} theme`;
@@ -61,10 +61,10 @@ const MysteryChat = ({
                 timestamp: new Date(),
             };
             setMessages([initialMessage]);
-            setInitialMessageSent(true); // Set the flag
+            setInitialMessageSent(true);
             handleAIResponse(initialMessage.content);
         }
-    }, [initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails, initialMessageSent]); // Add initialMessageSent to dependencies
+    }, [initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails, initialMessageSent]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -159,7 +159,9 @@ const MysteryChat = ({
                         >
                             <CardContent className="p-4">
                                 <div className="prose prose-sm dark:prose-invert max-w-none">
-                                    <ReactMarkdown>{message.content}</ReactMarkdown>
+                                    <ReactMarkdown>
+                                        {message.content}  {/* Render the message content as Markdown */}
+                                    </ReactMarkdown>
                                 </div>
                                 <div className="text-xs opacity-70 mt-2">
                                     {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
