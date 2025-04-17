@@ -1,5 +1,3 @@
-
-// src/pages/MysteryPreview.tsx
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -10,10 +8,11 @@ import Footer from "@/components/Footer";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
+import { Conversation } from "@/interfaces/mystery";
 
 const MysteryPreview = () => {
   const [loading, setLoading] = useState(true);
-  const [mystery, setMystery] = useState<any>(null);
+  const [mystery, setMystery] = useState<Partial<Conversation> | null>(null);
   const [purchasing, setPurchasing] = useState(false);
   const { id } = useParams();
   const navigate = useNavigate();
@@ -100,12 +99,13 @@ const MysteryPreview = () => {
               }
             }
             
-            // Extract player count
-            const playerMatch = content.match(/CHARACTER LIST\s*\((\d+)\s*PLAYERS\)/i) || 
-                                content.match(/(\d+)\s*players/i);
-            if (playerMatch && playerMatch[1]) {
-              playerCount = parseInt(playerMatch[1]);
-            }
+            // Safely extract playerCount
+            const mysteryData = data.mystery_data as Record<string, unknown>;
+            playerCount = typeof mysteryData?.playerCount === 'number' 
+              ? mysteryData.playerCount 
+              : (typeof mysteryData?.playerCount === 'string' 
+                ? parseInt(mysteryData.playerCount, 10) 
+                : 0);
           }
         }
       }
@@ -115,7 +115,10 @@ const MysteryPreview = () => {
         theme,
         title: title || data.title || `${theme || "Mystery"} Adventure`,
         premise,
-        playerCount: playerCount || (data.mystery_data?.playerCount || 0)
+        mystery_data: {
+          ...data.mystery_data,
+          playerCount: playerCount
+        }
       });
     } catch (error) {
       console.error("Error loading mystery:", error);
@@ -225,103 +228,98 @@ const MysteryPreview = () => {
       
       <main className="flex-1 py-12 px-4">
         <div className="container mx-auto max-w-4xl">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">{mystery.title || "Mystery Preview"}</h1>
-            <p className="text-muted-foreground">
-              Preview of your {mystery.theme || "murder mystery"}
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 gap-8 mb-8">
-            <div>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Mystery Overview</CardTitle>
-                  <CardDescription>The key elements of your murder mystery</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <h3 className="font-medium"><strong>Theme</strong></h3>
-                    <p>{mystery?.theme || "Not specified"}</p>
-                  </div>
-                  <div>
-                    <h3 className="font-medium"><strong>Number of Players</strong></h3>
-                    <p>{mystery?.playerCount || "Not specified"} players</p>
-                  </div>
-                  <div>
-                    <h3 className="font-medium"><strong>Premise</strong></h3>
-                    <p>{mystery?.premise || "Custom setting"}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-            
-            <div>
-              <Card className="mb-6">
-                <CardHeader>
-                  <CardTitle>Purchase Complete Package</CardTitle>
-                  <CardDescription>Get everything you need to host your mystery</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="font-bold text-2xl mb-4">$4.99</div>
-                  <div className="space-y-2">
-                    {[
-                      "Full character profiles for all suspects",
-                      "Host guide with step-by-step instructions",
-                      "Printable character sheets",
-                      "Evidence and clue cards",
-                      "Timeline of events",
-                      "Solution reveal script",
-                      "PDF downloads of all materials"
-                    ].map((item, index) => (
-                      <div key={index} className="flex items-start gap-2">
-                        <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                        <span>{item}</span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-                <CardFooter className="flex flex-col gap-3">
-                  <Button 
-                    className="w-full" 
-                    onClick={handlePurchase} 
-                    disabled={purchasing}
-                  >
-                    {purchasing ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Processing...
-                      </>
-                    ) : (
-                      "Purchase Now"
-                    )}
-                  </Button>
-                  
-                  <Button 
-                    className="w-full" 
-                    variant="outline"
-                    size="sm"
-                    onClick={handleSimulatePurchase} 
-                    disabled={purchasing}
-                  >
-                    Simulate Purchase (Dev Only)
-                  </Button>
-                </CardFooter>
-              </Card>
+          {mystery && (
+            <div className="grid md:grid-cols-2 gap-8 mb-8">
+              <div>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Mystery Overview</CardTitle>
+                    <CardDescription>The key elements of your murder mystery</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <h3 className="font-medium"><strong>Theme</strong></h3>
+                      <p>{mystery.theme || "Not specified"}</p>
+                    </div>
+                    <div>
+                      <h3 className="font-medium"><strong>Number of Players</strong></h3>
+                      <p>{mystery.mystery_data?.playerCount || "Not specified"} players</p>
+                    </div>
+                    <div>
+                      <h3 className="font-medium"><strong>Premise</strong></h3>
+                      <p>{mystery.premise || "Custom setting"}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
               
-              <div className="bg-muted p-4 rounded-lg">
-                <p className="text-sm">
-                  <strong>Important Notes</strong>
-                  <ul className="list-disc pl-5 space-y-1 mt-2">
-                    <li>This is a one-time purchase for this specific mystery package</li>
-                    <li>You'll have permanent access to download all materials</li>
-                    <li>Content is for personal use only, not for commercial redistribution</li>
-                    <li>Need help? Contact our support at support@mysterygenerator.com</li>
-                  </ul>
-                </p>
+              <div>
+                <Card className="mb-6">
+                  <CardHeader>
+                    <CardTitle>Purchase Complete Package</CardTitle>
+                    <CardDescription>Get everything you need to host your mystery</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="font-bold text-2xl mb-4">$4.99</div>
+                    <div className="space-y-2">
+                      {[
+                        "Full character profiles for all suspects",
+                        "Host guide with step-by-step instructions",
+                        "Printable character sheets",
+                        "Evidence and clue cards",
+                        "Timeline of events",
+                        "Solution reveal script",
+                        "PDF downloads of all materials"
+                      ].map((item, index) => (
+                        <div key={index} className="flex items-start gap-2">
+                          <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
+                          <span>{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                  <CardFooter className="flex flex-col gap-3">
+                    <Button 
+                      className="w-full" 
+                      onClick={handlePurchase} 
+                      disabled={purchasing}
+                    >
+                      {purchasing ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Processing...
+                        </>
+                      ) : (
+                        "Purchase Now"
+                      )}
+                    </Button>
+                    
+                    <Button 
+                      className="w-full" 
+                      variant="outline"
+                      size="sm"
+                      onClick={handleSimulatePurchase} 
+                      disabled={purchasing}
+                    >
+                      Simulate Purchase (Dev Only)
+                    </Button>
+                  </CardFooter>
+                </Card>
+                
+                <div className="bg-muted p-4 rounded-lg">
+                  <p className="text-sm">
+                    <strong>Important Notes</strong>
+                    <ul className="list-disc pl-5 space-y-1 mt-2">
+                      <li>This is a one-time purchase for this specific mystery package</li>
+                      <li>You'll have permanent access to download all materials</li>
+                      <li>Content is for personal use only, not for commercial redistribution</li>
+                      <li>Need help? Contact our support at support@mysterygenerator.com</li>
+                    </ul>
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
+          )}
           
           <div className="flex justify-between">
             <Button variant="outline" onClick={() => navigate(`/mystery/edit/${id}`)}>
