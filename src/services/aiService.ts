@@ -43,7 +43,9 @@ export const getAIResponse = async (messages: Message[], promptVersion: 'free' |
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(requestBody)
+      body: JSON.stringify(requestBody),
+      // Added timeout to prevent hanging requests
+      signal: AbortSignal.timeout(15000) // 15 second timeout
     });
 
     console.log(`API Response Status: ${response.status}`);
@@ -70,7 +72,9 @@ export const getAIResponse = async (messages: Message[], promptVersion: 'free' |
     } else {
       console.error("Invalid API response format");
       console.error("Response Data:", JSON.stringify(data));
-      throw new Error("Invalid response format from API");
+      
+      // Fallback response when API format is unexpected
+      return "# Sorry, I'm having trouble right now\n\nI wasn't able to generate a proper response. This could be due to connectivity issues or the server being temporarily unavailable. Here are some things you could try:\n\n1. Send your message again\n2. Refresh the page and try again\n3. Try a different browser or device\n\nIf the problem persists, please let us know through the contact form.";
     }
     
     // Make sure headings are properly formatted
@@ -80,6 +84,6 @@ export const getAIResponse = async (messages: Message[], promptVersion: 'free' |
 
   } catch (error) {
     console.error(`Error in getAIResponse: ${error.message}`);
-    return `# "ERROR OCCURRED" - A MURDER MYSTERY\n\nThere was an error: ${error.message}`;
+    return `# Unable to Connect\n\nI'm currently having trouble connecting to my knowledge base. This might be due to:\n\n- Network connectivity issues\n- High server load\n- Temporary service disruption\n\nPlease try again in a moment, or refresh the page if the problem persists.`;
   }
 };

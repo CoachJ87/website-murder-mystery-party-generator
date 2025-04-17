@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -92,7 +93,11 @@ const MysteryChat = ({
             setMessages([initialMessage]);
             setInitialMessageSent(true);
             messagesInitialized.current = true;
-            handleAIResponse(initialMessage.content);
+            
+            // Critical fix: Add a small delay before calling AI to ensure state is updated
+            setTimeout(() => {
+                handleAIResponse(initialMessage.content);
+            }, 100);
         }
     }, [initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails, messages.length, initialMessageSent]);
 
