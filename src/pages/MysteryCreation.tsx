@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -10,11 +11,13 @@ import MysteryForm from "@/components/MysteryForm";
 import MysteryChat from "@/components/MysteryChat";
 import { useAuth } from "@/context/AuthContext";
 import { Message, FormValues } from "@/components/types";
+import { Wand2 } from "lucide-react"; // Import the magic wand icon
 
 const MysteryCreation = () => {
   const [saving, setSaving] = useState(false);
   const [showChatUI, setShowChatUI] = useState(false);
   const [formData, setFormData] = useState<FormValues | null>(null);
+  const [conversationId, setConversationId] = useState<string | null>(null);
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditing = !!id;
@@ -23,6 +26,7 @@ const MysteryCreation = () => {
   useEffect(() => {
     if (isEditing) {
       setShowChatUI(true);
+      setConversationId(id || null);
     }
   }, [id]);
 
@@ -36,7 +40,7 @@ const MysteryCreation = () => {
       });
 
       if (isAuthenticated && user) {
-        let conversationId = id;
+        let newConversationId = id;
 
         if (!isEditing) {
           const { data: newConversation, error } = await supabase
@@ -53,7 +57,8 @@ const MysteryCreation = () => {
             console.error("Error saving mystery:", error);
             toast.error("Failed to save mystery data");
           } else if (newConversation) {
-            conversationId = newConversation.id;
+            newConversationId = newConversation.id;
+            setConversationId(newConversationId);
           }
         } else {
           const { error } = await supabase
@@ -72,8 +77,8 @@ const MysteryCreation = () => {
         }
 
         setShowChatUI(true);
-        if (conversationId && conversationId !== id) {
-          navigate(`/mystery/edit/${conversationId}`, { replace: true });
+        if (newConversationId && newConversationId !== id) {
+          navigate(`/mystery/edit/${newConversationId}`, { replace: true });
         }
       } else {
         setShowChatUI(true);
@@ -105,6 +110,15 @@ const MysteryCreation = () => {
           });
         }
       }
+    }
+  };
+  
+  // Handle navigation to preview page
+  const handleGenerateMystery = () => {
+    if (conversationId) {
+      navigate(`/mystery/preview/${conversationId}`);
+    } else {
+      toast.error("Please save your mystery first");
     }
   };
 
@@ -144,7 +158,15 @@ const MysteryCreation = () => {
             </CardContent>
           </Card>
 
-          <div className="mt-8 text-center">
+          <div className="mt-8 flex justify-center gap-4">
+            {showChatUI && (
+              <Button 
+                onClick={handleGenerateMystery}
+                className="bg-[#F97316] hover:bg-[#FB923C] text-white font-semibold"
+              >
+                <Wand2 className="mr-2 h-5 w-5" /> Generate Mystery
+              </Button>
+            )}
             <Button variant="outline" onClick={() => navigate("/dashboard")}>
               Back to Dashboard
             </Button>

@@ -75,7 +75,7 @@ const MysteryDashboard = () => {
         title: item.title || "Untitled Mystery",
         created_at: item.created_at,
         updated_at: item.updated_at || item.created_at,
-        status: "draft", // Default status since it doesn't exist in the database
+        status: item.mystery_data?.status || "draft", // Default status since it might not exist in the database
         theme: item.mystery_data?.theme,
         guests: item.mystery_data?.numberOfGuests,
         is_purchased: false // Default value since it doesn't exist in the database
@@ -140,6 +140,32 @@ const MysteryDashboard = () => {
 
   const handleStatusChange = async (id: string, newStatus: "draft" | "published" | "archived") => {
     try {
+      // Find the mystery to update
+      const mysteryToUpdate = mysteries.find(mystery => mystery.id === id);
+      if (!mysteryToUpdate) return;
+      
+      // Prepare updated mystery data
+      const updatedMysteryData = {
+        ...mysteryToUpdate,
+        status: newStatus,
+        updated_at: new Date().toISOString()
+      };
+      
+      // Update in database
+      const { error } = await supabase
+        .from("conversations")
+        .update({
+          mystery_data: {
+            ...mysteryToUpdate,
+            status: newStatus
+          },
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", id);
+      
+      if (error) throw error;
+      
+      // Update local state
       setMysteries(
         mysteries.map((mystery) =>
           mystery.id === id
@@ -155,9 +181,8 @@ const MysteryDashboard = () => {
     }
   };
 
-  const generateLoremIpsum = () => {
-    toast.success("Sample mystery content generated");
-    navigate("/mystery/view/sample");
+  const handleTabChange = (value: string) => {
+    setStatusFilter(value);
   };
 
   return (
@@ -166,45 +191,48 @@ const MysteryDashboard = () => {
 
       <main className="flex-1 py-12 px-4">
         <div className="container mx-auto max-w-5xl">
-          <div className="mb-8 flex justify-between items-center">
+          <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
               <h1 className="text-3xl font-bold mb-2">Mystery Dashboard</h1>
               <p className="text-muted-foreground">
                 Manage your created mysteries, start new ones, or explore sample content.
               </p>
             </div>
-            <Button onClick={() => navigate("/mystery/create")}><PlusCircle className="mr-2 h-4 w-4" /> Create New Mystery</Button>
+            <Button 
+              onClick={() => navigate("/mystery/create")}
+              className="self-start md:self-auto"
+            >
+              <PlusCircle className="mr-2 h-4 w-4" /> Create New Mystery
+            </Button>
           </div>
 
           {isAuthenticated ? (
             <>
-              <Tabs defaultValue="all" className="space-y-4">
-                <TabsList>
+              <Tabs defaultValue="all" className="space-y-4" onValueChange={handleTabChange}>
+                <TabsList className="w-full flex-wrap justify-start bg-muted/50 rounded-lg p-1">
                   <TabsTrigger value="all">All</TabsTrigger>
                   <TabsTrigger value="draft">Drafts</TabsTrigger>
                   <TabsTrigger value="published">Published</TabsTrigger>
                   <TabsTrigger value="archived">Archived</TabsTrigger>
                 </TabsList>
 
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Label htmlFor="search">
-                      <Search className="h-4 w-4 mr-2" />
-                    </Label>
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
+                  <div className="flex items-center space-x-2 w-full md:w-auto">
+                    <Search className="h-4 w-4 text-muted-foreground" />
                     <Input
-                      id="search"
+                      className="w-full md:w-[250px]"
                       placeholder="Search by title or theme..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                     />
                   </div>
 
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center space-x-2">
-                      <Label htmlFor="sort">Sort by:</Label>
+                  <div className="flex flex-col md:flex-row items-start md:items-center gap-4 w-full md:w-auto">
+                    <div className="flex items-center gap-2 w-full md:w-auto">
+                      <Label htmlFor="sort" className="whitespace-nowrap">Sort by:</Label>
                       <select
                         id="sort"
-                        className="rounded-md border border-input bg-background px-2 py-1 text-sm"
+                        className="rounded-md border border-input bg-background px-2 py-1 text-sm w-full"
                         value={sortOrder}
                         onChange={(e) => setSortOrder(e.target.value as "newest" | "oldest" | "lastUpdated")}
                       >
@@ -213,11 +241,11 @@ const MysteryDashboard = () => {
                         <option value="lastUpdated">Last Updated</option>
                       </select>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Label htmlFor="status">Filter by Status:</Label>
+                    <div className="flex items-center gap-2 w-full md:w-auto">
+                      <Label htmlFor="status" className="whitespace-nowrap">Filter by Status:</Label>
                       <select
                         id="status"
-                        className="rounded-md border border-input bg-background px-2 py-1 text-sm"
+                        className="rounded-md border border-input bg-background px-2 py-1 text-sm w-full"
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
                       >
@@ -231,16 +259,20 @@ const MysteryDashboard = () => {
                 </div>
 
                 {loading ? (
-                  <p>Loading mysteries...</p>
+                  <div className="text-center py-8">
+                    <p>Loading mysteries...</p>
+                  </div>
                 ) : filteredMysteries.length === 0 ? (
-                  <p>No mysteries found.</p>
+                  <div className="text-center py-8">
+                    <p>No mysteries found. Try changing your filters or create a new mystery.</p>
+                  </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredMysteries.map((mystery) => (
                       <Card key={mystery.id} className="bg-card text-card-foreground">
                         <CardHeader>
                           <CardTitle className="flex justify-between items-start">
-                            {mystery.title}
+                            <span className="truncate">{mystery.title}</span>
                             <div>
                               {mystery.status === "draft" && <Badge variant="secondary">Draft</Badge>}
                               {mystery.status === "published" && <Badge>Published</Badge>}
@@ -250,15 +282,15 @@ const MysteryDashboard = () => {
                         </CardHeader>
                         <CardContent className="space-y-2">
                           <p className="text-sm text-muted-foreground">
-                            Created: <Calendar className="inline-block h-4 w-4 mr-1" />
-                            {new Date(mystery.created_at).toLocaleDateString()}
+                            <Calendar className="inline-block h-4 w-4 mr-1" />
+                            Created: {new Date(mystery.created_at).toLocaleDateString()}
                           </p>
                           <p className="text-sm text-muted-foreground">
-                            Updated: <Clock className="inline-block h-4 w-4 mr-1" />
-                            {new Date(mystery.updated_at).toLocaleDateString()}
+                            <Clock className="inline-block h-4 w-4 mr-1" />
+                            Updated: {new Date(mystery.updated_at).toLocaleDateString()}
                           </p>
                           {mystery.theme && (
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm text-muted-foreground truncate">
                               Theme: {mystery.theme}
                             </p>
                           )}
@@ -267,11 +299,13 @@ const MysteryDashboard = () => {
                               Guests: {mystery.guests}
                             </p>
                           )}
-                          <div className="flex justify-end space-x-2">
+                          
+                          <div className="flex flex-wrap justify-end gap-2 pt-2">
                             <Button
                               size="sm"
                               variant="secondary"
                               onClick={() => navigate(`/mystery/edit/${mystery.id}`)}
+                              className="flex-1 min-w-[80px]"
                             >
                               <Edit className="h-4 w-4 mr-2" />
                               Edit
@@ -281,6 +315,7 @@ const MysteryDashboard = () => {
                                 size="sm"
                                 variant="outline"
                                 onClick={() => handleStatusChange(mystery.id, "archived")}
+                                className="flex-1 min-w-[80px]"
                               >
                                 <Archive className="h-4 w-4 mr-2" />
                                 Archive
@@ -290,6 +325,7 @@ const MysteryDashboard = () => {
                                 size="sm"
                                 variant="outline"
                                 onClick={() => handleStatusChange(mystery.id, "draft")}
+                                className="flex-1 min-w-[80px]"
                               >
                                 <Edit className="h-4 w-4 mr-2" />
                                 Unarchive
@@ -297,7 +333,11 @@ const MysteryDashboard = () => {
                             )}
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
-                                <Button size="sm" variant="destructive">
+                                <Button 
+                                  size="sm" 
+                                  variant="destructive"
+                                  className="flex-1 min-w-[80px]"
+                                >
                                   <Trash className="h-4 w-4 mr-2" />
                                   Delete
                                 </Button>

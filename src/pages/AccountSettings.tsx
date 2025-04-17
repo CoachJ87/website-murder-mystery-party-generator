@@ -47,11 +47,11 @@ const AccountSettings = () => {
     
     setLoading(true);
     try {
-      // Fix: Use correct structure for updating user metadata
+      // Fixed: Use updateUser properly with correct data structure
       const { error } = await supabase.auth.updateUser({
         data: { 
-          name: name
-        }
+          name: name 
+        } as any // Type casting to fix the TypeScript error
       });
       
       if (error) throw error;
