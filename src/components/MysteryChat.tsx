@@ -55,14 +55,12 @@ const MysteryChat = ({
         console.log("initialMessageSent:", initialMessageSent);
 
         // Skip if we already have messages or already sent initial message
-        if (messages.length > 0 || initialMessageSent || messagesInitialized.current) {
+        if ((messages.length > 0 || initialMessageSent) || messagesInitialized.current) {
             console.log("Skipping initial message creation");
             return;
         }
 
-        // Critical fix: Only send an initial message if there are no existing messages
-        // and we haven't sent one already
-        if (initialTheme && messages.length === 0 && !initialMessageSent) {
+        if (initialTheme) {
             console.log("Creating initial message with theme:", initialTheme);
             let initialChatMessage = `Let's create a murder mystery`;
             if (initialTheme) {
@@ -93,11 +91,7 @@ const MysteryChat = ({
             setMessages([initialMessage]);
             setInitialMessageSent(true);
             messagesInitialized.current = true;
-            
-            // Critical fix: Add a small delay before calling AI to ensure state is updated
-            setTimeout(() => {
-                handleAIResponse(initialMessage.content);
-            }, 500); // Increased delay for better state synchronization
+            handleAIResponse(initialMessage.content);
         }
     }, [initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails, messages.length, initialMessageSent]);
 
@@ -120,17 +114,8 @@ const MysteryChat = ({
             timestamp: new Date(),
         };
 
-        // First update the UI with the user message
         setMessages(prev => [...prev, userMessage]);
         setInput("");
-        
-        // Then call onSave to persist the user message
-        if (onSave) {
-            console.log("Saving user message before AI response:", userMessage);
-            onSave([...messages, userMessage]);
-        }
-        
-        // Then get the AI response
         await handleAIResponse(userMessage.content);
     };
 
@@ -145,25 +130,20 @@ const MysteryChat = ({
         try {
             setLoading(true);
             
-            // Convert messages to the format expected by the AI service
-            const aiServiceMessages = messages.map(m => ({
-                is_ai: m.is_ai,
+            const anthropicMessages = messages.map(m => ({
+                role: m.is_ai ? "assistant" : "user",
                 content: m.content,
             }));
-            
-            // For a new message that's not yet in the state, add it
-            const lastMessage = messages[messages.length - 1];
-            if (lastMessage?.content !== userMessage) {
-                aiServiceMessages.push({
-                    is_ai: false,
-                    content: userMessage,
-                });
-            }
 
-            console.log("Sending messages to AI service:", aiServiceMessages.length);
+            anthropicMessages.push({
+                role: "user",
+                content: userMessage,
+            });
+
+            console.log("Frontend - anthropicMessages being sent:", JSON.stringify(anthropicMessages, null, 2));
 
             const response = await getAIResponse(
-                aiServiceMessages,
+                anthropicMessages as any,
                 'free'
             );
 
@@ -177,7 +157,7 @@ const MysteryChat = ({
             setMessages(prev => {
                 const updatedMessages = [...prev, aiMessage];
                 
-                // Call onSave with the updated messages including AI response
+                // Call onSave with the updated messages
                 if (onSave) {
                     console.log("Calling onSave with updated messages:", updatedMessages.length);
                     onSave(updatedMessages);
