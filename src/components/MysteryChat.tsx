@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -17,6 +16,7 @@ interface MysteryChatProps {
     initialHasAccomplice?: boolean;
     initialScriptType?: "full" | "pointForm";
     initialAdditionalDetails?: string;
+    initialMessages?: Message[];
 }
 
 const MysteryChat = ({
@@ -27,8 +27,9 @@ const MysteryChat = ({
     initialHasAccomplice,
     initialScriptType,
     initialAdditionalDetails,
+    initialMessages = []
 }: MysteryChatProps) => {
-    const [messages, setMessages] = useState<Message[]>([]);
+    const [messages, setMessages] = useState<Message[]>(initialMessages);
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -36,6 +37,12 @@ const MysteryChat = ({
 
     useEffect(() => {
         console.log("initialHasAccomplice in Chat:", initialHasAccomplice);
+        console.log("Initial messages:", initialMessages);
+
+        if (initialMessages && initialMessages.length > 0) {
+            setInitialMessageSent(true);
+            return;
+        }
 
         if (initialTheme && !initialMessageSent) {
             let initialChatMessage = `Let's create a murder mystery`;
@@ -66,7 +73,7 @@ const MysteryChat = ({
             setInitialMessageSent(true);
             handleAIResponse(initialMessage.content);
         }
-    }, [initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails, initialMessageSent]);
+    }, [initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails, initialMessages, initialMessageSent]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });

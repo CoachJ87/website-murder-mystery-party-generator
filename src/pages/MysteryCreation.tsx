@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,7 @@ const MysteryCreation = () => {
     const { id } = useParams();
     const isEditing = !!id;
     const { isAuthenticated, user } = useAuth();
+    const [messages, setMessages] = useState<Message[]>([]);
 
     useEffect(() => {
         if (isEditing && id) {
@@ -38,16 +40,17 @@ const MysteryCreation = () => {
 
             if (error) {
                 console.error("Error loading conversation:", error);
-                return;
+                return [];
             }
 
             if (data) {
                 setShowChatUI(true);
                 setConversationId(data.id);
                 if (data.mystery_data) {
-                    setFormData(data.mystery_data);
+                    // Ensure we cast the mystery_data to FormValues
+                    setFormData(data.mystery_data as FormValues);
                 }
-                if (data.messages) {
+                if (data.messages && data.messages.length > 0) {
                     // Convert the messages to the correct format
                     const formattedMessages = data.messages.map((msg: any) => ({
                         id: msg.id,
@@ -55,6 +58,7 @@ const MysteryCreation = () => {
                         is_ai: msg.role === "assistant",
                         timestamp: new Date(msg.created_at)
                     }));
+                    setMessages(formattedMessages);
                     return formattedMessages;
                 }
             }
@@ -186,7 +190,7 @@ const MysteryCreation = () => {
                                         initialAdditionalDetails={formData?.additionalDetails}
                                         savedMysteryId={id}
                                         onSave={handleSaveMessages}
-                                        loadExistingMessages={loadExistingConversation}
+                                        initialMessages={messages}
                                     />
                                 </div>
                             ) : (
