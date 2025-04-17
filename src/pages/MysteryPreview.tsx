@@ -1,3 +1,4 @@
+
 // src/pages/MysteryPreview.tsx
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -42,25 +43,68 @@ const MysteryPreview = () => {
 
       let theme = "", title = "", premise = "", playerCount = 0;
       if (data.messages) {
-        const aiMessages = data.messages.filter((msg: any) => msg.role === "assistant");
+        const aiMessages = data.messages
+          .filter((msg: any) => msg.role === "assistant")
+          .sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+          
         for (const msg of aiMessages) {
           const content = msg.content;
-          if (content.includes("# ")) {
-            const lines = content.split("\n");
-            for (const line of lines) {
-              if (line.startsWith("# ")) {
-                title = line.replace("# ", "");
-              } else if (line.includes("Theme:")) {
-                theme = line.split("Theme:")[1].trim();
-              } else if (line.includes("PREMISE")) {
-                const nextLine = lines[lines.indexOf(line) + 1];
-                premise = nextLine || "";
-              } else if (line.includes("CHARACTER LIST")) {
-                const match = line.match(/\((\d+)\s+PLAYERS\)/);
-                if (match) {
-                  playerCount = parseInt(match[1]);
+          
+          // Try to find the title in the AI message content
+          if (content) {
+            // Look for title in quotes with "A MURDER MYSTERY" or similar pattern
+            const titleRegex = /"([^"]+)"(?:\s*[-–]\s*A\s+\w+\s+MURDER\s+MYSTERY)/i;
+            const titleWithoutQuotes = /^# "?([^"]+)"?\s*[-–].*?MURDER MYSTERY/im;
+            const simpleTitleWithoutQuotes = /^# (.*?MURDER MYSTERY)/im;
+            const titleMatch = content.match(titleRegex) || 
+                              content.match(titleWithoutQuotes) || 
+                              content.match(simpleTitleWithoutQuotes);
+            
+            if (titleMatch && titleMatch[1]) {
+              // Format title properly - capitalize first letter of each word
+              title = titleMatch[1].trim().split(/\s+/).map(word => 
+                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+              ).join(" ");
+            }
+            
+            // Extract theme
+            const themeMatch = content.match(/theme:\s*([^\n]+)/i) || 
+                              content.match(/with a\s+([^\s]+(?:\s+[^\s]+)?)\s+theme/i);
+            if (themeMatch && themeMatch[1]) {
+              theme = themeMatch[1].trim();
+            }
+            
+            // Extract premise
+            if (content.includes("PREMISE") || content.includes("## PREMISE")) {
+              const premiseSection = content.split(/##?\s*PREMISE/i)[1];
+              if (premiseSection) {
+                const premiseEnd = premiseSection.search(/##?\s*VICTIM|##?\s*CHARACTER LIST|##?\s*MURDER METHOD/i);
+                if (premiseEnd !== -1) {
+                  premise = premiseSection.substring(0, premiseEnd).trim();
+                } else {
+                  premise = premiseSection.trim().split('\n\n')[0];
+                }
+                
+                // Ensure we have a complete sentence ending with period, question mark, or exclamation point
+                if (premise && premise.length > 100) {
+                  const lastSentenceEnd = Math.max(
+                    premise.lastIndexOf('.'), 
+                    premise.lastIndexOf('!'), 
+                    premise.lastIndexOf('?')
+                  );
+                  
+                  if (lastSentenceEnd > 100) {
+                    premise = premise.substring(0, lastSentenceEnd + 1);
+                  }
                 }
               }
+            }
+            
+            // Extract player count
+            const playerMatch = content.match(/CHARACTER LIST\s*\((\d+)\s*PLAYERS\)/i) || 
+                                content.match(/(\d+)\s*players/i);
+            if (playerMatch && playerMatch[1]) {
+              playerCount = parseInt(playerMatch[1]);
             }
           }
         }
@@ -69,9 +113,9 @@ const MysteryPreview = () => {
       setMystery({
         ...data,
         theme,
-        title: title || data.title,
+        title: title || data.title || `${theme || "Mystery"} Adventure`,
         premise,
-        playerCount
+        playerCount: playerCount || (data.mystery_data?.playerCount || 0)
       });
     } catch (error) {
       console.error("Error loading mystery:", error);
@@ -101,21 +145,38 @@ const MysteryPreview = () => {
     try {
       setPurchasing(true);
       
-      const { error } = await supabase
-        .from("profiles")
+      // Update the conversation to mark it as purchased
+      const { error: conversationError } = await supabase
+        .from("conversations")
         .update({ 
-          has_purchased: true,
+          is_purchased: true,
           purchase_date: new Date().toISOString()
         })
         .eq("id", id);
         
-      if (error) {
+      if (conversationError) {
         throw new Error("Failed to update purchase status");
+      }
+      
+      // If user has profile table, you could update it too
+      if (user) {
+        const { error: profileError } = await supabase
+          .from("profiles")
+          .upsert({ 
+            id: user.id,
+            has_purchased: true,
+            updated_at: new Date().toISOString()
+          });
+          
+        if (profileError) {
+          console.error("Error updating profile:", profileError);
+        }
       }
       
       toast.success("Purchase simulated successfully!");
       
-      navigate("/dashboard");
+      // Navigate to the mystery view page
+      navigate(`/mystery/${id}`);
       
     } catch (error) {
       console.error("Error simulating purchase:", error);
@@ -180,16 +241,16 @@ const MysteryPreview = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <h3 className="font-medium">Theme</h3>
+                    <h3 className="font-medium"><strong>Theme</strong></h3>
                     <p>{mystery?.theme || "Not specified"}</p>
                   </div>
                   <div>
-                    <h3 className="font-medium">Number of Players</h3>
+                    <h3 className="font-medium"><strong>Number of Players</strong></h3>
                     <p>{mystery?.playerCount || "Not specified"} players</p>
                   </div>
                   <div>
-                    <h3 className="font-medium">Premise</h3>
-                    <p className="line-clamp-3">{mystery?.premise || "Custom setting"}</p>
+                    <h3 className="font-medium"><strong>Premise</strong></h3>
+                    <p>{mystery?.premise || "Custom setting"}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -206,11 +267,12 @@ const MysteryPreview = () => {
                   <div className="space-y-2">
                     {[
                       "Full character profiles for all suspects",
-                      "Detailed backstories and motives",
+                      "Host guide with step-by-step instructions",
                       "Printable character sheets",
-                      "Host instructions and timeline",
-                      "Clues and evidence cards",
-                      "Solution reveal script"
+                      "Evidence and clue cards",
+                      "Timeline of events",
+                      "Solution reveal script",
+                      "PDF downloads of all materials"
                     ].map((item, index) => (
                       <div key={index} className="flex items-start gap-2">
                         <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
@@ -249,7 +311,13 @@ const MysteryPreview = () => {
               
               <div className="bg-muted p-4 rounded-lg">
                 <p className="text-sm">
-                  <strong>Note:</strong> This is just a preview of your mystery concept. Purchase the full package to get all character details, clues, and printable materials.
+                  <strong>Important Notes</strong>
+                  <ul className="list-disc pl-5 space-y-1 mt-2">
+                    <li>This is a one-time purchase for this specific mystery package</li>
+                    <li>You'll have permanent access to download all materials</li>
+                    <li>Content is for personal use only, not for commercial redistribution</li>
+                    <li>Need help? Contact our support at support@mysterygenerator.com</li>
+                  </ul>
                 </p>
               </div>
             </div>
