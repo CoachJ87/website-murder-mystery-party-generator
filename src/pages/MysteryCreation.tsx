@@ -23,15 +23,18 @@ const MysteryCreation = () => {
     const isEditing = !!id;
     const { isAuthenticated, user } = useAuth();
     const [messages, setMessages] = useState<Message[]>([]);
+    const [initialDataLoaded, setInitialDataLoaded] = useState(false);
 
     useEffect(() => {
-        if (isEditing && id) {
+        if (isEditing && id && !initialDataLoaded) {
             loadExistingConversation(id);
+            setInitialDataLoaded(true);
         }
-    }, [id]);
+    }, [id, initialDataLoaded]);
 
     const loadExistingConversation = async (conversationId: string) => {
         try {
+            console.log("Loading conversation with ID:", conversationId);
             const { data, error } = await supabase
                 .from("conversations")
                 .select("*, messages(*)")
@@ -40,17 +43,22 @@ const MysteryCreation = () => {
 
             if (error) {
                 console.error("Error loading conversation:", error);
+                toast.error("Failed to load conversation data");
                 return [];
             }
 
             if (data) {
+                console.log("Loaded conversation data:", data);
                 setShowChatUI(true);
                 setConversationId(data.id);
+                
                 if (data.mystery_data) {
                     // Ensure we cast the mystery_data to FormValues
                     setFormData(data.mystery_data as FormValues);
                 }
+                
                 if (data.messages && data.messages.length > 0) {
+                    console.log("Found messages in conversation:", data.messages.length);
                     // Convert the messages to the correct format
                     const formattedMessages = data.messages.map((msg: any) => ({
                         id: msg.id,
@@ -60,13 +68,44 @@ const MysteryCreation = () => {
                     }));
                     setMessages(formattedMessages);
                     return formattedMessages;
+                } else {
+                    console.log("No messages found in conversation");
                 }
+            } else {
+                console.log("No conversation data found");
             }
         } catch (error) {
             console.error("Error:", error);
             toast.error("Failed to load conversation");
         }
         return [];
+    };
+
+    const saveMessage = async (message: Message) => {
+        if (!isAuthenticated || !user || !conversationId) {
+            console.log("Cannot save message: missing auth or conversation ID");
+            return;
+        }
+        
+        try {
+            console.log("Saving message to database:", message);
+            const { error } = await supabase
+                .from("messages")
+                .insert({
+                    conversation_id: conversationId,
+                    content: message.content,
+                    role: message.is_ai ? "assistant" : "user",
+                });
+                
+            if (error) {
+                console.error("Error saving message:", error);
+                toast.error("Failed to save message");
+            } else {
+                console.log("Message saved successfully");
+            }
+        } catch (error) {
+            console.error("Error saving message:", error);
+        }
     };
 
     const handleSave = async (data: FormValues) => {
@@ -134,7 +173,14 @@ const MysteryCreation = () => {
     };
 
     const handleSaveMessages = async (messages: Message[]) => {
+        console.log("Saving messages:", messages.length);
+        
+        // Save the latest message if it exists
         if (messages.length > 0) {
+            const latestMessage = messages[messages.length - 1];
+            await saveMessage(latestMessage);
+            
+            // Extract theme from messages
             const latestThemeMessage = messages.find(m => m.content.includes("theme"));
             if (latestThemeMessage) {
                 const extractedTheme = latestThemeMessage.content.split("theme").pop()?.trim().replace(".", "");

@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -29,22 +30,38 @@ const MysteryChat = ({
     initialAdditionalDetails,
     initialMessages = []
 }: MysteryChatProps) => {
-    const [messages, setMessages] = useState<Message[]>(initialMessages);
+    const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [initialMessageSent, setInitialMessageSent] = useState(false);
+    const messagesInitialized = useRef(false);
 
+    // Initialize messages from props
+    useEffect(() => {
+        console.log("Initial messages provided:", initialMessages.length);
+        if (initialMessages.length > 0 && !messagesInitialized.current) {
+            console.log("Setting initial messages:", initialMessages);
+            setMessages(initialMessages);
+            setInitialMessageSent(true);
+            messagesInitialized.current = true;
+        }
+    }, [initialMessages]);
+
+    // Handle creating initial prompt if no messages exist
     useEffect(() => {
         console.log("initialHasAccomplice in Chat:", initialHasAccomplice);
-        console.log("Initial messages:", initialMessages);
+        console.log("Initial messages state:", messages.length);
+        console.log("initialMessageSent:", initialMessageSent);
 
-        if (initialMessages && initialMessages.length > 0) {
-            setInitialMessageSent(true);
+        // Skip if we already have messages or already sent initial message
+        if ((messages.length > 0 || initialMessageSent) || messagesInitialized.current) {
+            console.log("Skipping initial message creation");
             return;
         }
 
-        if (initialTheme && !initialMessageSent) {
+        if (initialTheme) {
+            console.log("Creating initial message with theme:", initialTheme);
             let initialChatMessage = `Let's create a murder mystery`;
             if (initialTheme) {
                 initialChatMessage += ` with a ${initialTheme} theme`;
@@ -69,11 +86,14 @@ const MysteryChat = ({
                 is_ai: false,
                 timestamp: new Date(),
             };
+            
+            console.log("Setting initial user message:", initialMessage);
             setMessages([initialMessage]);
             setInitialMessageSent(true);
+            messagesInitialized.current = true;
             handleAIResponse(initialMessage.content);
         }
-    }, [initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails, initialMessages, initialMessageSent]);
+    }, [initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails, messages.length, initialMessageSent]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -134,11 +154,18 @@ const MysteryChat = ({
                 timestamp: new Date(),
             };
 
-            setMessages(prev => [...prev, aiMessage]);
+            setMessages(prev => {
+                const updatedMessages = [...prev, aiMessage];
+                
+                // Call onSave with the updated messages
+                if (onSave) {
+                    console.log("Calling onSave with updated messages:", updatedMessages.length);
+                    onSave(updatedMessages);
+                }
+                
+                return updatedMessages;
+            });
 
-            if (onSave) {
-                onSave([...messages, aiMessage]);
-            }
         } catch (error) {
             console.error("Error getting AI response:", error);
             toast.error("Failed to get AI response");
