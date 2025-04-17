@@ -112,10 +112,16 @@ export default {
                         },
                         ul: {
                             paddingLeft: '1.5em',
+                            listStyleType: 'disc',
+                        },
+                        ol: {
+                            paddingLeft: '1.5em',
+                            listStyleType: 'decimal',
                         },
                         li: {
                             marginTop: '0.25em',
                             marginBottom: '0.25em',
+                            display: 'list-item',
                         },
                         code: {
                             color: 'inherit',
@@ -123,6 +129,12 @@ export default {
                             padding: '0.2em 0.4em',
                             borderRadius: '0.25em',
                             fontWeight: '400',
+                        },
+                        strong: {
+                            fontWeight: '700',
+                        },
+                        em: {
+                            fontStyle: 'italic',
                         },
                     },
                 },
