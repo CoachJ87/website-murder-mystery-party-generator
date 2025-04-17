@@ -31,11 +31,15 @@ const AccountSettings = () => {
 
   const handleDeleteAccount = async () => {
     try {
-      await supabase.rpc('delete_user_account');
+      // Using explicit type annotation for the RPC call
+      const { error } = await supabase.rpc('delete_user_account');
+      if (error) throw error;
+      
       await signOut();
       toast.success("Your account has been deleted");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error deleting account:", error);
+      toast.error("Failed to delete account: " + error.message);
       throw error; // Rethrow to be caught by the DeleteAccount component
     }
   };

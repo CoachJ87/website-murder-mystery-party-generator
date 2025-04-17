@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,6 +43,7 @@ const ProfileSettings = ({ initialName, email }: ProfileSettingsProps) => {
   };
 
   return (
+    
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
