@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -154,7 +155,7 @@ const MysteryChat = ({
                             }`}
                         >
                             <CardContent className="p-4">
-                                <div className="prose prose-sm dark:prose-invert max-w-none">
+                                <div className={`prose ${message.is_ai ? 'prose-invert dark:prose-invert' : 'text-primary-foreground'} prose-sm max-w-none`}>
                                     {message.content && typeof message.content === 'string' ? (
                                         <ReactMarkdown>
                                             {message.content}
