@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -64,7 +63,6 @@ const MysteryDashboard = () => {
 
       if (error) throw error;
 
-      // Handle potential null data safely
       if (!data) {
         setMysteries([]);
         return;
@@ -75,10 +73,10 @@ const MysteryDashboard = () => {
         title: item.title || "Untitled Mystery",
         created_at: item.created_at,
         updated_at: item.updated_at || item.created_at,
-        status: item.mystery_data?.status || "draft", // Default status since it might not exist in the database
+        status: item.mystery_data?.status || "draft",
         theme: item.mystery_data?.theme,
         guests: item.mystery_data?.numberOfGuests,
-        is_purchased: false // Default value since it doesn't exist in the database
+        is_purchased: false
       }));
 
       setMysteries(formattedMysteries);
@@ -140,18 +138,15 @@ const MysteryDashboard = () => {
 
   const handleStatusChange = async (id: string, newStatus: "draft" | "published" | "archived") => {
     try {
-      // Find the mystery to update
       const mysteryToUpdate = mysteries.find(mystery => mystery.id === id);
       if (!mysteryToUpdate) return;
       
-      // Prepare updated mystery data
       const updatedMysteryData = {
         ...mysteryToUpdate,
         status: newStatus,
         updated_at: new Date().toISOString()
       };
       
-      // Update in database
       const { error } = await supabase
         .from("conversations")
         .update({
@@ -165,7 +160,6 @@ const MysteryDashboard = () => {
       
       if (error) throw error;
       
-      // Update local state
       setMysteries(
         mysteries.map((mystery) =>
           mystery.id === id
@@ -188,7 +182,6 @@ const MysteryDashboard = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-
       <main className="flex-1 py-12 px-4">
         <div className="container mx-auto max-w-5xl">
           <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -209,12 +202,14 @@ const MysteryDashboard = () => {
           {isAuthenticated ? (
             <>
               <Tabs defaultValue="all" className="space-y-4" onValueChange={handleTabChange}>
-                <TabsList className="w-full flex-wrap justify-start bg-muted/50 rounded-lg p-1">
-                  <TabsTrigger value="all">All</TabsTrigger>
-                  <TabsTrigger value="draft">Drafts</TabsTrigger>
-                  <TabsTrigger value="published">Published</TabsTrigger>
-                  <TabsTrigger value="archived">Archived</TabsTrigger>
-                </TabsList>
+                <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                  <TabsList className="w-full justify-start bg-muted/50 rounded-lg p-1 flex-nowrap overflow-x-auto">
+                    <TabsTrigger value="all" className="flex-shrink-0">All</TabsTrigger>
+                    <TabsTrigger value="draft" className="flex-shrink-0">Drafts</TabsTrigger>
+                    <TabsTrigger value="published" className="flex-shrink-0">Published</TabsTrigger>
+                    <TabsTrigger value="archived" className="flex-shrink-0">Archived</TabsTrigger>
+                  </TabsList>
+                </div>
 
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
                   <div className="flex items-center space-x-2 w-full md:w-auto">
@@ -269,9 +264,9 @@ const MysteryDashboard = () => {
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredMysteries.map((mystery) => (
-                      <Card key={mystery.id} className="bg-card text-card-foreground">
+                      <Card key={mystery.id} className="bg-card">
                         <CardHeader>
-                          <CardTitle className="flex justify-between items-start">
+                          <CardTitle className="flex justify-between items-start gap-2">
                             <span className="truncate">{mystery.title}</span>
                             <div>
                               {mystery.status === "draft" && <Badge variant="secondary">Draft</Badge>}

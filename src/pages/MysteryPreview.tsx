@@ -28,26 +28,51 @@ const MysteryPreview = () => {
     try {
       setLoading(true);
       
-      // Fetch mystery from Supabase
       const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
+        .from("conversations")
+        .select("*, messages(*)")
         .eq("id", id)
         .single();
-        
+      
       if (error) {
         console.error("Error loading mystery:", error);
         toast.error("Failed to load mystery details");
         return;
       }
-      
-      // If already purchased, redirect to view page
-      if (data.has_purchased) {
-        navigate(`/mystery/${id}`);
-        return;
+
+      let theme = "", title = "", premise = "", playerCount = 0;
+      if (data.messages) {
+        const aiMessages = data.messages.filter((msg: any) => msg.role === "assistant");
+        for (const msg of aiMessages) {
+          const content = msg.content;
+          if (content.includes("# ")) {
+            const lines = content.split("\n");
+            for (const line of lines) {
+              if (line.startsWith("# ")) {
+                title = line.replace("# ", "");
+              } else if (line.includes("Theme:")) {
+                theme = line.split("Theme:")[1].trim();
+              } else if (line.includes("PREMISE")) {
+                const nextLine = lines[lines.indexOf(line) + 1];
+                premise = nextLine || "";
+              } else if (line.includes("CHARACTER LIST")) {
+                const match = line.match(/\((\d+)\s+PLAYERS\)/);
+                if (match) {
+                  playerCount = parseInt(match[1]);
+                }
+              }
+            }
+          }
+        }
       }
-      
-      setMystery(data);
+
+      setMystery({
+        ...data,
+        theme,
+        title: title || data.title,
+        premise,
+        playerCount
+      });
     } catch (error) {
       console.error("Error loading mystery:", error);
       toast.error("Failed to load mystery details");
@@ -63,11 +88,9 @@ const MysteryPreview = () => {
       return;
     }
 
-    // Navigate to the dedicated purchase page
     navigate(`/mystery/purchase/${id}`);
   };
 
-  // For testing only - in development
   const handleSimulatePurchase = async () => {
     if (!isAuthenticated) {
       toast.error("Please sign in to purchase this mystery");
@@ -78,7 +101,6 @@ const MysteryPreview = () => {
     try {
       setPurchasing(true);
       
-      // Update the mystery as purchased
       const { error } = await supabase
         .from("profiles")
         .update({ 
@@ -93,7 +115,6 @@ const MysteryPreview = () => {
       
       toast.success("Purchase simulated successfully!");
       
-      // Navigate to dashboard where generation will happen
       navigate("/dashboard");
       
     } catch (error) {
@@ -160,15 +181,15 @@ const MysteryPreview = () => {
                 <CardContent className="space-y-4">
                   <div>
                     <h3 className="font-medium">Theme</h3>
-                    <p>{mystery.theme || "Not specified"}</p>
+                    <p>{mystery?.theme || "Not specified"}</p>
                   </div>
                   <div>
-                    <h3 className="font-medium">Setting</h3>
-                    <p>{mystery.setting || "Custom setting"}</p>
+                    <h3 className="font-medium">Number of Players</h3>
+                    <p>{mystery?.playerCount || "Not specified"} players</p>
                   </div>
                   <div>
-                    <h3 className="font-medium">Victim</h3>
-                    <p>{mystery.victim || "Custom victim"}</p>
+                    <h3 className="font-medium">Premise</h3>
+                    <p className="line-clamp-3">{mystery?.premise || "Custom setting"}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -214,7 +235,6 @@ const MysteryPreview = () => {
                     )}
                   </Button>
                   
-                  {/* For development testing only - remove in production */}
                   <Button 
                     className="w-full" 
                     variant="outline"

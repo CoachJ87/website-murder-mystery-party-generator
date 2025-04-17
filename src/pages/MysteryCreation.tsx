@@ -23,11 +23,47 @@ const MysteryCreation = () => {
     const { isAuthenticated, user } = useAuth();
 
     useEffect(() => {
-        if (isEditing) {
-            setShowChatUI(true);
-            setConversationId(id || null);
+        if (isEditing && id) {
+            loadExistingConversation(id);
         }
     }, [id]);
+
+    const loadExistingConversation = async (conversationId: string) => {
+        try {
+            const { data, error } = await supabase
+                .from("conversations")
+                .select("*, messages(*)")
+                .eq("id", conversationId)
+                .single();
+
+            if (error) {
+                console.error("Error loading conversation:", error);
+                return;
+            }
+
+            if (data) {
+                setShowChatUI(true);
+                setConversationId(data.id);
+                if (data.mystery_data) {
+                    setFormData(data.mystery_data);
+                }
+                if (data.messages) {
+                    // Convert the messages to the correct format
+                    const formattedMessages = data.messages.map((msg: any) => ({
+                        id: msg.id,
+                        content: msg.content,
+                        is_ai: msg.role === "assistant",
+                        timestamp: new Date(msg.created_at)
+                    }));
+                    return formattedMessages;
+                }
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            toast.error("Failed to load conversation");
+        }
+        return [];
+    };
 
     const handleSave = async (data: FormValues) => {
         try {
@@ -150,6 +186,7 @@ const MysteryCreation = () => {
                                         initialAdditionalDetails={formData?.additionalDetails}
                                         savedMysteryId={id}
                                         onSave={handleSaveMessages}
+                                        loadExistingMessages={loadExistingConversation}
                                     />
                                 </div>
                             ) : (
