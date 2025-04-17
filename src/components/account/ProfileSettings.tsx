@@ -27,9 +27,9 @@ const ProfileSettings = ({ initialName, email }: ProfileSettingsProps) => {
     
     setLoading(true);
     try {
-      // Use updateUser with the correct structure
+      // Fix the type error by properly specifying the data object type
       const { error } = await supabase.auth.updateUser({
-        data: { name } // This is the proper way to update user metadata
+        data: { name } as { [key: string]: string }
       });
       
       if (error) throw error;
