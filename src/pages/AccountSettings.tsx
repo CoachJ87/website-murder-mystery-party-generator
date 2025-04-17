@@ -47,9 +47,10 @@ const AccountSettings = () => {
     
     setLoading(true);
     try {
+      // Fix: Use correct structure for updating user metadata
       const { error } = await supabase.auth.updateUser({
         data: { 
-          name 
+          name: name
         }
       });
       
