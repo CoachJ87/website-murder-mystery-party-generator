@@ -27,7 +27,7 @@ const ProfileSettings = ({ initialName, email }: ProfileSettingsProps) => {
     
     setLoading(true);
     try {
-      // Fix the type error by properly specifying the data object type
+      // Ensure the data object is properly typed with an index signature
       const { error } = await supabase.auth.updateUser({
         data: { name } as { [key: string]: string }
       });

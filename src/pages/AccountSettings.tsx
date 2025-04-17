@@ -22,9 +22,9 @@ const AccountSettings = () => {
   
   useEffect(() => {
     if (user) {
-      // Safely check and extract user name from metadata
-      const userData = user.user_metadata as UserMetadata | null;
-      setName(userData?.name || "");
+      // Properly type cast the user metadata to ensure type safety
+      const userData = (user.user_metadata as UserMetadata) || {};
+      setName(userData.name || "");
       setEmail(user.email || "");
     }
   }, [user]);
