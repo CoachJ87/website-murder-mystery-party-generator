@@ -7,10 +7,6 @@ on:
     branches:
       - main
 
-concurrency:
-  group: ${{ github.ref }}  # Ensure only one run per branch
-  cancel-in-progress: true  # Cancel any in-progress jobs
-
 jobs:
   update-db:
     runs-on: ubuntu-latest
@@ -18,7 +14,7 @@ jobs:
       - uses: actions/checkout@v4
         name: Checkout code
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # Fetch the entire history
 
       - uses: oven-sh/setup-bun@v1
         name: Setup Bun
@@ -33,11 +29,9 @@ jobs:
       - run: npx update-browserslist-db@latest
         name: Update browserslist-db
 
-      - run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git remote set-url origin https://CoachJ87:${{ secrets.ACTIONS_ACCESS_TOKEN }}@github.com/CoachJ87/website-murder-mystery-party-generator.git  # Set remote URL with PAT
-          git add .
-          git commit -m "Automated update of browserslist-db"
-          git push origin main --force
-        name: Commit and push changes (Direct Git with PAT)
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        name: Commit and push changes
+        with:
+          commit_message: "Automated update of browserslist-db"
+          push_options: '--force'
+          # No explicit repository URL, will use GITHUB_TOKEN by default
