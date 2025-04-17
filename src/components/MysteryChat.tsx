@@ -155,7 +155,7 @@ const MysteryChat = ({
                             }`}
                         >
                             <CardContent className="p-4">
-                                <div className={`prose ${message.is_ai ? 'prose-invert dark:prose-invert' : 'text-primary-foreground'} prose-sm max-w-none`}>
+                                <div className={`prose prose-sm ${message.is_ai ? 'prose-stone dark:prose-invert' : 'text-primary-foreground prose-invert'} max-w-none`}>
                                     {message.content && typeof message.content === 'string' ? (
                                         <ReactMarkdown>
                                             {message.content}
