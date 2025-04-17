@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -57,21 +58,27 @@ const MysteryDashboard = () => {
 
       const { data, error } = await supabase
         .from("conversations")
-        .select("id, title, created_at, updated_at, mystery_data, is_purchased")
+        .select("id, title, created_at, updated_at, mystery_data")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
 
-      const formattedMysteries: Mystery[] = data.map((item) => ({
+      // Handle potential null data safely
+      if (!data) {
+        setMysteries([]);
+        return;
+      }
+
+      const formattedMysteries: Mystery[] = data.map((item: any) => ({
         id: item.id,
         title: item.title || "Untitled Mystery",
         created_at: item.created_at,
         updated_at: item.updated_at || item.created_at,
-        status: "draft",
+        status: "draft", // Default status since it doesn't exist in the database
         theme: item.mystery_data?.theme,
         guests: item.mystery_data?.numberOfGuests,
-        is_purchased: item.is_purchased || false,
+        is_purchased: false // Default value since it doesn't exist in the database
       }));
 
       setMysteries(formattedMysteries);
@@ -332,7 +339,7 @@ const MysteryDashboard = () => {
           )}
 
           <div className="mt-8 text-center">
-            <Button variant="secondary" onClick={generateLoremIpsum}>
+            <Button variant="secondary" onClick={() => navigate("/mystery/view/sample")}>
               Generate Sample Mystery
             </Button>
           </div>

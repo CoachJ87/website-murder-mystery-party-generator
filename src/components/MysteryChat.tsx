@@ -23,7 +23,7 @@ const MysteryChat = ({ initialTheme = "", savedMysteryId, onSave }: MysteryChatP
   useEffect(() => {
     // If we have an initial theme, start the conversation with it
     if (initialTheme) {
-      const initialMessage = {
+      const initialMessage: Message = {
         id: Date.now().toString(),
         content: `Let's create a murder mystery with a ${initialTheme} theme.`,
         is_ai: false,
@@ -46,7 +46,7 @@ const MysteryChat = ({ initialTheme = "", savedMysteryId, onSave }: MysteryChatP
     e.preventDefault();
     if (!input.trim()) return;
 
-    const userMessage = {
+    const userMessage: Message = {
       id: Date.now().toString(),
       content: input.trim(),
       is_ai: false,
@@ -70,35 +70,39 @@ const MysteryChat = ({ initialTheme = "", savedMysteryId, onSave }: MysteryChatP
       setLoading(true);
 
       // Include the new user message in the messages array
-      const updatedMessages = [...messages, {
+      const newUserMessage: Message = {
         id: Date.now().toString(),
         content: userMessage,
         is_ai: false,
         timestamp: new Date()
-      }];
+      };
+      
+      const updatedMessages = [...messages, newUserMessage];
 
-      // Fix the mapping to include is_ai property
+      // Fix the mapping to include all required Message properties
       const anthropicMessages = updatedMessages.map(m => ({
         role: m.is_ai ? "assistant" : "user",
         content: m.content,
-        is_ai: m.is_ai
-      })) as Message[];
+      }));
 
       console.log("Frontend - anthropicMessages being sent:", JSON.stringify(anthropicMessages, null, 2));
 
       const response = await getAIResponse(
-        anthropicMessages,
+        anthropicMessages as any,
         'free'
       );
 
-      const aiMessage = {
+      const aiMessage: Message = {
         id: Date.now().toString(),
         content: response,
         is_ai: true,
         timestamp: new Date(),
       };
+
       setMessages(prev => [...prev, aiMessage]);
+      
       if (onSave) {
+        // We need to make sure we're saving actual Message objects
         onSave([...updatedMessages, aiMessage]);
       }
     } catch (error) {

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,11 @@ import { toast } from "sonner";
 import { User, KeyRound, MailOpen, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
+interface UserMetadata {
+  name?: string;
+  [key: string]: any;
+}
+
 const AccountSettings = () => {
   const { user, signOut } = useAuth();
   const [name, setName] = useState("");
@@ -24,7 +30,9 @@ const AccountSettings = () => {
   
   useEffect(() => {
     if (user) {
-      setName(typeof user.name === 'string' ? user.name : '');
+      // Fixed: Safely check and extract user name from metadata
+      const userData = user.user_metadata as UserMetadata | null;
+      setName(userData?.name || "");
       setEmail(user.email || "");
     }
   }, [user]);
