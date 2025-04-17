@@ -1,17 +1,30 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, Search, Calendar, Clock, Filter, Trash, Archive, Edit } from "lucide-react";
 import SignInPrompt from "@/components/SignInPrompt";
-import { MysteryFilters } from "@/components/dashboard/MysteryFilters";
-import { MysteryList } from "@/components/dashboard/MysteryList";
-import { Mystery } from "@/interfaces/mystery";
+
+interface Mystery {
+  id: string;
+  title: string;
+  created_at: string;
+  updated_at: string;
+  status: "draft" | "published" | "archived";
+  theme?: string;
+  guests?: number;
+  is_purchased?: boolean;
+}
 
 const MysteryDashboard = () => {
   const navigate = useNavigate();
@@ -172,14 +185,6 @@ const MysteryDashboard = () => {
     setStatusFilter(value);
   };
 
-  const handleNavigateToCreate = () => {
-    navigate("/mystery/create");
-  };
-
-  const handleEdit = (id: string) => {
-    navigate(`/mystery/edit/${id}`);
-  };
-
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -193,7 +198,7 @@ const MysteryDashboard = () => {
               </p>
             </div>
             <Button 
-              onClick={handleNavigateToCreate}
+              onClick={() => navigate("/mystery/create")}
               className="self-start md:self-auto"
             >
               <PlusCircle className="mr-2 h-4 w-4" /> Create New Mystery
@@ -212,22 +217,159 @@ const MysteryDashboard = () => {
                   </TabsList>
                 </div>
 
-                <MysteryFilters
-                  searchTerm={searchTerm}
-                  setSearchTerm={setSearchTerm}
-                  statusFilter={statusFilter}
-                  setStatusFilter={setStatusFilter}
-                  sortOrder={sortOrder}
-                  setSortOrder={setSortOrder}
-                />
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
+                  <div className="flex items-center space-x-2 w-full md:w-auto">
+                    <Search className="h-4 w-4 text-muted-foreground" />
+                    <Input
+                      className="w-full md:w-[250px]"
+                      placeholder="Search by title or theme..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </div>
 
-                <MysteryList
-                  mysteries={filteredMysteries}
-                  onStatusChange={handleStatusChange}
-                  onDelete={handleDeleteMystery}
-                  onEdit={handleEdit}
-                  loading={loading}
-                />
+                  <div className="flex flex-col md:flex-row items-start md:items-center gap-4 w-full md:w-auto">
+                    <div className="flex items-center gap-2 w-full md:w-auto">
+                      <Label htmlFor="sort" className="whitespace-nowrap">Sort by:</Label>
+                      <select
+                        id="sort"
+                        className="rounded-md border border-input bg-background px-2 py-1 text-sm w-full"
+                        value={sortOrder}
+                        onChange={(e) => setSortOrder(e.target.value as "newest" | "oldest" | "lastUpdated")}
+                      >
+                        <option value="newest">Newest</option>
+                        <option value="oldest">Oldest</option>
+                        <option value="lastUpdated">Last Updated</option>
+                      </select>
+                    </div>
+                    <div className="flex items-center gap-2 w-full md:w-auto">
+                      <Label htmlFor="status" className="whitespace-nowrap">Filter by Status:</Label>
+                      <select
+                        id="status"
+                        className="rounded-md border border-input bg-background px-2 py-1 text-sm w-full"
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                      >
+                        <option value="all">All</option>
+                        <option value="draft">Draft</option>
+                        <option value="published">Published</option>
+                        <option value="archived">Archived</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {loading ? (
+                  <div className="text-center py-8">
+                    <p>Loading mysteries...</p>
+                  </div>
+                ) : filteredMysteries.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p>No mysteries found. Try changing your filters or create a new mystery.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredMysteries.map((mystery) => (
+                      <Card key={mystery.id} className="bg-card">
+                        <CardHeader>
+                          <CardTitle className="flex justify-between items-start gap-2">
+                            <span className="truncate">{mystery.title}</span>
+                            <div>
+                              {mystery.status === "draft" && <Badge variant="secondary">Draft</Badge>}
+                              {mystery.status === "published" && <Badge>Published</Badge>}
+                              {mystery.status === "archived" && <Badge variant="outline">Archived</Badge>}
+                            </div>
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-2">
+                          <p className="text-sm text-muted-foreground">
+                            <Calendar className="inline-block h-4 w-4 mr-1" />
+                            Created: {new Date(mystery.created_at).toLocaleDateString()}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            <Clock className="inline-block h-4 w-4 mr-1" />
+                            Updated: {new Date(mystery.updated_at).toLocaleDateString()}
+                          </p>
+                          {mystery.theme && (
+                            <p className="text-sm text-muted-foreground truncate">
+                              Theme: {mystery.theme}
+                            </p>
+                          )}
+                          {mystery.guests && (
+                            <p className="text-sm text-muted-foreground">
+                              Guests: {mystery.guests}
+                            </p>
+                          )}
+                          
+                          <div className="flex flex-wrap justify-end gap-2 pt-2">
+                            <Button
+                              size="sm"
+                              variant="secondary"
+                              onClick={() => navigate(`/mystery/edit/${mystery.id}`)}
+                              className="flex-1 min-w-[80px]"
+                            >
+                              <Edit className="h-4 w-4 mr-2" />
+                              Edit
+                            </Button>
+                            {mystery.status !== "archived" ? (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleStatusChange(mystery.id, "archived")}
+                                className="flex-1 min-w-[80px]"
+                              >
+                                <Archive className="h-4 w-4 mr-2" />
+                                Archive
+                              </Button>
+                            ) : (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleStatusChange(mystery.id, "draft")}
+                                className="flex-1 min-w-[80px]"
+                              >
+                                <Edit className="h-4 w-4 mr-2" />
+                                Unarchive
+                              </Button>
+                            )}
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button 
+                                  size="sm" 
+                                  variant="destructive"
+                                  className="flex-1 min-w-[80px]"
+                                >
+                                  <Trash className="h-4 w-4 mr-2" />
+                                  Delete
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This action cannot be undone. This will permanently delete your mystery from our
+                                    servers.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => {
+                                      setMysteryToDelete(mystery.id);
+                                      handleDeleteMystery(mystery.id);
+                                    }}
+                                  >
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
               </Tabs>
             </>
           ) : (
@@ -244,6 +386,7 @@ const MysteryDashboard = () => {
           </div>
         </div>
       </main>
+
       <Footer />
     </div>
   );

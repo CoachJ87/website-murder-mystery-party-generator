@@ -1,3 +1,4 @@
+
 export interface MysteryData {
   title: string;
   theme?: string;
@@ -19,15 +20,4 @@ export interface Conversation {
   is_paid?: boolean;
   mystery_id?: string;
   prompt_version?: string;
-}
-
-export interface Mystery {
-  id: string;
-  title: string;
-  created_at: string;
-  updated_at: string;
-  status: "draft" | "published" | "archived";
-  theme?: string;
-  guests?: number;
-  is_purchased?: boolean;
 }
