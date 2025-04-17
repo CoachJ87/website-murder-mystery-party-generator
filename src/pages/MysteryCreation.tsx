@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -54,14 +55,13 @@ const MysteryCreation = () => {
         
         if (data.messages && data.messages.length > 0) {
           console.log("Found messages in conversation:", data.messages.length);
-          const formattedMessages = data.messages.map((msg: any) => ({
+          // We don't need to set messages here - the ConversationManager will handle it
+          return data.messages.map((msg: any) => ({
             id: msg.id,
             content: msg.content,
             is_ai: msg.role === "assistant",
             timestamp: new Date(msg.created_at)
           }));
-          setMessages(formattedMessages);
-          return formattedMessages;
         } else {
           console.log("No messages found in conversation");
         }
