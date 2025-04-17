@@ -4,7 +4,7 @@ export interface MysteryData {
   theme?: string;
   playerCount?: number;
   hasAccomplice?: boolean;
-  scriptType?: 'full' | 'summary';
+  scriptType?: 'full' | 'pointForm';
   additionalDetails?: string;
   status?: 'draft' | 'published' | 'archived';
   [key: string]: any;  // Allow for additional properties
@@ -30,6 +30,8 @@ export interface Message {
   content: string;
   role: "user" | "assistant";
   created_at?: string;
+  timestamp?: Date;
+  is_ai?: boolean;
 }
 
 export interface Mystery {

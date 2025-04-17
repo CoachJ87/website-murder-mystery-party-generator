@@ -45,7 +45,7 @@ export const getAIResponse = async (messages: Message[], promptVersion: 'free' |
       },
       body: JSON.stringify(requestBody),
       // Added timeout to prevent hanging requests
-      signal: AbortSignal.timeout(15000) // 15 second timeout
+      signal: AbortSignal.timeout(20000) // 20 second timeout - increased from 15 seconds
     });
 
     console.log(`API Response Status: ${response.status}`);
@@ -69,6 +69,14 @@ export const getAIResponse = async (messages: Message[], promptVersion: 'free' |
         // Fallback for older Claude API response structure
         console.log("Successfully extracted (older format) AI response content");
         aiResponse = data.content[0].text;
+    } else if (data && typeof data === 'string' && data.trim().length > 0) {
+        // Handle case where the API returns just a string
+        console.log("API returned a direct string response");
+        aiResponse = data;
+    } else if (data && data.message && typeof data.message === 'string') {
+        // Handle case where response is in a message property
+        console.log("API returned response in message property");
+        aiResponse = data.message;
     } else {
       console.error("Invalid API response format");
       console.error("Response Data:", JSON.stringify(data));

@@ -59,13 +59,18 @@ const MysteryCreation = () => {
                 
                 if (data.messages && data.messages.length > 0) {
                     console.log("Found messages in conversation:", data.messages.length);
-                    // Convert the messages to the correct format
-                    const formattedMessages = data.messages.map((msg: any) => ({
-                        id: msg.id,
-                        content: msg.content,
-                        is_ai: msg.role === "assistant",
-                        timestamp: new Date(msg.created_at)
-                    }));
+                    // Convert the messages to the correct format and properly sort them
+                    const formattedMessages = data.messages
+                        .map((msg: any) => ({
+                            id: msg.id,
+                            content: msg.content,
+                            is_ai: msg.role === "assistant",
+                            timestamp: new Date(msg.created_at)
+                        }))
+                        .sort((a: Message, b: Message) => 
+                            a.timestamp.getTime() - b.timestamp.getTime()
+                        );
+                    
                     setMessages(formattedMessages);
                     return formattedMessages;
                 } else {
@@ -175,25 +180,62 @@ const MysteryCreation = () => {
     const handleSaveMessages = async (messages: Message[]) => {
         console.log("Saving messages:", messages.length);
         
-        // Save the latest message if it exists
-        if (messages.length > 0) {
-            const latestMessage = messages[messages.length - 1];
-            await saveMessage(latestMessage);
+        if (messages.length === 0) return;
+        
+        // Find the latest message
+        const latestMessage = messages[messages.length - 1];
+        await saveMessage(latestMessage);
+        
+        // Extract title from AI messages that look like they contain a title
+        const aiMessages = messages.filter(m => m.is_ai);
+        let possibleTitleMessages = aiMessages.filter(m => 
+            (m.content.includes("# ") || 
+             m.content.includes("Title:") || 
+             m.content.toLowerCase().includes("mystery")) && 
+            !m.content.includes("Unable to Connect")
+        );
+        
+        if (possibleTitleMessages.length > 0) {
+            // Find the most likely title message
+            const titleMessage = possibleTitleMessages[0];
+            let extractedTitle = "";
             
-            // Extract theme from messages
-            const latestThemeMessage = messages.find(m => m.content.includes("theme"));
-            if (latestThemeMessage) {
-                const extractedTheme = latestThemeMessage.content.split("theme").pop()?.trim().replace(".", "");
-                if (extractedTheme) {
-                    await new Promise<void>((resolve) => {
-                        setFormData(prevData => {
-                            if (prevData) {
-                                return { ...prevData, theme: extractedTheme };
-                            }
-                            return prevData;
-                        });
-                        resolve();
-                    });
+            // Extract title from the message content
+            const titleLines = titleMessage.content.split('\n')
+                .filter(line => 
+                    (line.startsWith('# ') || 
+                     line.includes('Title:') || 
+                     (line.includes(':') && line.length < 50))
+                );
+                
+            if (titleLines.length > 0) {
+                extractedTitle = titleLines[0]
+                    .replace(/^#+ /, '')
+                    .replace('Title:', '')
+                    .replace('TITLE:', '')
+                    .trim();
+            }
+            
+            if (extractedTitle && extractedTitle.length > 3 && extractedTitle.length < 100) {
+                // Update the title in the database
+                if (conversationId && isAuthenticated) {
+                    try {
+                        const { error } = await supabase
+                            .from("conversations")
+                            .update({
+                                title: extractedTitle,
+                                updated_at: new Date().toISOString()
+                            })
+                            .eq("id", conversationId);
+                            
+                        if (error) {
+                            console.error("Error updating title:", error);
+                        } else {
+                            console.log("Updated conversation title to:", extractedTitle);
+                        }
+                    } catch (error) {
+                        console.error("Error updating title:", error);
+                    }
                 }
             }
         }
