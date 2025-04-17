@@ -22,6 +22,7 @@ export const ConversationManager = ({
 }: ConversationManagerProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [initialDataLoaded, setInitialDataLoaded] = useState(false);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(true);
 
   useEffect(() => {
     if (conversationId && !initialDataLoaded) {
@@ -33,6 +34,8 @@ export const ConversationManager = ({
   const loadExistingConversation = async (id: string) => {
     try {
       console.log("Loading conversation with ID:", id);
+      setIsLoadingHistory(true);
+      
       const { data, error } = await supabase
         .from("messages")
         .select("*")
@@ -60,6 +63,8 @@ export const ConversationManager = ({
     } catch (error) {
       console.error("Error:", error);
       toast.error("Failed to load conversation");
+    } finally {
+      setIsLoadingHistory(false);
     }
   };
 
@@ -74,6 +79,7 @@ export const ConversationManager = ({
         savedMysteryId={conversationId || undefined}
         onSave={onSaveMessages}
         initialMessages={messages}
+        isLoadingHistory={isLoadingHistory}
       />
     </div>
   );

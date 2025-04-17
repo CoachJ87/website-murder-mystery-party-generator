@@ -32,24 +32,42 @@ const MysteryCreation = () => {
   const extractTitleFromMessages = (messages: any[]) => {
     if (!messages || messages.length === 0) return null;
     
-    // Look through AI messages for titles
-    const titlePattern = /#\s*["']?([^"'\n#]+)["']?(?:\s*-\s*A MURDER MYSTERY)?/i;
-    const alternativeTitlePattern = /title:\s*["']?([^"'\n]+)["']?/i;
+    // Only look at AI messages
+    const aiMessages = messages.filter(msg => msg.role === 'assistant' || msg.is_ai);
+    if (aiMessages.length === 0) return null;
     
-    for (const message of messages) {
-      if (message.role === 'assistant' || message.is_ai) {
-        const content = message.content || '';
-        
-        // Try to find title in markdown format
-        const titleMatch = content.match(titlePattern);
-        if (titleMatch && titleMatch[1]) {
-          return formatTitle(titleMatch[1]);
-        }
-        
-        // Try alternative format
-        const altMatch = content.match(alternativeTitlePattern);
-        if (altMatch && altMatch[1]) {
-          return formatTitle(altMatch[1]);
+    // Patterns to match proper title formats (ignoring "Questions" or clarification titles)
+    // Match titles in quotes that are in all caps
+    const titlePatterns = [
+      // Title in quotes, all caps, possibly followed by "- A MURDER MYSTERY"
+      /"([^"]+)"\s*(?:-\s*A\s+MURDER\s+MYSTERY)?/i,
+      
+      // Title with # prefix, in quotes 
+      /#\s*["']([^"']+)["']/i,
+      
+      // Title with # prefix without quotes
+      /#\s*([A-Z][A-Z\s]+[A-Z])/,
+      
+      // Title specified with "title:" format
+      /title:\s*["']?([^"'\n]+)["']?/i,
+    ];
+    
+    // Check each AI message for a title pattern match
+    for (const message of aiMessages) {
+      const content = message.content || '';
+      
+      // Skip messages that appear to be clarification questions
+      if (content.includes("# Questions") || 
+          content.includes("## Questions") || 
+          content.toLowerCase().includes("clarification")) {
+        continue;
+      }
+      
+      // Try each pattern
+      for (const pattern of titlePatterns) {
+        const match = content.match(pattern);
+        if (match && match[1]) {
+          return formatTitle(match[1]);
         }
       }
     }
@@ -58,9 +76,16 @@ const MysteryCreation = () => {
   };
   
   const formatTitle = (title: string) => {
+    // Remove excess quotes if present
+    let cleanTitle = title.trim().replace(/^["']|["']$/g, '');
+    
+    // Convert from all caps if necessary
+    if (cleanTitle === cleanTitle.toUpperCase() && cleanTitle.length > 3) {
+      cleanTitle = cleanTitle.toLowerCase();
+    }
+    
     // Convert to title case (first letter of each word capitalized)
-    return title
-      .trim()
+    return cleanTitle
       .split(' ')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(' ');
@@ -220,6 +245,7 @@ const MysteryCreation = () => {
     if (conversationId) {
       const aiTitle = extractTitleFromMessages(messages);
       if (aiTitle) {
+        console.log("Found AI title:", aiTitle);
         await supabase
           .from("conversations")
           .update({

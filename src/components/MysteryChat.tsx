@@ -8,6 +8,7 @@ import { getAIResponse } from "@/services/aiService";
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import { Message } from "@/components/types";
+import { Loader2 } from "lucide-react";
 
 interface MysteryChatProps {
     initialTheme?: string;
@@ -18,6 +19,7 @@ interface MysteryChatProps {
     initialScriptType?: "full" | "pointForm";
     initialAdditionalDetails?: string;
     initialMessages?: Message[];
+    isLoadingHistory?: boolean;
 }
 
 const MysteryChat = ({
@@ -28,7 +30,8 @@ const MysteryChat = ({
     initialHasAccomplice,
     initialScriptType,
     initialAdditionalDetails,
-    initialMessages = []
+    initialMessages = [],
+    isLoadingHistory = false
 }: MysteryChatProps) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
@@ -59,7 +62,8 @@ const MysteryChat = ({
     // Handle creating initial prompt if no messages exist
     useEffect(() => {
         // Skip if we already have messages or already sent initial message
-        if ((messages.length > 0 || initialMessageSent) || messagesInitialized.current) {
+        // Also skip if still loading history
+        if ((messages.length > 0 || initialMessageSent) || messagesInitialized.current || isLoadingHistory) {
             console.log("Skipping initial message creation");
             return;
         }
@@ -96,12 +100,12 @@ const MysteryChat = ({
             setInitialMessageSent(true);
             messagesInitialized.current = true;
             
-            // Don't send AI response if there was already an AI response as the last message
-            if (!aiHasRespondedRef.current) {
+            // Only send AI response if there was no prior conversation
+            if (!aiHasRespondedRef.current && initialMessages.length === 0) {
                 handleAIResponse(initialMessage.content);
             }
         }
-    }, [initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails, messages.length, initialMessageSent]);
+    }, [initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails, messages.length, initialMessageSent, isLoadingHistory, initialMessages.length]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -194,7 +198,12 @@ const MysteryChat = ({
     return (
         <div className="flex flex-col h-full">
             <div className="flex-1 overflow-y-auto mb-4 space-y-4 p-4 border rounded-lg bg-background/50 min-h-[400px] max-h-[500px]">
-                {messages.length === 0 ? (
+                {isLoadingHistory ? (
+                    <div className="flex flex-col items-center justify-center h-full">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        <p className="mt-2 text-muted-foreground">Loading conversation history...</p>
+                    </div>
+                ) : messages.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
                         <p>Start creating your murder mystery by sending your first message.</p>
                     </div>
@@ -248,9 +257,9 @@ const MysteryChat = ({
                     onKeyDown={handleKeyDown}
                     placeholder="Type your message here..."
                     className="flex-1 min-h-[80px]"
-                    disabled={loading}
+                    disabled={loading || isLoadingHistory}
                 />
-                <Button type="submit" disabled={loading || !input.trim()}>
+                <Button type="submit" disabled={loading || isLoadingHistory || !input.trim()}>
                     {loading ? "Thinking..." : "Send"}
                 </Button>
             </form>
