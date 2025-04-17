@@ -1,11 +1,10 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { getAIResponse } from "@/services/aiService";
-import ReactMarkdown from 'react-markdown';  // Import ReactMarkdown
+import ReactMarkdown from 'react-markdown';
 import { Message } from "@/components/types";
 
 interface MysteryChatProps {
@@ -107,7 +106,6 @@ const MysteryChat = ({
                 content: m.content,
             }));
 
-            // Add the new user message to the array
             anthropicMessages.push({
                 role: "user",
                 content: userMessage,
@@ -159,7 +157,7 @@ const MysteryChat = ({
                                 <div className="prose prose-sm dark:prose-invert max-w-none">
                                     {message.content && typeof message.content === 'string' ? (
                                         <ReactMarkdown>
-                                                {console.log(message.content)}{message.content}
+                                            {message.content}
                                         </ReactMarkdown>
                                     ) : (
                                         <p>Unable to display message</p>
