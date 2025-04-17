@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -60,7 +59,9 @@ const MysteryChat = ({
             return;
         }
 
-        if (initialTheme) {
+        // Critical fix: Only send an initial message if there are no existing messages
+        // and we haven't sent one already
+        if (initialTheme && messages.length === 0 && !initialMessageSent) {
             console.log("Creating initial message with theme:", initialTheme);
             let initialChatMessage = `Let's create a murder mystery`;
             if (initialTheme) {

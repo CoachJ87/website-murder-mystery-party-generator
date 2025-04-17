@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -55,9 +56,10 @@ const MysteryDashboard = () => {
       setLoading(true);
       if (!user?.id) return;
 
+      // Updated query to include messages for title extraction
       const { data, error } = await supabase
         .from("conversations")
-        .select("id, title, created_at, updated_at, mystery_data")
+        .select("id, title, created_at, updated_at, mystery_data, messages(content, role)")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
@@ -71,7 +73,38 @@ const MysteryDashboard = () => {
       const formattedMysteries: Mystery[] = data.map((item: any) => {
         const mysteryData = item.mystery_data || {};
         const theme = mysteryData.theme || 'Unknown';
-        const title = item.title || `${theme} Mystery`;
+        
+        // Extract title from conversation messages if they exist
+        let title = item.title || '';
+        
+        // If there are messages, try to extract a title from AI responses
+        if (item.messages && item.messages.length > 0) {
+          // Look for AI messages that might contain a title
+          const aiMessages = item.messages.filter((msg: any) => msg.role === 'assistant');
+          
+          for (const msg of aiMessages) {
+            if (msg.content) {
+              // Look for a title pattern in the message (e.g., # "Title", ## Title, etc.)
+              const titleMatch = msg.content.match(/(?:^|\n)(?:#+\s*["']?|["']\*\*)([^"'\n#]+)(?:["']?\*\*|["'])/);
+              if (titleMatch && titleMatch[1]) {
+                title = titleMatch[1].trim();
+                break;
+              }
+              
+              // Try to find a title with quotes around it
+              const quotedTitleMatch = msg.content.match(/["']([^"']+)["']\s*-\s*A/);
+              if (quotedTitleMatch && quotedTitleMatch[1]) {
+                title = quotedTitleMatch[1].trim();
+                break;
+              }
+            }
+          }
+        }
+        
+        // If no title found in messages, use format [Theme] Mystery
+        if (!title) {
+          title = `${theme} Mystery`;
+        }
         
         return {
           id: item.id,
@@ -378,12 +411,8 @@ const MysteryDashboard = () => {
               onClose={() => setShowSignInPrompt(false)} 
             />
           )}
-
-          <div className="mt-8 text-center">
-            <Button variant="secondary" onClick={() => navigate("/mystery/view/sample")}>
-              Generate Sample Mystery
-            </Button>
-          </div>
+          
+          {/* Removed the "Generate Sample Mystery" button */}
         </div>
       </main>
 

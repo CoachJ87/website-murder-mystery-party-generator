@@ -6,6 +6,7 @@ export interface MysteryData {
   hasAccomplice?: boolean;
   scriptType?: 'full' | 'summary';
   additionalDetails?: string;
+  status?: 'draft' | 'published' | 'archived';
   [key: string]: any;  // Allow for additional properties
 }
 
@@ -20,4 +21,24 @@ export interface Conversation {
   is_paid?: boolean;
   mystery_id?: string;
   prompt_version?: string;
+  messages?: Message[];
+}
+
+export interface Message {
+  id: string;
+  conversation_id?: string;
+  content: string;
+  role: "user" | "assistant";
+  created_at?: string;
+}
+
+export interface Mystery {
+  id: string;
+  title: string;
+  created_at: string;
+  updated_at: string;
+  status: "draft" | "published" | "archived";
+  theme?: string;
+  guests?: number;
+  is_purchased?: boolean;
 }
