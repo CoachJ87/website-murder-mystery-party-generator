@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -34,10 +33,8 @@ const AccountSettings = () => {
 
   const handleDeleteAccount = async () => {
     try {
-      // Using explicit type annotation for the RPC call with proper generics
-      // The first type parameter is for the input params, the second is for the return type
-      const { error } = await supabase.rpc<Record<string, never>, any>('delete_user_account' as RpcFunction, {}, {
-        // Explicitly provide the type for the RPC function return
+      // Fixed: use a simpler approach without generics to avoid TypeScript constraints
+      const { error } = await supabase.rpc('delete_user_account', {}, {
         count: 'exact'
       });
       
