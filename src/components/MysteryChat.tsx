@@ -30,38 +30,41 @@ const MysteryChat = ({
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const [initialMessageSent, setInitialMessageSent] = useState(false); // Track initial message
 
     useEffect(() => {
-        console.log("initialHasAccomplice in Chat:", initialHasAccomplice); // Keep this log
+        console.log("initialHasAccomplice in Chat:", initialHasAccomplice);
 
-        let initialChatMessage = `Let's create a murder mystery`;
-        if (initialTheme) {
-            initialChatMessage += ` with a ${initialTheme} theme`;
-        }
-        if (initialPlayerCount) {
-            initialChatMessage += ` for ${initialPlayerCount} players`;
-        }
-        if (initialHasAccomplice !== undefined) {
-            initialChatMessage += initialHasAccomplice ? `, including an accomplice` : `, without an accomplice`;
-        }
-        if (initialScriptType) {
-            initialChatMessage += ` with ${initialScriptType} scripts`;
-        }
-        if (initialAdditionalDetails) {
-            initialChatMessage += `. Additional details: ${initialAdditionalDetails}`;
-        }
-        initialChatMessage += ".";
+        if (initialTheme && !initialMessageSent) { // Only run if initial message not sent
+            let initialChatMessage = `Let's create a murder mystery`;
+            if (initialTheme) {
+                initialChatMessage += ` with a ${initialTheme} theme`;
+            }
+            if (initialPlayerCount) {
+                initialChatMessage += ` for ${initialPlayerCount} players`;
+            }
+            if (initialHasAccomplice !== undefined) {
+                initialChatMessage += initialHasAccomplice ? `, including an accomplice` : `, without an accomplice`;
+            }
+            if (initialScriptType) {
+                initialChatMessage += ` with ${initialScriptType} scripts`;
+            }
+            if (initialAdditionalDetails) {
+                initialChatMessage += `. Additional details: ${initialAdditionalDetails}`;
+            }
+            initialChatMessage += ".";
 
-        const initialMessage: Message = {
-            id: Date.now().toString(),
-            content: initialChatMessage,
-            is_ai: false,
-            timestamp: new Date(),
-        };
-        setMessages([initialMessage]);
-        handleAIResponse(initialMessage.content);
-
-    }, [initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails]);
+            const initialMessage: Message = {
+                id: Date.now().toString(),
+                content: initialChatMessage,
+                is_ai: false,
+                timestamp: new Date(),
+            };
+            setMessages([initialMessage]);
+            setInitialMessageSent(true); // Set the flag
+            handleAIResponse(initialMessage.content);
+        }
+    }, [initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails, initialMessageSent]); // Add initialMessageSent to dependencies
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
