@@ -110,16 +110,18 @@ const MysteryPreview = () => {
         }
       }
 
-      setMystery({
+      const mysteryData = {
         ...data,
         theme,
         title: title || data.title || `${theme || "Mystery"} Adventure`,
         premise,
         mystery_data: {
-          ...data.mystery_data,
-          playerCount: playerCount
+          ...(data.mystery_data || {}),
+          playerCount: playerCount || 0
         }
-      });
+      };
+
+      setMystery(mysteryData);
     } catch (error) {
       console.error("Error loading mystery:", error);
       toast.error("Failed to load mystery details");

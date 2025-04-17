@@ -22,6 +22,8 @@ export interface Conversation {
   mystery_id?: string;
   prompt_version?: string;
   messages?: any[];
+  theme?: string;
+  premise?: string;
 }
 
 export interface Mystery {
