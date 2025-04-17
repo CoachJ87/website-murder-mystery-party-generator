@@ -32,6 +32,7 @@ const MysteryCreation = () => {
     const handleSave = async (data: FormValues) => {
         try {
             setSaving(true);
+            console.log("formData on save:", data); // Troubleshooting log
 
             await new Promise<void>((resolve) => {
                 setFormData(data);
