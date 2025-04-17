@@ -32,7 +32,11 @@ const AccountSettings = () => {
   const handleDeleteAccount = async () => {
     try {
       // Using explicit type annotation for the RPC call
-      const { error } = await supabase.rpc('delete_user_account');
+      const { error } = await supabase.rpc('delete_user_account', {}, {
+        // Explicitly provide the type for the RPC function return
+        count: 'exact'
+      });
+      
       if (error) throw error;
       
       await signOut();
