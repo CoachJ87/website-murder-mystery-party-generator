@@ -159,7 +159,7 @@ const MysteryChat = ({
                                 <div className="prose prose-sm dark:prose-invert max-w-none">
                                     {message.content && typeof message.content === 'string' ? (
                                         <ReactMarkdown>
-                                            {message.content}
+                                                {console.log(message.content)}{message.content}
                                         </ReactMarkdown>
                                     ) : (
                                         <p>Unable to display message</p>
