@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { getAIResponse } from "@/services/aiService";
 import ReactMarkdown from 'react-markdown';
 import { Message } from "@/components/types";
+import rehypeRaw from 'rehype-raw'; // Import rehype-raw
 
 interface MysteryChatProps {
     initialTheme?: string;
@@ -100,7 +101,7 @@ const MysteryChat = ({
     const handleAIResponse = async (userMessage: string) => {
         try {
             setLoading(true);
-            
+
             const anthropicMessages = messages.map(m => ({
                 role: m.is_ai ? "assistant" : "user",
                 content: m.content,
@@ -146,29 +147,31 @@ const MysteryChat = ({
                         <p>Start creating your murder mystery by sending your first message.</p>
                     </div>
                 ) : (
-                    messages.map((message) => (
-                        <Card
-                            key={message.id}
-                            className={`max-w-[80%] ${message.is_ai ? 'ml-0' : 'ml-auto'} ${
-                                message.is_ai ? 'bg-background' : 'bg-primary text-primary-foreground'
-                            }`}
-                        >
-                            <CardContent className="p-4">
-                                <div className="prose prose-sm dark:prose-invert max-w-none">
-                                    {message.content && typeof message.content === 'string' ? (
-                                        <ReactMarkdown>
-                                            {message.content}
-                                        </ReactMarkdown>
-                                    ) : (
-                                        <p>Unable to display message</p>
-                                    )}
-                                </div>
-                                <div className="text-xs opacity-70 mt-2">
-                                    {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                </div>
-                            </CardContent>
-                        </Card>
-                    ))
+                    messages.map((message) => {
+                        return (
+                            <Card
+                                key={message.id}
+                                className={`max-w-[80%] ${message.is_ai ? 'ml-0' : 'ml-auto'} ${
+                                    message.is_ai ? 'bg-background' : 'bg-primary text-primary-foreground'
+                                }`}
+                            >
+                                <CardContent className="p-4">
+                                    <div className="prose prose-sm dark:prose-invert max-w-none">
+                                        {message.content && typeof message.content === 'string' ? (
+                                            <ReactMarkdown rehypePlugins={[rehypeRaw]}>
+                                                {message.content}
+                                            </ReactMarkdown>
+                                        ) : (
+                                            <p>Unable to display message</p>
+                                        )}
+                                    </div>
+                                    <div className="text-xs opacity-70 mt-2">
+                                        {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        );
+                    })
                 )}
                 <div ref={messagesEndRef} />
             </div>
@@ -191,3 +194,4 @@ const MysteryChat = ({
 };
 
 export default MysteryChat;
+
