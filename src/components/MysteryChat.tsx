@@ -5,14 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { getAIResponse } from "@/services/aiService";
-import ReactMarkdown from 'react-markdown'; 
-
-interface Message {
-  id: string;
-  content: string;
-  is_ai: boolean;
-  timestamp: Date;
-}
+import ReactMarkdown from 'react-markdown';
+import { Message } from "@/components/types";
 
 interface MysteryChatProps {
   initialTheme?: string;
@@ -83,10 +77,12 @@ const MysteryChat = ({ initialTheme = "", savedMysteryId, onSave }: MysteryChatP
         timestamp: new Date()
       }];
 
+      // Fix the mapping to include is_ai property
       const anthropicMessages = updatedMessages.map(m => ({
         role: m.is_ai ? "assistant" : "user",
-        content: m.content
-      }));
+        content: m.content,
+        is_ai: m.is_ai
+      })) as Message[];
 
       console.log("Frontend - anthropicMessages being sent:", JSON.stringify(anthropicMessages, null, 2));
 

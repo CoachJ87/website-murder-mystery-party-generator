@@ -36,6 +36,7 @@ const MysteryDashboard = () => {
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest" | "lastUpdated">("newest");
   const [loading, setLoading] = useState(true);
   const [mysteryToDelete, setMysteryToDelete] = useState<string | null>(null);
+  const [showSignInPrompt, setShowSignInPrompt] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -56,19 +57,18 @@ const MysteryDashboard = () => {
 
       const { data, error } = await supabase
         .from("conversations")
-        .select("id, title, created_at, updated_at, status, mystery_data, is_purchased")
+        .select("id, title, created_at, updated_at, mystery_data, is_purchased")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
 
-      // Format the data to match our Mystery interface
       const formattedMysteries: Mystery[] = data.map((item) => ({
         id: item.id,
         title: item.title || "Untitled Mystery",
         created_at: item.created_at,
         updated_at: item.updated_at || item.created_at,
-        status: item.status || "draft",
+        status: "draft",
         theme: item.mystery_data?.theme,
         guests: item.mystery_data?.numberOfGuests,
         is_purchased: item.is_purchased || false,
@@ -86,7 +86,6 @@ const MysteryDashboard = () => {
   const applyFiltersAndSort = () => {
     let filtered = [...mysteries];
 
-    // Apply search filter
     if (searchTerm) {
       filtered = filtered.filter(
         (mystery) =>
@@ -95,12 +94,10 @@ const MysteryDashboard = () => {
       );
     }
 
-    // Apply status filter
     if (statusFilter !== "all") {
       filtered = filtered.filter((mystery) => mystery.status === statusFilter);
     }
 
-    // Apply sorting
     if (sortOrder === "newest") {
       filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     } else if (sortOrder === "oldest") {
@@ -136,16 +133,6 @@ const MysteryDashboard = () => {
 
   const handleStatusChange = async (id: string, newStatus: "draft" | "published" | "archived") => {
     try {
-      const { error } = await supabase
-        .from("conversations")
-        .update({
-          status: newStatus,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", id);
-
-      if (error) throw error;
-
       setMysteries(
         mysteries.map((mystery) =>
           mystery.id === id
@@ -162,7 +149,6 @@ const MysteryDashboard = () => {
   };
 
   const generateLoremIpsum = () => {
-    // This is a placeholder for generating content for demo purposes
     toast.success("Sample mystery content generated");
     navigate("/mystery/view/sample");
   };
@@ -339,7 +325,10 @@ const MysteryDashboard = () => {
               </Tabs>
             </>
           ) : (
-            <SignInPrompt />
+            <SignInPrompt 
+              isOpen={true} 
+              onClose={() => setShowSignInPrompt(false)} 
+            />
           )}
 
           <div className="mt-8 text-center">

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -25,7 +24,7 @@ const AccountSettings = () => {
   
   useEffect(() => {
     if (user) {
-      setName(user.name || "");
+      setName(typeof user.name === 'string' ? user.name : '');
       setEmail(user.email || "");
     }
   }, [user]);

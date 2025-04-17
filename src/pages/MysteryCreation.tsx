@@ -6,42 +6,38 @@ import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { supabase } from "@/lib/supabase";
-import MysteryForm, { FormValues } from "@/components/MysteryForm"; // Ensure you import FormValues type
+import MysteryForm from "@/components/MysteryForm";
 import MysteryChat from "@/components/MysteryChat";
 import { useAuth } from "@/context/AuthContext";
-import { Message } from "@/components/types"; //Create a types.ts file for export interface Message
+import { Message, FormValues } from "@/components/types";
 
 const MysteryCreation = () => {
   const [saving, setSaving] = useState(false);
   const [showChatUI, setShowChatUI] = useState(false);
-  const [formData, setFormData] = useState<FormValues | null>(null); // Use the correct type
+  const [formData, setFormData] = useState<FormValues | null>(null);
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditing = !!id;
   const { isAuthenticated, user } = useAuth();
 
   useEffect(() => {
-    // Check if we're returning from preview to edit
     if (isEditing) {
       setShowChatUI(true);
     }
   }, [id]);
 
-  const handleSave = async (data: FormValues) => { // Use the correct type
+  const handleSave = async (data: FormValues) => {
     try {
       setSaving(true);
 
-      // Store form data
       await new Promise<void>((resolve) => {
         setFormData(data);
         resolve();
       });
 
-      // If user is authenticated, save to database
       if (isAuthenticated && user) {
         let conversationId = id;
 
-        // If not editing, create a new conversation
         if (!isEditing) {
           const { data: newConversation, error } = await supabase
             .from("conversations")
@@ -60,7 +56,6 @@ const MysteryCreation = () => {
             conversationId = newConversation.id;
           }
         } else {
-          // Update existing conversation
           const { error } = await supabase
             .from("conversations")
             .update({
@@ -76,13 +71,11 @@ const MysteryCreation = () => {
           }
         }
 
-        // Show the chat UI and set ID in URL if we have one
         setShowChatUI(true);
         if (conversationId && conversationId !== id) {
           navigate(`/mystery/edit/${conversationId}`, { replace: true });
         }
       } else {
-        // For non-authenticated users, just show chat UI
         setShowChatUI(true);
       }
 
@@ -96,7 +89,6 @@ const MysteryCreation = () => {
   };
 
   const handleSaveMessages = async (messages: Message[]) => {
-    // Update form data with the latest theme from the chat
     if (messages.length > 0) {
       const latestThemeMessage = messages.find(m => m.content.includes("theme"));
       if (latestThemeMessage) {
@@ -140,7 +132,7 @@ const MysteryCreation = () => {
                   <MysteryChat
                     initialTheme={formData?.theme || ""}
                     savedMysteryId={id}
-                    onSave={handleSaveMessages} // Now using handleSaveMessages
+                    onSave={handleSaveMessages}
                   />
                 </div>
               ) : (
