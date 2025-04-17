@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -11,7 +10,7 @@ import MysteryForm from "@/components/MysteryForm";
 import MysteryChat from "@/components/MysteryChat";
 import { useAuth } from "@/context/AuthContext";
 import { Message, FormValues } from "@/components/types";
-import { Wand2 } from "lucide-react"; // Import the magic wand icon
+import { Wand2 } from "lucide-react";
 
 const MysteryCreation = () => {
   const [saving, setSaving] = useState(false);
@@ -112,8 +111,7 @@ const MysteryCreation = () => {
       }
     }
   };
-  
-  // Handle navigation to preview page
+
   const handleGenerateMystery = () => {
     if (conversationId) {
       navigate(`/mystery/preview/${conversationId}`);
@@ -167,9 +165,11 @@ const MysteryCreation = () => {
                 <Wand2 className="mr-2 h-5 w-5" /> Generate Mystery
               </Button>
             )}
-            <Button variant="outline" onClick={() => navigate("/dashboard")}>
-              Back to Dashboard
-            </Button>
+            {showChatUI ? null : (
+              <Button variant="outline" onClick={() => navigate("/dashboard")}>
+                Back to Dashboard
+              </Button>
+            )}
           </div>
         </div>
       </main>
