@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -34,6 +35,7 @@ const SignUp = () => {
       setIsLoading(true);
       console.log("Attempting signup with:", { email, name });
       
+      // Use signUp without trying to auto-sign-in afterward
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -61,13 +63,12 @@ const SignUp = () => {
 
       console.log("Sign up successful:", data);
       
-      if (data.session) {
-        toast.success("Account created and signed in successfully!");
-        navigate("/dashboard");
-      } else {
-        toast.success("Account created! Please check your email to confirm your account.");
-        navigate("/check-email");
-      }
+      // For Supabase, by default email confirmation is required
+      // Redirect to check email page regardless of session
+      // This prevents the "Email not confirmed" error on auto-login attempts
+      toast.success("Account created! Please check your email to confirm your account.");
+      navigate("/check-email");
+      
     } catch (error: any) {
       console.error("Sign-up catch block:", error);
       toast.error("An unexpected error occurred. Please try again.");
