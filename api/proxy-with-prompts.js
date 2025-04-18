@@ -1,3 +1,4 @@
+
 export const config = {
   runtime: 'edge',
 };
@@ -61,8 +62,19 @@ export default async function handler(req) {
 
     if (!systemPrompt) {
       console.error(`Environment variable for ${promptVersion} prompt is not set.`);
-      return new Response(JSON.stringify({ error: `Environment variable for ${promptVersion} prompt is not set.` }), {
-        status: 500,
+      console.log("Using mock response due to missing system prompt");
+      
+      // Return mock response if system prompt is not available
+      const mockResponse = {
+        choices: [{
+          message: {
+            content: "# \"THE MISSING PROMPT\" - A DEBUGGING MYSTERY\n\n## PREMISE\nIt appears the system prompt is missing, but I can still help you create a murder mystery!\n\n## VICTIM\n**The System Prompt** - Mysteriously disappeared without a trace.\n\n## SUSPECTS\n1. **The Environment Variables** - Known to go missing in deployment\n2. **The Configuration** - Often misunderstood and misconfigured\n3. **The Deployment Process** - Sometimes drops important settings\n\nWhat theme would you like for your murder mystery? I can help you create something fun despite this technical hiccup!"
+          }
+        }]
+      };
+      
+      return new Response(JSON.stringify(mockResponse), {
+        status: 200,
         headers: {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*',
@@ -71,6 +83,7 @@ export default async function handler(req) {
         },
       });
     }
+    
     console.log(`System prompt (first 100 chars): ${systemPrompt.substring(0, 100)}...`);
 
     const useRealAPI = process.env.USE_REAL_API === 'true';
@@ -81,14 +94,11 @@ export default async function handler(req) {
       // Return mock response
       const mockResponse = {
         id: "msg_mock",
-        type: "message",
-        role: "assistant",
-        content: [
-          {
-            type: "text",
-            text: "# \"DEBUGGING MODE\" - A MURDER MYSTERY\n\n## PREMISE\nThis is a debug response to verify the API endpoint is being called correctly.\n\n## VICTIM\n**The API** - Mysteriously not showing any logs or errors.\n\n## CHARACTER LIST (4 PLAYERS)\n1. **The Frontend** - Sends requests but doesn't see proper responses.\n2. **The Backend** - Processes requests but might have issues.\n3. **The Environment Variables** - Might be missing or invalid.\n4. **The Claude API** - The external service that might be rejecting our calls.\n\nWould this murder mystery concept work for your event? You can continue to make edits, and once you're satisfied, press the 'Generate Mystery' button to create a complete game package with detailed character guides, host instructions, and all the game materials you'll need if you choose to purchase the full version!"
+        choices: [{
+          message: {
+            content: "# \"DEBUGGING MODE\" - A MURDER MYSTERY\n\n## PREMISE\nThis is a debug response to verify the API endpoint is being called correctly.\n\n## VICTIM\n**The API** - Mysteriously not showing any logs or errors.\n\n## CHARACTER LIST (4 PLAYERS)\n1. **The Frontend** - Sends requests but doesn't see proper responses.\n2. **The Backend** - Processes requests but might have issues.\n3. **The Environment Variables** - Might be missing or invalid.\n4. **The Claude API** - The external service that might be rejecting our calls.\n\nWould this murder mystery concept work for your event? You can continue to make edits, and once you're satisfied, press the 'Generate Mystery' button to create a complete game package with detailed character guides, host instructions, and all the game materials you'll need if you choose to purchase the full version!"
           }
-        ],
+        }],
         model: "claude-3-7-sonnet-20250219",
         stop_reason: "end_turn",
         usage: {
@@ -102,7 +112,6 @@ export default async function handler(req) {
         status: 200,
         headers: {
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-api-key',
@@ -118,7 +127,7 @@ export default async function handler(req) {
       system: systemPrompt
     };
 
-    console.log("Backend - anthropicRequest.messages:", JSON.stringify(anthropicRequest.messages, null, 2)); // ADD THIS LINE
+    console.log("Backend - anthropicRequest.messages:", JSON.stringify(anthropicRequest.messages, null, 2));
 
     console.log("Calling Anthropic API with request:", JSON.stringify(anthropicRequest));
 
@@ -142,7 +151,6 @@ export default async function handler(req) {
         status: response.status,
         headers: {
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-api-key',
@@ -171,12 +179,11 @@ export default async function handler(req) {
     return new Response(JSON.stringify({
       error: error.message || "Unknown error",
       type: error.name || "Error",
-      content: [
-        {
-          type: "text",
-          text: `Debug error information: ${error.message}`
+      choices: [{
+        message: {
+          content: `There was an error processing your request: ${error.message}. Please try again.`
         }
-      ]
+      }]
     }), {
       status: 500,
       headers: {

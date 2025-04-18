@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -41,17 +40,20 @@ const MysteryChat = ({
     const messagesInitialized = useRef(false);
     const aiHasRespondedRef = useRef(false);
 
-    // Initialize messages from props
     useEffect(() => {
-        console.log("Initial messages provided:", initialMessages.length);
+        console.log("DEBUG: Initializing messages effect", { 
+            initialMessagesLength: initialMessages.length,
+            messagesInitialized: messagesInitialized.current 
+        });
+        
         if (initialMessages.length > 0 && !messagesInitialized.current) {
-            console.log("Setting initial messages:", initialMessages);
+            console.log("DEBUG: Setting initial messages from props");
             setMessages(initialMessages);
             
-            // Check if the last message is from AI to determine if we need to send an initial message
             if (initialMessages.length > 0) {
                 const lastMessage = initialMessages[initialMessages.length - 1];
                 aiHasRespondedRef.current = lastMessage.is_ai;
+                console.log("DEBUG: Last message is from AI:", lastMessage.is_ai);
             }
             
             setInitialMessageSent(true);
@@ -59,17 +61,22 @@ const MysteryChat = ({
         }
     }, [initialMessages]);
 
-    // Handle creating initial prompt if no messages exist
     useEffect(() => {
-        // Skip if we already have messages or already sent initial message
-        // Also skip if still loading history
+        console.log("DEBUG: Initial prompt creation effect", {
+            messagesLength: messages.length,
+            initialMessageSent,
+            messagesInitialized: messagesInitialized.current,
+            isLoadingHistory,
+            theme: initialTheme
+        });
+        
         if (messages.length > 0 || initialMessageSent || messagesInitialized.current || isLoadingHistory) {
-            console.log("Skipping initial message creation");
+            console.log("DEBUG: Skipping initial message creation - condition failed");
             return;
         }
 
         if (initialTheme) {
-            console.log("Creating initial message with theme:", initialTheme);
+            console.log("DEBUG: Creating initial message with theme:", initialTheme);
             let initialChatMessage = `Let's create a murder mystery`;
             if (initialTheme) {
                 initialChatMessage += ` with a ${initialTheme} theme`;
@@ -95,14 +102,14 @@ const MysteryChat = ({
                 timestamp: new Date(),
             };
             
-            console.log("Setting initial user message:", initialMessage);
+            console.log("DEBUG: Setting initial user message:", initialMessage);
             setMessages([initialMessage]);
             setInitialMessageSent(true);
             messagesInitialized.current = true;
             
-            // Only send AI response if there was no prior conversation or the last message wasn't from AI
             if (!aiHasRespondedRef.current && (!initialMessages.length || 
                 (initialMessages.length > 0 && !initialMessages[initialMessages.length - 1].is_ai))) {
+                console.log("DEBUG: About to call handleAIResponse with initial message");
                 handleAIResponse(initialMessage.content);
             }
         }
@@ -118,6 +125,7 @@ const MysteryChat = ({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        console.log("DEBUG: handleSubmit called with input:", input);
         if (!input.trim()) return;
 
         const userMessage: Message = {
@@ -127,15 +135,17 @@ const MysteryChat = ({
             timestamp: new Date(),
         };
 
+        console.log("DEBUG: Creating user message:", userMessage);
         const updatedMessages = [...messages, userMessage];
         setMessages(updatedMessages);
         setInput("");
         
-        // Save user message immediately
         if (onSave) {
+            console.log("DEBUG: Calling onSave with updated messages");
             onSave(updatedMessages);
         }
         
+        console.log("DEBUG: About to call handleAIResponse from handleSubmit");
         await handleAIResponse(userMessage.content);
     };
 
@@ -147,27 +157,28 @@ const MysteryChat = ({
     };
 
     const handleAIResponse = async (userMessage: string) => {
+        console.log("DEBUG: handleAIResponse called with:", userMessage);
         try {
             setLoading(true);
             
-            // Build complete conversation history for context
             const anthropicMessages = messages.map(m => ({
                 role: m.is_ai ? "assistant" : "user",
                 content: m.content,
             }));
 
-            // Add the current user message to the context
             anthropicMessages.push({
                 role: "user",
                 content: userMessage,
             });
 
-            console.log("Frontend - anthropicMessages being sent:", JSON.stringify(anthropicMessages, null, 2));
+            console.log("DEBUG: anthropicMessages being sent:", JSON.stringify(anthropicMessages, null, 2));
 
             const response = await getAIResponse(
                 anthropicMessages,
                 'free'
             );
+            
+            console.log("DEBUG: Received AI response:", response ? response.substring(0, 50) + "..." : "null");
 
             const aiMessage: Message = {
                 id: Date.now().toString(),
@@ -181,9 +192,8 @@ const MysteryChat = ({
             setMessages(prev => {
                 const updatedMessages = [...prev, aiMessage];
                 
-                // Call onSave with the updated messages
                 if (onSave) {
-                    console.log("Calling onSave with updated messages:", updatedMessages.length);
+                    console.log("DEBUG: Calling onSave with AI message added");
                     onSave(updatedMessages);
                 }
                 
@@ -191,7 +201,7 @@ const MysteryChat = ({
             });
 
         } catch (error) {
-            console.error("Error getting AI response:", error);
+            console.error("DEBUG: Error getting AI response:", error);
             toast.error("Failed to get AI response. Please try again.");
         } finally {
             setLoading(false);

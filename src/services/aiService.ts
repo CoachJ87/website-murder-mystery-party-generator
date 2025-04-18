@@ -1,3 +1,4 @@
+
 // src/services/aiService.ts
 
 // Interface for messages sent to the API
@@ -15,8 +16,8 @@ interface Message {
 
 export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVersion: 'free' | 'paid'): Promise<string> => {
   try {
-    console.log(`Starting getAIResponse with ${messages.length} messages`);
-    console.log(`Prompt version: ${promptVersion}`);
+    console.log(`DEBUG: Starting getAIResponse with ${messages.length} messages`);
+    console.log(`DEBUG: Prompt version: ${promptVersion}`);
 
     // Add an instruction about Markdown formatting
     const enhancedMessages = [...messages];
@@ -43,6 +44,7 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
 
     // Your Vercel deployed URL - ensure this is correct
     const apiUrl = 'https://website-murder-mystery-party-generator.vercel.app/api/proxy-with-prompts';
+    console.log(`DEBUG: Using API URL: ${apiUrl}`);
 
     // Prepare the request - ensure messages are in the correct format
     const requestBody = {
@@ -64,9 +66,9 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
       promptVersion: promptVersion
     };
 
-    console.log(`Prepared request with ${requestBody.messages.length} messages`);
-    console.log(`Calling API at ${apiUrl}`);
-    console.log("Request Body:", JSON.stringify(requestBody)); // Log the request body
+    console.log(`DEBUG: Prepared request with ${requestBody.messages.length} messages`);
+    console.log(`DEBUG: Calling API at ${apiUrl}`);
+    console.log("DEBUG: Request Body:", JSON.stringify(requestBody)); // Log the request body
 
     // Make the API request with a longer timeout
     const controller = new AbortController();
@@ -85,55 +87,52 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
 
       clearTimeout(timeoutId);
 
-      console.log(`API Response Status: ${response.status}`);
+      console.log(`DEBUG: API Response Status: ${response.status}`);
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error(`API Error: ${response.status} - ${errorText}`);
+        console.error(`DEBUG: API Error: ${response.status} - ${errorText}`);
         throw new Error(`API returned status ${response.status}: ${errorText}`);
       }
 
       const data = await response.json();
-      console.log("API Response Data:", JSON.stringify(data));
+      console.log("DEBUG: API Response Data:", JSON.stringify(data));
 
       // **ADJUST THIS SECTION BASED ON YOUR ACTUAL ANTHROPIC RESPONSE STRUCTURE**
       let aiResponse = "";
 
       // **CHECK IF THE RESPONSE HAS 'choices' AND THE MESSAGE CONTENT IS HERE**
       if (data && data.choices && data.choices.length > 0 && data.choices[0].message && data.choices[0].message.content) {
-        console.log("Successfully extracted AI response content (Anthropic 'messages' format)");
+        console.log("DEBUG: Successfully extracted AI response content (Anthropic 'messages' format)");
         aiResponse = data.choices[0].message.content;
       }
       // **IF NOT, CHECK IF THE CONTENT IS DIRECTLY IN 'content' AS AN ARRAY OF TEXT OBJECTS (OLDER FORMAT)**
       else if (data && data.content && data.content.length > 0 && data.content[0].type === 'text') {
-        console.log("Successfully extracted (older format) AI response content");
+        console.log("DEBUG: Successfully extracted (older format) AI response content");
         aiResponse = data.content[0].text;
       }
       // **ADD MORE 'else if' CHECKS HERE IF THE RESPONSE HAS A DIFFERENT STRUCTURE**
-      // **FOR EXAMPLE, IF THE AI TEXT IS IN A FIELD LIKE 'result' or 'output':**
-      // else if (data && data.result) {
-      //   aiResponse = data.result;
-      // }
-
       else {
-        console.error("Invalid API response format");
-        console.error("Response Data:", JSON.stringify(data));
+        console.error("DEBUG: Invalid API response format");
+        console.error("DEBUG: Response Data:", JSON.stringify(data));
         throw new Error("Invalid response format from API");
       }
 
       // Make sure headings are properly formatted
       aiResponse = aiResponse.replace(/^(VICTIM|SUSPECTS|CLUES|SOLUTION):/gm, "## $1:");
-
+      
+      console.log("DEBUG: Returning formatted AI response");
       return aiResponse;
 
     } catch (error) {
+      console.error(`DEBUG: Fetch error in getAIResponse: ${error.message}`);
       if (error.name === 'AbortError') {
         throw new Error('Request timed out. Please try again.');
       }
       throw error;
     }
   } catch (error) {
-    console.error(`Error in getAIResponse: ${error.message}`);
+    console.error(`DEBUG: Error in getAIResponse: ${error.message}`);
     if (error.message === 'Failed to fetch') {
       return `There was a network error while connecting to our AI service. Please check your internet connection and try again.`;
     }
