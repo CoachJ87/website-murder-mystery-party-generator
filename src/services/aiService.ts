@@ -24,14 +24,18 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
     const lastMessage = enhancedMessages[enhancedMessages.length - 1];
     
     // Check if the last message is from the user (not AI)
-    if (lastMessage && 
-        ((lastMessage.role === 'user') || 
-        (lastMessage.hasOwnProperty('is_ai') && !lastMessage.is_ai))) {
+    if (lastMessage) {
+      // Safely check whether it's a user message based on available properties
+      const isUserMessage = 
+        ('role' in lastMessage && lastMessage.role === 'user') || 
+        ('is_ai' in lastMessage && lastMessage.is_ai === false);
       
-      enhancedMessages.push({
-        role: "user",
-        content: "Please format your response using Markdown syntax with headings (##, ###), lists (-, 1., 2.), bold (**), italic (*), and other formatting as appropriate to structure the information clearly. Do not use a title at the beginning of your response unless you are presenting a complete murder mystery concept with a title, premise, victim details, and character list."
-      });
+      if (isUserMessage) {
+        enhancedMessages.push({
+          role: "user",
+          content: "Please format your response using Markdown syntax with headings (##, ###), lists (-, 1., 2.), bold (**), italic (*), and other formatting as appropriate to structure the information clearly. Do not use a title at the beginning of your response unless you are presenting a complete murder mystery concept with a title, premise, victim details, and character list."
+        });
+      }
     }
 
     // Your Vercel deployed URL - ensure this is correct
@@ -40,7 +44,7 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
     // Prepare the request - ensure messages are in the correct format
     const requestBody = {
         messages: enhancedMessages.map(msg => ({
-          role: msg.role || (msg.hasOwnProperty('is_ai') ? (msg.is_ai ? "assistant" : "user") : "user"),
+          role: 'role' in msg ? msg.role : ('is_ai' in msg ? (msg.is_ai ? "assistant" : "user") : "user"),
           content: msg.content
         })),
       promptVersion: promptVersion
