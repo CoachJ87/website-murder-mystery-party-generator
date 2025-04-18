@@ -24,6 +24,8 @@ export interface Conversation {
   messages?: any[];
   theme?: string;
   premise?: string;
+  purchase_date?: string;
+  is_purchased?: boolean;
 }
 
 export interface Mystery {
@@ -36,4 +38,5 @@ export interface Mystery {
   guests?: number;
   is_purchased?: boolean;
   ai_title?: string;
+  premise?: string;
 }

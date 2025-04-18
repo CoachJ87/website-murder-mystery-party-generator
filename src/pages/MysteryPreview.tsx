@@ -9,7 +9,7 @@ import Footer from "@/components/Footer";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
-import { Conversation, MysteryData } from "@/interfaces/mystery";
+import { Conversation, MysteryData, Mystery } from "@/interfaces/mystery";
 
 const MysteryPreview = () => {
   const [loading, setLoading] = useState(true);
@@ -143,7 +143,26 @@ const MysteryPreview = () => {
       return;
     }
 
-    navigate(`/mystery/purchase/${id}`);
+    // Skip the purchase page and go directly to Stripe (or simulate purchase in development)
+    try {
+      setPurchasing(true);
+      
+      // In a production environment, this would call a function to create a Stripe checkout session
+      // For now, we'll just simulate the purchase
+      
+      toast.info("Redirecting to payment...");
+      
+      // In production, you would redirect to Stripe here instead of simulating
+      // window.location.href = stripeCheckoutUrl;
+      
+      // For development/demo purposes, simulate the purchase
+      handleSimulatePurchase();
+      
+    } catch (error) {
+      console.error("Error initiating purchase:", error);
+      toast.error("Failed to initiate purchase");
+      setPurchasing(false);
+    }
   };
 
   const handleSimulatePurchase = async () => {
@@ -161,7 +180,8 @@ const MysteryPreview = () => {
         .from("conversations")
         .update({ 
           is_purchased: true,
-          purchase_date: new Date().toISOString()
+          purchase_date: new Date().toISOString(),
+          is_completed: true // Mark as completed so it appears in the purchased mysteries section
         })
         .eq("id", id);
         
@@ -169,7 +189,7 @@ const MysteryPreview = () => {
         throw new Error("Failed to update purchase status");
       }
       
-      // If user has profile table, you could update it too
+      // If user has profile table, update it too
       if (user) {
         const { error: profileError } = await supabase
           .from("profiles")
@@ -184,7 +204,7 @@ const MysteryPreview = () => {
         }
       }
       
-      toast.success("Purchase simulated successfully!");
+      toast.success("Purchase successful!");
       
       // Navigate to the mystery view page
       navigate(`/mystery/${id}`);

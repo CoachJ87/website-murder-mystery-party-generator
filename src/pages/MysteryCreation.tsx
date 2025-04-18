@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -306,7 +305,7 @@ const MysteryCreation = () => {
                 onClick={handleGenerateMystery}
                 className="bg-[#F97316] hover:bg-[#FB923C] text-white font-semibold"
               >
-                <Wand2 className="mr-2 h-5 w-5" /> Generate Mystery
+                <Wand2 className="mr-2 h-5 w-5" /> Finalize Mystery
               </Button>
             )}
             {showChatUI ? null : (

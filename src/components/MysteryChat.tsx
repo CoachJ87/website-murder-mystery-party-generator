@@ -156,6 +156,7 @@ const MysteryChat = ({
                 content: m.content,
             }));
 
+            // Add the current user message to the context
             anthropicMessages.push({
                 role: "user",
                 content: userMessage,
@@ -164,7 +165,7 @@ const MysteryChat = ({
             console.log("Frontend - anthropicMessages being sent:", JSON.stringify(anthropicMessages, null, 2));
 
             const response = await getAIResponse(
-                anthropicMessages as any,
+                anthropicMessages,
                 'free'
             );
 
