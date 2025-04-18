@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -35,12 +34,11 @@ const SignUp = () => {
       setIsLoading(true);
       console.log("Attempting signup with:", { email, name });
       
-      // Only do sign up, don't try to sign in automatically
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: { name }, // Store name in user metadata
+          data: { name },
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
@@ -48,27 +46,27 @@ const SignUp = () => {
       if (error) {
         console.error("Sign-up error:", error);
         
-        if (error.message.includes("already registered")) {
+        if (error.message.includes('already registered')) {
           toast.error("This email is already registered. Please sign in instead.");
         } else {
-          toast.error(`Failed to create account: ${error.message}`);
+          toast.error(error.message || "Failed to create account");
         }
         return;
       }
       
-      // Check if user was created
-      if (data?.user) {
-        console.log("Sign up successful:", data.user);
-        
-        if (data.session) {
-          // Auto sign-in was successful
-          toast.success("Account created and signed in successfully!");
-          navigate("/dashboard");
-        } else {
-          // Email confirmation is required
-          toast.success("Account created successfully! Please check your email to confirm your account.");
-          navigate("/check-email");
-        }
+      if (!data.user) {
+        toast.error("Failed to create account");
+        return;
+      }
+
+      console.log("Sign up successful:", data);
+      
+      if (data.session) {
+        toast.success("Account created and signed in successfully!");
+        navigate("/dashboard");
+      } else {
+        toast.success("Account created! Please check your email to confirm your account.");
+        navigate("/check-email");
       }
     } catch (error: any) {
       console.error("Sign-up catch block:", error);
