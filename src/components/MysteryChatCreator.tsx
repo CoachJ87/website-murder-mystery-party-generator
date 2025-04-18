@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,7 +12,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Message, FormValues } from "@/components/types";
 import { Wand2 } from "lucide-react";
 
-const MysteryCreation = () => {
+const MysteryChatCreator = () => { // Renamed to MysteryChatCreator
     const [saving, setSaving] = useState(false);
     const [showChatUI, setShowChatUI] = useState(false);
     const [formData, setFormData] = useState<FormValues | null>(null);
@@ -184,4 +184,4 @@ const MysteryCreation = () => {
     );
 };
 
-export default MysteryCreation;
+export default MysteryChatCreator; // Export with the new name
