@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -40,7 +39,7 @@ const MysteryChat = ({
     const [initialMessageSent, setInitialMessageSent] = useState(false);
     const messagesInitialized = useRef(false);
     const aiHasRespondedRef = useRef(false);
-    
+
     console.log("DEBUG: MysteryChat rendering with props:", {
         initialTheme,
         savedMysteryId,
@@ -53,27 +52,27 @@ const MysteryChat = ({
     });
 
     useEffect(() => {
-        console.log("DEBUG: Initializing messages effect", { 
+        console.log("DEBUG: Initializing messages effect", {
             initialMessagesLength: initialMessages.length,
             messagesInitialized: messagesInitialized.current,
             currentMessagesLength: messages.length
         });
-        
+
         if (initialMessages.length > 0 && !messagesInitialized.current) {
             console.log("DEBUG: Setting initial messages from props");
             console.log("DEBUG: Initial messages content:", initialMessages.map(m => ({
                 is_ai: m.is_ai,
                 content_preview: m.content.substring(0, 30) + '...'
             })));
-            
+
             setMessages(initialMessages);
-            
+
             if (initialMessages.length > 0) {
                 const lastMessage = initialMessages[initialMessages.length - 1];
                 aiHasRespondedRef.current = !!lastMessage.is_ai;
                 console.log("DEBUG: Last message is from AI:", !!lastMessage.is_ai);
             }
-            
+
             setInitialMessageSent(true);
             messagesInitialized.current = true;
         }
@@ -88,7 +87,7 @@ const MysteryChat = ({
             theme: initialTheme,
             aiHasResponded: aiHasRespondedRef.current
         });
-        
+
         if (messages.length > 0 || initialMessageSent || messagesInitialized.current || isLoadingHistory) {
             console.log("DEBUG: Skipping initial message creation - condition failed");
             return;
@@ -97,38 +96,28 @@ const MysteryChat = ({
         if (initialTheme) {
             console.log("DEBUG: Creating initial message with theme:", initialTheme);
             let initialChatMessage = `Let's create a murder mystery`;
-            if (initialTheme) {
-                initialChatMessage += ` with a ${initialTheme} theme`;
-            }
-            if (initialPlayerCount) {
-                initialChatMessage += ` for ${initialPlayerCount} players`;
-            }
-            if (initialHasAccomplice !== undefined) {
-                initialChatMessage += initialHasAccomplice ? `, including an accomplice` : `, without an accomplice`;
-            }
-            if (initialScriptType) {
-                initialChatMessage += ` with ${initialScriptType} scripts`;
-            }
-            if (initialAdditionalDetails) {
-                initialChatMessage += `. Additional details: ${initialAdditionalDetails}`;
-            }
+            if (initialTheme) initialChatMessage += ` with a ${initialTheme} theme`;
+            if (initialPlayerCount) initialChatMessage += ` for ${initialPlayerCount} players`;
+            if (initialHasAccomplice !== undefined) initialChatMessage += initialHasAccomplice ? `, including an accomplice` : `, without an accomplice`;
+            if (initialScriptType) initialChatMessage += ` with ${initialScriptType} scripts`;
+            if (initialAdditionalDetails) initialChatMessage += `. Additional details: ${initialAdditionalDetails}`;
             initialChatMessage += ".";
 
             console.log("DEBUG: Initial chat message:", initialChatMessage);
-            
+
             const initialMessage: Message = {
                 id: Date.now().toString(),
                 content: initialChatMessage,
                 is_ai: false,
                 timestamp: new Date(),
             };
-            
+
             console.log("DEBUG: Setting initial user message:", initialMessage);
             setMessages([initialMessage]);
             setInitialMessageSent(true);
             messagesInitialized.current = true;
-            
-            if (!aiHasRespondedRef.current && (!initialMessages.length || 
+
+            if (!aiHasRespondedRef.current && (!initialMessages.length ||
                 (initialMessages.length > 0 && !initialMessages[initialMessages.length - 1].is_ai))) {
                 console.log("DEBUG: About to call handleAIResponse with initial message");
                 handleAIResponse(initialMessage.content);
@@ -166,14 +155,15 @@ const MysteryChat = ({
         const updatedMessages = [...messages, userMessage];
         setMessages(updatedMessages);
         setInput("");
-        
+
         if (onSave) {
             console.log("DEBUG: Calling onSave with updated messages");
             onSave(updatedMessages);
         }
-        
+
         console.log("DEBUG: About to call handleAIResponse from handleSubmit");
         await handleAIResponse(userMessage.content);
+        console.log("DEBUG: handleAIResponse call finished in handleSubmit");
     };
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -188,7 +178,7 @@ const MysteryChat = ({
         console.log("DEBUG: handleAIResponse called with:", userMessage);
         try {
             setLoading(true);
-            
+
             const anthropicMessages = messages.map(m => ({
                 role: m.is_ai ? "assistant" : "user",
                 content: m.content,
@@ -206,12 +196,12 @@ const MysteryChat = ({
                     messageCount: anthropicMessages.length,
                     promptVersion: 'free'
                 });
-                
+
                 const response = await getAIResponse(
                     anthropicMessages,
                     'free'
                 );
-                
+
                 console.log("DEBUG: Received AI response:", response ? response.substring(0, 50) + "..." : "null");
 
                 const aiMessage: Message = {
@@ -222,15 +212,15 @@ const MysteryChat = ({
                 };
 
                 aiHasRespondedRef.current = true;
-                
+
                 setMessages(prev => {
                     const updatedMessages = [...prev, aiMessage];
-                    
+
                     if (onSave) {
                         console.log("DEBUG: Calling onSave with AI message added");
                         onSave(updatedMessages);
                     }
-                    
+
                     return updatedMessages;
                 });
             } catch (error) {
@@ -242,18 +232,18 @@ const MysteryChat = ({
                     is_ai: true,
                     timestamp: new Date(),
                 };
-                
+
                 setMessages(prev => {
                     const updatedMessages = [...prev, fallbackMessage];
-                    
+
                     if (onSave) {
                         console.log("DEBUG: Calling onSave with fallback message");
                         onSave(updatedMessages);
                     }
-                    
+
                     return updatedMessages;
                 });
-                
+
                 toast.error("Failed to get AI response. Please try again.");
             }
         } catch (error) {
@@ -262,14 +252,15 @@ const MysteryChat = ({
         } finally {
             setLoading(false);
         }
+        console.log("DEBUG: handleAIResponse finished");
     };
 
     // Verify render tree
     useEffect(() => {
-      console.log("DEBUG: MysteryChat component mounted");
-      return () => {
-        console.log("DEBUG: MysteryChat component unmounted");
-      };
+        console.log("DEBUG: MysteryChat component mounted");
+        return () => {
+            console.log("DEBUG: MysteryChat component unmounted");
+        };
     }, []);
 
     return (
@@ -295,20 +286,20 @@ const MysteryChat = ({
                             <CardContent className="p-4">
                                 <div className={`prose prose-sm ${message.is_ai ? 'prose-stone dark:prose-invert' : 'text-primary-foreground prose-invert'} max-w-none`}>
                                     {message.content && typeof message.content === 'string' ? (
-                                        <ReactMarkdown 
+                                        <ReactMarkdown
                                             rehypePlugins={[rehypeRaw]}
                                             components={{
-                                                h1: ({node, ...props}) => <h1 className="text-xl font-bold my-2" {...props} />,
-                                                h2: ({node, ...props}) => <h2 className="text-lg font-bold my-2" {...props} />,
-                                                h3: ({node, ...props}) => <h3 className="text-md font-bold my-1" {...props} />,
-                                                ul: ({node, ...props}) => <ul className="list-disc ml-4 my-2" {...props} />,
-                                                ol: ({node, ...props}) => <ol className="list-decimal ml-4 my-2" {...props} />,
-                                                li: ({node, ...props}) => <li className="my-1" {...props} />,
-                                                p: ({node, ...props}) => <p className="my-2" {...props} />,
-                                                a: ({node, ...props}) => <a className="text-blue-500 underline" {...props} />,
-                                                em: ({node, ...props}) => <em className="italic" {...props} />,
-                                                strong: ({node, ...props}) => <strong className="font-bold" {...props} />,
-                                                code: ({node, ...props}) => <code className="bg-gray-200 dark:bg-gray-700 px-1 py-0.5 rounded" {...props} />
+                                                h1: ({ node, ...props }) => <h1 className="text-xl font-bold my-2" {...props} />,
+                                                h2: ({ node, ...props }) => <h2 className="text-lg font-bold my-2" {...props} />,
+                                                h3: ({ node, ...props }) => <h3 className="text-md font-bold my-1" {...props} />,
+                                                ul: ({ node, ...props }) => <ul className="list-disc ml-4 my-2" {...props} />,
+                                                ol: ({ node, ...props }) => <ol className="list-decimal ml-4 my-2" {...props} />,
+                                                li: ({ node, ...props }) => <li className="my-1" {...props} />,
+                                                p: ({ node, ...props }) => <p className="my-2" {...props} />,
+                                                a: ({ node, ...props }) => <a className="text-blue-500 underline" {...props} />,
+                                                em: ({ node, ...props }) => <em className="italic" {...props} />,
+                                                strong: ({ node, ...props }) => <strong className="font-bold" {...props} />,
+                                                code: ({ node, ...props }) => <code className="bg-gray-200 dark:bg-gray-700 px-1 py-0.5 rounded" {...props} />
                                             }}
                                         >
                                             {message.content}
@@ -336,8 +327,8 @@ const MysteryChat = ({
                     className="flex-1 min-h-[80px]"
                     disabled={loading || isLoadingHistory}
                 />
-                <Button 
-                    type="submit" 
+                <Button
+                    type="submit"
                     disabled={loading || isLoadingHistory || !input.trim()}
                     onClick={() => console.log("DEBUG: Send button clicked")}
                 >
