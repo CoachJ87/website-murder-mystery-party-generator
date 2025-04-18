@@ -21,14 +21,18 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
 
     // Add an instruction about Markdown formatting
     const enhancedMessages = [...messages];
-    const lastMessage = enhancedMessages[enhancedMessages.length - 1];
     
-    // Check if the last message is from the user (not AI)
-    if (lastMessage) {
-      // Safely check whether it's a user message based on available properties
-      const isUserMessage = 
-        ('role' in lastMessage && lastMessage.role === 'user') || 
-        ('is_ai' in lastMessage && lastMessage.is_ai === false);
+    if (enhancedMessages.length > 0) {
+      const lastMessage = enhancedMessages[enhancedMessages.length - 1];
+      
+      // Only add formatting instruction after user messages
+      let isUserMessage = false;
+      
+      if ('role' in lastMessage && lastMessage.role === 'user') {
+        isUserMessage = true;
+      } else if ('is_ai' in lastMessage && lastMessage.is_ai === false) {
+        isUserMessage = true;
+      }
       
       if (isUserMessage) {
         enhancedMessages.push({
@@ -43,10 +47,21 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
 
     // Prepare the request - ensure messages are in the correct format
     const requestBody = {
-        messages: enhancedMessages.map(msg => ({
-          role: 'role' in msg ? msg.role : ('is_ai' in msg ? (msg.is_ai ? "assistant" : "user") : "user"),
+      messages: enhancedMessages.map(msg => {
+        // Determine the role based on available properties
+        let role = "user"; // Default role
+        
+        if ('role' in msg && msg.role) {
+          role = msg.role;
+        } else if ('is_ai' in msg) {
+          role = msg.is_ai ? "assistant" : "user";
+        }
+        
+        return {
+          role: role,
           content: msg.content
-        })),
+        };
+      }),
       promptVersion: promptVersion
     };
 
