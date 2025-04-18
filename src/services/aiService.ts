@@ -1,5 +1,4 @@
 
-// src/services/aiService.ts
 import { supabase } from "@/lib/supabase";
 
 // Interface for messages sent to the API
@@ -48,7 +47,7 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
       }
     }
 
-    // Try to use the Supabase edge function first
+    // First try using the Supabase Edge Function
     try {
       console.log("DEBUG: Attempting to use mystery-ai Edge Function");
       
@@ -92,7 +91,7 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
       // Fallback to Vercel API if Edge Function fails
       console.log("DEBUG: Falling back to Vercel API proxy");
       
-      // Your Vercel deployed URL
+      // Your Vercel deployed URL - ensure this is the correct absolute URL
       const apiUrl = 'https://website-murder-mystery-party-generator.vercel.app/api/proxy-with-prompts';
       console.log(`DEBUG: Using API URL: ${apiUrl}`);
 

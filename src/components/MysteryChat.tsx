@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -51,6 +52,7 @@ const MysteryChat = ({
         isLoadingHistory
     });
 
+    // Handle initial messages from props
     useEffect(() => {
         console.log("DEBUG: Initializing messages effect", {
             initialMessagesLength: initialMessages.length,
@@ -78,6 +80,7 @@ const MysteryChat = ({
         }
     }, [initialMessages]);
 
+    // Create initial message and trigger AI response
     useEffect(() => {
         console.log("DEBUG: Initial prompt creation effect", {
             messagesLength: messages.length,
@@ -89,11 +92,13 @@ const MysteryChat = ({
             initialMessagesLength: initialMessages.length
         });
 
+        // Skip if we already have messages or are loading history
         if (messages.length > 0 || initialMessageSent || messagesInitialized.current || isLoadingHistory) {
             console.log("DEBUG: Skipping initial message creation - condition failed");
             return;
         }
 
+        // Create initial message if we have a theme
         if (initialTheme && initialMessages.length === 0 && !isLoadingHistory) {
             console.log("DEBUG: Creating initial message with theme:", initialTheme);
             let initialChatMessage = `Let's create a murder mystery`;
@@ -118,6 +123,7 @@ const MysteryChat = ({
             setInitialMessageSent(true);
             messagesInitialized.current = true;
 
+            // Only trigger AI response if we haven't already received one
             if (!aiHasRespondedRef.current) {
                 console.log("DEBUG: About to call handleAIResponse with initial message");
                 handleAIResponse(initialMessage.content);
@@ -137,6 +143,7 @@ const MysteryChat = ({
         }
     }, [initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails, messages.length, initialMessageSent, isLoadingHistory, initialMessages]);
 
+    // Scroll to bottom when messages change
     const scrollToBottom = () => {
         console.log("DEBUG: Scrolling to bottom of messages");
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -146,6 +153,7 @@ const MysteryChat = ({
         scrollToBottom();
     }, [messages]);
 
+    // Handle user message submission
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         console.log("DEBUG: handleSubmit called with input:", input);
@@ -176,6 +184,7 @@ const MysteryChat = ({
         console.log("DEBUG: handleAIResponse call finished in handleSubmit");
     };
 
+    // Handle Enter key to submit form
     const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (event.key === 'Enter' && !event.shiftKey) {
             console.log("DEBUG: Enter key pressed (without shift), submitting form");
@@ -184,11 +193,14 @@ const MysteryChat = ({
         }
     };
 
+    // Get AI response
     const handleAIResponse = async (userMessage: string) => {
         console.log("DEBUG: handleAIResponse called with:", userMessage);
         try {
             setLoading(true);
+            toast.info("AI is thinking...");
 
+            // Format messages for AI API
             const anthropicMessages = messages.map(m => ({
                 role: m.is_ai ? "assistant" : "user",
                 content: m.content,
@@ -199,7 +211,10 @@ const MysteryChat = ({
                 content: userMessage,
             });
 
-            console.log("DEBUG: anthropicMessages being sent:", JSON.stringify(anthropicMessages, null, 2));
+            console.log("DEBUG: anthropicMessages being sent:", JSON.stringify(anthropicMessages.map(m => ({
+                role: m.role,
+                contentPreview: m.content.substring(0, 30) + '...'
+            })), null, 2));
 
             try {
                 console.log("DEBUG: Calling getAIResponse with", {
@@ -213,6 +228,10 @@ const MysteryChat = ({
                 );
 
                 console.log("DEBUG: Received AI response:", response ? response.substring(0, 50) + "..." : "null");
+
+                if (!response || response.includes("There was an error")) {
+                    throw new Error("Failed to get a valid response from AI");
+                }
 
                 const aiMessage: Message = {
                     id: Date.now().toString(),
@@ -233,8 +252,12 @@ const MysteryChat = ({
 
                     return updatedMessages;
                 });
+                
+                toast.success("AI response received!");
             } catch (error) {
                 console.error("DEBUG: Error in getAIResponse:", error);
+                toast.error("Failed to get AI response. Please try again.");
+                
                 // Provide a fallback response when the API call fails
                 const fallbackMessage: Message = {
                     id: Date.now().toString(),
@@ -253,8 +276,6 @@ const MysteryChat = ({
 
                     return updatedMessages;
                 });
-
-                toast.error("Failed to get AI response. Please try again.");
             }
         } catch (error) {
             console.error("DEBUG: Error getting AI response:", error);
@@ -265,7 +286,7 @@ const MysteryChat = ({
         console.log("DEBUG: handleAIResponse finished");
     };
 
-    // Verify render tree
+    // Debug component lifecycle
     useEffect(() => {
         console.log("DEBUG: MysteryChat component mounted");
         return () => {

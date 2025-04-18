@@ -84,6 +84,10 @@ serve(async (req) => {
     }
 
     console.log(`Processing request with ${messages.length} messages and prompt version: ${promptVersion}`);
+    console.log("Message previews:", JSON.stringify(messages.map((m: any) => ({
+      role: m.role,
+      contentPreview: m.content.substring(0, 30) + '...'
+    }))));
 
     // Get the appropriate system prompt based on promptVersion
     const systemPrompt = promptVersion === 'paid' 
@@ -91,7 +95,7 @@ serve(async (req) => {
       : "You are an AI assistant that helps create murder mystery party games. Create an engaging storyline and suggest character ideas, but don't provide complete details as this is a preview.";
 
     // Format messages for Anthropic API
-    const formattedMessages = messages.map(msg => {
+    const formattedMessages = messages.map((msg: any) => {
       // Check if this is from our API structure or direct from the frontend
       if ('is_ai' in msg) {
         return {
@@ -115,7 +119,7 @@ serve(async (req) => {
     });
     
     console.log("Sending request to Anthropic API with formatted messages:", 
-      JSON.stringify(formattedMessages.map(m => ({ role: m.role, contentPreview: m.content.substring(0, 30) + '...' }))));
+      JSON.stringify(formattedMessages.map((m: any) => ({ role: m.role, contentPreview: m.content.substring(0, 30) + '...' }))));
     
     // Call Anthropic API
     try {
@@ -145,6 +149,7 @@ serve(async (req) => {
         id: response.id
       };
 
+      console.log("Returning formatted response");
       return new Response(JSON.stringify(formattedResponse), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
