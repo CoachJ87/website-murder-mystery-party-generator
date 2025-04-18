@@ -20,7 +20,7 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
     console.log("DEBUG: Messages content:", JSON.stringify(messages.map(m => ({
       role: 'role' in m ? m.role : (m.is_ai ? 'assistant' : 'user'),
       content: m.content.substring(0, 50) + (m.content.length > 50 ? '...' : '')
-    }), null, 2));
+    }), null, 2)));
 
     // Add an instruction about Markdown formatting
     const enhancedMessages = [...messages];
