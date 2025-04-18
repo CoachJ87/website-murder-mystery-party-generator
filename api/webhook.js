@@ -1,5 +1,4 @@
 import Stripe from 'stripe';
-import { buffer } from 'node:stream/consumers';
 
 export const config = {
   runtime: 'edge',
@@ -13,13 +12,12 @@ const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 export default async function handler(req) {
   if (req.method === 'POST') {
-    const buf = await buffer(req.body);
-    const sig = req.headers.get('stripe-signature');
-
     let event;
+    const signature = req.headers.get('stripe-signature');
+    const body = await req.text(); // Use req.text() to get the raw body as a string
 
     try {
-      event = stripe.webhooks.constructEvent(buf, sig, webhookSecret);
+      event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
     } catch (err) {
       console.error(`Webhook Error: ${err.message}`);
       return new Response(`Webhook Error: ${err.message}`, {
@@ -32,19 +30,39 @@ export default async function handler(req) {
 
       // Extract mysteryId from metadata
       const mysteryId = session.metadata?.mysteryId;
+      const userId = session.metadata?.userId; // Extract userId as well
 
-      if (mysteryId) {
-        console.log(`Checkout session completed for mystery ID: ${mysteryId}`);
+      if (mysteryId && userId) {
+        console.log(`Checkout session completed for mystery ID: ${mysteryId} and user ID: ${userId}`);
 
         // **TODO: Update your Supabase database here**
-        // 1. Identify the user associated with this purchase (using session.customer?)
-        // 2. Update the 'profiles' table to set has_purchased to true for that user.
-        // 3. Update the 'conversations' table (if applicable) to set is_paid and purchase_date.
+        // 1. Use supabaseAdmin to interact with your database
+        const { error: userUpdateError } = await supabaseAdmin
+          .from('profiles')
+          .update({ has_purchased: true, purchase_date: new Date().toISOString() })
+          .eq('id', userId);
+
+        if (userUpdateError) {
+          console.error('Error updating user profile:', userUpdateError);
+          return new Response('Failed to update user profile', { status: 500 });
+        }
+
+        // Update conversations table if applicable
+        const { error: conversationUpdateError } = await supabaseAdmin
+          .from('conversations')
+          .update({ is_paid: true, purchase_date: new Date().toISOString() })
+          .eq('mystery_id', mysteryId)
+          .eq('user_id', userId); // Assuming you link conversation to user
+
+        if (conversationUpdateError) {
+          console.error('Error updating conversation:', conversationUpdateError);
+          // Decide if this is critical enough to fail the webhook response
+        }
 
         return new Response(null, { status: 200 });
       } else {
-        console.log('No mystery ID found in checkout session metadata.');
-        return new Response('No mystery ID found', { status: 200 });
+        console.log('Missing mystery ID or user ID in checkout session metadata.');
+        return new Response('Missing metadata', { status: 200 });
       }
     } else {
       // Handle other event types if needed
