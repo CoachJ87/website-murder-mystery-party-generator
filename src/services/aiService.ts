@@ -1,4 +1,3 @@
-
 // src/services/aiService.ts
 
 // Interface for messages sent to the API
@@ -21,19 +20,19 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
 
     // Add an instruction about Markdown formatting
     const enhancedMessages = [...messages];
-    
+
     if (enhancedMessages.length > 0) {
       const lastMessage = enhancedMessages[enhancedMessages.length - 1];
-      
+
       // Only add formatting instruction after user messages
       let isUserMessage = false;
-      
+
       if ('role' in lastMessage && lastMessage.role === 'user') {
         isUserMessage = true;
       } else if ('is_ai' in lastMessage && lastMessage.is_ai === false) {
         isUserMessage = true;
       }
-      
+
       if (isUserMessage) {
         enhancedMessages.push({
           role: "user",
@@ -50,13 +49,13 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
       messages: enhancedMessages.map(msg => {
         // Determine the role based on available properties
         let role = "user"; // Default role
-        
+
         if ('role' in msg && msg.role) {
           role = msg.role;
         } else if ('is_ai' in msg) {
           role = msg.is_ai ? "assistant" : "user";
         }
-        
+
         return {
           role: role,
           content: msg.content
@@ -72,7 +71,7 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
     // Make the API request with a longer timeout
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
-    
+
     try {
       // Make the API request
       const response = await fetch(apiUrl, {
@@ -83,9 +82,9 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
         body: JSON.stringify(requestBody),
         signal: controller.signal
       });
-      
+
       clearTimeout(timeoutId);
-      
+
       console.log(`API Response Status: ${response.status}`);
 
       if (!response.ok) {
@@ -97,26 +96,36 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
       const data = await response.json();
       console.log("API Response Data:", JSON.stringify(data));
 
-      // Extract the response content
+      // **ADJUST THIS SECTION BASED ON YOUR ACTUAL ANTHROPIC RESPONSE STRUCTURE**
       let aiResponse = "";
-      
+
+      // **CHECK IF THE RESPONSE HAS 'choices' AND THE MESSAGE CONTENT IS HERE**
       if (data && data.choices && data.choices.length > 0 && data.choices[0].message && data.choices[0].message.content) {
-        console.log("Successfully extracted AI response content");
+        console.log("Successfully extracted AI response content (Anthropic 'messages' format)");
         aiResponse = data.choices[0].message.content;
-      } else if (data && data.content && data.content.length > 0 && data.content[0].type === 'text') {
-          // Fallback for older Claude API response structure
-          console.log("Successfully extracted (older format) AI response content");
-          aiResponse = data.content[0].text;
-      } else {
+      }
+      // **IF NOT, CHECK IF THE CONTENT IS DIRECTLY IN 'content' AS AN ARRAY OF TEXT OBJECTS (OLDER FORMAT)**
+      else if (data && data.content && data.content.length > 0 && data.content[0].type === 'text') {
+        console.log("Successfully extracted (older format) AI response content");
+        aiResponse = data.content[0].text;
+      }
+      // **ADD MORE 'else if' CHECKS HERE IF THE RESPONSE HAS A DIFFERENT STRUCTURE**
+      // **FOR EXAMPLE, IF THE AI TEXT IS IN A FIELD LIKE 'result' or 'output':**
+      // else if (data && data.result) {
+      //   aiResponse = data.result;
+      // }
+
+      else {
         console.error("Invalid API response format");
         console.error("Response Data:", JSON.stringify(data));
         throw new Error("Invalid response format from API");
       }
-      
+
       // Make sure headings are properly formatted
       aiResponse = aiResponse.replace(/^(VICTIM|SUSPECTS|CLUES|SOLUTION):/gm, "## $1:");
-      
+
       return aiResponse;
+
     } catch (error) {
       if (error.name === 'AbortError') {
         throw new Error('Request timed out. Please try again.');
