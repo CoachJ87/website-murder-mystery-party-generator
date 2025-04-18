@@ -18,6 +18,10 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
   try {
     console.log(`DEBUG: Starting getAIResponse with ${messages.length} messages`);
     console.log(`DEBUG: Prompt version: ${promptVersion}`);
+    console.log("DEBUG: Messages content:", JSON.stringify(messages.map(m => ({
+      role: 'role' in m ? m.role : (m.is_ai ? 'assistant' : 'user'),
+      content: m.content.substring(0, 50) + (m.content.length > 50 ? '...' : '')
+    })));
 
     // Add an instruction about Markdown formatting
     const enhancedMessages = [...messages];
@@ -35,6 +39,7 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
       }
 
       if (isUserMessage) {
+        console.log("DEBUG: Adding Markdown formatting instruction after user message");
         enhancedMessages.push({
           role: "user",
           content: "Please format your response using Markdown syntax with headings (##, ###), lists (-, 1., 2.), bold (**), italic (*), and other formatting as appropriate to structure the information clearly. Do not use a title at the beginning of your response unless you are presenting a complete murder mystery concept with a title, premise, victim details, and character list."
@@ -68,14 +73,18 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
 
     console.log(`DEBUG: Prepared request with ${requestBody.messages.length} messages`);
     console.log(`DEBUG: Calling API at ${apiUrl}`);
-    console.log("DEBUG: Request Body:", JSON.stringify(requestBody)); // Log the request body
+    console.log("DEBUG: Request Body:", JSON.stringify(requestBody, null, 2)); // More detailed logging
 
     // Make the API request with a longer timeout
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
+    const timeoutId = setTimeout(() => {
+      console.log("DEBUG: Request timeout reached (60 seconds)");
+      controller.abort();
+    }, 60000); // 60 second timeout
 
     try {
       // Make the API request
+      console.log("DEBUG: Initiating fetch request to API");
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
@@ -86,8 +95,8 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
       });
 
       clearTimeout(timeoutId);
-
       console.log(`DEBUG: API Response Status: ${response.status}`);
+      console.log(`DEBUG: API Response Headers:`, Object.fromEntries(response.headers.entries()));
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -96,7 +105,7 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
       }
 
       const data = await response.json();
-      console.log("DEBUG: API Response Data:", JSON.stringify(data));
+      console.log("DEBUG: API Response Data:", JSON.stringify(data, null, 2));
 
       // **ADJUST THIS SECTION BASED ON YOUR ACTUAL ANTHROPIC RESPONSE STRUCTURE**
       let aiResponse = "";
@@ -114,18 +123,19 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
       // **ADD MORE 'else if' CHECKS HERE IF THE RESPONSE HAS A DIFFERENT STRUCTURE**
       else {
         console.error("DEBUG: Invalid API response format");
-        console.error("DEBUG: Response Data:", JSON.stringify(data));
+        console.error("DEBUG: Response Data:", JSON.stringify(data, null, 2));
         throw new Error("Invalid response format from API");
       }
 
       // Make sure headings are properly formatted
       aiResponse = aiResponse.replace(/^(VICTIM|SUSPECTS|CLUES|SOLUTION):/gm, "## $1:");
       
-      console.log("DEBUG: Returning formatted AI response");
+      console.log(`DEBUG: Returning formatted AI response (first 100 chars): ${aiResponse.substring(0, 100)}...`);
       return aiResponse;
 
     } catch (error) {
       console.error(`DEBUG: Fetch error in getAIResponse: ${error.message}`);
+      console.error(`DEBUG: Error stack: ${error.stack}`);
       if (error.name === 'AbortError') {
         throw new Error('Request timed out. Please try again.');
       }
@@ -133,6 +143,7 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
     }
   } catch (error) {
     console.error(`DEBUG: Error in getAIResponse: ${error.message}`);
+    console.error(`DEBUG: Error stack: ${error.stack}`);
     if (error.message === 'Failed to fetch') {
       return `There was a network error while connecting to our AI service. Please check your internet connection and try again.`;
     }

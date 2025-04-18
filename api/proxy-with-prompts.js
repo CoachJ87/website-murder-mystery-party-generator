@@ -5,6 +5,8 @@ export const config = {
 
 export default async function handler(req) {
   console.log("----- NEW REQUEST TO PROXY-WITH-PROMPTS -----");
+  console.log(`Request method: ${req.method}`);
+  console.log(`Request URL: ${req.url}`);
 
   // Handle OPTIONS request for CORS preflight
   if (req.method === 'OPTIONS') {
@@ -20,10 +22,19 @@ export default async function handler(req) {
     });
   }
 
+  // Only allow POST requests
+  if (req.method !== 'POST') {
+    console.log(`Error: Method ${req.method} not allowed`);
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      },
+    });
+  }
+  
   try {
-    console.log(`Request method: ${req.method}`);
-    console.log(`Request URL: ${req.url}`);
-
     // Try to get the real IP for debugging
     const ip = req.headers.get('x-forwarded-for') || 'unknown';
     console.log(`Request from IP: ${ip}`);
@@ -40,7 +51,7 @@ export default async function handler(req) {
     let rawBody = "";
     try {
       rawBody = await req.text();
-      console.log(`Raw request body (first 200 chars): ${rawBody.substring(0, 200)}...`);
+      console.log(`Raw request body (first 500 chars): ${rawBody.substring(0, 500)}...`);
       requestBody = JSON.parse(rawBody);
       console.log("Successfully parsed request body");
     } catch (error) {
@@ -56,8 +67,10 @@ export default async function handler(req) {
     let systemPrompt;
     if (promptVersion === 'paid') {
       systemPrompt = process.env.MURDER_MYSTERY_PAID_PROMPT;
+      console.log("Using paid prompt");
     } else {
       systemPrompt = process.env.MURDER_MYSTERY_FREE_PROMPT;
+      console.log("Using free prompt");
     }
 
     if (!systemPrompt) {
@@ -73,6 +86,7 @@ export default async function handler(req) {
         }]
       };
       
+      console.log("Returning mock response due to missing system prompt");
       return new Response(JSON.stringify(mockResponse), {
         status: 200,
         headers: {
@@ -84,7 +98,7 @@ export default async function handler(req) {
       });
     }
     
-    console.log(`System prompt (first 100 chars): ${systemPrompt.substring(0, 100)}...`);
+    console.log(`System prompt exists (first 100 chars): ${systemPrompt.substring(0, 100)}...`);
 
     const useRealAPI = process.env.USE_REAL_API === 'true';
     console.log(`USE_REAL_API: ${useRealAPI}`);
@@ -127,9 +141,14 @@ export default async function handler(req) {
       system: systemPrompt
     };
 
-    console.log("Backend - anthropicRequest.messages:", JSON.stringify(anthropicRequest.messages, null, 2));
+    console.log("Backend - anthropicRequest structure:", JSON.stringify({
+      model: anthropicRequest.model,
+      max_tokens: anthropicRequest.max_tokens,
+      message_count: anthropicRequest.messages.length,
+      system_prompt_length: anthropicRequest.system ? anthropicRequest.system.length : 0
+    }));
 
-    console.log("Calling Anthropic API with request:", JSON.stringify(anthropicRequest));
+    console.log("Calling Anthropic API...");
 
     // Call Anthropic API
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -143,11 +162,20 @@ export default async function handler(req) {
     });
 
     console.log(`Anthropic API response status: ${response.status}`);
+    console.log(`Anthropic API response headers:`, Object.fromEntries(response.headers.entries()));
 
     if (!response.ok) {
       const errorText = await response.text();
       console.error(`Anthropic API error: ${response.status} - ${errorText}`);
-      return new Response(JSON.stringify({ error: `Anthropic API error: ${response.status} - ${errorText}` }), {
+      return new Response(JSON.stringify({ 
+        error: `Anthropic API error: ${response.status}`, 
+        details: errorText,
+        choices: [{
+          message: {
+            content: `There was an error processing your request: ${response.status}. Please try again.`
+          }
+        }] 
+      }), {
         status: response.status,
         headers: {
           'Content-Type': 'application/json',
@@ -158,10 +186,17 @@ export default async function handler(req) {
       });
     }
     const data = await response.json();
-    console.log("Anthropic API response data:", JSON.stringify(data));
-
+    console.log("Anthropic API response data (structure):", JSON.stringify({
+      id: data.id,
+      model: data.model,
+      type: data.type,
+      role: data.role,
+      content_length: data.content ? data.content.length : 'unknown',
+      usage: data.usage
+    }));
 
     // Return the response
+    console.log("Successfully returning Anthropic API response");
     return new Response(JSON.stringify(data), {
       status: response.status,
       headers: {

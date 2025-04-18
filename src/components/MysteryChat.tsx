@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -39,21 +40,38 @@ const MysteryChat = ({
     const [initialMessageSent, setInitialMessageSent] = useState(false);
     const messagesInitialized = useRef(false);
     const aiHasRespondedRef = useRef(false);
+    
+    console.log("DEBUG: MysteryChat rendering with props:", {
+        initialTheme,
+        savedMysteryId,
+        initialPlayerCount,
+        initialHasAccomplice,
+        initialScriptType,
+        initialAdditionalDetails,
+        initialMessagesCount: initialMessages.length,
+        isLoadingHistory
+    });
 
     useEffect(() => {
         console.log("DEBUG: Initializing messages effect", { 
             initialMessagesLength: initialMessages.length,
-            messagesInitialized: messagesInitialized.current 
+            messagesInitialized: messagesInitialized.current,
+            currentMessagesLength: messages.length
         });
         
         if (initialMessages.length > 0 && !messagesInitialized.current) {
             console.log("DEBUG: Setting initial messages from props");
+            console.log("DEBUG: Initial messages content:", initialMessages.map(m => ({
+                is_ai: m.is_ai,
+                content_preview: m.content.substring(0, 30) + '...'
+            })));
+            
             setMessages(initialMessages);
             
             if (initialMessages.length > 0) {
                 const lastMessage = initialMessages[initialMessages.length - 1];
-                aiHasRespondedRef.current = lastMessage.is_ai;
-                console.log("DEBUG: Last message is from AI:", lastMessage.is_ai);
+                aiHasRespondedRef.current = !!lastMessage.is_ai;
+                console.log("DEBUG: Last message is from AI:", !!lastMessage.is_ai);
             }
             
             setInitialMessageSent(true);
@@ -67,7 +85,8 @@ const MysteryChat = ({
             initialMessageSent,
             messagesInitialized: messagesInitialized.current,
             isLoadingHistory,
-            theme: initialTheme
+            theme: initialTheme,
+            aiHasResponded: aiHasRespondedRef.current
         });
         
         if (messages.length > 0 || initialMessageSent || messagesInitialized.current || isLoadingHistory) {
@@ -95,6 +114,8 @@ const MysteryChat = ({
             }
             initialChatMessage += ".";
 
+            console.log("DEBUG: Initial chat message:", initialChatMessage);
+            
             const initialMessage: Message = {
                 id: Date.now().toString(),
                 content: initialChatMessage,
@@ -111,11 +132,14 @@ const MysteryChat = ({
                 (initialMessages.length > 0 && !initialMessages[initialMessages.length - 1].is_ai))) {
                 console.log("DEBUG: About to call handleAIResponse with initial message");
                 handleAIResponse(initialMessage.content);
+            } else {
+                console.log("DEBUG: Skipping AI response for initial message - AI has already responded");
             }
         }
     }, [initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails, messages.length, initialMessageSent, isLoadingHistory, initialMessages]);
 
     const scrollToBottom = () => {
+        console.log("DEBUG: Scrolling to bottom of messages");
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
@@ -126,7 +150,10 @@ const MysteryChat = ({
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         console.log("DEBUG: handleSubmit called with input:", input);
-        if (!input.trim()) return;
+        if (!input.trim()) {
+            console.log("DEBUG: Empty input, returning early from handleSubmit");
+            return;
+        }
 
         const userMessage: Message = {
             id: Date.now().toString(),
@@ -151,6 +178,7 @@ const MysteryChat = ({
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (event.key === 'Enter' && !event.shiftKey) {
+            console.log("DEBUG: Enter key pressed (without shift), submitting form");
             event.preventDefault();
             handleSubmit(event as unknown as React.FormEvent);
         }
@@ -173,33 +201,61 @@ const MysteryChat = ({
 
             console.log("DEBUG: anthropicMessages being sent:", JSON.stringify(anthropicMessages, null, 2));
 
-            const response = await getAIResponse(
-                anthropicMessages,
-                'free'
-            );
-            
-            console.log("DEBUG: Received AI response:", response ? response.substring(0, 50) + "..." : "null");
-
-            const aiMessage: Message = {
-                id: Date.now().toString(),
-                content: response,
-                is_ai: true,
-                timestamp: new Date(),
-            };
-
-            aiHasRespondedRef.current = true;
-            
-            setMessages(prev => {
-                const updatedMessages = [...prev, aiMessage];
+            try {
+                console.log("DEBUG: Calling getAIResponse with", {
+                    messageCount: anthropicMessages.length,
+                    promptVersion: 'free'
+                });
                 
-                if (onSave) {
-                    console.log("DEBUG: Calling onSave with AI message added");
-                    onSave(updatedMessages);
-                }
+                const response = await getAIResponse(
+                    anthropicMessages,
+                    'free'
+                );
                 
-                return updatedMessages;
-            });
+                console.log("DEBUG: Received AI response:", response ? response.substring(0, 50) + "..." : "null");
 
+                const aiMessage: Message = {
+                    id: Date.now().toString(),
+                    content: response,
+                    is_ai: true,
+                    timestamp: new Date(),
+                };
+
+                aiHasRespondedRef.current = true;
+                
+                setMessages(prev => {
+                    const updatedMessages = [...prev, aiMessage];
+                    
+                    if (onSave) {
+                        console.log("DEBUG: Calling onSave with AI message added");
+                        onSave(updatedMessages);
+                    }
+                    
+                    return updatedMessages;
+                });
+            } catch (error) {
+                console.error("DEBUG: Error in getAIResponse:", error);
+                // Provide a fallback response when the API call fails
+                const fallbackMessage: Message = {
+                    id: Date.now().toString(),
+                    content: "I'm having trouble connecting to my AI service right now. Please try again in a moment.",
+                    is_ai: true,
+                    timestamp: new Date(),
+                };
+                
+                setMessages(prev => {
+                    const updatedMessages = [...prev, fallbackMessage];
+                    
+                    if (onSave) {
+                        console.log("DEBUG: Calling onSave with fallback message");
+                        onSave(updatedMessages);
+                    }
+                    
+                    return updatedMessages;
+                });
+                
+                toast.error("Failed to get AI response. Please try again.");
+            }
         } catch (error) {
             console.error("DEBUG: Error getting AI response:", error);
             toast.error("Failed to get AI response. Please try again.");
@@ -207,6 +263,14 @@ const MysteryChat = ({
             setLoading(false);
         }
     };
+
+    // Verify render tree
+    useEffect(() => {
+      console.log("DEBUG: MysteryChat component mounted");
+      return () => {
+        console.log("DEBUG: MysteryChat component unmounted");
+      };
+    }, []);
 
     return (
         <div className="flex flex-col h-full">
@@ -272,7 +336,11 @@ const MysteryChat = ({
                     className="flex-1 min-h-[80px]"
                     disabled={loading || isLoadingHistory}
                 />
-                <Button type="submit" disabled={loading || isLoadingHistory || !input.trim()}>
+                <Button 
+                    type="submit" 
+                    disabled={loading || isLoadingHistory || !input.trim()}
+                    onClick={() => console.log("DEBUG: Send button clicked")}
+                >
                     {loading ? "Thinking..." : "Send"}
                 </Button>
             </form>
