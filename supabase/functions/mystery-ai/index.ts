@@ -127,7 +127,8 @@ serve(async (req) => {
         model: "claude-3-opus-20240229",
         system: systemPrompt,
         messages: formattedMessages,
-        max_tokens: 1000,
+        max_tokens: 4000, // Increased token limit for more detailed responses
+        temperature: 0.7, // Slightly increased creativity
       });
       
       console.log("Received response from Anthropic API:", JSON.stringify({

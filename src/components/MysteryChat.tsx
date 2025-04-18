@@ -8,7 +8,7 @@ import { getAIResponse } from "@/services/aiService";
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import { Message } from "@/components/types";
-import { Loader2 } from "lucide-react";
+import { Loader2, AlertCircle, Send } from "lucide-react";
 
 interface MysteryChatProps {
     initialTheme?: string;
@@ -40,6 +40,7 @@ const MysteryChat = ({
     const [initialMessageSent, setInitialMessageSent] = useState(false);
     const messagesInitialized = useRef(false);
     const aiHasRespondedRef = useRef(false);
+    const [error, setError] = useState<string | null>(null);
 
     console.log("DEBUG: MysteryChat rendering with props:", {
         initialTheme,
@@ -77,6 +78,16 @@ const MysteryChat = ({
 
             setInitialMessageSent(true);
             messagesInitialized.current = true;
+            
+            // If the last message is from a user and there's no AI response yet,
+            // automatically trigger the AI response
+            if (initialMessages.length > 0) {
+                const lastMessage = initialMessages[initialMessages.length - 1];
+                if (!lastMessage.is_ai && !aiHasRespondedRef.current) {
+                    console.log("DEBUG: Last message is from user, triggering AI response");
+                    handleAIResponse(lastMessage.content);
+                }
+            }
         }
     }, [initialMessages]);
 
@@ -173,6 +184,7 @@ const MysteryChat = ({
         const updatedMessages = [...messages, userMessage];
         setMessages(updatedMessages);
         setInput("");
+        setError(null); // Clear any previous errors
 
         if (onSave) {
             console.log("DEBUG: Calling onSave with updated messages");
@@ -198,6 +210,7 @@ const MysteryChat = ({
         console.log("DEBUG: handleAIResponse called with:", userMessage);
         try {
             setLoading(true);
+            setError(null);
             toast.info("AI is thinking...");
 
             // Format messages for AI API
@@ -229,8 +242,12 @@ const MysteryChat = ({
 
                 console.log("DEBUG: Received AI response:", response ? response.substring(0, 50) + "..." : "null");
 
-                if (!response || response.includes("There was an error")) {
-                    throw new Error("Failed to get a valid response from AI");
+                if (!response) {
+                    throw new Error("Failed to get a response from AI");
+                }
+                
+                if (response.includes("There was an error")) {
+                    throw new Error(response);
                 }
 
                 const aiMessage: Message = {
@@ -256,6 +273,7 @@ const MysteryChat = ({
                 toast.success("AI response received!");
             } catch (error) {
                 console.error("DEBUG: Error in getAIResponse:", error);
+                setError(error instanceof Error ? error.message : "Unknown error occurred");
                 toast.error("Failed to get AI response. Please try again.");
                 
                 // Provide a fallback response when the API call fails
@@ -279,11 +297,24 @@ const MysteryChat = ({
             }
         } catch (error) {
             console.error("DEBUG: Error getting AI response:", error);
+            setError(error instanceof Error ? error.message : "Unknown error occurred");
             toast.error("Failed to get AI response. Please try again.");
         } finally {
             setLoading(false);
         }
         console.log("DEBUG: handleAIResponse finished");
+    };
+
+    const retryLastMessage = () => {
+        // Find the last user message
+        const lastUserMessageIndex = [...messages].reverse().findIndex(m => !m.is_ai);
+        if (lastUserMessageIndex >= 0) {
+            const lastUserMessage = [...messages].reverse()[lastUserMessageIndex];
+            // Remove messages after this one
+            const messagesUntilLastUser = messages.slice(0, messages.length - lastUserMessageIndex);
+            setMessages(messagesUntilLastUser);
+            handleAIResponse(lastUserMessage.content);
+        }
     };
 
     // Debug component lifecycle
@@ -296,6 +327,24 @@ const MysteryChat = ({
 
     return (
         <div className="flex flex-col h-full">
+            {error && (
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 mb-4 flex items-start gap-3">
+                    <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+                    <div>
+                        <h4 className="text-sm font-medium text-red-800 dark:text-red-300">Error connecting to AI service</h4>
+                        <p className="text-sm text-red-700 dark:text-red-400 mt-1">{error}</p>
+                        <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="mt-2 text-xs" 
+                            onClick={retryLastMessage}
+                        >
+                            Try Again
+                        </Button>
+                    </div>
+                </div>
+            )}
+            
             <div className="flex-1 overflow-y-auto mb-4 space-y-4 p-4 border rounded-lg bg-background/50 min-h-[400px] max-h-[500px]">
                 {isLoadingHistory ? (
                     <div className="flex flex-col items-center justify-center h-full">
@@ -346,6 +395,15 @@ const MysteryChat = ({
                         </Card>
                     ))
                 )}
+                {loading && (
+                    <div className="bg-muted p-3 rounded-lg max-w-[80%] animate-pulse">
+                        <div className="flex space-x-2">
+                            <div className="h-2 w-2 bg-current rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                            <div className="h-2 w-2 bg-current rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                            <div className="h-2 w-2 bg-current rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
+                        </div>
+                    </div>
+                )}
                 <div ref={messagesEndRef} />
             </div>
 
@@ -363,7 +421,15 @@ const MysteryChat = ({
                     disabled={loading || isLoadingHistory || !input.trim()}
                     onClick={() => console.log("DEBUG: Send button clicked")}
                 >
-                    {loading ? "Thinking..." : "Send"}
+                    {loading ? (
+                        <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Thinking...
+                        </>
+                    ) : (
+                        <>
+                            <Send className="h-4 w-4 mr-2" /> Send
+                        </>
+                    )}
                 </Button>
             </form>
         </div>

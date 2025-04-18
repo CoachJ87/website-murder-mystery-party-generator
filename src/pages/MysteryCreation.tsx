@@ -94,11 +94,12 @@ const MysteryCreation = () => {
     const loadExistingConversation = async (conversationId: string) => {
         try {
             console.log("Loading conversation with ID:", conversationId);
+            // Use maybeSingle() instead of single() to avoid errors when no data is found
             const { data, error } = await supabase
                 .from("conversations")
                 .select("*, messages(*)")
                 .eq("id", conversationId)
-                .single();
+                .maybeSingle();
 
             if (error) {
                 console.error("Error loading conversation:", error);
@@ -133,6 +134,9 @@ const MysteryCreation = () => {
                 return [];
             } else {
                 console.log("No conversation data found");
+                // If we're in edit mode but conversation doesn't exist, redirect to create new
+                toast.error("This mystery doesn't exist or was deleted");
+                navigate('/mystery/create', { replace: true });
             }
         } catch (error) {
             console.error("Error:", error);
