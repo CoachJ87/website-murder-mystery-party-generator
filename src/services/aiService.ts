@@ -1,22 +1,35 @@
 
 // src/services/aiService.ts
 
-// Interface for conversation messages
-interface Message {
-  is_ai: boolean;
+// Interface for messages sent to the API
+interface ApiMessage {
+  role: string;
   content: string;
 }
 
-export const getAIResponse = async (messages: Message[], promptVersion: 'free' | 'paid'): Promise<string> => {
+// Local Message interface for compatibility
+interface Message {
+  is_ai?: boolean;
+  content: string;
+  role?: string;
+}
+
+export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVersion: 'free' | 'paid'): Promise<string> => {
   try {
     console.log(`Starting getAIResponse with ${messages.length} messages`);
     console.log(`Prompt version: ${promptVersion}`);
 
     // Add an instruction about Markdown formatting
     const enhancedMessages = [...messages];
-    if (enhancedMessages.length > 0 && enhancedMessages[enhancedMessages.length - 1].is_ai === false) {
+    const lastMessage = enhancedMessages[enhancedMessages.length - 1];
+    
+    // Check if the last message is from the user (not AI)
+    if (lastMessage && 
+        ((lastMessage.role === 'user') || 
+        (lastMessage.hasOwnProperty('is_ai') && !lastMessage.is_ai))) {
+      
       enhancedMessages.push({
-        is_ai: false,
+        role: "user",
         content: "Please format your response using Markdown syntax with headings (##, ###), lists (-, 1., 2.), bold (**), italic (*), and other formatting as appropriate to structure the information clearly. Do not use a title at the beginning of your response unless you are presenting a complete murder mystery concept with a title, premise, victim details, and character list."
       });
     }
@@ -24,10 +37,10 @@ export const getAIResponse = async (messages: Message[], promptVersion: 'free' |
     // Your Vercel deployed URL - ensure this is correct
     const apiUrl = 'https://website-murder-mystery-party-generator.vercel.app/api/proxy-with-prompts';
 
-    // Prepare the request
+    // Prepare the request - ensure messages are in the correct format
     const requestBody = {
         messages: enhancedMessages.map(msg => ({
-          role: msg.is_ai ? "assistant" : "user",
+          role: msg.role || (msg.hasOwnProperty('is_ai') ? (msg.is_ai ? "assistant" : "user") : "user"),
           content: msg.content
         })),
       promptVersion: promptVersion
