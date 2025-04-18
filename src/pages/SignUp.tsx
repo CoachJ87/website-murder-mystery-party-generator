@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -34,11 +35,12 @@ const SignUp = () => {
       setIsLoading(true);
       console.log("Attempting signup with:", { email, name });
       
+      // Only do sign up, don't try to sign in automatically
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: { name },
+          data: { name }, // Store name in user metadata
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
@@ -54,10 +56,19 @@ const SignUp = () => {
         return;
       }
       
+      // Check if user was created
       if (data?.user) {
         console.log("Sign up successful:", data.user);
-        toast.success("Account created successfully! Please check your email to confirm your account.");
-        navigate("/check-email");
+        
+        if (data.session) {
+          // Auto sign-in was successful
+          toast.success("Account created and signed in successfully!");
+          navigate("/dashboard");
+        } else {
+          // Email confirmation is required
+          toast.success("Account created successfully! Please check your email to confirm your account.");
+          navigate("/check-email");
+        }
       }
     } catch (error: any) {
       console.error("Sign-up catch block:", error);
