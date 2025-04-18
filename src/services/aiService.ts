@@ -1,5 +1,6 @@
 
 // src/services/aiService.ts
+import { supabase } from "@/lib/supabase";
 
 // Interface for messages sent to the API
 interface ApiMessage {
@@ -50,7 +51,7 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
     // Try to use the Supabase edge function first
     try {
       console.log("DEBUG: Attempting to use mystery-ai Edge Function");
-      const { data: functionData, error: functionError } = await window.supabase.functions.invoke('mystery-ai', {
+      const { data: functionData, error: functionError } = await supabase.functions.invoke('mystery-ai', {
         body: {
           messages: enhancedMessages,
           promptVersion
