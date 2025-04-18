@@ -11,7 +11,7 @@ import { useState, useEffect, useCallback } from 'react';
     const { id } = useParams();
     const navigate = useNavigate();
     const supabaseClient = useSupabaseClient();
-    const { isLoading: isUserLoading, isAuthenticated } = useUser();
+    const { isLoading: isUserLoading, isAuthenticated, user } = useUser(); // Get the user object
     const [mystery, setMystery] = useState<MysteryPackage | null>(null);
     const [loading, setLoading] = useState(true);
     const [purchasing, setPurchasing] = useState(false);
@@ -63,7 +63,7 @@ import { useState, useEffect, useCallback } from 'react';
     }, [loadMystery]);
 
     const handlePurchase = async () => {
-      if (!isAuthenticated) {
+      if (!isAuthenticated || !user?.id) { // Ensure user is authenticated and has an ID
         toast.error("Please sign in to purchase this mystery");
         navigate("/sign-in");
         return;
@@ -76,7 +76,7 @@ import { useState, useEffect, useCallback } from 'react';
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ mysteryId: id }),
+          body: JSON.stringify({ mysteryId: id, userId: user.id }), // Send the userId
         });
 
         if (!response.ok) {
