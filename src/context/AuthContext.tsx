@@ -3,7 +3,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from "react
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
-import { User } from "@supabase/supabase-js";
+import { User, Session } from "@supabase/supabase-js";
 
 // Define the User type with additional fields
 type AuthUser = User & {
@@ -14,6 +14,7 @@ type AuthUser = User & {
 // Define the context type
 type AuthContextType = {
   user: AuthUser | null;
+  session: Session | null;
   loading: boolean;
   isAuthenticated: boolean;
   isPublic: boolean;
@@ -28,6 +29,7 @@ type AuthContextType = {
 // Create context with default values
 const AuthContext = createContext<AuthContextType>({
   user: null,
+  session: null,
   loading: true,
   isAuthenticated: false,
   isPublic: false,
@@ -42,52 +44,68 @@ const AuthContext = createContext<AuthContextType>({
 // Create provider component
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [isPublic, setIsPublic] = useState(false);
   const navigate = useNavigate();
 
-  // Check if user is authenticated and set up auth state change listener
+  // Improved auth state handling with proper initialization order
   useEffect(() => {
-    const checkUser = async () => {
-      try {
-        // Get initial session
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-          const userData = {
-            ...session.user,
-            name: session.user.user_metadata?.name || session.user.email?.split("@")[0] || "User",
-            avatar: session.user.user_metadata?.avatar_url || null,
-          };
-          setUser(userData);
-        }
-      } catch (error: any) {
-        console.error("Error checking user:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    console.log("Setting up auth state listener");
     
-    // Set up auth state change listener
+    // 1. Set up the auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (session?.user) {
+      (event, currentSession) => {
+        console.log("Auth state changed:", event, currentSession?.user?.id);
+        
+        // Only use synchronous state updates here
+        setSession(currentSession);
+        
+        if (currentSession?.user) {
           const userData = {
-            ...session.user,
-            name: session.user.user_metadata?.name || session.user.email?.split("@")[0] || "User",
-            avatar: session.user.user_metadata?.avatar_url || null,
+            ...currentSession.user,
+            name: currentSession.user.user_metadata?.name || 
+                  currentSession.user.email?.split("@")[0] || 
+                  "User",
+            avatar: currentSession.user.user_metadata?.avatar_url || null,
           };
           setUser(userData);
         } else {
           setUser(null);
         }
+        
         setLoading(false);
       }
     );
     
-    checkUser();
+    // 2. THEN check for existing session
+    const checkSession = async () => {
+      try {
+        console.log("Checking for existing session");
+        const { data: { session: existingSession }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error("Error checking session:", error);
+          return;
+        }
+        
+        if (existingSession?.user) {
+          console.log("Found existing session:", existingSession.user.id);
+        } else {
+          console.log("No existing session found");
+        }
+        
+        // Don't set state here, the onAuthStateChange listener will handle it
+      } catch (error) {
+        console.error("Session check error:", error);
+      }
+    };
+    
+    checkSession();
     
     // Clean up subscription on unmount
     return () => {
+      console.log("Cleaning up auth subscription");
       subscription.unsubscribe();
     };
   }, []);
@@ -98,58 +116,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.log("Attempting to sign in with:", email);
       setLoading(true);
       
-      // Try direct sign in first with the exact email
+      // Sign in directly without workarounds
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       
+      if (error) {
+        console.error("Sign-in error:", error);
+        
+        if (error.message.includes('Invalid login credentials')) {
+          toast.error("The email or password you entered is incorrect. Please try again.");
+        } else if (error.message.includes('Email not confirmed')) {
+          toast.error("Please confirm your email before logging in. Check your inbox.");
+          navigate("/check-email");
+        } else {
+          toast.error(`Failed to sign in: ${error.message}`);
+        }
+        
+        throw error;
+      }
+      
       // If successful, navigate to dashboard
       if (data?.user) {
+        console.log("Sign in successful:", data.user.id);
         toast.success("Signed in successfully!");
         navigate("/dashboard");
-        return;
       }
-      
-      // For test@test.com specifically, try alternate formats if first attempt failed
-      if (email.toLowerCase() === "test@test.com" && error) {
-        console.log("First attempt failed, trying alternate test account format");
-        
-        // Try with test.test@gmail.com (common format we use for test accounts)
-        const { data: altData, error: altError } = await supabase.auth.signInWithPassword({
-          email: "test.test@gmail.com",
-          password,
-        });
-        
-        if (altData?.user) {
-          toast.success("Signed in successfully with test account!");
-          navigate("/dashboard");
-          return;
-        }
-        
-        if (altError) {
-          // If both attempts failed, show a specific message for test accounts
-          console.error("Both login attempts failed:", error, altError);
-          toast.error("Test account login failed. Please contact support.");
-          throw new Error("Test account authentication failed");
-        }
-      }
-      
-      // If we got here with an error from the first attempt, throw it
-      if (error) throw error;
-      
     } catch (error: any) {
-      // More specific error handling
-      if (error.message.includes('Invalid login credentials')) {
-        toast.error("The email or password you entered is incorrect. Please try again.");
-      } else if (error.message.includes('Email not confirmed')) {
-        toast.error("Please confirm your email before logging in. Check your inbox.");
-        navigate("/check-email");
-      } else {
-        toast.error(`Failed to sign in: ${error.message}`);
-      }
-      console.error("Sign-in error:", error);
-      throw error;
+      // Error is already handled above
+      console.error("Sign-in catch block:", error);
     } finally {
       setLoading(false);
     }
@@ -158,6 +154,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Sign up with email and password
   const signUp = async (name: string, email: string, password: string) => {
     try {
+      console.log("Attempting to sign up:", email);
       setLoading(true);
       
       // Validate email format
@@ -166,51 +163,46 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
       
-      // For testing purposes, substitute test emails with random valid emails
-      let finalEmail = email;
-      if (email.includes("test@test") || email.includes("example.com")) {
-        const randomString = Math.random().toString(36).substring(2, 10);
-        finalEmail = `test.${randomString}@gmail.com`;
-      }
-      
-      // Sign up with automatic confirmation for testing
+      // Sign up with user metadata for name
       const { data, error } = await supabase.auth.signUp({
-        email: finalEmail,
+        email,
         password,
         options: {
-          data: {
-            name,
-          },
-          // For automatic sign-in without email verification
-          emailRedirectTo: undefined,
+          data: { name },
+          // For automatic sign-in without email verification (optional)
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
       
-      if (error) throw error;
-      
-      // Auto sign-in after successful sign-up
-      if (data.user) {
-        toast.success("Account created successfully! You're now logged in.");
+      if (error) {
+        console.error("Sign-up error:", error);
         
-        // Automatically sign the user in
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email: finalEmail,
-          password,
-        });
-        
-        if (signInError) {
-          throw signInError;
+        if (error.message.includes("already registered")) {
+          toast.error("This email is already registered. Try signing in instead.");
+        } else {
+          toast.error(`Failed to create account: ${error.message}`);
         }
         
+        throw error;
+      }
+      
+      // If email confirmation is required
+      if (data.user && !data.session) {
+        console.log("Sign up successful, email confirmation required");
+        toast.success("Account created! Please check your email to confirm your account.");
+        navigate("/check-email");
+        return;
+      }
+      
+      // If auto sign-in is enabled
+      if (data.user && data.session) {
+        console.log("Sign up and auto sign-in successful:", data.user.id);
+        toast.success("Account created successfully! You're now logged in.");
         navigate("/dashboard");
       }
     } catch (error: any) {
-      if (error.message.includes("already registered")) {
-        toast.error("This email is already registered. Try signing in instead.");
-      } else {
-        toast.error(`Failed to create account: ${error.message}`);
-      }
-      console.error("Sign-up error:", error);
+      // Error is already handled above
+      console.error("Sign-up catch block:", error);
     } finally {
       setLoading(false);
     }
@@ -219,6 +211,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Sign in with Google
   const signInWithGoogle = async () => {
     try {
+      console.log("Attempting to sign in with Google");
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
@@ -226,12 +220,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         },
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error("Google sign-in error:", error);
+        toast.error(`Failed to sign in with Google: ${error.message}`);
+        throw error;
+      }
       
     } catch (error: any) {
-      toast.error(`Failed to sign in with Google: ${error.message}`);
-      console.error("Google sign-in error:", error);
-      throw error;
+      console.error("Google sign-in catch block:", error);
     }
   };
 
@@ -239,17 +235,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const resetPassword = async (email: string) => {
     try {
       setLoading(true);
+      console.log("Attempting to reset password for:", email);
+      
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/reset-password`,
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error("Password reset error:", error);
+        toast.error(`Failed to reset password: ${error.message}`);
+        throw error;
+      }
       
       toast.success("Password reset instructions sent to your email.");
     } catch (error: any) {
-      toast.error(`Failed to reset password: ${error.message}`);
-      console.error("Password reset error:", error);
-      throw error;
+      // Error is already handled above
+      console.error("Password reset catch block:", error);
     } finally {
       setLoading(false);
     }
@@ -259,14 +260,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signOut = async () => {
     try {
       setLoading(true);
+      console.log("Signing out");
+      
       const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      
+      if (error) {
+        console.error("Sign-out error:", error);
+        toast.error(`Failed to sign out: ${error.message}`);
+        throw error;
+      }
       
       navigate("/");
       toast.success("Signed out successfully.");
     } catch (error: any) {
-      toast.error(`Failed to sign out: ${error.message}`);
-      console.error("Sign-out error:", error);
+      // Error is already handled above
+      console.error("Sign-out catch block:", error);
     } finally {
       setLoading(false);
     }
@@ -275,6 +283,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Provide context value
   const value = {
     user,
+    session,
     loading,
     isAuthenticated: !!user,
     isPublic,

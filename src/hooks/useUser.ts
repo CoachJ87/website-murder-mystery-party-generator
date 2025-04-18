@@ -8,31 +8,37 @@ export const useUser = () => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
+    console.log("useUser: Setting up auth listener");
+    
+    // First set up the listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log("useUser: Auth state changed", session?.user?.id);
+      setIsAuthenticated(!!session?.user);
+      setUser(session?.user || null);
+      setIsLoading(false);
+    });
+
+    // Then check current session
     const checkAuth = async () => {
       try {
-        setIsLoading(true);
-        const { data: { session } } = await supabase.auth.getSession();
-        setIsAuthenticated(!!session?.user);
-        setUser(session?.user || null);
+        console.log("useUser: Checking current session");
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('useUser: Error checking auth session:', error);
+        }
+        
+        // States will be updated by the onAuthStateChange listener
       } catch (error) {
-        console.error('Error checking auth session:', error);
-        setIsAuthenticated(false);
-        setUser(null);
-      } finally {
-        setIsLoading(false);
+        console.error('useUser: Error in checkAuth:', error);
       }
     };
 
     checkAuth();
 
-    // Set up auth state change listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsAuthenticated(!!session?.user);
-      setUser(session?.user || null);
-    });
-
     // Clean up subscription on unmount
     return () => {
+      console.log("useUser: Cleaning up auth subscription");
       subscription?.unsubscribe();
     };
   }, []);
