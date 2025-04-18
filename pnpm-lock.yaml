@@ -95,6 +95,9 @@ importers:
       '@radix-ui/react-tooltip':
         specifier: ^1.1.4
         version: 1.2.0(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@supabase/auth-helpers-react':
+        specifier: ^0.5.0
+        version: 0.5.0(@supabase/supabase-js@2.49.4)
       '@supabase/supabase-js':
         specifier: ^2.49.4
         version: 2.49.4
@@ -1374,6 +1377,12 @@ packages:
     resolution: {integrity: sha512-lpPE1cLfP5oPzVjKMx10pgBmKELQnFJXHgvtHCtuJWOv8MxqdEIMNtgHgBFf7Ea2/7EuVwa9fodWUfXAlXZLZQ==}
     cpu: [x64]
     os: [win32]
+
+  '@supabase/auth-helpers-react@0.5.0':
+    resolution: {integrity: sha512-5QSaV2CGuhDhd7RlQCoviVEAYsP7XnrFMReOcBazDvVmqSIyjKcDwhLhWvnrxMOq5qjOaA44MHo7wXqDiF0puQ==}
+    deprecated: This package is now deprecated - please use the @supabase/ssr package instead.
+    peerDependencies:
+      '@supabase/supabase-js': ^2.39.8
 
   '@supabase/auth-js@2.69.1':
     resolution: {integrity: sha512-FILtt5WjCNzmReeRLq5wRs3iShwmnWgBvxHfqapC/VoljJl+W8hDAyFmf1NVw3zH+ZjZ05AKxiKxVeb0HNWRMQ==}
@@ -4116,6 +4125,10 @@ snapshots:
 
   '@rollup/rollup-win32-x64-msvc@4.40.0':
     optional: true
+
+  '@supabase/auth-helpers-react@0.5.0(@supabase/supabase-js@2.49.4)':
+    dependencies:
+      '@supabase/supabase-js': 2.49.4
 
   '@supabase/auth-js@2.69.1':
     dependencies:
