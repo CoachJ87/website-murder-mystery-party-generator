@@ -85,7 +85,8 @@ const MysteryChat = ({
             messagesInitialized: messagesInitialized.current,
             isLoadingHistory,
             theme: initialTheme,
-            aiHasResponded: aiHasRespondedRef.current
+            aiHasResponded: aiHasRespondedRef.current,
+            initialMessagesLength: initialMessages.length // Added for clarity
         });
 
         if (messages.length > 0 || initialMessageSent || messagesInitialized.current || isLoadingHistory) {
@@ -93,7 +94,7 @@ const MysteryChat = ({
             return;
         }
 
-        if (initialTheme) {
+        if (initialTheme && initialMessages.length === 0) { // Only create if there are no initial messages
             console.log("DEBUG: Creating initial message with theme:", initialTheme);
             let initialChatMessage = `Let's create a murder mystery`;
             if (initialTheme) initialChatMessage += ` with a ${initialTheme} theme`;
@@ -117,13 +118,23 @@ const MysteryChat = ({
             setInitialMessageSent(true);
             messagesInitialized.current = true;
 
-            if (!aiHasRespondedRef.current && (!initialMessages.length ||
-                (initialMessages.length > 0 && !initialMessages[initialMessages.length - 1].is_ai))) {
+            if (!aiHasRespondedRef.current) {
                 console.log("DEBUG: About to call handleAIResponse with initial message");
                 handleAIResponse(initialMessage.content);
             } else {
                 console.log("DEBUG: Skipping AI response for initial message - AI has already responded");
             }
+        } else if (initialMessages.length > 0 && !messagesInitialized.current) {
+            // This part was already handled in the other useEffect, but let's ensure it's consistent
+            console.log("DEBUG: Initial messages were provided, skipping initial prompt creation for theme");
+            setMessages(initialMessages);
+            if (initialMessages.length > 0) {
+                const lastMessage = initialMessages[initialMessages.length - 1];
+                aiHasRespondedRef.current = !!lastMessage.is_ai;
+                console.log("DEBUG: Last message is from AI:", !!lastMessage.is_ai);
+            }
+            setInitialMessageSent(true);
+            messagesInitialized.current = true;
         }
     }, [initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails, messages.length, initialMessageSent, isLoadingHistory, initialMessages]);
 
