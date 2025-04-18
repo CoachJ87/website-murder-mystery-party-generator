@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -24,15 +23,15 @@ export default function MysteryPreview() {
   const [mystery, setMystery] = useState<MysteryPackage | null>(null);
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
-  
+
   const loadMystery = useCallback(async () => {
     if (!id) {
       navigate('/mystery');
       return;
     }
-    
+
     setLoading(true);
-    
+
     try {
       // Check if user has already purchased this mystery
       if (user?.id) {
@@ -50,19 +49,16 @@ export default function MysteryPreview() {
         }
       }
 
-      // Load mystery details
-      const { data: mysteryData, error: mysteryError } = await supabase
-        .from('prompts')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-      if (mysteryError) {
-        console.error('Error loading mystery:', mysteryError);
-        toast.error('Failed to load mystery preview.');
-      } else {
-        setMystery(mysteryData);
+      // Load mystery details - Changed to fetch from Vercel API
+      const response = await fetch(`/api/get-mystery/${id}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        toast.error(`Failed to load mystery preview: ${errorData?.error || 'Unknown error'}`);
+        return;
       }
+      const mysteryData = await response.json();
+      setMystery(mysteryData);
+
     } catch (error) {
       console.error('Error in loadMystery:', error);
       toast.error('An error occurred while loading the mystery.');
@@ -81,22 +77,22 @@ export default function MysteryPreview() {
       navigate("/sign-in");
       return;
     }
-    
+
     setPurchasing(true);
     try {
       // Update the profiles table to mark the mystery as purchased
       const { error } = await supabase
         .from('profiles')
-        .update({ 
+        .update({
           has_purchased: true,
           purchase_date: new Date().toISOString()
         })
         .eq('id', user.id);
-      
+
       if (error) {
         throw error;
       }
-      
+
       toast.success("Purchase simulated successfully!");
       navigate(`/mystery/${id}`);
     } catch (error) {
@@ -163,24 +159,24 @@ export default function MysteryPreview() {
 
   // Extract the premise without cutting it off
   const premise = mystery?.premise || mystery?.content.split('\n\n')[0] || '';
-  
+
   return (
     <div className="container mx-auto py-10">
       <h1 className="text-3xl font-bold mb-4">{mystery?.name}</h1>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <div className="p-4 border rounded-md">
           <h2 className="text-xl font-semibold mb-4">Preview</h2>
-          <p className="font-bold">Theme:</p> 
+          <p className="font-bold">Theme:</p>
           <p className="mb-2">{mystery?.theme || 'Classic Murder Mystery'}</p>
-          
+
           <p className="font-bold">Number of Players:</p>
           <p className="mb-2">{mystery?.num_players || 6}</p>
-          
+
           <p className="font-bold">Premise:</p>
           <p className="whitespace-pre-line">{premise}</p>
         </div>
-        
+
         <div className="p-4 border rounded-md">
           <h2 className="text-xl font-semibold mb-4">What's Included</h2>
           <ul className="list-disc ml-4 space-y-1">
@@ -192,7 +188,7 @@ export default function MysteryPreview() {
             <li>Solution reveal script</li>
             <li>PDF downloads of all materials</li>
           </ul>
-          
+
           <div className="mt-6 p-3 bg-muted/50 rounded">
             <h3 className="font-semibold">Important Notes</h3>
             <ul className="text-sm list-disc ml-4 mt-2 space-y-1">
@@ -204,7 +200,7 @@ export default function MysteryPreview() {
           </div>
         </div>
       </div>
-      
+
       <div className="flex gap-4">
         <Button onClick={handlePurchase} disabled={purchasing} className="flex-1">
           {purchasing ? 'Processing...' : 'Purchase Now for $4.99'}
