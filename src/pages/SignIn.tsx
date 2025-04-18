@@ -1,7 +1,6 @@
 
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,9 +8,9 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { toast } from "sonner";
 import { Mail, Lock, ArrowRight } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 const SignIn = () => {
-  const { signIn, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,11 +27,34 @@ const SignIn = () => {
     
     try {
       setIsLoading(true);
-      await signIn(email, password);
-      // Navigation is handled inside signIn function
-    } catch (error) {
-      console.error(error);
-      // Error is handled in the signIn function
+      console.log("Attempting direct signin with:", email);
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) {
+        console.error("Direct signin error:", error.message);
+        if (error.message.includes('Invalid login credentials')) {
+          toast.error("The email or password you entered is incorrect. Please try again.");
+        } else if (error.message.includes('Email not confirmed')) {
+          toast.error("Please confirm your email before logging in. Check your inbox.");
+          navigate("/check-email");
+        } else {
+          toast.error(`Failed to sign in: ${error.message}`);
+        }
+        return;
+      }
+      
+      if (data?.user) {
+        console.log("Signin successful:", data);
+        toast.success("Signed in successfully!");
+        navigate("/dashboard");
+      }
+    } catch (error: any) {
+      console.error("Signin catch block error:", error);
+      toast.error(`An unexpected error occurred: ${error.message || "Unknown error"}`);
     } finally {
       setIsLoading(false);
     }
@@ -41,11 +63,22 @@ const SignIn = () => {
   const handleGoogleSignIn = async () => {
     try {
       setSocialLoading('google');
-      await signInWithGoogle();
-      // Redirect happens in the signInWithGoogle function
-      // Not setting socialLoading to null here as the page will redirect
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        }
+      });
+      
+      if (error) {
+        console.error("Google sign in error:", error);
+        toast.error(`Failed to sign in with Google: ${error.message}`);
+        setSocialLoading(null);
+      }
+      // Page will redirect if successful
     } catch (error: any) {
-      console.error("Google sign in error:", error);
+      console.error("Google sign in catch block:", error);
+      toast.error(`An unexpected error occurred: ${error.message || "Unknown error"}`);
       setSocialLoading(null);
     }
   };
