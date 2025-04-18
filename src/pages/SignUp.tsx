@@ -1,14 +1,13 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { Mail, User, Lock, ArrowRight } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 const SignUp = () => {
   const [name, setName] = useState("");
@@ -33,22 +32,22 @@ const SignUp = () => {
     
     try {
       setIsLoading(true);
-      console.log("Attempting direct signup with:", email);
+      console.log("Attempting signup with:", { email, name });
       
-      // Direct signup with Supabase client
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: { name },
           emailRedirectTo: `${window.location.origin}/auth/callback`,
-        }
+        },
       });
       
       if (error) {
-        console.error("Direct signup error:", error.message);
+        console.error("Sign-up error:", error);
+        
         if (error.message.includes("already registered")) {
-          toast.error("This email is already registered. Try signing in instead.");
+          toast.error("This email is already registered. Please sign in instead.");
         } else {
           toast.error(`Failed to create account: ${error.message}`);
         }
@@ -56,13 +55,13 @@ const SignUp = () => {
       }
       
       if (data?.user) {
-        console.log("Signup successful:", data);
-        toast.success("Account created successfully! Please check your email for verification.");
+        console.log("Sign up successful:", data.user);
+        toast.success("Account created successfully! Please check your email to confirm your account.");
         navigate("/check-email");
       }
     } catch (error: any) {
-      console.error("Signup catch block error:", error);
-      toast.error(`An unexpected error occurred: ${error.message || "Unknown error"}`);
+      console.error("Sign-up catch block:", error);
+      toast.error("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
