@@ -1,6 +1,6 @@
 
 export interface MysteryData {
-  title?: string; // Making title optional to fix the type error
+  title: string;
   theme?: string;
   playerCount?: number;
   hasAccomplice?: boolean;
@@ -22,10 +22,6 @@ export interface Conversation {
   mystery_id?: string;
   prompt_version?: string;
   messages?: any[];
-  theme?: string;
-  premise?: string;
-  purchase_date?: string;
-  is_purchased?: boolean;
 }
 
 export interface Mystery {
@@ -38,5 +34,4 @@ export interface Mystery {
   guests?: number;
   is_purchased?: boolean;
   ai_title?: string;
-  premise?: string;
 }

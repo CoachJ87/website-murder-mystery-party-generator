@@ -8,14 +8,14 @@ import Footer from "@/components/Footer";
 import { toast } from "sonner";
 import { CheckCircle, CreditCard, ArrowRight } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { supabase } from "@/lib/supabase";
 
 const MysteryPurchase = () => {
   const { id } = useParams();
   const [processing, setProcessing] = useState(false);
   const navigate = useNavigate();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
 
+  // Placeholder function for when we implement Stripe
   const handlePurchase = async () => {
     if (!isAuthenticated) {
       toast.error("Please sign in to purchase this mystery");
@@ -29,34 +29,6 @@ const MysteryPurchase = () => {
       // Simulate payment processing
       toast.loading("Processing payment...");
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Update the conversation to mark it as purchased
-      if (user && id) {
-        const { error: conversationError } = await supabase
-          .from("conversations")
-          .update({ 
-            is_purchased: true,
-            purchase_date: new Date().toISOString()
-          })
-          .eq("id", id);
-          
-        if (conversationError) {
-          console.error("Error updating conversation:", conversationError);
-        }
-        
-        // If user has profile table, you could update it too
-        const { error: profileError } = await supabase
-          .from("profiles")
-          .upsert({ 
-            id: user.id,
-            has_purchased: true,
-            updated_at: new Date().toISOString()
-          });
-          
-        if (profileError) {
-          console.error("Error updating profile:", profileError);
-        }
-      }
       
       toast.success("Purchase successful! You now have access to the full mystery package.");
       navigate(`/mystery/${id}`);
@@ -102,13 +74,15 @@ const MysteryPurchase = () => {
               <div className="space-y-3 mb-6">
                 <h3 className="font-medium">What's included:</h3>
                 {[
-                  "Full character profiles for all suspects",
+                  "Detailed character profiles for all suspects",
                   "Host guide with step-by-step instructions",
-                  "Printable character sheets",
+                  "Printable character sheets and name tags",
                   "Evidence and clue cards",
                   "Timeline of events",
                   "Solution reveal script",
-                  "PDF downloads of all materials"
+                  "Customizable invitations",
+                  "PDF downloads of all materials",
+                  "Party planning checklist"
                 ].map((item, index) => (
                   <div key={index} className="flex items-start gap-2">
                     <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />

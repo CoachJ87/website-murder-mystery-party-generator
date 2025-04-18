@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -381,7 +382,7 @@ const VercelChatbot = () => {
             </Button>
           )}
           <Button onClick={handleGenerateMystery} disabled={messages.length < 3}>
-            Finalize Mystery
+            Generate Mystery Preview
           </Button>
         </div>
       </div>
@@ -436,14 +437,14 @@ const VercelChatbot = () => {
 
       <div className="flex flex-col md:flex-row justify-between gap-4">
         <p className="text-muted-foreground text-sm">
-          When you're satisfied with your mystery, finalize it to continue.
+          When you're satisfied with your mystery, generate the preview to continue.
         </p>
         <Button 
           onClick={handleGenerateMystery} 
           className="self-end"
           disabled={messages.length < 3}
         >
-          Finalize Mystery
+          Generate Mystery Preview
         </Button>
       </div>
     </div>
