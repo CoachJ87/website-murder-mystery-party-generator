@@ -300,26 +300,4 @@ const MysteryCreation = () => {
                         </CardContent>
                     </Card>
 
-                    <div className="mt-8 flex justify-center gap-4">
-                        {showChatUI && (
-                            <Button
-                                onClick={handleGenerateMystery}
-                                className="bg-[#F97316] hover:bg-[#FB923C] text-white font-semibold"
-                            >
-                                <Wand2 className="mr-2 h-5 w-5" /> Finalize Mystery
-                            </Button>
-                        )}
-                        {showChatUI ? null : (
-                            <Button variant="outline" onClick={() => navigate("/dashboard")}>
-                                Back to Dashboard
-                            </Button>
-                        )}
-                    </div>
-                </div>
-            </main>
-            <Footer />
-        </div>
-    );
-};
-
-export default MysteryCreation;
+                    <div
