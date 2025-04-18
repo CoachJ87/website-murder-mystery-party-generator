@@ -1,32 +1,45 @@
-import { useSupabaseClient, useUser as useSupabaseAuthUser } from '@supabase/auth-helpers-react';
+
 import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
 
 export const useUser = () => {
-  const supabaseClient = useSupabaseClient();
-  const supabaseUser = useSupabaseAuthUser();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const checkAuth = async () => {
-      setIsLoading(true);
-      const { data: { session } } = await supabaseClient.auth.getSession();
-      setIsAuthenticated(!!session?.user);
-      setIsLoading(false);
+      try {
+        setIsLoading(true);
+        const { data: { session } } = await supabase.auth.getSession();
+        setIsAuthenticated(!!session?.user);
+        setUser(session?.user || null);
+      } catch (error) {
+        console.error('Error checking auth session:', error);
+        setIsAuthenticated(false);
+        setUser(null);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     checkAuth();
 
-    const { data: { subscription } } = supabaseClient.auth.onAuthStateChange((_event, session) => {
+    // Set up auth state change listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setIsAuthenticated(!!session?.user);
+      setUser(session?.user || null);
     });
 
-    return () => subscription.unsubscribe();
-  }, [supabaseClient]);
+    // Clean up subscription on unmount
+    return () => {
+      subscription?.unsubscribe();
+    };
+  }, []);
 
   return {
     isAuthenticated,
     isLoading,
-    user: supabaseUser, // You might also want to return the user object
+    user,
   };
 };
