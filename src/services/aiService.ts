@@ -1,3 +1,4 @@
+
 // src/services/aiService.ts
 
 // Interface for messages sent to the API
@@ -46,56 +47,68 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
       }
     }
 
-    // Your Vercel deployed URL - ensure this is correct
-    const apiUrl = 'https://website-murder-mystery-party-generator.vercel.app/api/proxy-with-prompts';
-    console.log(`DEBUG: Using API URL: ${apiUrl}`);
-
-    // Prepare the request - ensure messages are in the correct format
-    const requestBody = {
-      messages: enhancedMessages.map(msg => {
-        // Determine the role based on available properties
-        let role = "user"; // Default role
-
-        if ('role' in msg && msg.role) {
-          role = msg.role;
-        } else if ('is_ai' in msg) {
-          role = msg.is_ai ? "assistant" : "user";
-        }
-
-        return {
-          role: role,
-          content: msg.content
-        };
-      }),
-      promptVersion: promptVersion
-    };
-
-    console.log(`DEBUG: Prepared request with ${requestBody.messages.length} messages`);
-    console.log(`DEBUG: Calling API at ${apiUrl}`);
-    console.log("DEBUG: Request Body:", JSON.stringify(requestBody, null, 2)); // More detailed logging
-
-    // Make the API request with a longer timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => {
-      console.log("DEBUG: Request timeout reached (60 seconds)");
-      controller.abort();
-    }, 60000); // 60 second timeout
-
+    // Try to use the Supabase edge function first
     try {
-      // Make the API request
-      console.log("DEBUG: Initiating fetch request to API");
+      console.log("DEBUG: Attempting to use mystery-ai Edge Function");
+      const { data: functionData, error: functionError } = await window.supabase.functions.invoke('mystery-ai', {
+        body: {
+          messages: enhancedMessages,
+          promptVersion
+        }
+      });
+
+      console.log("DEBUG: Edge Function response received:", functionData);
+      
+      if (functionError) {
+        console.error("DEBUG: Error from Edge Function:", functionError);
+        throw new Error(`Edge Function error: ${functionError.message}`);
+      }
+
+      if (functionData && functionData.choices && functionData.choices[0] && functionData.choices[0].message) {
+        console.log("DEBUG: Successfully extracted content from Edge Function response");
+        return functionData.choices[0].message.content;
+      } else {
+        console.error("DEBUG: Invalid response format from Edge Function:", functionData);
+        throw new Error("Invalid response format from Edge Function");
+      }
+    } catch (edgeFunctionError) {
+      console.error("DEBUG: Error calling Edge Function:", edgeFunctionError);
+      
+      // Fallback to Vercel API if Edge Function fails
+      console.log("DEBUG: Falling back to Vercel API proxy");
+      
+      // Your Vercel deployed URL
+      const apiUrl = 'https://website-murder-mystery-party-generator.vercel.app/api/proxy-with-prompts';
+      console.log(`DEBUG: Using API URL: ${apiUrl}`);
+
+      // Prepare the request
+      const requestBody = {
+        messages: enhancedMessages.map(msg => {
+          // Determine the role based on available properties
+          let role = "user"; // Default role
+
+          if ('role' in msg && msg.role) {
+            role = msg.role;
+          } else if ('is_ai' in msg) {
+            role = msg.is_ai ? "assistant" : "user";
+          }
+
+          return {
+            role: role,
+            content: msg.content
+          };
+        }),
+        promptVersion: promptVersion
+      };
+
+      console.log("DEBUG: Calling Vercel API");
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(requestBody),
-        signal: controller.signal
+        body: JSON.stringify(requestBody)
       });
-
-      clearTimeout(timeoutId);
-      console.log(`DEBUG: API Response Status: ${response.status}`);
-      console.log(`DEBUG: API Response Headers:`, Object.fromEntries(response.headers.entries()));
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -104,48 +117,19 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
       }
 
       const data = await response.json();
-      console.log("DEBUG: API Response Data:", JSON.stringify(data, null, 2));
+      console.log("DEBUG: Vercel API Response:", data);
 
-      // **ADJUST THIS SECTION BASED ON YOUR ACTUAL ANTHROPIC RESPONSE STRUCTURE**
-      let aiResponse = "";
-
-      // **CHECK IF THE RESPONSE HAS 'choices' AND THE MESSAGE CONTENT IS HERE**
-      if (data && data.choices && data.choices.length > 0 && data.choices[0].message && data.choices[0].message.content) {
-        console.log("DEBUG: Successfully extracted AI response content (Anthropic 'messages' format)");
-        aiResponse = data.choices[0].message.content;
-      }
-      // **IF NOT, CHECK IF THE CONTENT IS DIRECTLY IN 'content' AS AN ARRAY OF TEXT OBJECTS (OLDER FORMAT)**
-      else if (data && data.content && data.content.length > 0 && data.content[0].type === 'text') {
-        console.log("DEBUG: Successfully extracted (older format) AI response content");
-        aiResponse = data.content[0].text;
-      }
-      // **ADD MORE 'else if' CHECKS HERE IF THE RESPONSE HAS A DIFFERENT STRUCTURE**
-      else {
-        console.error("DEBUG: Invalid API response format");
-        console.error("DEBUG: Response Data:", JSON.stringify(data, null, 2));
+      if (data && data.choices && data.choices.length > 0 && data.choices[0].message) {
+        console.log("DEBUG: Successfully extracted content from Vercel API response");
+        return data.choices[0].message.content;
+      } else {
+        console.error("DEBUG: Invalid API response format from Vercel");
         throw new Error("Invalid response format from API");
       }
-
-      // Make sure headings are properly formatted
-      aiResponse = aiResponse.replace(/^(VICTIM|SUSPECTS|CLUES|SOLUTION):/gm, "## $1:");
-      
-      console.log(`DEBUG: Returning formatted AI response (first 100 chars): ${aiResponse.substring(0, 100)}...`);
-      return aiResponse;
-
-    } catch (error) {
-      console.error(`DEBUG: Fetch error in getAIResponse: ${error.message}`);
-      console.error(`DEBUG: Error stack: ${error.stack}`);
-      if (error.name === 'AbortError') {
-        throw new Error('Request timed out. Please try again.');
-      }
-      throw error;
     }
   } catch (error) {
     console.error(`DEBUG: Error in getAIResponse: ${error.message}`);
     console.error(`DEBUG: Error stack: ${error.stack}`);
-    if (error.message === 'Failed to fetch') {
-      return `There was a network error while connecting to our AI service. Please check your internet connection and try again.`;
-    }
     return `There was an error: ${error.message}. Please try again.`;
   }
 };

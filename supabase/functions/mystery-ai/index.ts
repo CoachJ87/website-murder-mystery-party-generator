@@ -22,7 +22,12 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           error: "Configuration error: Missing Anthropic API key",
-          message: "The Anthropic API key is not configured in the Edge Function environment"
+          message: "The Anthropic API key is not configured in the Edge Function environment",
+          choices: [{
+            message: {
+              content: "API configuration error: The Anthropic API key is missing. Please contact support."
+            }
+          }]
         }), {
           status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -37,10 +42,21 @@ serve(async (req) => {
     let requestBody;
     try {
       requestBody = await req.json();
+      console.log("Received request body:", JSON.stringify({
+        messageCount: requestBody.messages?.length || 0,
+        promptVersion: requestBody.promptVersion
+      }));
     } catch (e) {
       console.error("Failed to parse request body:", e);
       return new Response(
-        JSON.stringify({ error: "Invalid request body" }), {
+        JSON.stringify({ 
+          error: "Invalid request body",
+          choices: [{
+            message: {
+              content: "Invalid request format. Please try again."
+            }
+          }]
+        }), {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         }
@@ -53,7 +69,14 @@ serve(async (req) => {
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       console.error("Missing or invalid messages in request:", messages);
       return new Response(
-        JSON.stringify({ error: "Missing or invalid messages parameter" }), {
+        JSON.stringify({ 
+          error: "Missing or invalid messages parameter",
+          choices: [{
+            message: {
+              content: "No messages provided. Please try again with a valid prompt."
+            }
+          }]
+        }), {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         }
@@ -68,12 +91,31 @@ serve(async (req) => {
       : "You are an AI assistant that helps create murder mystery party games. Create an engaging storyline and suggest character ideas, but don't provide complete details as this is a preview.";
 
     // Format messages for Anthropic API
-    const formattedMessages = messages.map(msg => ({
-      role: msg.is_ai ? "assistant" : "user",
-      content: msg.content
-    }));
+    const formattedMessages = messages.map(msg => {
+      // Check if this is from our API structure or direct from the frontend
+      if ('is_ai' in msg) {
+        return {
+          role: msg.is_ai ? "assistant" : "user",
+          content: msg.content
+        };
+      } else if ('role' in msg) {
+        // Already in the correct format
+        return {
+          role: msg.role,
+          content: msg.content
+        };
+      } else {
+        // Default to user if we can't determine
+        console.warn("Unexpected message format:", msg);
+        return {
+          role: "user",
+          content: String(msg.content || "")
+        };
+      }
+    });
     
-    console.log("Sending request to Anthropic API");
+    console.log("Sending request to Anthropic API with formatted messages:", 
+      JSON.stringify(formattedMessages.map(m => ({ role: m.role, contentPreview: m.content.substring(0, 30) + '...' }))));
     
     // Call Anthropic API
     const response = await anthropic.messages.create({
@@ -83,9 +125,13 @@ serve(async (req) => {
       max_tokens: 1000,
     });
     
-    console.log("Received response from Anthropic API");
+    console.log("Received response from Anthropic API:", JSON.stringify({
+      id: response.id,
+      model: response.model,
+      contentLength: response.content[0].text.length
+    }));
 
-    // Format response in expected structure
+    // Format response in expected structure (compatible with OpenAI format)
     const formattedResponse = {
       choices: [
         {
