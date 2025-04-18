@@ -63,7 +63,7 @@ const MysteryChat = ({
     useEffect(() => {
         // Skip if we already have messages or already sent initial message
         // Also skip if still loading history
-        if ((messages.length > 0 || initialMessageSent) || messagesInitialized.current || isLoadingHistory) {
+        if (messages.length > 0 || initialMessageSent || messagesInitialized.current || isLoadingHistory) {
             console.log("Skipping initial message creation");
             return;
         }
@@ -100,12 +100,13 @@ const MysteryChat = ({
             setInitialMessageSent(true);
             messagesInitialized.current = true;
             
-            // Only send AI response if there was no prior conversation
-            if (!aiHasRespondedRef.current && initialMessages.length === 0) {
+            // Only send AI response if there was no prior conversation or the last message wasn't from AI
+            if (!aiHasRespondedRef.current && (!initialMessages.length || 
+                (initialMessages.length > 0 && !initialMessages[initialMessages.length - 1].is_ai))) {
                 handleAIResponse(initialMessage.content);
             }
         }
-    }, [initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails, messages.length, initialMessageSent, isLoadingHistory, initialMessages.length]);
+    }, [initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails, messages.length, initialMessageSent, isLoadingHistory, initialMessages]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -149,11 +150,13 @@ const MysteryChat = ({
         try {
             setLoading(true);
             
+            // Build complete conversation history for context
             const anthropicMessages = messages.map(m => ({
                 role: m.is_ai ? "assistant" : "user",
                 content: m.content,
             }));
 
+            // Add the current user message to the context
             anthropicMessages.push({
                 role: "user",
                 content: userMessage,
@@ -162,7 +165,7 @@ const MysteryChat = ({
             console.log("Frontend - anthropicMessages being sent:", JSON.stringify(anthropicMessages, null, 2));
 
             const response = await getAIResponse(
-                anthropicMessages as any,
+                anthropicMessages,
                 'free'
             );
 
@@ -189,7 +192,7 @@ const MysteryChat = ({
 
         } catch (error) {
             console.error("Error getting AI response:", error);
-            toast.error("Failed to get AI response");
+            toast.error("Failed to get AI response. Please try again.");
         } finally {
             setLoading(false);
         }
