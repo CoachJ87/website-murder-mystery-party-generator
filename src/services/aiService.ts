@@ -51,9 +51,23 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
     // Try to use the Supabase edge function first
     try {
       console.log("DEBUG: Attempting to use mystery-ai Edge Function");
+      
+      // Convert messages to the format expected by the Edge Function
+      const edgeFunctionMessages = enhancedMessages.map(msg => {
+        if ('is_ai' in msg) {
+          return {
+            role: msg.is_ai ? "assistant" : "user",
+            content: msg.content
+          };
+        } else {
+          // Already in the correct format
+          return msg;
+        }
+      });
+      
       const { data: functionData, error: functionError } = await supabase.functions.invoke('mystery-ai', {
         body: {
-          messages: enhancedMessages,
+          messages: edgeFunctionMessages,
           promptVersion
         }
       });
@@ -102,7 +116,12 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
         promptVersion: promptVersion
       };
 
-      console.log("DEBUG: Calling Vercel API");
+      console.log("DEBUG: Calling Vercel API with request body:", JSON.stringify({
+        messageCount: requestBody.messages.length,
+        promptVersion: requestBody.promptVersion,
+        firstMessagePreview: requestBody.messages[0]?.content.substring(0, 30) + '...' || 'empty'
+      }));
+
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
@@ -118,13 +137,13 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
       }
 
       const data = await response.json();
-      console.log("DEBUG: Vercel API Response:", data);
+      console.log("DEBUG: Vercel API Response structure:", Object.keys(data).join(', '));
 
       if (data && data.choices && data.choices.length > 0 && data.choices[0].message) {
         console.log("DEBUG: Successfully extracted content from Vercel API response");
         return data.choices[0].message.content;
       } else {
-        console.error("DEBUG: Invalid API response format from Vercel");
+        console.error("DEBUG: Invalid API response format from Vercel:", data);
         throw new Error("Invalid response format from API");
       }
     }

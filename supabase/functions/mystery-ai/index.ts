@@ -10,6 +10,7 @@ const corsHeaders = {
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
+    console.log("Handling OPTIONS request");
     return new Response(null, { headers: corsHeaders });
   }
 
@@ -22,7 +23,6 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           error: "Configuration error: Missing Anthropic API key",
-          message: "The Anthropic API key is not configured in the Edge Function environment",
           choices: [{
             message: {
               content: "API configuration error: The Anthropic API key is missing. Please contact support."
@@ -42,7 +42,7 @@ serve(async (req) => {
     let requestBody;
     try {
       requestBody = await req.json();
-      console.log("Received request body:", JSON.stringify({
+      console.log("Received request with data:", JSON.stringify({
         messageCount: requestBody.messages?.length || 0,
         promptVersion: requestBody.promptVersion
       }));
@@ -67,7 +67,7 @@ serve(async (req) => {
     
     // Validate request data
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
-      console.error("Missing or invalid messages in request:", messages);
+      console.error("Missing or invalid messages in request");
       return new Response(
         JSON.stringify({ 
           error: "Missing or invalid messages parameter",
@@ -106,7 +106,7 @@ serve(async (req) => {
         };
       } else {
         // Default to user if we can't determine
-        console.warn("Unexpected message format:", msg);
+        console.warn("Unexpected message format:", JSON.stringify(msg));
         return {
           role: "user",
           content: String(msg.content || "")
@@ -118,40 +118,58 @@ serve(async (req) => {
       JSON.stringify(formattedMessages.map(m => ({ role: m.role, contentPreview: m.content.substring(0, 30) + '...' }))));
     
     // Call Anthropic API
-    const response = await anthropic.messages.create({
-      model: "claude-3-opus-20240229",
-      system: systemPrompt,
-      messages: formattedMessages,
-      max_tokens: 1000,
-    });
-    
-    console.log("Received response from Anthropic API:", JSON.stringify({
-      id: response.id,
-      model: response.model,
-      contentLength: response.content[0].text.length
-    }));
+    try {
+      const response = await anthropic.messages.create({
+        model: "claude-3-opus-20240229",
+        system: systemPrompt,
+        messages: formattedMessages,
+        max_tokens: 1000,
+      });
+      
+      console.log("Received response from Anthropic API:", JSON.stringify({
+        id: response.id,
+        model: response.model,
+        contentLength: response.content[0].text.length
+      }));
 
-    // Format response in expected structure (compatible with OpenAI format)
-    const formattedResponse = {
-      choices: [
-        {
-          message: {
-            content: response.content[0].text
+      // Format response in expected structure (compatible with OpenAI format)
+      const formattedResponse = {
+        choices: [
+          {
+            message: {
+              content: response.content[0].text
+            }
           }
-        }
-      ],
-      model: response.model,
-      id: response.id
-    };
+        ],
+        model: response.model,
+        id: response.id
+      };
 
-    return new Response(JSON.stringify(formattedResponse), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+      return new Response(JSON.stringify(formattedResponse), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    } catch (apiError) {
+      console.error("Error calling Anthropic API:", apiError);
+      return new Response(
+        JSON.stringify({ 
+          error: "Anthropic API error",
+          details: apiError.message,
+          choices: [{
+            message: {
+              content: `There was an error generating your murder mystery: ${apiError.message}. Please try again.`
+            }
+          }]
+        }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
+    }
   } catch (error) {
-    console.error("Error calling Anthropic API:", error);
+    console.error("Unhandled error in mystery-ai function:", error);
     return new Response(
       JSON.stringify({ 
-        error: "Failed to get AI response", 
+        error: "Internal server error", 
         details: error.message,
         choices: [{
           message: {

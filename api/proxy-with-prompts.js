@@ -39,14 +39,14 @@ export default async function handler(req) {
     const ip = req.headers.get('x-forwarded-for') || 'unknown';
     console.log(`Request from IP: ${ip}`);
 
-    // Log all request headers for debugging
+    // Log request headers for debugging
     const headers = {};
     req.headers.forEach((value, key) => {
       headers[key] = value;
     });
     console.log("Request headers:", JSON.stringify(headers));
 
-    // Try to parse the request body
+    // Parse the request body
     let requestBody;
     let rawBody = "";
     try {
@@ -54,10 +54,32 @@ export default async function handler(req) {
       console.log(`Raw request body (first 500 chars): ${rawBody.substring(0, 500)}...`);
       requestBody = JSON.parse(rawBody);
       console.log("Successfully parsed request body");
+
+      // Log message structure
+      if (requestBody.messages && Array.isArray(requestBody.messages)) {
+        console.log(`Received ${requestBody.messages.length} messages`);
+        console.log("First message:", JSON.stringify({
+          role: requestBody.messages[0]?.role || 'unknown',
+          contentPreview: requestBody.messages[0]?.content?.substring(0, 50) || 'empty'
+        }));
+      }
     } catch (error) {
       console.log(`Error parsing request body: ${error.message}`);
       console.log(`Raw body: ${rawBody}`);
-      requestBody = {};
+      return new Response(JSON.stringify({ 
+        error: "Failed to parse request body", 
+        choices: [{
+          message: {
+            content: "Invalid request format. Please try again."
+          }
+        }]
+      }), {
+        status: 400,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+      });
     }
 
     const promptVersion = requestBody.promptVersion || 'free';
@@ -75,32 +97,33 @@ export default async function handler(req) {
 
     if (!systemPrompt) {
       console.error(`Environment variable for ${promptVersion} prompt is not set.`);
-      console.log("Using mock response due to missing system prompt");
-      
-      // Return mock response if system prompt is not available
-      const mockResponse = {
-        choices: [{
-          message: {
-            content: "# \"THE MISSING PROMPT\" - A DEBUGGING MYSTERY\n\n## PREMISE\nIt appears the system prompt is missing, but I can still help you create a murder mystery!\n\n## VICTIM\n**The System Prompt** - Mysteriously disappeared without a trace.\n\n## SUSPECTS\n1. **The Environment Variables** - Known to go missing in deployment\n2. **The Configuration** - Often misunderstood and misconfigured\n3. **The Deployment Process** - Sometimes drops important settings\n\nWhat theme would you like for your murder mystery? I can help you create something fun despite this technical hiccup!"
-          }
-        }]
-      };
-      
-      console.log("Returning mock response due to missing system prompt");
-      return new Response(JSON.stringify(mockResponse), {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-api-key',
-        },
-      });
+      console.log("Using default system prompt due to missing environment variable");
+      systemPrompt = "You are an AI assistant that helps create murder mystery party games. Create an engaging storyline and suggest character ideas.";
     }
     
     console.log(`System prompt exists (first 100 chars): ${systemPrompt.substring(0, 100)}...`);
 
-    const useRealAPI = process.env.USE_REAL_API === 'true';
+    // Validate messages array
+    if (!requestBody.messages || !Array.isArray(requestBody.messages) || requestBody.messages.length === 0) {
+      console.error("Missing or invalid messages in request");
+      return new Response(JSON.stringify({ 
+        error: "Missing or invalid messages parameter", 
+        choices: [{
+          message: {
+            content: "No messages provided. Please try again with a valid prompt."
+          }
+        }]
+      }), {
+        status: 400,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+      });
+    }
+
+    // For testing/development, we can use mock responses if needed
+    const useRealAPI = process.env.USE_REAL_API !== 'false';
     console.log(`USE_REAL_API: ${useRealAPI}`);
 
     if (!useRealAPI) {
@@ -148,6 +171,26 @@ export default async function handler(req) {
       system_prompt_length: anthropicRequest.system ? anthropicRequest.system.length : 0
     }));
 
+    // Validate the ANTHROPIC_API_KEY
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      console.error("ANTHROPIC_API_KEY is not set in environment variables");
+      return new Response(JSON.stringify({
+        error: "API key configuration error",
+        choices: [{
+          message: {
+            content: "The server is not properly configured. Please contact support."
+          }
+        }]
+      }), {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+      });
+    }
+
     console.log("Calling Anthropic API...");
 
     // Call Anthropic API
@@ -155,7 +198,7 @@ export default async function handler(req) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
+        'x-api-key': apiKey,
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify(anthropicRequest),
@@ -195,10 +238,22 @@ export default async function handler(req) {
       usage: data.usage
     }));
 
-    // Return the response
-    console.log("Successfully returning Anthropic API response");
-    return new Response(JSON.stringify(data), {
-      status: response.status,
+    // Format response to match expected structure
+    const formattedResponse = {
+      choices: [
+        {
+          message: {
+            content: data.content && data.content[0] ? data.content[0].text : "No content returned from API"
+          }
+        }
+      ],
+      model: data.model,
+      id: data.id
+    };
+
+    console.log("Successfully returning formatted Anthropic API response");
+    return new Response(JSON.stringify(formattedResponse), {
+      status: 200,
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
