@@ -36,29 +36,45 @@ export const ConversationManager = ({
       console.log("Loading conversation with ID:", id);
       setIsLoadingHistory(true);
       
-      const { data, error } = await supabase
-        .from("messages")
-        .select("*")
-        .eq("conversation_id", id)
-        .order("created_at", { ascending: true });
+      const { data: conversationData, error: convError } = await supabase
+        .from("conversations")
+        .select("*, messages(*)")
+        .eq("id", id)
+        .single();
 
-      if (error) {
-        console.error("Error loading messages:", error);
-        toast.error("Failed to load conversation messages");
+      if (convError) {
+        console.error("Error loading conversation:", convError);
+        toast.error("Failed to load conversation");
         return;
       }
 
-      if (data && data.length > 0) {
-        console.log("Loaded messages:", data.length);
-        const formattedMessages = data.map((msg: any) => ({
+      if (conversationData) {
+        const messages = conversationData.messages || [];
+        const formattedMessages = messages.map((msg: any) => ({
           id: msg.id,
           content: msg.content,
           is_ai: msg.role === "assistant",
           timestamp: new Date(msg.created_at)
         }));
+
+        // If this is an existing conversation but no messages exist,
+        // let's add the initial form data as the first message
+        if (formattedMessages.length === 0 && formData) {
+          const initialMessage = {
+            id: 'initial-' + Date.now(),
+            content: `Let's create a murder mystery with a ${formData.theme} theme` +
+                    `${formData.playerCount ? ` for ${formData.playerCount} players` : ''}` +
+                    `${formData.hasAccomplice !== undefined ? formData.hasAccomplice ? ' with an accomplice' : ' without an accomplice' : ''}` +
+                    `${formData.scriptType ? ` with ${formData.scriptType} scripts` : ''}` +
+                    `${formData.additionalDetails ? `. Additional details: ${formData.additionalDetails}` : ''}.`,
+            is_ai: false,
+            timestamp: new Date()
+          };
+          formattedMessages.push(initialMessage);
+        }
+
+        console.log("Loaded messages:", formattedMessages.length);
         setMessages(formattedMessages);
-      } else {
-        console.log("No messages found for conversation:", id);
       }
     } catch (error) {
       console.error("Error:", error);

@@ -101,25 +101,27 @@ const MysteryPreview = () => {
     try {
       setPurchasing(true);
       
-      const { error } = await supabase
+      const { error: profileError } = await supabase
         .from("profiles")
-        .update({ 
+        .upsert({ 
+          id: user?.id,
           has_purchased: true,
-          purchase_date: new Date().toISOString()
-        })
-        .eq("id", id);
+          updated_at: new Date().toISOString(),
+          purchase_date: new Date().toISOString(),
+          purchased_mystery_id: id
+        });
         
-      if (error) {
+      if (profileError) {
         throw new Error("Failed to update purchase status");
       }
       
       toast.success("Purchase simulated successfully!");
-      
-      navigate("/dashboard");
+      navigate(`/mystery/view/${id}`);
       
     } catch (error) {
       console.error("Error simulating purchase:", error);
       toast.error("Failed to simulate purchase");
+    } finally {
       setPurchasing(false);
     }
   };
@@ -165,9 +167,9 @@ const MysteryPreview = () => {
       <main className="flex-1 py-12 px-4">
         <div className="container mx-auto max-w-4xl">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">{mystery.title || "Mystery Preview"}</h1>
+            <h1 className="text-3xl font-bold mb-2">{mystery?.title || "Mystery Preview"}</h1>
             <p className="text-muted-foreground">
-              Preview of your {mystery.theme || "murder mystery"}
+              Preview of your murder mystery
             </p>
           </div>
           
@@ -180,16 +182,16 @@ const MysteryPreview = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <h3 className="font-medium">Theme</h3>
-                    <p>{mystery?.theme || "Not specified"}</p>
+                    <h3 className="font-bold">Theme</h3>
+                    <p>{mystery?.mystery_data?.theme || mystery?.theme || "Not specified"}</p>
                   </div>
                   <div>
-                    <h3 className="font-medium">Number of Players</h3>
-                    <p>{mystery?.playerCount || "Not specified"} players</p>
+                    <h3 className="font-bold">Number of Players</h3>
+                    <p>{mystery?.playerCount || mystery?.mystery_data?.playerCount || "Not specified"} players</p>
                   </div>
                   <div>
-                    <h3 className="font-medium">Premise</h3>
-                    <p className="line-clamp-3">{mystery?.premise || "Custom setting"}</p>
+                    <h3 className="font-bold">Premise</h3>
+                    <p className="whitespace-pre-wrap">{mystery?.premise || mystery?.mystery_data?.premise || "Custom setting"}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -198,7 +200,7 @@ const MysteryPreview = () => {
             <div>
               <Card className="mb-6">
                 <CardHeader>
-                  <CardTitle>Purchase Complete Package</CardTitle>
+                  <CardTitle>Complete Mystery Package</CardTitle>
                   <CardDescription>Get everything you need to host your mystery</CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -206,11 +208,12 @@ const MysteryPreview = () => {
                   <div className="space-y-2">
                     {[
                       "Full character profiles for all suspects",
-                      "Detailed backstories and motives",
+                      "Host guide with step-by-step instructions",
                       "Printable character sheets",
-                      "Host instructions and timeline",
-                      "Clues and evidence cards",
-                      "Solution reveal script"
+                      "Evidence and clue cards",
+                      "Timeline of events",
+                      "Solution reveal script",
+                      "PDF downloads of all materials"
                     ].map((item, index) => (
                       <div key={index} className="flex items-start gap-2">
                         <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
@@ -222,7 +225,7 @@ const MysteryPreview = () => {
                 <CardFooter className="flex flex-col gap-3">
                   <Button 
                     className="w-full" 
-                    onClick={handlePurchase} 
+                    onClick={handlePurchase}
                     disabled={purchasing}
                   >
                     {purchasing ? (
@@ -247,10 +250,14 @@ const MysteryPreview = () => {
                 </CardFooter>
               </Card>
               
-              <div className="bg-muted p-4 rounded-lg">
-                <p className="text-sm">
-                  <strong>Note:</strong> This is just a preview of your mystery concept. Purchase the full package to get all character details, clues, and printable materials.
-                </p>
+              <div className="bg-muted p-4 rounded-lg space-y-2 text-sm">
+                <p className="font-semibold">Important Notes</p>
+                <ul className="list-disc pl-4 space-y-1">
+                  <li>This is a one-time purchase for this specific mystery package</li>
+                  <li>You'll have permanent access to download all materials</li>
+                  <li>Content is for personal use only, not for commercial redistribution</li>
+                  <li>Need help? Contact our support at support@mysterygenerator.com</li>
+                </ul>
               </div>
             </div>
           </div>
