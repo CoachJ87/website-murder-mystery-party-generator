@@ -67,7 +67,11 @@ const SignUp = () => {
       // Redirect to check email page regardless of session
       // This prevents the "Email not confirmed" error on auto-login attempts
       toast.success("Account created! Please check your email to confirm your account.");
-      navigate("/check-email");
+      
+      // Add a small delay before navigation to ensure the toast is shown
+      setTimeout(() => {
+        navigate("/check-email");
+      }, 100);
       
     } catch (error: any) {
       console.error("Sign-up catch block:", error);
