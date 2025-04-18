@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -257,7 +258,7 @@ const MysteryCreation = () => {
     };
 
     const handleGenerateMystery = () => {
-        console.log("conversationId when Finalize Mystery clicked:", conversationId); // <--------------------- THIS LINE
+        console.log("conversationId when Finalize Mystery clicked:", conversationId);
         if (conversationId) {
             navigate(`/mystery/preview/${conversationId}`);
         } else {
@@ -300,4 +301,24 @@ const MysteryCreation = () => {
                         </CardContent>
                     </Card>
 
-                    <div
+                    <div className="mt-6 flex justify-center">
+                        {showChatUI && (
+                            <Button
+                                variant="default"
+                                size="lg"
+                                className="flex items-center gap-2"
+                                onClick={handleGenerateMystery}
+                            >
+                                <Wand2 className="w-4 h-4" />
+                                Finalize Mystery
+                            </Button>
+                        )}
+                    </div>
+                </div>
+            </main>
+            <Footer />
+        </div>
+    );
+};
+
+export default MysteryCreation;
