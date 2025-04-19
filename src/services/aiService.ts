@@ -35,7 +35,7 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
       if (isUserMessage) {
         console.log("DEBUG: Adding Markdown formatting instruction after user message");
         enhancedMessages.push({
-          role: "user",
+          role: "system",
           content: "Please format your response using Markdown syntax with headings (##, ###), lists (-, 1., 2.), bold (**), italic (*), and other formatting as appropriate to structure the information clearly. Do not use a title at the beginning of your response unless you are presenting a complete murder mystery concept with a title, premise, victim details, and character list."
         });
       }
@@ -56,6 +56,15 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
         return msg;
       });
 
+      // Log the formatted messages for debugging
+      console.log("DEBUG: Sending these messages to Edge Function:", 
+        edgeFunctionMessages.map((m, i) => ({
+          index: i,
+          role: m.role,
+          contentPreview: m.content.substring(0, 30) + (m.content.length > 30 ? '...' : '')
+        }))
+      );
+
       const { data: functionData, error: functionError } = await supabase.functions.invoke('mystery-ai', {
         body: {
           messages: edgeFunctionMessages,
@@ -74,21 +83,23 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
           return await fallbackToVercelApi(enhancedMessages, promptVersion);
         }
 
-        // For successful responses or other errors, return the content
+        // For successful responses, return the content
         if (functionData.choices?.[0]?.message?.content) {
           return functionData.choices[0].message.content;
         }
       }
 
+      // Handle explicit errors from the Edge Function
       if (functionError) {
-        console.log("DEBUG: Edge Function error, falling back to Vercel API");
+        console.log("DEBUG: Edge Function error, falling back to Vercel API:", functionError);
         return await fallbackToVercelApi(enhancedMessages, promptVersion);
       }
 
-      throw new Error("Invalid response format from Edge Function");
+      console.log("DEBUG: Invalid response format from Edge Function, falling back");
+      return await fallbackToVercelApi(enhancedMessages, promptVersion);
 
     } catch (edgeFunctionError) {
-      console.log("DEBUG: Edge Function error, falling back to Vercel API");
+      console.log("DEBUG: Edge Function exception, falling back to Vercel API:", edgeFunctionError);
       return await fallbackToVercelApi(enhancedMessages, promptVersion);
     }
   } catch (error) {
@@ -101,17 +112,29 @@ const fallbackToVercelApi = async (messages: (ApiMessage | Message)[], promptVer
   console.log("DEBUG: Using Vercel API fallback");
   const apiUrl = 'https://website-murder-mystery-party-generator.vercel.app/api/proxy-with-prompts';
 
-  // Format messages for the Vercel API
+  // Format messages for the Vercel API - ensuring we only send the last user message as input
+  // This prevents the API from seeing the entire conversation history as a single input
+  const formattedMessages = messages.map(msg => {
+    let role = "user";
+    if ('role' in msg && msg.role) {
+      role = msg.role;
+    } else if ('is_ai' in msg) {
+      role = msg.is_ai ? "assistant" : "user";
+    }
+    return { role, content: msg.content };
+  });
+
+  // Log the formatted messages before sending to Vercel API
+  console.log("DEBUG: Sending these messages to Vercel API:", 
+    formattedMessages.map((m, i) => ({
+      index: i,
+      role: m.role,
+      contentPreview: m.content.substring(0, 30) + (m.content.length > 30 ? '...' : '')
+    }))
+  );
+
   const requestBody = {
-    messages: messages.map(msg => {
-      let role = "user";
-      if ('role' in msg && msg.role) {
-        role = msg.role;
-      } else if ('is_ai' in msg) {
-        role = msg.is_ai ? "assistant" : "user";
-      }
-      return { role, content: msg.content };
-    }),
+    messages: formattedMessages,
     promptVersion
   };
 

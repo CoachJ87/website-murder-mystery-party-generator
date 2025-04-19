@@ -12,8 +12,8 @@ import { Loader2, AlertCircle, Send } from "lucide-react";
 interface MysteryChatProps {
     initialTheme?: string;
     savedMysteryId?: string;
-    onSave?: (message: Message) => void; // Changed onSave to single message
-    onGenerateFinal?: (messages: Message[]) => void; // New prop for final generation
+    onSave?: (message: Message) => void;
+    onGenerateFinal?: (messages: Message[]) => void;
     initialPlayerCount?: number;
     initialHasAccomplice?: boolean;
     initialScriptType?: "full" | "pointForm";
@@ -54,7 +54,6 @@ const MysteryChat = ({
         isLoadingHistory
     });
 
-    // Handle initial messages from props
     useEffect(() => {
         console.log("DEBUG: Initializing messages effect", {
             initialMessagesLength: initialMessages.length,
@@ -80,8 +79,6 @@ const MysteryChat = ({
             setInitialMessageSent(true);
             messagesInitialized.current = true;
 
-            // If the last message is from a user and there's no AI response yet,
-            // automatically trigger the AI response
             if (initialMessages.length > 0) {
                 const lastMessage = initialMessages[initialMessages.length - 1];
                 if (!lastMessage.is_ai && !aiHasRespondedRef.current) {
@@ -92,7 +89,6 @@ const MysteryChat = ({
         }
     }, [initialMessages]);
 
-    // Create initial message and trigger AI response
     useEffect(() => {
         console.log("DEBUG: Initial prompt creation effect", {
             messagesLength: messages.length,
@@ -104,13 +100,11 @@ const MysteryChat = ({
             initialMessagesLength: initialMessages.length
         });
 
-        // Skip if we already have messages or are loading history
         if (messages.length > 0 || initialMessageSent || messagesInitialized.current || isLoadingHistory) {
             console.log("DEBUG: Skipping initial message creation - condition failed");
             return;
         }
 
-        // Create initial message if we have a theme
         if (initialTheme && initialMessages.length === 0 && !isLoadingHistory) {
             console.log("DEBUG: Creating initial message with theme:", initialTheme);
             let initialChatMessage = `Let's create a murder mystery`;
@@ -135,7 +129,6 @@ const MysteryChat = ({
             setInitialMessageSent(true);
             messagesInitialized.current = true;
 
-            // Only trigger AI response if we haven't already received one
             if (!aiHasRespondedRef.current) {
                 console.log("DEBUG: About to call handleAIResponse with initial message");
                 handleAIResponse(initialMessage.content);
@@ -155,7 +148,6 @@ const MysteryChat = ({
         }
     }, [initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails, messages.length, initialMessageSent, isLoadingHistory, initialMessages]);
 
-    // Scroll to bottom when messages change
     const scrollToBottom = () => {
         console.log("DEBUG: Scrolling to bottom of messages");
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -165,7 +157,6 @@ const MysteryChat = ({
         scrollToBottom();
     }, [messages]);
 
-    // Handle user message submission
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         console.log("DEBUG: handleSubmit called with input:", input);
@@ -185,11 +176,11 @@ const MysteryChat = ({
         const updatedMessages = [...messages, userMessage];
         setMessages(updatedMessages);
         setInput("");
-        setError(null); // Clear any previous errors
+        setError(null);
 
         if (onSave) {
             console.log("DEBUG: Calling onSave with updated messages");
-            onSave(userMessage); // Changed to single message
+            onSave(userMessage);
         }
 
         console.log("DEBUG: About to call handleAIResponse from handleSubmit");
@@ -197,7 +188,6 @@ const MysteryChat = ({
         console.log("DEBUG: handleAIResponse call finished in handleSubmit");
     };
 
-    // Handle Enter key to submit form
     const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (event.key === 'Enter' && !event.shiftKey) {
             console.log("DEBUG: Enter key pressed (without shift), submitting form");
@@ -206,7 +196,6 @@ const MysteryChat = ({
         }
     };
 
-    // Get AI response
     const handleAIResponse = async (userMessage: string) => {
         console.log("DEBUG: handleAIResponse called with:", userMessage);
         try {
@@ -214,18 +203,24 @@ const MysteryChat = ({
             setError(null);
             toast.info("AI is thinking...");
 
-            // Format messages for AI API
             const anthropicMessages = messages.map(m => ({
                 role: m.is_ai ? "assistant" : "user",
                 content: m.content,
             }));
 
-            anthropicMessages.push({
+            const currentUserMessage = {
                 role: "user",
                 content: userMessage,
-            });
+            };
 
-            console.log("DEBUG: anthropicMessages being sent:", JSON.stringify(anthropicMessages.map(m => ({
+            if (anthropicMessages.length === 0 || 
+                (anthropicMessages.length > 0 && 
+                anthropicMessages[anthropicMessages.length - 1].content !== userMessage)) {
+                anthropicMessages.push(currentUserMessage);
+            }
+
+            console.log("DEBUG: anthropicMessages being sent:", JSON.stringify(anthropicMessages.map((m, i) => ({
+                index: i,
                 role: m.role,
                 contentPreview: m.content.substring(0, 30) + '...'
             })), null, 2));
@@ -265,7 +260,7 @@ const MysteryChat = ({
 
                     if (onSave) {
                         console.log("DEBUG: Calling onSave with AI message added");
-                        onSave(aiMessage); // Changed to single message
+                        onSave(aiMessage);
                     }
 
                     return updatedMessages;
@@ -277,7 +272,6 @@ const MysteryChat = ({
                 setError(error instanceof Error ? error.message : "Unknown error occurred");
                 toast.error("Failed to get AI response. Please try again.");
 
-                // Provide a fallback response when the API call fails
                 const fallbackMessage: Message = {
                     id: Date.now().toString(),
                     content: "I'm having trouble connecting to my AI service right now. Please try again in a moment.",
@@ -290,7 +284,7 @@ const MysteryChat = ({
 
                     if (onSave) {
                         console.log("DEBUG: Calling onSave with fallback message");
-                        onSave(fallbackMessage); // Changed to single message
+                        onSave(fallbackMessage);
                     }
 
                     return updatedMessages;
@@ -307,11 +301,9 @@ const MysteryChat = ({
     };
 
     const retryLastMessage = () => {
-        // Find the last user message
         const lastUserMessageIndex = [...messages].reverse().findIndex(m => !m.is_ai);
         if (lastUserMessageIndex >= 0) {
             const lastUserMessage = [...messages].reverse()[lastUserMessageIndex];
-            // Remove messages after this one
             const messagesUntilLastUser = messages.slice(0, messages.length - lastUserMessageIndex);
             setMessages(messagesUntilLastUser);
             handleAIResponse(lastUserMessage.content);
@@ -327,7 +319,6 @@ const MysteryChat = ({
         }
     };
 
-    // Debug component lifecycle
     useEffect(() => {
         console.log("DEBUG: MysteryChat component mounted");
         return () => {
@@ -407,31 +398,31 @@ const MysteryChat = ({
 
             <form onSubmit={handleSubmit} className="p-4 border-t">
                 <div className="flex items-center space-x-4">
-                        <Textarea
-                            placeholder="Ask the AI..."
-                            value={input}
-                            onChange={(e) => setInput(e.target.value)}
-                            onKeyDown={handleKeyDown}
-                            className="flex-1 resize-none"
-                        />
-                        <Button type="submit" disabled={loading} className="ml-2">
-                            {loading ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                                <Send className="h-4 w-4" />
-                            )}
-                        </Button>
-                    </div>
-                </form>
+                    <Textarea
+                        placeholder="Ask the AI..."
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        className="flex-1 resize-none"
+                    />
+                    <Button type="submit" disabled={loading} className="ml-2">
+                        {loading ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                            <Send className="h-4 w-4" />
+                        )}
+                    </Button>
+                </div>
+            </form>
 
-                {messages.length > 1 && !loading && (
-                    <div className="p-4 border-t">
-                        <Button onClick={handleGenerateFinalClick} variant="secondary">
-                            Generate Final Mystery
-                        </Button>
-                    </div>
-                )}
-            </div>
+            {messages.length > 1 && !loading && (
+                <div className="p-4 border-t">
+                    <Button onClick={handleGenerateFinalClick} variant="secondary">
+                        Generate Final Mystery
+                    </Button>
+                </div>
+            )}
+        </div>
     );
 };
 
