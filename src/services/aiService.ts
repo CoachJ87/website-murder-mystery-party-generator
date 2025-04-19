@@ -64,6 +64,7 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
         }
       });
       
+      // Invoke the function with just the required data, no custom headers
       const { data: functionData, error: functionError } = await supabase.functions.invoke('mystery-ai', {
         body: {
           messages: edgeFunctionMessages,
