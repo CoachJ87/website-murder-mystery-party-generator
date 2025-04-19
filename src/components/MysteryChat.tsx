@@ -398,4 +398,41 @@ const MysteryChat = ({
                                         <p>Unable to display message</p>
                                     )}
                                 </div>
-                                <div className
+                            </CardContent>
+                        </Card>
+                    ))
+                )}
+                <div ref={messagesEndRef} />
+            </div>
+
+            <form onSubmit={handleSubmit} className="p-4 border-t">
+                <div className="flex items-center space-x-4">
+                        <Textarea
+                            placeholder="Ask the AI..."
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            className="flex-1 resize-none"
+                        />
+                        <Button type="submit" disabled={loading} className="ml-2">
+                            {loading ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                                <Send className="h-4 w-4" />
+                            )}
+                        </Button>
+                    </div>
+                </form>
+
+                {messages.length > 1 && !loading && (
+                    <div className="p-4 border-t">
+                        <Button onClick={handleGenerateFinalClick} variant="secondary">
+                            Generate Final Mystery
+                        </Button>
+                    </div>
+                )}
+            </div>
+    );
+};
+
+export default MysteryChat;
