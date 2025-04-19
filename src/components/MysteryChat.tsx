@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -84,16 +83,21 @@ const MysteryChat = ({
 
             setInitialMessageSent(true);
             messagesInitialized.current = true;
-
-            if (initialMessages.length > 0) {
-                const lastMessage = initialMessages[initialMessages.length - 1];
-                if (!lastMessage.is_ai && !aiHasRespondedRef.current) {
-                    console.log("DEBUG: Last message is from user, triggering AI response");
-                    handleAIResponse(lastMessage.content, false); // Pass false to indicate not user-initiated
-                }
-            }
         }
     }, [initialMessages]);
+
+    // Separate effect to handle triggering AI response for last user message
+    useEffect(() => {
+        if (messagesInitialized.current && messages.length > 0 && !isLoadingHistory) {
+            const lastMessage = messages[messages.length - 1];
+            
+            // Only trigger AI response if the last message is from the user and AI hasn't responded yet
+            if (!lastMessage.is_ai && !aiHasRespondedRef.current) {
+                console.log("DEBUG: Last message is from user, triggering AI response");
+                handleAIResponse(lastMessage.content, false); // Pass false to indicate not user-initiated
+            }
+        }
+    }, [messages, messagesInitialized.current, isLoadingHistory]);
 
     useEffect(() => {
         console.log("DEBUG: Initial prompt creation effect", {
@@ -134,23 +138,8 @@ const MysteryChat = ({
             setMessages([initialMessage]);
             setInitialMessageSent(true);
             messagesInitialized.current = true;
-
-            if (!aiHasRespondedRef.current) {
-                console.log("DEBUG: About to call handleAIResponse with initial message");
-                handleAIResponse(initialMessage.content, false); // Pass false for initial prompt
-            } else {
-                console.log("DEBUG: Skipping AI response for initial message - AI has already responded");
-            }
         } else if (initialMessages.length > 0 && !messagesInitialized.current) {
             console.log("DEBUG: Initial messages were provided, skipping initial prompt creation for theme");
-            setMessages(initialMessages);
-            if (initialMessages.length > 0) {
-                const lastMessage = initialMessages[initialMessages.length - 1];
-                aiHasRespondedRef.current = !!lastMessage.is_ai;
-                console.log("DEBUG: Last message is from AI:", !!lastMessage.is_ai);
-            }
-            setInitialMessageSent(true);
-            messagesInitialized.current = true;
         }
     }, [initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails, messages.length, initialMessageSent, isLoadingHistory, initialMessages]);
 
