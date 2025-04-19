@@ -10,7 +10,7 @@ export default async function handler(req) {
     headers: {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-api-key, x-client-info, apikey',
+      'Access-Control-Allow-Headers': '*',
       'Access-Control-Max-Age': '86400',
     },
   });

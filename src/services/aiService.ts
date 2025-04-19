@@ -64,7 +64,7 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
         }
       });
       
-      // Invoke the function with just the required data, no additional headers
+      // Use the invoke method without any custom headers
       const { data: functionData, error: functionError } = await supabase.functions.invoke('mystery-ai', {
         body: {
           messages: edgeFunctionMessages,
@@ -96,7 +96,7 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
       const apiUrl = 'https://website-murder-mystery-party-generator.vercel.app/api/proxy-with-prompts';
       console.log(`DEBUG: Using API URL: ${apiUrl}`);
 
-      // Prepare the request without any CORS headers that should be set by the server
+      // Use fetch directly without any custom headers
       const requestBody = {
         messages: enhancedMessages.map(msg => {
           // Determine the role based on available properties
@@ -126,7 +126,6 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // Do not include CORS headers here - they should be set by the server
         },
         body: JSON.stringify(requestBody)
       });
