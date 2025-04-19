@@ -21,6 +21,7 @@ interface MysteryChatProps {
     initialAdditionalDetails?: string;
     initialMessages?: Message[];
     isLoadingHistory?: boolean;
+    systemInstruction?: string;
 }
 
 const MysteryChat = ({
@@ -33,7 +34,8 @@ const MysteryChat = ({
     initialScriptType,
     initialAdditionalDetails,
     initialMessages = [],
-    isLoadingHistory = false
+    isLoadingHistory = false,
+    systemInstruction = ""
 }: MysteryChatProps) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
@@ -54,7 +56,8 @@ const MysteryChat = ({
         initialScriptType,
         initialAdditionalDetails,
         initialMessagesCount: initialMessages.length,
-        isLoadingHistory
+        isLoadingHistory,
+        hasSystemInstruction: !!systemInstruction
     });
 
     useEffect(() => {
@@ -218,6 +221,7 @@ const MysteryChat = ({
                 
                 if (lastAiMessageIndex >= 0) {
                     const lastAiMessage = [...messages].reverse()[lastAiMessageIndex];
+                    // Include the form data summary as context at the start of each new user message
                     anthropicMessages = [
                         {
                             role: "assistant",
@@ -241,8 +245,8 @@ const MysteryChat = ({
             } else if (isEditModeRef.current && !isUserInitiated) {
                 console.log("DEBUG: Edit mode with auto-triggered response, using last few messages for context");
                 
-                // For initial load in edit mode, only take the last 2-4 messages to avoid context overload
-                const contextSize = 4; // Adjust based on your needs
+                // For initial load in edit mode, only take the last 3-4 messages to avoid context overload
+                const contextSize = 4; // Take the last 4 messages for context
                 const recentMessages = messages.slice(-contextSize);
                 
                 anthropicMessages = recentMessages.map(m => ({
@@ -287,6 +291,8 @@ const MysteryChat = ({
                 contentPreview: m.content.substring(0, 30) + '...'
             })), null, 2));
 
+            console.log("DEBUG: System instruction exists:", !!systemInstruction);
+
             try {
                 console.log("DEBUG: Calling getAIResponse with", {
                     messageCount: anthropicMessages.length,
@@ -295,7 +301,8 @@ const MysteryChat = ({
 
                 const response = await getAIResponse(
                     anthropicMessages,
-                    'free'
+                    'free',
+                    systemInstruction || undefined
                 );
 
                 console.log("DEBUG: Received AI response:", response ? response.substring(0, 50) + "..." : "null");

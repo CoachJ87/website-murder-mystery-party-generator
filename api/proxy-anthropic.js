@@ -45,6 +45,10 @@ export default async function handler(req) {
       systemPrompt = process.env.MURDER_MYSTERY_FREE_PROMPT;
     }
     
+    // Add a context reminder to help the AI maintain awareness of the user's preferences
+    const contextReminder = "Remember details the user has already provided and don't ask about them again. Be consistent in your responses.";
+    systemPrompt = systemPrompt + "\n\n" + contextReminder;
+    
     // Ensure messages only contain user and assistant roles, not system
     const filteredMessages = requestData.messages ? 
       requestData.messages.filter(msg => msg.role === 'user' || msg.role === 'assistant') : 
@@ -58,7 +62,8 @@ export default async function handler(req) {
       model: "claude-3-7-sonnet-20250219", // Using the latest model
       max_tokens: 1000,
       messages: filteredMessages,
-      system: systemPrompt
+      system: systemPrompt,
+      temperature: 0.7 // Add some creativity but keep responses consistent
     };
     
     // Forward the request to Anthropic API

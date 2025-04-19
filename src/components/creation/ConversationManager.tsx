@@ -8,7 +8,7 @@ import MysteryChat from "@/components/MysteryChat";
 interface ConversationManagerProps {
   conversationId: string | null;
   formData: FormValues | null;
-  onSaveMessages: (message: Message) => Promise<void>; // Changed to accept a single message
+  onSaveMessages: (message: Message) => Promise<void>;
   userId: string | undefined;
   isEditing: boolean;
 }
@@ -124,6 +124,30 @@ export const ConversationManager = ({
     return Promise.resolve();
   };
 
+  // Create a special system message to help maintain context
+  const createSystemMessage = (formData: FormValues | null) => {
+    if (!formData) return "";
+    
+    let systemMessage = "This is a murder mystery creation conversation. ";
+    systemMessage += "Here are the user's confirmed preferences that you should remember and not ask about again: ";
+    
+    if (formData.theme) {
+      systemMessage += `Theme: ${formData.theme}. `;
+    }
+    if (formData.playerCount) {
+      systemMessage += `Player count: ${formData.playerCount}. `;
+    }
+    if (formData.hasAccomplice !== undefined) {
+      systemMessage += `Accomplice: ${formData.hasAccomplice ? "Yes" : "No"}. `;
+    }
+    if (formData.scriptType) {
+      systemMessage += `Script type: ${formData.scriptType}. `;
+    }
+    
+    systemMessage += "Please remember these details throughout our conversation and don't ask about them again.";
+    return systemMessage;
+  };
+
   return (
     <div className="w-full h-full">
       <MysteryChat
@@ -133,9 +157,10 @@ export const ConversationManager = ({
         initialScriptType={formData?.scriptType}
         initialAdditionalDetails={formData?.additionalDetails}
         savedMysteryId={conversationId || undefined}
-        onSave={handleSaveMessage} // Using the adapter function
+        onSave={handleSaveMessage}
         initialMessages={messages}
         isLoadingHistory={isLoadingHistory}
+        systemInstruction={createSystemMessage(formData)}
       />
     </div>
   );
