@@ -10,7 +10,7 @@ import MysteryForm from "@/components/MysteryForm";
 import { useAuth } from "@/context/AuthContext";
 import { Message, FormValues } from "@/components/types";
 import { Wand2 } from "lucide-react";
-import MysteryChat from "@/components/MysteryChat"; // Import the MysteryChat component
+import MysteryChat from "@/components/MysteryChat";
 
 const MysteryCreation = () => {
     const [saving, setSaving] = useState(false);
@@ -26,7 +26,7 @@ const MysteryCreation = () => {
 
     useEffect(() => {
         if (isEditing && id) {
-            console.log("useEffect [id] triggered. ID:", id); // ADD THIS LINE
+            console.log("useEffect [id] triggered. ID:", id);
             loadExistingConversation(id);
         }
     }, [id]);
@@ -34,7 +34,11 @@ const MysteryCreation = () => {
     const extractTitleFromMessages = (messages: any[]) => {
         if (!messages || messages.length === 0) return null;
 
-        const aiMessages = messages.filter(msg => msg.role === 'assistant' || msg.is_ai);
+        const aiMessages = messages.filter(msg => {
+            if (msg.role) return msg.role === 'assistant';
+            return msg.is_ai === true;
+        });
+        
         if (aiMessages.length === 0) return null;
 
         const titlePatterns = [
@@ -220,9 +224,9 @@ const MysteryCreation = () => {
             await saveMessage(newMessage);
             setMessages(prevMessages => [...prevMessages, newMessage]);
 
-            // Look for title in AI messages and update conversation title if found
             const updatedMessages = [...messages, newMessage];
-            const aiTitle = extractTitleFromMessages(updatedMessages.filter(m => m.is_ai || m.role === 'assistant'));
+            const aiMessages = updatedMessages.filter(m => m.is_ai === true);
+            const aiTitle = extractTitleFromMessages(aiMessages);
             if (aiTitle) {
                 console.log("Found AI title:", aiTitle);
                 await supabase

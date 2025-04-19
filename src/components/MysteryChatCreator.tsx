@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,7 @@ import MysteryChat from "@/components/MysteryChat";
 import { useAuth } from "@/context/AuthContext";
 import { Message, FormValues } from "@/components/types";
 import { Wand2 } from "lucide-react";
+import { getAIResponse } from "@/services/aiService"; // Import getAIResponse
 
 const MysteryChatCreator = () => {
     const [saving, setSaving] = useState(false);
@@ -44,10 +46,13 @@ const MysteryChatCreator = () => {
                 console.error("Error loading messages:", error);
                 toast.error("Failed to load previous messages.");
             } else if (data) {
+                // Ensure we're creating proper Message objects with all required properties
                 setChatMessages(data.map(msg => ({
+                    id: msg.id || `msg-${Date.now()}-${Math.random()}`,
                     content: msg.content,
                     is_ai: msg.is_ai,
-                    role: msg.role
+                    role: msg.role,
+                    timestamp: new Date(msg.created_at || Date.now())
                 })));
             }
         } catch (error) {
@@ -134,7 +139,7 @@ const MysteryChatCreator = () => {
                     conversation_id: conversationId,
                     content: message.content,
                     is_ai: message.is_ai,
-                    role: message.role,
+                    role: message.is_ai ? "assistant" : "user", // Set role based on is_ai
                 });
 
             if (error) {
@@ -155,16 +160,15 @@ const MysteryChatCreator = () => {
             return;
         }
 
-        // **THIS IS WHERE YOU WILL CALL getAIResponse**
         console.log("DEBUG (MysteryChatCreator): Generating final mystery with messages:", messages);
         // Convert local Message format to ApiMessage format
         const apiMessages = messages.map(msg => ({
-            role: msg.role || (msg.is_ai ? 'assistant' : 'user'),
+            role: msg.is_ai ? 'assistant' : 'user',
             content: msg.content,
         }));
 
         try {
-            const response = await getAIResponse(apiMessages, 'paid'); // Assuming 'paid' prompt for final generation
+            const response = await getAIResponse(apiMessages, 'paid'); // Using imported getAIResponse
             console.log("DEBUG (MysteryChatCreator): AI Response received:", response);
             navigate(`/mystery/preview/${conversationId}`); // Navigate after receiving response
             // You might want to save the final response to the database here as well

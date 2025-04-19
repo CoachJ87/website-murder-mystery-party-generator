@@ -4,6 +4,7 @@ export interface Message {
   content: string;
   is_ai: boolean;
   timestamp: Date;
+  role?: string; // Add optional role property
 }
 
 // Add FormValues interface for MysteryForm component

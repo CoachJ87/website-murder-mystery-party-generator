@@ -8,7 +8,7 @@ import MysteryChat from "@/components/MysteryChat";
 interface ConversationManagerProps {
   conversationId: string | null;
   formData: FormValues | null;
-  onSaveMessages: (messages: Message[]) => Promise<void>;
+  onSaveMessages: (message: Message) => Promise<void>; // Changed to accept a single message
   userId: string | undefined;
   isEditing: boolean;
 }
@@ -51,10 +51,10 @@ export const ConversationManager = ({
       if (data && data.length > 0) {
         console.log("Loaded messages:", data.length);
         const formattedMessages = data.map((msg: any) => ({
-          id: msg.id,
+          id: msg.id || `msg-${Date.now()}-${Math.random()}`,
           content: msg.content,
           is_ai: msg.role === "assistant",
-          timestamp: new Date(msg.created_at)
+          timestamp: new Date(msg.created_at || Date.now())
         }));
         
         // Sort messages by timestamp to ensure proper order
@@ -116,6 +116,14 @@ export const ConversationManager = ({
     };
   };
 
+  // Adapter function to handle the updated onSave prop type
+  const handleSaveMessage = (message: Message) => {
+    if (onSaveMessages) {
+      return onSaveMessages(message);
+    }
+    return Promise.resolve();
+  };
+
   return (
     <div className="w-full h-full">
       <MysteryChat
@@ -125,7 +133,7 @@ export const ConversationManager = ({
         initialScriptType={formData?.scriptType}
         initialAdditionalDetails={formData?.additionalDetails}
         savedMysteryId={conversationId || undefined}
-        onSave={onSaveMessages}
+        onSave={handleSaveMessage} // Using the adapter function
         initialMessages={messages}
         isLoadingHistory={isLoadingHistory}
       />
