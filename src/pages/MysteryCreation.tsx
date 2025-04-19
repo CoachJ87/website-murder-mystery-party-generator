@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -11,13 +10,15 @@ import MysteryForm from "@/components/MysteryForm";
 import { useAuth } from "@/context/AuthContext";
 import { Message, FormValues } from "@/components/types";
 import { Wand2 } from "lucide-react";
-import { ConversationManager } from "@/components/creation/ConversationManager";
+import MysteryChat from "@/components/MysteryChat"; // Import the MysteryChat component
 
 const MysteryCreation = () => {
     const [saving, setSaving] = useState(false);
     const [showChatUI, setShowChatUI] = useState(false);
     const [formData, setFormData] = useState<FormValues | null>(null);
     const [conversationId, setConversationId] = useState<string | null>(null);
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [isLoadingHistory, setIsLoadingHistory] = useState(false);
     const navigate = useNavigate();
     const { id } = useParams();
     const isEditing = !!id;
@@ -32,38 +33,21 @@ const MysteryCreation = () => {
     const extractTitleFromMessages = (messages: any[]) => {
         if (!messages || messages.length === 0) return null;
 
-        // Only look at AI messages
         const aiMessages = messages.filter(msg => msg.role === 'assistant' || msg.is_ai);
         if (aiMessages.length === 0) return null;
 
-        // Patterns to match proper title formats (ignoring "Questions" or clarification titles)
-        // Match titles in quotes that are in all caps
         const titlePatterns = [
-            // Title in quotes, all caps, possibly followed by "- A MURDER MYSTERY"
             /"([^"]+)"\s*(?:-\s*A\s+MURDER\s+MYSTERY)?/i,
-
-            // Title with # prefix, in quotes
             /#\s*["']([^"']+)["']/i,
-
-            // Title with # prefix without quotes
             /#\s*([A-Z][A-Z\s]+[A-Z])/,
-
-            // Title specified with "title:" format
             /title:\s*["']?([^"'\n]+)["']?/i,
         ];
 
-        // Check each AI message for a title pattern match
         for (const message of aiMessages) {
             const content = message.content || '';
-
-            // Skip messages that appear to be clarification questions
-            if (content.includes("# Questions") ||
-                content.includes("## Questions") ||
-                content.toLowerCase().includes("clarification")) {
+            if (content.includes("# Questions") || content.includes("## Questions") || content.toLowerCase().includes("clarification")) {
                 continue;
             }
-
-            // Try each pattern
             for (const pattern of titlePatterns) {
                 const match = content.match(pattern);
                 if (match && match[1]) {
@@ -71,20 +55,14 @@ const MysteryCreation = () => {
                 }
             }
         }
-
         return null;
     };
 
     const formatTitle = (title: string) => {
-        // Remove excess quotes if present
         let cleanTitle = title.trim().replace(/^["']|["']$/g, '');
-
-        // Convert from all caps if necessary
         if (cleanTitle === cleanTitle.toUpperCase() && cleanTitle.length > 3) {
             cleanTitle = cleanTitle.toLowerCase();
         }
-
-        // Convert to title case (first letter of each word capitalized)
         return cleanTitle
             .split(' ')
             .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
@@ -93,8 +71,8 @@ const MysteryCreation = () => {
 
     const loadExistingConversation = async (conversationId: string) => {
         try {
+            setIsLoadingHistory(true);
             console.log("Loading conversation with ID:", conversationId);
-            // Use maybeSingle() instead of single() to avoid errors when no data is found
             const { data, error } = await supabase
                 .from("conversations")
                 .select("*, messages(*)")
@@ -104,23 +82,22 @@ const MysteryCreation = () => {
             if (error) {
                 console.error("Error loading conversation:", error);
                 toast.error("Failed to load conversation data");
-                return [];
+                return;
             }
 
             if (data) {
                 console.log("Loaded conversation data:", data);
                 setShowChatUI(true);
                 setConversationId(data.id);
+                setMessages(data.messages as Message[] || []);
 
                 if (data.mystery_data) {
                     setFormData(data.mystery_data as FormValues);
                 }
 
-                // If this conversation has messages, we can also try to extract a title
                 if (data.messages && data.messages.length > 0) {
                     const aiTitle = extractTitleFromMessages(data.messages);
                     if (aiTitle) {
-                        // Update the conversation with the AI-generated title
                         await supabase
                             .from("conversations")
                             .update({
@@ -130,19 +107,17 @@ const MysteryCreation = () => {
                             .eq("id", conversationId);
                     }
                 }
-
-                return [];
             } else {
                 console.log("No conversation data found");
-                // If we're in edit mode but conversation doesn't exist, redirect to create new
                 toast.error("This mystery doesn't exist or was deleted");
                 navigate('/mystery/create', { replace: true });
             }
         } catch (error) {
             console.error("Error:", error);
             toast.error("Failed to load conversation");
+        } finally {
+            setIsLoadingHistory(false);
         }
-        return [];
     };
 
     const saveMessage = async (message: Message) => {
@@ -236,18 +211,14 @@ const MysteryCreation = () => {
         }
     };
 
-    const handleSaveMessages = async (messages: Message[]) => {
-        console.log("Saving messages:", messages.length);
-
-        if (!messages.length) return;
-
-        // Find the latest message that hasn't been saved yet
-        const latestMessage = messages[messages.length - 1];
-        await saveMessage(latestMessage);
-
-        // Look for title in AI messages and update conversation title if found
+    const handleSaveMessages = async (newMessage: Message) => {
         if (conversationId) {
-            const aiTitle = extractTitleFromMessages(messages);
+            await saveMessage(newMessage);
+            setMessages(prevMessages => [...prevMessages, newMessage]);
+
+            // Look for title in AI messages and update conversation title if found
+            const updatedMessages = [...messages, newMessage];
+            const aiTitle = extractTitleFromMessages(updatedMessages.filter(m => m.is_ai || m.role === 'assistant'));
             if (aiTitle) {
                 console.log("Found AI title:", aiTitle);
                 await supabase
@@ -258,6 +229,8 @@ const MysteryCreation = () => {
                     })
                     .eq("id", conversationId);
             }
+        } else {
+            toast.error("Conversation ID not found, cannot save message.");
         }
     };
 
@@ -288,13 +261,18 @@ const MysteryCreation = () => {
 
                     <Card>
                         <CardContent className="p-6">
-                            {showChatUI ? (
-                                <ConversationManager
-                                    conversationId={conversationId}
-                                    formData={formData}
-                                    onSaveMessages={handleSaveMessages}
-                                    userId={user?.id}
-                                    isEditing={isEditing}
+                            {showChatUI && formData ? (
+                                <MysteryChat
+                                    initialTheme={formData?.theme}
+                                    savedMysteryId={id}
+                                    onSave={handleSaveMessages}
+                                    onGenerateFinal={handleGenerateMystery}
+                                    initialPlayerCount={formData?.playerCount}
+                                    initialHasAccomplice={formData?.hasAccomplice}
+                                    initialScriptType={formData?.scriptType}
+                                    initialAdditionalDetails={formData?.additionalDetails}
+                                    initialMessages={messages}
+                                    isLoadingHistory={isLoadingHistory}
                                 />
                             ) : (
                                 <MysteryForm
