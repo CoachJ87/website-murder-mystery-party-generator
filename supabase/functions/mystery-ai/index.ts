@@ -2,16 +2,16 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { Anthropic } from "https://esm.sh/@anthropic-ai/sdk@0.39.0";
 
-// Update CORS headers to be more permissive
+// Comprehensive CORS headers to ensure compatibility
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Max-Age': '86400',
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
+  // Handle CORS preflight requests with careful logging
   if (req.method === 'OPTIONS') {
     console.log("Handling OPTIONS request");
     return new Response(null, { 
