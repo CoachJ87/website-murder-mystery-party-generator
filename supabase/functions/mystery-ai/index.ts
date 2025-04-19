@@ -1,6 +1,6 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { Client } from "https://esm.sh/@anthropic-ai/sdk";
+import { Anthropic } from "https://esm.sh/@anthropic-ai/sdk@0.39.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -36,7 +36,7 @@ serve(async (req) => {
     }
 
     // Initialize Anthropic client
-    const anthropic = new Client({ apiKey: anthropicApiKey });
+    const anthropic = new Anthropic({ apiKey: anthropicApiKey });
     
     // Parse request body
     let requestBody;
