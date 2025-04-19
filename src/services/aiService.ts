@@ -30,14 +30,21 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
       return msg;
     });
     
+    // FIXED: Separate system messages and ensure they are not in the messages array
     // Extract any system messages (we'll handle these differently)
     const userAndAssistantMessages = standardMessages.filter(msg => msg.role !== 'system');
     const systemMessages = standardMessages.filter(msg => msg.role === 'system');
     
-    // Extract Markdown formatting instruction if it exists
+    // Extract Markdown formatting instruction if no system message exists
     const markdownInstruction = "Please format your response using Markdown syntax with headings (##, ###), lists (-, 1., 2.), bold (**), italic (*), and other formatting as appropriate to structure the information clearly. Do not use a title at the beginning of your response unless you are presenting a complete murder mystery concept with a title, premise, victim details, and character list.";
     
-    console.log(`DEBUG: Found ${userAndAssistantMessages.length} user/assistant messages and ${systemMessages.length} system messages`);
+    // Get system instruction (use the last system message if available)
+    const systemInstruction = systemMessages.length > 0
+      ? systemMessages[systemMessages.length - 1].content
+      : markdownInstruction;
+    
+    console.log(`DEBUG: Found ${userAndAssistantMessages.length} user/assistant messages`);
+    console.log(`DEBUG: System instruction (truncated): ${systemInstruction.substring(0, 50)}...`);
 
     // First try using the Supabase Edge Function
     try {
@@ -46,9 +53,7 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
       // Format the request for the Edge Function
       const edgeFunctionPayload = {
         messages: userAndAssistantMessages,
-        system: systemMessages.length > 0 
-          ? systemMessages[systemMessages.length - 1].content 
-          : markdownInstruction,
+        system: systemInstruction, // Send as top-level system parameter
         promptVersion
       };
 
@@ -71,7 +76,7 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
           functionData.error.includes("Missing Anthropic API key")
         )) {
           console.log("DEBUG: Edge Function not configured, falling back to Vercel API");
-          return await fallbackToVercelApi(userAndAssistantMessages, systemMessages, promptVersion);
+          return await fallbackToVercelApi(userAndAssistantMessages, systemInstruction, promptVersion);
         }
 
         // For successful responses, return the content
@@ -83,15 +88,15 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
       // Handle explicit errors from the Edge Function
       if (functionError) {
         console.log("DEBUG: Edge Function error, falling back to Vercel API:", functionError);
-        return await fallbackToVercelApi(userAndAssistantMessages, systemMessages, promptVersion);
+        return await fallbackToVercelApi(userAndAssistantMessages, systemInstruction, promptVersion);
       }
 
       console.log("DEBUG: Invalid response format from Edge Function, falling back");
-      return await fallbackToVercelApi(userAndAssistantMessages, systemMessages, promptVersion);
+      return await fallbackToVercelApi(userAndAssistantMessages, systemInstruction, promptVersion);
 
     } catch (edgeFunctionError) {
       console.log("DEBUG: Edge Function exception, falling back to Vercel API:", edgeFunctionError);
-      return await fallbackToVercelApi(userAndAssistantMessages, systemMessages, promptVersion);
+      return await fallbackToVercelApi(userAndAssistantMessages, systemInstruction, promptVersion);
     }
   } catch (error) {
     console.error(`DEBUG: Error in getAIResponse: ${error.message}`);
@@ -101,21 +106,16 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
 
 const fallbackToVercelApi = async (
   userAndAssistantMessages: ApiMessage[],
-  systemMessages: ApiMessage[],
+  systemInstruction: string,
   promptVersion: 'free' | 'paid'
 ): Promise<string> => {
   console.log("DEBUG: Using Vercel API fallback");
   const apiUrl = 'https://website-murder-mystery-party-generator.vercel.app/api/proxy-with-prompts';
 
-  // Extract system instruction (use the last system message if available)
-  const systemInstruction = systemMessages.length > 0
-    ? systemMessages[systemMessages.length - 1].content
-    : "Please format your response using Markdown syntax with headings, lists, and other formatting as appropriate.";
-
-  // Format request for the Vercel API
+  // Format request for the Vercel API - ensure system is sent as a separate parameter
   const requestBody = {
     messages: userAndAssistantMessages,
-    system: systemInstruction, // Send system instruction as a separate parameter
+    system: systemInstruction, // Send as top-level system parameter
     promptVersion
   };
 

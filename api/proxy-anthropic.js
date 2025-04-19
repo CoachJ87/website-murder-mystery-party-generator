@@ -35,23 +35,23 @@ export default async function handler(req) {
     // Check which prompt to use
     const promptVersion = requestData.promptVersion || 'free';
     
-    // Get appropriate prompt from environment variables
+    // Get appropriate prompt from environment variables or use the provided system instruction
     let systemPrompt;
-    if (promptVersion === 'paid') {
+    if (requestData.system) {
+      systemPrompt = requestData.system;
+    } else if (promptVersion === 'paid') {
       systemPrompt = process.env.MURDER_MYSTERY_PAID_PROMPT;
     } else {
       systemPrompt = process.env.MURDER_MYSTERY_FREE_PROMPT;
     }
     
-    // If the request includes a system instruction, use it
-    if (requestData.system) {
-      systemPrompt = requestData.system;
-    }
-    
-    // Filter out any system messages from the messages array
+    // Ensure messages only contain user and assistant roles, not system
     const filteredMessages = requestData.messages ? 
-      requestData.messages.filter(msg => msg.role !== 'system') : 
+      requestData.messages.filter(msg => msg.role === 'user' || msg.role === 'assistant') : 
       [];
+    
+    // Log the structure of what we're sending to Anthropic
+    console.log(`Sending ${filteredMessages.length} messages to Anthropic with system prompt`);
     
     // Prepare Anthropic API request with system at the top level
     const anthropicRequest = {
@@ -60,9 +60,6 @@ export default async function handler(req) {
       messages: filteredMessages,
       system: systemPrompt
     };
-    
-    // Log which prompt version we're using (only visible in Vercel logs)
-    console.log(`Using ${promptVersion} prompt version`);
     
     // Forward the request to Anthropic API
     const response = await fetch('https://api.anthropic.com/v1/messages', {

@@ -42,6 +42,7 @@ const MysteryChat = ({
     const messagesInitialized = useRef(false);
     const aiHasRespondedRef = useRef(false);
     const [error, setError] = useState<string | null>(null);
+    const isEditModeRef = useRef(!!savedMysteryId);
 
     console.log("DEBUG: MysteryChat rendering with props:", {
         initialTheme,
@@ -203,20 +204,52 @@ const MysteryChat = ({
             setError(null);
             toast.info("AI is thinking...");
 
-            const anthropicMessages = messages.map(m => ({
-                role: m.is_ai ? "assistant" : "user",
-                content: m.content,
-            }));
+            let anthropicMessages;
+            
+            if (isEditModeRef.current && messages.length > 0) {
+                console.log("DEBUG: Edit mode detected, limiting conversation context");
+                
+                const lastAiMessageIndex = [...messages].reverse().findIndex(m => m.is_ai);
+                
+                if (lastAiMessageIndex >= 0) {
+                    const lastAiMessage = [...messages].reverse()[lastAiMessageIndex];
+                    anthropicMessages = [
+                        {
+                            role: "assistant",
+                            content: lastAiMessage.content
+                        },
+                        {
+                            role: "user",
+                            content: userMessage
+                        }
+                    ];
+                    console.log("DEBUG: Using last AI response + new user message for context");
+                } else {
+                    anthropicMessages = [
+                        {
+                            role: "user",
+                            content: "Let's continue our murder mystery planning. " + userMessage
+                        }
+                    ];
+                    console.log("DEBUG: No AI messages found, using single message with context hint");
+                }
+            } else {
+                anthropicMessages = messages.map(m => ({
+                    role: m.is_ai ? "assistant" : "user",
+                    content: m.content,
+                }));
 
-            const currentUserMessage = {
-                role: "user",
-                content: userMessage,
-            };
+                const currentUserMessage = {
+                    role: "user",
+                    content: userMessage,
+                };
 
-            if (anthropicMessages.length === 0 || 
-                (anthropicMessages.length > 0 && 
-                anthropicMessages[anthropicMessages.length - 1].content !== userMessage)) {
-                anthropicMessages.push(currentUserMessage);
+                if (anthropicMessages.length === 0 || 
+                    (anthropicMessages.length > 0 && 
+                    anthropicMessages[anthropicMessages.length - 1].content !== userMessage)) {
+                    anthropicMessages.push(currentUserMessage);
+                }
+                console.log("DEBUG: Using full conversation context");
             }
 
             console.log("DEBUG: anthropicMessages being sent:", JSON.stringify(anthropicMessages.map((m, i) => ({
