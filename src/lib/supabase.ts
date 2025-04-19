@@ -11,6 +11,11 @@ export const supabase = createClient(
       autoRefreshToken: true,
       detectSessionInUrl: false,
       storage: localStorage
+    },
+    global: {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      }
     }
   }
 );

@@ -39,6 +39,11 @@ vector_port = 54329
 
 [functions.mystery-ai]
 verify_jwt = true
+allowed_http_hosts = ["*"]
+cors_allowed_origins = ["https://website-murder-mystery-party-generator.vercel.app"]
 
 [functions.generate-chatbot-token]
 verify_jwt = true
+allowed_http_hosts = ["*"]
+cors_allowed_origins = ["https://website-murder-mystery-party-generator.vercel.app"]
+
