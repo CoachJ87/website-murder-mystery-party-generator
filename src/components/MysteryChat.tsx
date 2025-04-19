@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,7 +12,8 @@ import { Loader2, AlertCircle, Send } from "lucide-react";
 interface MysteryChatProps {
     initialTheme?: string;
     savedMysteryId?: string;
-    onSave?: (messages: Message[]) => void;
+    onSave?: (message: Message) => void; // Changed onSave to single message
+    onGenerateFinal?: (messages: Message[]) => void; // New prop for final generation
     initialPlayerCount?: number;
     initialHasAccomplice?: boolean;
     initialScriptType?: "full" | "pointForm";
@@ -26,6 +26,7 @@ const MysteryChat = ({
     initialTheme = "",
     savedMysteryId,
     onSave,
+    onGenerateFinal,
     initialPlayerCount,
     initialHasAccomplice,
     initialScriptType,
@@ -78,7 +79,7 @@ const MysteryChat = ({
 
             setInitialMessageSent(true);
             messagesInitialized.current = true;
-            
+
             // If the last message is from a user and there's no AI response yet,
             // automatically trigger the AI response
             if (initialMessages.length > 0) {
@@ -188,7 +189,7 @@ const MysteryChat = ({
 
         if (onSave) {
             console.log("DEBUG: Calling onSave with updated messages");
-            onSave(updatedMessages);
+            onSave(userMessage); // Changed to single message
         }
 
         console.log("DEBUG: About to call handleAIResponse from handleSubmit");
@@ -245,7 +246,7 @@ const MysteryChat = ({
                 if (!response) {
                     throw new Error("Failed to get a response from AI");
                 }
-                
+
                 if (response.includes("There was an error")) {
                     throw new Error(response);
                 }
@@ -264,18 +265,18 @@ const MysteryChat = ({
 
                     if (onSave) {
                         console.log("DEBUG: Calling onSave with AI message added");
-                        onSave(updatedMessages);
+                        onSave(aiMessage); // Changed to single message
                     }
 
                     return updatedMessages;
                 });
-                
+
                 toast.success("AI response received!");
             } catch (error) {
                 console.error("DEBUG: Error in getAIResponse:", error);
                 setError(error instanceof Error ? error.message : "Unknown error occurred");
                 toast.error("Failed to get AI response. Please try again.");
-                
+
                 // Provide a fallback response when the API call fails
                 const fallbackMessage: Message = {
                     id: Date.now().toString(),
@@ -289,7 +290,7 @@ const MysteryChat = ({
 
                     if (onSave) {
                         console.log("DEBUG: Calling onSave with fallback message");
-                        onSave(updatedMessages);
+                        onSave(fallbackMessage); // Changed to single message
                     }
 
                     return updatedMessages;
@@ -317,6 +318,15 @@ const MysteryChat = ({
         }
     };
 
+    const handleGenerateFinalClick = () => {
+        console.log("DEBUG: Generate Final button clicked, sending all messages");
+        if (onGenerateFinal) {
+            onGenerateFinal(messages);
+        } else {
+            toast.error("Final generation callback not provided.");
+        }
+    };
+
     // Debug component lifecycle
     useEffect(() => {
         console.log("DEBUG: MysteryChat component mounted");
@@ -326,17 +336,17 @@ const MysteryChat = ({
     }, []);
 
     return (
-        <div className="flex flex-col h-full">
+        <div data-testid="mystery-chat" className="flex flex-col h-full">
             {error && (
                 <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 mb-4 flex items-start gap-3">
                     <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
                     <div>
                         <h4 className="text-sm font-medium text-red-800 dark:text-red-300">Error connecting to AI service</h4>
                         <p className="text-sm text-red-700 dark:text-red-400 mt-1">{error}</p>
-                        <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="mt-2 text-xs" 
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="mt-2 text-xs"
                             onClick={retryLastMessage}
                         >
                             Try Again
@@ -344,7 +354,7 @@ const MysteryChat = ({
                     </div>
                 </div>
             )}
-            
+
             <div className="flex-1 overflow-y-auto mb-4 space-y-4 p-4 border rounded-lg bg-background/50 min-h-[400px] max-h-[500px]">
                 {isLoadingHistory ? (
                     <div className="flex flex-col items-center justify-center h-full">
@@ -393,47 +403,3 @@ const MysteryChat = ({
                                 </div>
                             </CardContent>
                         </Card>
-                    ))
-                )}
-                {loading && (
-                    <div className="bg-muted p-3 rounded-lg max-w-[80%] animate-pulse">
-                        <div className="flex space-x-2">
-                            <div className="h-2 w-2 bg-current rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                            <div className="h-2 w-2 bg-current rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                            <div className="h-2 w-2 bg-current rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
-                        </div>
-                    </div>
-                )}
-                <div ref={messagesEndRef} />
-            </div>
-
-            <form onSubmit={handleSubmit} className="flex gap-2">
-                <Textarea
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Type your message here..."
-                    className="flex-1 min-h-[80px]"
-                    disabled={loading || isLoadingHistory}
-                />
-                <Button
-                    type="submit"
-                    disabled={loading || isLoadingHistory || !input.trim()}
-                    onClick={() => console.log("DEBUG: Send button clicked")}
-                >
-                    {loading ? (
-                        <>
-                            <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Thinking...
-                        </>
-                    ) : (
-                        <>
-                            <Send className="h-4 w-4 mr-2" /> Send
-                        </>
-                    )}
-                </Button>
-            </form>
-        </div>
-    );
-};
-
-export default MysteryChat;
