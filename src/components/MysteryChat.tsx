@@ -398,5 +398,4 @@ const MysteryChat = ({
                                         <p>Unable to display message</p>
                                     )}
                                 </div>
-                                <div className="text-xs opacity-70 mt-2">
-                                    {message.timestamp.
+                                <div className
