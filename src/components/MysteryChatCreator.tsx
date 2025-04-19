@@ -12,7 +12,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Message, FormValues } from "@/components/types";
 import { Wand2 } from "lucide-react";
 
-const MysteryChatCreator = () => { // Renamed to MysteryChatCreator
+const MysteryChatCreator = () => {
     const [saving, setSaving] = useState(false);
     const [showChatUI, setShowChatUI] = useState(false);
     const [formData, setFormData] = useState<FormValues | null>(null);
@@ -21,18 +21,45 @@ const MysteryChatCreator = () => { // Renamed to MysteryChatCreator
     const { id } = useParams();
     const isEditing = !!id;
     const { isAuthenticated, user } = useAuth();
+    const [chatMessages, setChatMessages] = useState<Message[]>([]); // To hold chat messages
 
     useEffect(() => {
         if (isEditing) {
             setShowChatUI(true);
             setConversationId(id || null);
+            loadExistingMessages(id); // Load previous messages if editing
         }
     }, [id]);
+
+    const loadExistingMessages = async (conversationId: string) => {
+        if (!conversationId) return;
+        try {
+            const { data, error } = await supabase
+                .from("messages")
+                .select("*")
+                .eq("conversation_id", conversationId)
+                .order("created_at", { ascending: true });
+
+            if (error) {
+                console.error("Error loading messages:", error);
+                toast.error("Failed to load previous messages.");
+            } else if (data) {
+                setChatMessages(data.map(msg => ({
+                    content: msg.content,
+                    is_ai: msg.is_ai,
+                    role: msg.role
+                })));
+            }
+        } catch (error) {
+            console.error("Error loading messages:", error);
+            toast.error("Failed to load previous messages.");
+        }
+    };
 
     const handleSave = async (data: FormValues) => {
         try {
             setSaving(true);
-            console.log("formData on save:", data); // Troubleshooting log
+            console.log("formData on save:", data);
 
             await new Promise<void>((resolve) => {
                 setFormData(data);
@@ -93,38 +120,63 @@ const MysteryChatCreator = () => { // Renamed to MysteryChatCreator
         }
     };
 
-    const handleSaveMessages = async (messages: Message[]) => {
-        if (messages.length > 0) {
-            const latestThemeMessage = messages.find(m => m.content.includes("theme"));
-            if (latestThemeMessage) {
-                const extractedTheme = latestThemeMessage.content.split("theme").pop()?.trim().replace(".", "");
-                if (extractedTheme) {
-                    await new Promise<void>((resolve) => {
-                        setFormData(prevData => {
-                            if (prevData) {
-                                return { ...prevData, theme: extractedTheme };
-                            }
-                            return prevData;
-                        });
-                        resolve();
-                    });
-                }
+    const handleSaveChatMessage = async (message: Message) => {
+        if (!isAuthenticated || !user || !conversationId) {
+            console.log("Cannot save message: missing auth or conversation ID");
+            return;
+        }
+
+        try {
+            console.log("Saving message to database:", message);
+            const { error } = await supabase
+                .from("messages")
+                .insert({
+                    conversation_id: conversationId,
+                    content: message.content,
+                    is_ai: message.is_ai,
+                    role: message.role,
+                });
+
+            if (error) {
+                console.error("Error saving message:", error);
+                toast.error("Failed to save message");
+            } else {
+                console.log("Message saved successfully");
+                setChatMessages(prev => [...prev, message]); // Update local chat messages
             }
+        } catch (error) {
+            console.error("Error saving message:", error);
         }
     };
 
-    const handleGenerateMystery = () => {
-        if (conversationId) {
-            navigate(`/mystery/preview/${conversationId}`);
-        } else {
-            toast.error("Please save your mystery first");
+    const handleGenerateMystery = async (messages: Message[]) => {
+        if (!conversationId) {
+            toast.error("Conversation ID is missing.");
+            return;
+        }
+
+        // **THIS IS WHERE YOU WILL CALL getAIResponse**
+        console.log("DEBUG (MysteryChatCreator): Generating final mystery with messages:", messages);
+        // Convert local Message format to ApiMessage format
+        const apiMessages = messages.map(msg => ({
+            role: msg.role || (msg.is_ai ? 'assistant' : 'user'),
+            content: msg.content,
+        }));
+
+        try {
+            const response = await getAIResponse(apiMessages, 'paid'); // Assuming 'paid' prompt for final generation
+            console.log("DEBUG (MysteryChatCreator): AI Response received:", response);
+            navigate(`/mystery/preview/${conversationId}`); // Navigate after receiving response
+            // You might want to save the final response to the database here as well
+        } catch (error: any) {
+            console.error("Error generating mystery:", error);
+            toast.error(error.message || "Failed to generate the final mystery.");
         }
     };
 
     return (
         <div className="min-h-screen flex flex-col">
             <Header />
-
             <main className="flex-1 py-12 px-4">
                 <div className="container mx-auto max-w-4xl">
                     <div className="mb-8">
@@ -149,7 +201,9 @@ const MysteryChatCreator = () => { // Renamed to MysteryChatCreator
                                         initialScriptType={formData?.scriptType}
                                         initialAdditionalDetails={formData?.additionalDetails}
                                         savedMysteryId={id}
-                                        onSave={handleSaveMessages}
+                                        onSave={handleSaveChatMessage}
+                                        onGenerateFinal={handleGenerateMystery} // Pass the generate function
+                                        initialMessages={chatMessages} // Pass loaded messages
                                     />
                                 </div>
                             ) : (
@@ -162,15 +216,22 @@ const MysteryChatCreator = () => { // Renamed to MysteryChatCreator
                     </Card>
 
                     <div className="mt-8 flex justify-center gap-4">
-                        {showChatUI && (
+                        {showChatUI ? (
                             <Button
-                                onClick={handleGenerateMystery}
+                                onClick={() => {
+                                    // Trigger the final generation from MysteryChat
+                                    const chatComponent = document.querySelector('[data-testid="mystery-chat"]');
+                                    if (chatComponent && (chatComponent as any).__reactFiber$?.child?.stateNode?.handleSendMessage) {
+                                        (chatComponent as any).__reactFiber$?.child?.stateNode?.handleSendMessage("Generate the full murder mystery package.");
+                                    } else {
+                                        toast.error("Unable to trigger final generation.");
+                                    }
+                                }}
                                 className="bg-[#F97316] hover:bg-[#FB923C] text-white font-semibold"
                             >
                                 <Wand2 className="mr-2 h-5 w-5" /> Generate Mystery
                             </Button>
-                        )}
-                        {showChatUI ? null : (
+                        ) : (
                             <Button variant="outline" onClick={() => navigate("/dashboard")}>
                                 Back to Dashboard
                             </Button>
@@ -178,10 +239,9 @@ const MysteryChatCreator = () => { // Renamed to MysteryChatCreator
                     </div>
                 </div>
             </main>
-
             <Footer />
         </div>
     );
 };
 
-export default MysteryChatCreator; // Export with the new name
+export default MysteryChatCreator;
