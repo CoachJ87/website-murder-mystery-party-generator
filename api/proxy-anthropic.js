@@ -9,7 +9,7 @@ export default async function handler(req) {
     return new Response(null, {
       status: 200,
       headers: {
-        'Access-Control-Allow-Origin': 'https://website-murder-mystery-party-generator.vercel.app',
+        'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-api-key',
         'Access-Control-Max-Age': '86400',
@@ -23,7 +23,7 @@ export default async function handler(req) {
       status: 405,
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': 'https://website-murder-mystery-party-generator.vercel.app',
+        'Access-Control-Allow-Origin': '*',
       },
     });
   }
@@ -43,11 +43,21 @@ export default async function handler(req) {
       systemPrompt = process.env.MURDER_MYSTERY_FREE_PROMPT;
     }
     
-    // Prepare Anthropic API request
+    // If the request includes a system instruction, use it
+    if (requestData.system) {
+      systemPrompt = requestData.system;
+    }
+    
+    // Filter out any system messages from the messages array
+    const filteredMessages = requestData.messages ? 
+      requestData.messages.filter(msg => msg.role !== 'system') : 
+      [];
+    
+    // Prepare Anthropic API request with system at the top level
     const anthropicRequest = {
       model: "claude-3-7-sonnet-20250219", // Using the latest model
       max_tokens: 1000,
-      messages: requestData.messages || [],
+      messages: filteredMessages,
       system: systemPrompt
     };
     
@@ -73,7 +83,7 @@ export default async function handler(req) {
       status: response.status,
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': 'https://website-murder-mystery-party-generator.vercel.app',
+        'Access-Control-Allow-Origin': '*',
       },
     });
   } catch (error) {
@@ -82,7 +92,7 @@ export default async function handler(req) {
       status: 500,
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': 'https://website-murder-mystery-party-generator.vercel.app',
+        'Access-Control-Allow-Origin': '*',
       },
     });
   }

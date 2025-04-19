@@ -101,6 +101,12 @@ export default async function handler(req) {
       systemPrompt = "You are an AI assistant that helps create murder mystery party games. Create an engaging storyline and suggest character ideas.";
     }
     
+    // If the request includes a system instruction, use it instead of or in addition to the environment variable prompt
+    if (requestBody.system) {
+      console.log("Request includes system instruction, appending to environment prompt");
+      systemPrompt = systemPrompt + "\n\n" + requestBody.system;
+    }
+    
     console.log(`System prompt exists (first 100 chars): ${systemPrompt.substring(0, 100)}...`);
 
     // Validate messages array
@@ -156,11 +162,14 @@ export default async function handler(req) {
       });
     }
 
-    // Prepare Anthropic API request
+    // Filter out any system messages from the messages array, as they need to be handled separately
+    const filteredMessages = requestBody.messages.filter(msg => msg.role !== 'system');
+
+    // Prepare Anthropic API request - using the system parameter at the top level, not as a message
     const anthropicRequest = {
       model: "claude-3-7-sonnet-20250219",
       max_tokens: 2000,
-      messages: requestBody.messages || [],
+      messages: filteredMessages,
       system: systemPrompt
     };
 
