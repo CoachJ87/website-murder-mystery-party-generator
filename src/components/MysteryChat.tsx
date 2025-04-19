@@ -399,7 +399,4 @@ const MysteryChat = ({
                                     )}
                                 </div>
                                 <div className="text-xs opacity-70 mt-2">
-                                    {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                </div>
-                            </CardContent>
-                        </Card>
+                                    {message.timestamp.
