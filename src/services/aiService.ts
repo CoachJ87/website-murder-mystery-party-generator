@@ -30,8 +30,7 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
       return msg;
     });
     
-    // FIXED: Separate system messages and ensure they are not in the messages array
-    // Extract any system messages (we'll handle these differently)
+    // IMPORTANT: Filter out any system messages - they need to be handled separately
     const userAndAssistantMessages = standardMessages.filter(msg => msg.role !== 'system');
     const systemMessages = standardMessages.filter(msg => msg.role === 'system');
     
@@ -50,7 +49,7 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
     try {
       console.log("DEBUG: Attempting to use mystery-ai Edge Function");
       
-      // Format the request for the Edge Function
+      // Format the request for the Edge Function - only send user/assistant messages
       const edgeFunctionPayload = {
         messages: userAndAssistantMessages,
         system: systemInstruction, // Send as top-level system parameter

@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -43,6 +44,7 @@ const MysteryChat = ({
     const aiHasRespondedRef = useRef(false);
     const [error, setError] = useState<string | null>(null);
     const isEditModeRef = useRef(!!savedMysteryId);
+    const [hasUserEditedInSession, setHasUserEditedInSession] = useState(false);
 
     console.log("DEBUG: MysteryChat rendering with props:", {
         initialTheme,
@@ -84,7 +86,7 @@ const MysteryChat = ({
                 const lastMessage = initialMessages[initialMessages.length - 1];
                 if (!lastMessage.is_ai && !aiHasRespondedRef.current) {
                     console.log("DEBUG: Last message is from user, triggering AI response");
-                    handleAIResponse(lastMessage.content);
+                    handleAIResponse(lastMessage.content, false); // Pass false to indicate not user-initiated
                 }
             }
         }
@@ -132,7 +134,7 @@ const MysteryChat = ({
 
             if (!aiHasRespondedRef.current) {
                 console.log("DEBUG: About to call handleAIResponse with initial message");
-                handleAIResponse(initialMessage.content);
+                handleAIResponse(initialMessage.content, false); // Pass false for initial prompt
             } else {
                 console.log("DEBUG: Skipping AI response for initial message - AI has already responded");
             }
@@ -178,6 +180,7 @@ const MysteryChat = ({
         setMessages(updatedMessages);
         setInput("");
         setError(null);
+        setHasUserEditedInSession(true); // Mark that the user has submitted a new message in this session
 
         if (onSave) {
             console.log("DEBUG: Calling onSave with updated messages");
@@ -185,7 +188,7 @@ const MysteryChat = ({
         }
 
         console.log("DEBUG: About to call handleAIResponse from handleSubmit");
-        await handleAIResponse(userMessage.content);
+        await handleAIResponse(userMessage.content, true); // Pass true to indicate user-initiated
         console.log("DEBUG: handleAIResponse call finished in handleSubmit");
     };
 
@@ -197,8 +200,8 @@ const MysteryChat = ({
         }
     };
 
-    const handleAIResponse = async (userMessage: string) => {
-        console.log("DEBUG: handleAIResponse called with:", userMessage);
+    const handleAIResponse = async (userMessage: string, isUserInitiated: boolean = false) => {
+        console.log("DEBUG: handleAIResponse called with:", userMessage, "isUserInitiated:", isUserInitiated);
         try {
             setLoading(true);
             setError(null);
@@ -206,8 +209,10 @@ const MysteryChat = ({
 
             let anthropicMessages;
             
-            if (isEditModeRef.current && messages.length > 0) {
-                console.log("DEBUG: Edit mode detected, limiting conversation context");
+            // Use different context strategies based on whether this is a user-initiated message
+            // in edit mode, and whether the user has edited in this session
+            if (isEditModeRef.current && isUserInitiated) {
+                console.log("DEBUG: Edit mode with user-initiated message, limiting conversation context");
                 
                 const lastAiMessageIndex = [...messages].reverse().findIndex(m => m.is_ai);
                 
@@ -233,7 +238,31 @@ const MysteryChat = ({
                     ];
                     console.log("DEBUG: No AI messages found, using single message with context hint");
                 }
+            } else if (isEditModeRef.current && !isUserInitiated) {
+                console.log("DEBUG: Edit mode with auto-triggered response, using last few messages for context");
+                
+                // For initial load in edit mode, only take the last 2-4 messages to avoid context overload
+                const contextSize = 4; // Adjust based on your needs
+                const recentMessages = messages.slice(-contextSize);
+                
+                anthropicMessages = recentMessages.map(m => ({
+                    role: m.is_ai ? "assistant" : "user",
+                    content: m.content,
+                }));
+                
+                // Ensure the current user message is included if not already
+                if (anthropicMessages.length === 0 || 
+                    (anthropicMessages.length > 0 && 
+                     anthropicMessages[anthropicMessages.length - 1].content !== userMessage)) {
+                    anthropicMessages.push({
+                        role: "user",
+                        content: userMessage
+                    });
+                }
+                
+                console.log("DEBUG: Using last few messages for context in initial edit mode response");
             } else {
+                // Standard approach for new mysteries - include full history
                 anthropicMessages = messages.map(m => ({
                     role: m.is_ai ? "assistant" : "user",
                     content: m.content,
@@ -249,7 +278,7 @@ const MysteryChat = ({
                     anthropicMessages[anthropicMessages.length - 1].content !== userMessage)) {
                     anthropicMessages.push(currentUserMessage);
                 }
-                console.log("DEBUG: Using full conversation context");
+                console.log("DEBUG: Using full conversation context for new mystery");
             }
 
             console.log("DEBUG: anthropicMessages being sent:", JSON.stringify(anthropicMessages.map((m, i) => ({
@@ -339,7 +368,7 @@ const MysteryChat = ({
             const lastUserMessage = [...messages].reverse()[lastUserMessageIndex];
             const messagesUntilLastUser = messages.slice(0, messages.length - lastUserMessageIndex);
             setMessages(messagesUntilLastUser);
-            handleAIResponse(lastUserMessage.content);
+            handleAIResponse(lastUserMessage.content, true); // Treat retry as user-initiated
         }
     };
 
