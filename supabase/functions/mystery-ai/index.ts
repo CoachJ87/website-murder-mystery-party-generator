@@ -26,16 +26,19 @@ serve(async (req) => {
     
     if (!anthropicApiKey) {
       console.error("Missing Anthropic API key in environment variables");
+      // Instead of returning 500, return a structured error response with 200 status
+      // This allows the client to handle the error gracefully
       return new Response(
         JSON.stringify({ 
           error: "Configuration error: Missing Anthropic API key",
+          status: "error",
           choices: [{
             message: {
-              content: "API configuration error: The Anthropic API key is missing. Please contact support."
+              content: "API configuration error: The Anthropic API key is missing. Falling back to the proxy API."
             }
           }]
         }), {
-          status: 500,
+          status: 200, // Return 200 instead of 500 to prevent CORS issues
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         }
       );
@@ -57,13 +60,14 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           error: "Invalid request body",
+          status: "error",
           choices: [{
             message: {
               content: "Invalid request format. Please try again."
             }
           }]
         }), {
-          status: 400,
+          status: 200, // Use 200 instead of 400 to prevent CORS issues
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         }
       );
@@ -77,13 +81,14 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           error: "Missing or invalid messages parameter",
+          status: "error",
           choices: [{
             message: {
               content: "No messages provided. Please try again with a valid prompt."
             }
           }]
         }), {
-          status: 400,
+          status: 200, // Use 200 instead of 400 to prevent CORS issues
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         }
       );
@@ -166,13 +171,14 @@ serve(async (req) => {
         JSON.stringify({ 
           error: "Anthropic API error",
           details: apiError.message,
+          status: "error",
           choices: [{
             message: {
               content: `There was an error generating your murder mystery: ${apiError.message}. Please try again.`
             }
           }]
         }), {
-          status: 500,
+          status: 200, // Use 200 instead of 500 to prevent CORS issues
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         }
       );
@@ -183,13 +189,14 @@ serve(async (req) => {
       JSON.stringify({ 
         error: "Internal server error", 
         details: error.message,
+        status: "error",
         choices: [{
           message: {
             content: `There was an error generating your murder mystery: ${error.message}. Please try again.`
           }
         }]
       }), {
-        status: 500,
+        status: 200, // Use 200 instead of 500 to prevent CORS issues
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );

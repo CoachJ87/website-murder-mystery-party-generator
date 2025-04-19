@@ -74,6 +74,23 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
 
       console.log("DEBUG: Edge Function response received:", functionData);
       
+      // Check first for specific error we know about (missing API key)
+      if (functionData && functionData.error) {
+        console.log("DEBUG: Edge Function returned structured error:", functionData.error);
+        
+        // If the error is about configuration/missing API key, we'll fall through to the Vercel API
+        if (functionData.error.includes("Configuration error") || 
+            functionData.error.includes("Missing Anthropic API key")) {
+          console.log("DEBUG: Edge Function missing API key, falling back to Vercel API");
+          throw new Error("Edge Function configuration error - falling back to Vercel API");
+        }
+        
+        // For other structured errors, return the error message
+        if (functionData.choices && functionData.choices[0] && functionData.choices[0].message) {
+          return functionData.choices[0].message.content;
+        }
+      }
+      
       if (functionError) {
         console.error("DEBUG: Error from Edge Function:", functionError);
         throw new Error(`Edge Function error: ${functionError.message}`);
