@@ -26,6 +26,7 @@ const MysteryCreation = () => {
 
     useEffect(() => {
         if (isEditing && id) {
+            console.log("useEffect [id] triggered. ID:", id); // ADD THIS LINE
             loadExistingConversation(id);
         }
     }, [id]);
@@ -70,6 +71,7 @@ const MysteryCreation = () => {
     };
 
     const loadExistingConversation = async (conversationId: string) => {
+        console.log("loadExistingConversation called with ID:", conversationId);
         try {
             setIsLoadingHistory(true);
             console.log("Loading conversation with ID:", conversationId);
@@ -85,6 +87,8 @@ const MysteryCreation = () => {
                 return;
             }
 
+            console.log("Conversation data loaded:", data);
+            
             if (data) {
                 console.log("Loaded conversation data:", data);
                 setShowChatUI(true);
@@ -140,7 +144,7 @@ const MysteryCreation = () => {
                 console.error("Error saving message:", error);
                 toast.error("Failed to save message");
             } else {
-                console.log("Message saved successfully");
+                console.log("Message saved to database:", message);
             }
         } catch (error) {
             console.error("Error saving message:", error);
