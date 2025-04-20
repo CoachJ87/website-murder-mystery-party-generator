@@ -19,6 +19,7 @@ export type Database = {
           mystery_id: string | null
           prompt_version: string | null
           purchase_date: string | null
+          system_instruction: string | null
           title: string | null
           updated_at: string | null
           user_id: string
@@ -32,6 +33,7 @@ export type Database = {
           mystery_id?: string | null
           prompt_version?: string | null
           purchase_date?: string | null
+          system_instruction?: string | null
           title?: string | null
           updated_at?: string | null
           user_id: string
@@ -45,6 +47,7 @@ export type Database = {
           mystery_id?: string | null
           prompt_version?: string | null
           purchase_date?: string | null
+          system_instruction?: string | null
           title?: string | null
           updated_at?: string | null
           user_id?: string

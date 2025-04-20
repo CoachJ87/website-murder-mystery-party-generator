@@ -10,7 +10,6 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { CheckCircle, CreditCard } from 'lucide-react';
 
-// Define the MysteryPackage type
 interface MysteryPackage {
   id: string;
   name: string;
@@ -28,21 +27,17 @@ export default function MysteryPreview() {
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
 
-  // Helper function to extract premise from messages
   const extractPremiseFromMessages = (messages: any[]) => {
-    // Find AI messages with premise content
     const aiMessages = messages.filter(msg => msg.is_ai === true || msg.role === 'assistant');
     
     for (const msg of aiMessages) {
       const content = msg.content || '';
-      // Look for a premise section in markdown
       const premiseMatch = content.match(/## PREMISE\n([\s\S]*?)(?=\n##|\n$)/i);
       if (premiseMatch && premiseMatch[1]) {
         return premiseMatch[1].trim();
       }
     }
 
-    // Fallback - return the first AI message (shortened)
     if (aiMessages.length > 0) {
       const firstMsg = aiMessages[0].content || '';
       const firstParagraph = firstMsg.split('\n\n')[0] || '';
@@ -61,7 +56,6 @@ export default function MysteryPreview() {
     setLoading(true);
 
     try {
-      // Check if user has already purchased this mystery
       if (user?.id) {
         const { data, error } = await supabase
           .from('conversations')
@@ -78,7 +72,6 @@ export default function MysteryPreview() {
         }
       }
 
-      // Load the conversation and messages to extract mystery details
       const { data, error } = await supabase
         .from('conversations')
         .select('*, mystery_data, messages(*)')
@@ -91,7 +84,6 @@ export default function MysteryPreview() {
         return;
       }
 
-      // Extract mystery data
       const mysteryData = {
         id: data.id,
         name: data.title || 'Mystery Preview',
@@ -115,36 +107,7 @@ export default function MysteryPreview() {
   }, [loadMystery]);
 
   const handlePurchase = async () => {
-    if (!isAuthenticated || !user?.id) {
-      toast.error("Please sign in to purchase this mystery");
-      navigate("/sign-in");
-      return;
-    }
-
-    setPurchasing(true);
-    try {
-      const response = await fetch('/api/create-checkout-session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ mysteryId: id, userId: user.id }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        toast.error(`Failed to initiate purchase: ${errorData.error || 'Unknown error'}`);
-        return;
-      }
-
-      const { url } = await response.json();
-      window.location.href = url; // Redirect to Stripe Checkout
-    } catch (error) {
-      console.error('Error initiating purchase:', error);
-      toast.error('Failed to initiate purchase. Please try again.');
-    } finally {
-      setPurchasing(false);
-    }
+    window.location.href = "https://buy.stripe.com/6oE6rm1fT4BRdyM3cd";
   };
 
   const simulatePurchase = async () => {
@@ -156,7 +119,6 @@ export default function MysteryPreview() {
 
     setPurchasing(true);
     try {
-      // Update the profiles table to mark the mystery as purchased
       const { error: profileError } = await supabase
         .from('profiles')
         .update({
@@ -169,7 +131,6 @@ export default function MysteryPreview() {
         throw profileError;
       }
       
-      // Update the conversations table
       const { error: convError } = await supabase
         .from('conversations')
         .update({
@@ -230,7 +191,6 @@ export default function MysteryPreview() {
         <h1 className="text-3xl font-bold mb-6">{mystery?.name}</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Mystery Preview Section */}
           <Card>
             <CardHeader>
               <CardTitle>Mystery Preview</CardTitle>
@@ -253,7 +213,6 @@ export default function MysteryPreview() {
             </CardContent>
           </Card>
 
-          {/* Purchase Section */}
           <Card>
             <CardHeader>
               <CardTitle>Purchase This Mystery</CardTitle>
@@ -291,11 +250,9 @@ export default function MysteryPreview() {
                 {purchasing ? 'Processing...' : 'Purchase Now'}
               </Button>
               
-              {process.env.NODE_ENV !== 'production' && (
-                <Button onClick={simulatePurchase} variant="outline" disabled={purchasing} className="w-full mt-2">
-                  Simulate Purchase (Dev Only)
-                </Button>
-              )}
+              <Button onClick={simulatePurchase} variant="outline" disabled={purchasing} className="w-full mt-2">
+                Simulate Purchase (Dev Mode)
+              </Button>
             </CardContent>
           </Card>
         </div>
