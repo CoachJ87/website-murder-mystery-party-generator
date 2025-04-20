@@ -5,8 +5,9 @@ import { supabase } from '@/lib/supabase';
 import { useUser } from '@/hooks/useUser';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertTriangle } from 'lucide-react';
 
-// Define the MysteryPackage type to fix the missing import
 interface MysteryPackage {
   id: string;
   name: string;
@@ -23,6 +24,51 @@ export default function MysteryPreview() {
   const [mystery, setMystery] = useState<MysteryPackage | null>(null);
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadMysteryFromSupabase = useCallback(async () => {
+    if (!id) return null;
+
+    try {
+      const { data: conversation, error: conversationError } = await supabase
+        .from('conversations')
+        .select('*, messages(*)')
+        .eq('id', id)
+        .single();
+
+      if (conversationError) throw conversationError;
+      if (!conversation) throw new Error('No conversation found');
+
+      const aiMessages = conversation.messages?.filter(msg => msg.role === 'assistant') || [];
+      const latestMessage = aiMessages.length > 0 
+        ? aiMessages[aiMessages.length - 1] 
+        : null;
+
+      return {
+        id: conversation.id,
+        name: conversation.title || 'Custom Murder Mystery',
+        content: latestMessage?.content || 'Mystery content not available yet.',
+        theme: conversation.mystery_data?.theme || 'Classic',
+        num_players: conversation.mystery_data?.playerCount || 6,
+        premise: extractPremise(latestMessage?.content)
+      };
+    } catch (error) {
+      console.error('Error fetching mystery from Supabase:', error);
+      return null;
+    }
+  }, [id]);
+
+  const extractPremise = (content?: string) => {
+    if (!content) return '';
+    
+    const premiseMatch = content.match(/##?\s*PREMISE\s*\n([\s\S]*?)(?=##|\n\n|$)/i);
+    if (premiseMatch && premiseMatch[1]) {
+      return premiseMatch[1].trim();
+    }
+    
+    const paragraphs = content.split('\n\n');
+    return paragraphs[0] || '';
+  };
 
   const loadMystery = useCallback(async () => {
     if (!id) {
@@ -31,9 +77,9 @@ export default function MysteryPreview() {
     }
 
     setLoading(true);
+    setError(null);
 
     try {
-      // Check if user has already purchased this mystery
       if (user?.id) {
         const { data, error } = await supabase
           .from('profiles')
@@ -49,23 +95,36 @@ export default function MysteryPreview() {
         }
       }
 
-      // Load mystery details - Changed to fetch from Vercel API
-      const response = await fetch(`/api/get-mystery/${id}`);
-      if (!response.ok) {
-        const errorData = await response.json();
-        toast.error(`Failed to load mystery preview: ${errorData?.error || 'Unknown error'}`);
+      const mysteryData = await loadMysteryFromSupabase();
+      
+      if (mysteryData) {
+        setMystery(mysteryData);
         return;
       }
-      const mysteryData = await response.json();
-      setMystery(mysteryData);
 
-    } catch (error) {
+      try {
+        const response = await fetch(`/api/get-mystery/${id}`);
+        
+        if (!response.ok) {
+          throw new Error(`Failed to load mystery: ${response.status} ${response.statusText}`);
+        }
+        
+        const apiMysteryData = await response.json();
+        setMystery(apiMysteryData);
+      } catch (apiError: any) {
+        console.error('Error fetching from API:', apiError);
+        setError('Could not load mystery preview. Please try again later.');
+        toast.error('Failed to load mystery preview.');
+      }
+
+    } catch (error: any) {
       console.error('Error in loadMystery:', error);
+      setError('An error occurred while loading the mystery.');
       toast.error('An error occurred while loading the mystery.');
     } finally {
       setLoading(false);
     }
-  }, [id, navigate, user?.id]);
+  }, [id, navigate, user?.id, loadMysteryFromSupabase]);
 
   useEffect(() => {
     loadMystery();
@@ -80,7 +139,6 @@ export default function MysteryPreview() {
 
     setPurchasing(true);
     try {
-      // Update the profiles table to mark the mystery as purchased
       const { error } = await supabase
         .from('profiles')
         .update({
@@ -149,15 +207,31 @@ export default function MysteryPreview() {
     );
   }
 
-  if (!mystery) {
+  if (error) {
     return (
       <div className="container mx-auto py-10 text-center">
-        <p className="text-lg text-muted-foreground">Mystery not found.</p>
+        <Alert variant="destructive" className="mb-4">
+          <AlertTriangle className="h-4 w-4 mr-2" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+        <Button onClick={() => navigate('/mystery')} className="mt-4">
+          Return to Mysteries
+        </Button>
       </div>
     );
   }
 
-  // Extract the premise without cutting it off
+  if (!mystery) {
+    return (
+      <div className="container mx-auto py-10 text-center">
+        <p className="text-lg text-muted-foreground">Mystery not found.</p>
+        <Button onClick={() => navigate('/mystery')} className="mt-4">
+          Return to Mysteries
+        </Button>
+      </div>
+    );
+  }
+
   const premise = mystery?.premise || mystery?.content.split('\n\n')[0] || '';
 
   return (
