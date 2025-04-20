@@ -7,7 +7,7 @@ import { useUser } from '@/hooks/useUser';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertTriangle, CheckCircle, CreditCard, Wand2 } from 'lucide-react';
+import { AlertTriangle, CheckCircle, CreditCard } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
@@ -83,11 +83,7 @@ export default function MysteryPreview() {
     setError(null);
 
     try {
-      // Only check purchase status if not coming from chat/creation
-      const referrer = document.referrer;
-      const isFromChat = referrer.includes('/mystery/edit') || referrer.includes('/mystery/create');
-      
-      if (!isFromChat && user?.id) {
+      if (user?.id) {
         const { data, error } = await supabase
           .from('profiles')
           .select('has_purchased')
@@ -267,80 +263,64 @@ export default function MysteryPreview() {
         <div className="container mx-auto py-10">
           <h1 className="text-3xl font-bold mb-4">{mystery?.name}</h1>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <div className="md:col-span-2">
-              <div className="p-4 border rounded-md">
-                <h2 className="text-xl font-semibold mb-4">Preview</h2>
-                <p className="font-bold">Theme:</p>
-                <p className="mb-2">{mystery?.theme || 'Classic Murder Mystery'}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="p-4 border rounded-md">
+              <h2 className="text-xl font-semibold mb-4">Preview</h2>
+              <p className="font-bold">Theme:</p>
+              <p className="mb-2">{mystery?.theme || 'Classic Murder Mystery'}</p>
 
-                <p className="font-bold">Number of Players:</p>
-                <p className="mb-2">{mystery?.num_players || 6}</p>
+              <p className="font-bold">Number of Players:</p>
+              <p className="mb-2">{mystery?.num_players || 6}</p>
 
-                <p className="font-bold">Premise:</p>
-                <p className="whitespace-pre-line">{premise}</p>
-              </div>
-
-              <div className="mt-6 p-4 border rounded-md">
-                <h2 className="text-xl font-semibold mb-4">What's Included</h2>
-                <ul className="space-y-2">
-                  {[
-                    "Full character profiles for all suspects",
-                    "Host guide with step-by-step instructions",
-                    "Printable character sheets",
-                    "Evidence and clue cards",
-                    "Timeline of events",
-                    "Solution reveal script",
-                    "PDF downloads of all materials"
-                  ].map((item, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <p className="font-bold">Premise:</p>
+              <p className="whitespace-pre-line">{premise}</p>
             </div>
 
-            <div className="md:col-span-1">
-              <div className="p-4 border rounded-md sticky top-4">
-                <div className="mb-6 p-3 bg-muted/50 rounded">
-                  <h3 className="font-semibold">Important Notes</h3>
-                  <ul className="text-sm list-disc ml-4 mt-2 space-y-1">
-                    <li>This is a one-time purchase for this specific mystery package</li>
-                    <li>You'll have permanent access to download all materials</li>
-                    <li>Content is for personal use only, not for commercial redistribution</li>
-                    <li>Need help? Contact our support at support@mysterygenerator.com</li>
-                  </ul>
-                </div>
-
-                <div className="flex flex-col gap-4">
-                  <Button 
-                    onClick={handlePurchase} 
-                    disabled={purchasing} 
-                    className="w-full"
-                  >
-                    {purchasing ? 'Processing...' : (
-                      <span className="flex items-center gap-2">
-                        <CreditCard className="h-4 w-4" />
-                        Purchase Now for $4.99
-                      </span>
-                    )}
-                  </Button>
-                  {process.env.NODE_ENV !== 'production' && (
-                    <Button 
-                      onClick={simulatePurchase} 
-                      variant="outline" 
-                      disabled={purchasing}
-                      className="w-full"
-                    >
-                      <Wand2 className="h-4 w-4 mr-2" />
-                      Simulate Purchase (Dev Only)
-                    </Button>
-                  )}
-                </div>
-              </div>
+            <div className="p-4 border rounded-md">
+              <h2 className="text-xl font-semibold mb-4">What's Included</h2>
+              <ul className="space-y-2">
+                {[
+                  "Full character profiles for all suspects",
+                  "Host guide with step-by-step instructions",
+                  "Printable character sheets",
+                  "Evidence and clue cards",
+                  "Timeline of events",
+                  "Solution reveal script",
+                  "PDF downloads of all materials"
+                ].map((item, index) => (
+                  <li key={index} className="flex items-start gap-2">
+                    <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
+          </div>
+
+          <div className="mb-6 p-3 bg-muted/50 rounded">
+            <h3 className="font-semibold">Important Notes</h3>
+            <ul className="text-sm list-disc ml-4 mt-2 space-y-1">
+              <li>This is a one-time purchase for this specific mystery package</li>
+              <li>You'll have permanent access to download all materials</li>
+              <li>Content is for personal use only, not for commercial redistribution</li>
+              <li>Need help? Contact our support at support@mysterygenerator.com</li>
+            </ul>
+          </div>
+
+          <div className="flex gap-4">
+            <Button onClick={handlePurchase} disabled={purchasing} className="flex-1">
+              {purchasing ? 'Processing...' : (
+                <span className="flex items-center gap-2">
+                  <CreditCard className="h-4 w-4" />
+                  Purchase Now for $4.99
+                </span>
+              )}
+            </Button>
+            {process.env.NODE_ENV !== 'production' && (
+              <Button onClick={simulatePurchase} variant="outline" disabled={purchasing} className="flex-1">
+                Simulate Purchase (Dev Only)
+              </Button>
+            )}
           </div>
         </div>
       </main>
