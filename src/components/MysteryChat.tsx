@@ -46,6 +46,7 @@ const MysteryChat = ({
     const [error, setError] = useState<string | null>(null);
     const isEditModeRef = useRef(!!savedMysteryId);
     const [hasUserEditedInSession, setHasUserEditedInSession] = useState(false);
+    const initialFormPromptSaved = useRef(false);
 
     console.log("DEBUG: MysteryChat rendering with props:", {
         initialTheme,
@@ -70,23 +71,61 @@ const MysteryChat = ({
             // Add message content analysis to detect incorrect is_ai flags
             console.log("DEBUG: Analyzing message contents for correct is_ai flags");
             
+            let userMessageCount = 0;
+            let aiMessageCount = 0;
+            
+            // First pass - count current message types
+            initialMessages.forEach(msg => {
+                if (msg.is_ai) {
+                    aiMessageCount++;
+                } else {
+                    userMessageCount++;
+                }
+            });
+            
+            console.log(`DEBUG: Initial analysis - User: ${userMessageCount}, AI: ${aiMessageCount}`);
+            
+            // If almost all messages are marked as user, something is wrong
+            const needsDeepAnalysis = userMessageCount > 1 && aiMessageCount === 0;
+            
             const correctedMessages = initialMessages.map((msg, index) => {
-                // Simple heuristic to detect if a message looks like it might be from AI
+                // Enhanced heuristic to detect AI messages
                 const looksLikeAI = 
                     // Contains markdown headings
                     msg.content.includes("# ") || 
                     msg.content.includes("## ") || 
-                    // Long explanatory text with typical AI structure
-                    (msg.content.length > 300 && 
-                     (msg.content.includes("Thank you for") || 
-                      msg.content.includes("CHARACTER LIST") || 
-                      msg.content.includes("PREMISE") ||
-                      msg.content.includes("VICTIM")));
+                    // Contains typical AI phrasings
+                    msg.content.includes("Thank you for sharing") ||
+                    msg.content.includes("I'd be happy to") ||
+                    msg.content.includes("Here's a murder mystery") ||
+                    // Content has structural elements typical of AI responses
+                    (msg.content.includes("CHARACTER") && msg.content.includes("LIST")) ||
+                    msg.content.includes("PREMISE") ||
+                    msg.content.includes("VICTIM") ||
+                    // Content is long and formatted
+                    (msg.content.length > 200 && 
+                     (msg.content.includes("**") || // Bold markdown
+                      (msg.content.match(/\d\./g) || []).length > 2)); // Numbered lists
                 
-                if (!msg.is_ai && looksLikeAI) {
+                // Apply more aggressive correction if we detected an issue with all messages
+                const shouldCorrect = needsDeepAnalysis ? 
+                    // In deep analysis mode, assume even-indexed messages in conversation are from AI
+                    // after the first message (which is typically the user's initial prompt)
+                    (index > 0 && index % 2 === 1) || looksLikeAI : 
+                    // Normal mode - just check content heuristics
+                    looksLikeAI;
+                
+                if (!msg.is_ai && shouldCorrect) {
                     console.warn(`DEBUG: Message ${index} is marked as user but looks like AI content - correcting flag`);
                     // Return a new message object with corrected flag
                     return { ...msg, is_ai: true };
+                }
+                
+                // If needsDeepAnalysis is true and it's an even index message after the first,
+                // make sure it's marked as user message
+                if (needsDeepAnalysis && msg.is_ai && index > 0 && index % 2 === 0) {
+                    console.warn(`DEBUG: Message ${index} is marked as AI but should be user content - correcting flag`);
+                    return { ...msg, is_ai: false };
                 }
                 
                 return msg;
@@ -98,16 +137,45 @@ const MysteryChat = ({
                 content_preview: m.content.substring(0, 30) + '...'
             })));
 
-            setMessages(correctedMessages);
+            // Re-count after correction
+            let correctedUserCount = 0;
+            let correctedAiCount = 0;
+            
+            correctedMessages.forEach(msg => {
+                if (msg.is_ai) {
+                    correctedAiCount++;
+                } else {
+                    correctedUserCount++;
+                }
+            });
+            
+            console.log(`DEBUG: After correction - User: ${correctedUserCount}, AI: ${correctedAiCount}`);
 
-            if (correctedMessages.length > 0) {
-                const lastMessage = correctedMessages[correctedMessages.length - 1];
+            // Sort messages by timestamp to ensure correct order
+            const sortedMessages = [...correctedMessages].sort((a, b) => {
+                const timeA = a.timestamp instanceof Date ? a.timestamp.getTime() : new Date(a.timestamp).getTime();
+                const timeB = b.timestamp instanceof Date ? b.timestamp.getTime() : new Date(b.timestamp).getTime();
+                return timeA - timeB;
+            });
+
+            console.log("DEBUG: Sorted messages by timestamp");
+            
+            setMessages(sortedMessages);
+
+            if (sortedMessages.length > 0) {
+                const lastMessage = sortedMessages[sortedMessages.length - 1];
                 aiHasRespondedRef.current = !!lastMessage.is_ai;
                 console.log("DEBUG: Last message is from AI:", !!lastMessage.is_ai);
             }
 
             setInitialMessageSent(true);
             messagesInitialized.current = true;
+            
+            // Check if we already have the initial form prompt
+            const hasInitialFormPrompt = sortedMessages.some(msg => 
+                !msg.is_ai && msg.content.includes(`Let's create a murder mystery`)
+            );
+            initialFormPromptSaved.current = hasInitialFormPrompt;
         }
     }, [initialMessages]);
 
@@ -132,7 +200,8 @@ const MysteryChat = ({
             isLoadingHistory,
             theme: initialTheme,
             aiHasResponded: aiHasRespondedRef.current,
-            initialMessagesLength: initialMessages.length
+            initialMessagesLength: initialMessages.length,
+            initialFormPromptSaved: initialFormPromptSaved.current
         });
 
         if (messages.length > 0 || initialMessageSent || messagesInitialized.current || isLoadingHistory) {
@@ -163,10 +232,61 @@ const MysteryChat = ({
             setMessages([initialMessage]);
             setInitialMessageSent(true);
             messagesInitialized.current = true;
+            
+            // Save the initial form prompt message to the database
+            if (onSave && !initialFormPromptSaved.current) {
+                console.log("DEBUG: Saving initial form prompt to database");
+                onSave(initialMessage);
+                initialFormPromptSaved.current = true;
+            }
         } else if (initialMessages.length > 0 && !messagesInitialized.current) {
             console.log("DEBUG: Initial messages were provided, skipping initial prompt creation for theme");
         }
-    }, [initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails, messages.length, initialMessageSent, isLoadingHistory, initialMessages]);
+    }, [initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails, messages.length, initialMessageSent, isLoadingHistory, initialMessages, onSave]);
+
+    // Make sure form data gets saved for edit mode if not present
+    useEffect(() => {
+        if (isEditModeRef.current && messages.length > 0 && !initialFormPromptSaved.current && !isLoadingHistory) {
+            console.log("DEBUG: Checking if we need to add the initial form prompt");
+            
+            // Check if we have the initial form prompt
+            const hasInitialFormPrompt = messages.some(msg => 
+                !msg.is_ai && msg.content.includes(`Let's create a murder mystery`)
+            );
+            
+            if (!hasInitialFormPrompt && initialTheme) {
+                console.log("DEBUG: Adding missing initial form prompt for edit mode");
+                
+                // Create the initial form prompt
+                let initialChatMessage = `Let's create a murder mystery`;
+                if (initialTheme) initialChatMessage += ` with a ${initialTheme} theme`;
+                if (initialPlayerCount) initialChatMessage += ` for ${initialPlayerCount} players`;
+                if (initialHasAccomplice !== undefined) initialChatMessage += initialHasAccomplice ? `, including an accomplice` : `, without an accomplice`;
+                if (initialScriptType) initialChatMessage += ` with ${initialScriptType} scripts`;
+                if (initialAdditionalDetails) initialChatMessage += `. Additional details: ${initialAdditionalDetails}`;
+                initialChatMessage += ".";
+                
+                const initialMessage: Message = {
+                    id: Date.now().toString(),
+                    content: initialChatMessage,
+                    is_ai: false,
+                    timestamp: new Date(Date.now() - 1000000), // Set timestamp to earlier than other messages
+                };
+                
+                // Save to database
+                if (onSave) {
+                    console.log("DEBUG: Saving missing initial form prompt to database");
+                    onSave(initialMessage);
+                }
+                
+                // Add to messages at the beginning
+                setMessages(prev => [initialMessage, ...prev]);
+                initialFormPromptSaved.current = true;
+            } else {
+                initialFormPromptSaved.current = true;
+            }
+        }
+    }, [messages, isLoadingHistory, initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails, onSave]);
 
     const scrollToBottom = () => {
         console.log("DEBUG: Scrolling to bottom of messages");
