@@ -5,11 +5,12 @@ import { supabase } from '@/lib/supabase';
 import { useUser } from '@/hooks/useUser';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, CreditCard } from 'lucide-react';
 
-// Define the MysteryPackage type to fix the missing import
+// Define the MysteryPackage type
 interface MysteryPackage {
   id: string;
   name: string;
@@ -27,9 +28,33 @@ export default function MysteryPreview() {
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
 
+  // Helper function to extract premise from messages
+  const extractPremiseFromMessages = (messages: any[]) => {
+    // Find AI messages with premise content
+    const aiMessages = messages.filter(msg => msg.is_ai === true || msg.role === 'assistant');
+    
+    for (const msg of aiMessages) {
+      const content = msg.content || '';
+      // Look for a premise section in markdown
+      const premiseMatch = content.match(/## PREMISE\n([\s\S]*?)(?=\n##|\n$)/i);
+      if (premiseMatch && premiseMatch[1]) {
+        return premiseMatch[1].trim();
+      }
+    }
+
+    // Fallback - return the first AI message (shortened)
+    if (aiMessages.length > 0) {
+      const firstMsg = aiMessages[0].content || '';
+      const firstParagraph = firstMsg.split('\n\n')[0] || '';
+      return firstParagraph.length > 200 ? firstParagraph.substring(0, 200) + '...' : firstParagraph;
+    }
+    
+    return 'An intriguing murder mystery awaits...';
+  };
+
   const loadMystery = useCallback(async () => {
     if (!id) {
-      navigate('/mystery');
+      navigate('/dashboard');
       return;
     }
 
@@ -39,29 +64,44 @@ export default function MysteryPreview() {
       // Check if user has already purchased this mystery
       if (user?.id) {
         const { data, error } = await supabase
-          .from('profiles')
-          .select('has_purchased')
-          .eq('id', user.id)
+          .from('conversations')
+          .select('is_paid')
+          .eq('id', id)
           .single();
 
         if (error) {
           console.error('Error loading purchase status:', error);
-        } else if (data?.has_purchased) {
+        } else if (data?.is_paid) {
+          toast.info("You've already purchased this mystery!");
           navigate(`/mystery/${id}`);
           return;
         }
       }
 
-      // Load mystery details - Changed to fetch from Vercel API
-      const response = await fetch(`/api/get-mystery/${id}`);
-      if (!response.ok) {
-        const errorData = await response.json();
-        toast.error(`Failed to load mystery preview: ${errorData?.error || 'Unknown error'}`);
+      // Load the conversation and messages to extract mystery details
+      const { data, error } = await supabase
+        .from('conversations')
+        .select('*, mystery_data, messages(*)')
+        .eq('id', id)
+        .single();
+
+      if (error) {
+        console.error('Error loading mystery:', error);
+        toast.error('Failed to load mystery preview');
         return;
       }
-      const mysteryData = await response.json();
-      setMystery(mysteryData);
 
+      // Extract mystery data
+      const mysteryData = {
+        id: data.id,
+        name: data.title || 'Mystery Preview',
+        theme: data.mystery_data?.theme || 'Classic Mystery',
+        num_players: data.mystery_data?.playerCount || 6,
+        content: '',
+        premise: extractPremiseFromMessages(data.messages || [])
+      };
+
+      setMystery(mysteryData);
     } catch (error) {
       console.error('Error in loadMystery:', error);
       toast.error('An error occurred while loading the mystery.');
@@ -134,6 +174,7 @@ export default function MysteryPreview() {
         .from('conversations')
         .update({
           is_paid: true,
+          status: "published",
           purchase_date: new Date().toISOString()
         })
         .eq('id', id);
@@ -181,71 +222,90 @@ export default function MysteryPreview() {
     );
   }
 
-  // Extract the premise without cutting it off
-  const premise = mystery?.premise || mystery?.content.split('\n\n')[0] || '';
-
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
       
-      <div className="container mx-auto py-10 flex-1">
-        <h1 className="text-3xl font-bold mb-4">{mystery?.name}</h1>
+      <main className="container mx-auto py-10 flex-1">
+        <h1 className="text-3xl font-bold mb-6">{mystery?.name}</h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div className="p-4 border rounded-md">
-            <h2 className="text-xl font-semibold mb-4">Preview</h2>
-            <p className="font-bold">Theme:</p>
-            <p className="mb-2">{mystery?.theme || 'Classic Murder Mystery'}</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Mystery Preview Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Mystery Preview</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <h3 className="font-bold text-lg mb-2">Theme</h3>
+                <p>{mystery?.theme || 'Classic Murder Mystery'}</p>
+              </div>
+              
+              <div>
+                <h3 className="font-bold text-lg mb-2">Number of Players</h3>
+                <p>{mystery?.num_players || 6} players</p>
+              </div>
+              
+              <div>
+                <h3 className="font-bold text-lg mb-2">Premise</h3>
+                <p className="whitespace-pre-line">{mystery?.premise}</p>
+              </div>
+            </CardContent>
+          </Card>
 
-            <p className="font-bold">Number of Players:</p>
-            <p className="mb-2">{mystery?.num_players || 6}</p>
-
-            <p className="font-bold">Premise:</p>
-            <p className="whitespace-pre-line">{premise}</p>
-          </div>
-
-          <div className="p-4 border rounded-md">
-            <h2 className="text-xl font-semibold mb-4">What's Included</h2>
-            <ul className="space-y-2">
-              {[
-                "Full character profiles for all suspects",
-                "Host guide with step-by-step instructions",
-                "Printable character sheets",
-                "Evidence and clue cards",
-                "Timeline of events",
-                "Solution reveal script",
-                "PDF downloads of all materials"
-              ].map((item, index) => (
-                <li key={index} className="flex items-start gap-2">
-                  <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {/* Purchase Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Purchase This Mystery</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="h-12 w-12 rounded bg-primary/10 flex items-center justify-center shrink-0">
+                  <CreditCard className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <div className="font-bold text-2xl mb-1">$4.99</div>
+                  <p className="text-muted-foreground">One-time purchase, instant access</p>
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                <h3 className="font-medium">What's included:</h3>
+                {[
+                  "Full character profiles for all suspects",
+                  "Host guide with step-by-step instructions",
+                  "Printable character sheets",
+                  "Evidence and clue cards",
+                  "Timeline of events",
+                  "Solution reveal script",
+                  "PDF downloads of all materials"
+                ].map((item, index) => (
+                  <div key={index} className="flex items-start gap-2">
+                    <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+              
+              <Button onClick={handlePurchase} disabled={purchasing} className="w-full mt-4">
+                {purchasing ? 'Processing...' : 'Purchase Now'}
+              </Button>
+              
+              {process.env.NODE_ENV !== 'production' && (
+                <Button onClick={simulatePurchase} variant="outline" disabled={purchasing} className="w-full mt-2">
+                  Simulate Purchase (Dev Only)
+                </Button>
+              )}
+            </CardContent>
+          </Card>
         </div>
         
-        <div className="p-4 bg-muted/50 rounded-lg mb-6">
-          <h3 className="font-semibold">Important Notes</h3>
-          <ul className="text-sm list-disc ml-4 mt-2 space-y-1">
-            <li>This is a one-time purchase for this specific mystery package</li>
-            <li>You'll have permanent access to download all materials</li>
-            <li>Content is for personal use only, not for commercial redistribution</li>
-            <li>Need help? Contact our support at support@mysterygenerator.com</li>
-          </ul>
-        </div>
-
-        <div className="flex gap-4">
-          <Button onClick={handlePurchase} disabled={purchasing} className="flex-1">
-            {purchasing ? 'Processing...' : 'Purchase Now for $4.99'}
+        <div className="mt-8 text-center">
+          <Button variant="outline" onClick={() => navigate("/dashboard")}>
+            Back to Dashboard
           </Button>
-          {process.env.NODE_ENV !== 'production' && (
-            <Button onClick={simulatePurchase} variant="outline" disabled={purchasing} className="flex-1">
-              Simulate Purchase (Dev Only)
-            </Button>
-          )}
         </div>
-      </div>
+      </main>
       
       <Footer />
     </div>
