@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -7,9 +6,7 @@ import { useUser } from '@/hooks/useUser';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertTriangle, CheckCircle, CreditCard } from 'lucide-react';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import { AlertTriangle } from 'lucide-react';
 
 interface MysteryPackage {
   id: string;
@@ -142,17 +139,12 @@ export default function MysteryPreview() {
 
     setPurchasing(true);
     try {
-      // Check if the profiles table has a purchase_date column
-      const { error: columnCheckError } = await supabase
-        .rpc('column_exists', { 
-          p_table: 'profiles', 
-          p_column: 'purchase_date' 
-        });
-
-      // Only update the has_purchased field since purchase_date doesn't exist in the type
       const { error } = await supabase
         .from('profiles')
-        .update({ has_purchased: true })
+        .update({
+          has_purchased: true,
+          purchase_date: new Date().toISOString()
+        })
         .eq('id', user.id);
 
       if (error) {
@@ -187,15 +179,13 @@ export default function MysteryPreview() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to initiate purchase");
+        const errorData = await response.json();
+        toast.error(`Failed to initiate purchase: ${errorData.error || 'Unknown error'}`);
+        return;
       }
 
-      const data = await response.json();
-      if (data.url) {
-        window.location.href = data.url; // Redirect to Stripe Checkout
-      } else {
-        throw new Error("Invalid response from payment service");
-      }
+      const { url } = await response.json();
+      window.location.href = url; // Redirect to Stripe Checkout
     } catch (error) {
       console.error('Error initiating purchase:', error);
       toast.error('Failed to initiate purchase. Please try again.');
@@ -206,50 +196,38 @@ export default function MysteryPreview() {
 
   if (isUserLoading || loading) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <div className="container mx-auto py-10 flex-grow">
-          <Skeleton className="h-10 w-80 mb-4" />
-          <Skeleton className="h-64 w-full rounded-md" />
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Skeleton className="h-48 rounded-md" />
-            <Skeleton className="h-48 rounded-md" />
-          </div>
+      <div className="container mx-auto py-10">
+        <Skeleton className="h-10 w-80 mb-4" />
+        <Skeleton className="h-64 w-full rounded-md" />
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Skeleton className="h-48 rounded-md" />
+          <Skeleton className="h-48 rounded-md" />
         </div>
-        <Footer />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <div className="container mx-auto py-10 text-center flex-grow">
-          <Alert variant="destructive" className="mb-4">
-            <AlertTriangle className="h-4 w-4 mr-2" />
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-          <Button onClick={() => navigate('/mystery')} className="mt-4">
-            Return to Mysteries
-          </Button>
-        </div>
-        <Footer />
+      <div className="container mx-auto py-10 text-center">
+        <Alert variant="destructive" className="mb-4">
+          <AlertTriangle className="h-4 w-4 mr-2" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+        <Button onClick={() => navigate('/mystery')} className="mt-4">
+          Return to Mysteries
+        </Button>
       </div>
     );
   }
 
   if (!mystery) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <div className="container mx-auto py-10 text-center flex-grow">
-          <p className="text-lg text-muted-foreground">Mystery not found.</p>
-          <Button onClick={() => navigate('/mystery')} className="mt-4">
-            Return to Mysteries
-          </Button>
-        </div>
-        <Footer />
+      <div className="container mx-auto py-10 text-center">
+        <p className="text-lg text-muted-foreground">Mystery not found.</p>
+        <Button onClick={() => navigate('/mystery')} className="mt-4">
+          Return to Mysteries
+        </Button>
       </div>
     );
   }
@@ -257,47 +235,35 @@ export default function MysteryPreview() {
   const premise = mystery?.premise || mystery?.content.split('\n\n')[0] || '';
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-grow">
-        <div className="container mx-auto py-10">
-          <h1 className="text-3xl font-bold mb-4">{mystery?.name}</h1>
+    <div className="container mx-auto py-10">
+      <h1 className="text-3xl font-bold mb-4">{mystery?.name}</h1>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div className="p-4 border rounded-md">
-              <h2 className="text-xl font-semibold mb-4">Preview</h2>
-              <p className="font-bold">Theme:</p>
-              <p className="mb-2">{mystery?.theme || 'Classic Murder Mystery'}</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div className="p-4 border rounded-md">
+          <h2 className="text-xl font-semibold mb-4">Preview</h2>
+          <p className="font-bold">Theme:</p>
+          <p className="mb-2">{mystery?.theme || 'Classic Murder Mystery'}</p>
 
-              <p className="font-bold">Number of Players:</p>
-              <p className="mb-2">{mystery?.num_players || 6}</p>
+          <p className="font-bold">Number of Players:</p>
+          <p className="mb-2">{mystery?.num_players || 6}</p>
 
-              <p className="font-bold">Premise:</p>
-              <p className="whitespace-pre-line">{premise}</p>
-            </div>
+          <p className="font-bold">Premise:</p>
+          <p className="whitespace-pre-line">{premise}</p>
+        </div>
 
-            <div className="p-4 border rounded-md">
-              <h2 className="text-xl font-semibold mb-4">What's Included</h2>
-              <ul className="space-y-2">
-                {[
-                  "Full character profiles for all suspects",
-                  "Host guide with step-by-step instructions",
-                  "Printable character sheets",
-                  "Evidence and clue cards",
-                  "Timeline of events",
-                  "Solution reveal script",
-                  "PDF downloads of all materials"
-                ].map((item, index) => (
-                  <li key={index} className="flex items-start gap-2">
-                    <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+        <div className="p-4 border rounded-md">
+          <h2 className="text-xl font-semibold mb-4">What's Included</h2>
+          <ul className="list-disc ml-4 space-y-1">
+            <li>Full character profiles for all suspects</li>
+            <li>Host guide with step-by-step instructions</li>
+            <li>Printable character sheets</li>
+            <li>Evidence and clue cards</li>
+            <li>Timeline of events</li>
+            <li>Solution reveal script</li>
+            <li>PDF downloads of all materials</li>
+          </ul>
 
-          <div className="mb-6 p-3 bg-muted/50 rounded">
+          <div className="mt-6 p-3 bg-muted/50 rounded">
             <h3 className="font-semibold">Important Notes</h3>
             <ul className="text-sm list-disc ml-4 mt-2 space-y-1">
               <li>This is a one-time purchase for this specific mystery package</li>
@@ -306,25 +272,19 @@ export default function MysteryPreview() {
               <li>Need help? Contact our support at support@mysterygenerator.com</li>
             </ul>
           </div>
-
-          <div className="flex gap-4">
-            <Button onClick={handlePurchase} disabled={purchasing} className="flex-1">
-              {purchasing ? 'Processing...' : (
-                <span className="flex items-center gap-2">
-                  <CreditCard className="h-4 w-4" />
-                  Purchase Now for $4.99
-                </span>
-              )}
-            </Button>
-            {process.env.NODE_ENV !== 'production' && (
-              <Button onClick={simulatePurchase} variant="outline" disabled={purchasing} className="flex-1">
-                Simulate Purchase (Dev Only)
-              </Button>
-            )}
-          </div>
         </div>
-      </main>
-      <Footer />
+      </div>
+
+      <div className="flex gap-4">
+        <Button onClick={handlePurchase} disabled={purchasing} className="flex-1">
+          {purchasing ? 'Processing...' : 'Purchase Now for $4.99'}
+        </Button>
+        {process.env.NODE_ENV !== 'production' && (
+          <Button onClick={simulatePurchase} variant="outline" disabled={purchasing} className="flex-1">
+            Simulate Purchase (Dev Only)
+          </Button>
+        )}
+      </div>
     </div>
   );
 }
