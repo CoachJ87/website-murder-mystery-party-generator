@@ -149,19 +149,10 @@ export default function MysteryPreview() {
           p_column: 'purchase_date' 
         });
 
-      let updateData = { has_purchased: true };
-      
-      // Only include purchase_date if the column exists
-      if (!columnCheckError) {
-        updateData = { 
-          ...updateData, 
-          purchase_date: new Date().toISOString() 
-        };
-      }
-
+      // Only update the has_purchased field since purchase_date doesn't exist in the type
       const { error } = await supabase
         .from('profiles')
-        .update(updateData)
+        .update({ has_purchased: true })
         .eq('id', user.id);
 
       if (error) {
