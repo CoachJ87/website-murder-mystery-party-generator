@@ -7,10 +7,9 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { supabase } from "@/lib/supabase";
 import MysteryForm from "@/components/MysteryForm";
+import MysteryChat from "@/components/MysteryChat";
 import { useAuth } from "@/context/AuthContext";
 import { Message, FormValues } from "@/components/types";
-import { Wand2 } from "lucide-react";
-import MysteryChat from "@/components/MysteryChat";
 
 const MysteryCreation = () => {
     const [saving, setSaving] = useState(false);
@@ -31,23 +30,46 @@ const MysteryCreation = () => {
         }
     }, [id]);
 
+    // Create a system message based on form data
+    const createSystemMessage = (data: FormValues) => {
+        let systemMsg = "This is a murder mystery creation conversation. ";
+        systemMsg += "The user has ALREADY selected the following preferences, so DO NOT ask about these again: ";
+        
+        if (data.theme) {
+            systemMsg += `Theme: ${data.theme}. `;
+        }
+        if (data.playerCount) {
+            systemMsg += `Player count: ${data.playerCount}. `;
+        }
+        if (data.hasAccomplice !== undefined) {
+            systemMsg += `Accomplice: ${data.hasAccomplice ? "Yes" : "No"}. `;
+        }
+        if (data.scriptType) {
+            systemMsg += `Script type: ${data.scriptType}. `;
+        }
+        if (data.additionalDetails) {
+            systemMsg += `Additional details: ${data.additionalDetails}. `;
+        }
+        
+        systemMsg += "Please start directly with creating a suitable murder mystery based on these preferences without asking clarifying questions about these specified parameters. You may ask about other aspects of the mystery if needed.";
+        
+        return systemMsg;
+    };
+
     const extractTitleFromMessages = (messages: any[]) => {
         if (!messages || messages.length === 0) return null;
-
         const aiMessages = messages.filter(msg => {
             if (msg.role) return msg.role === 'assistant';
             return msg.is_ai === true;
         });
         
         if (aiMessages.length === 0) return null;
-
         const titlePatterns = [
             /"([^"]+)"\s*(?:-\s*A\s+MURDER\s+MYSTERY)?/i,
             /#\s*["']([^"']+)["']/i,
             /#\s*([A-Z][A-Z\s]+[A-Z])/,
             /title:\s*["']?([^"'\n]+)["']?/i,
         ];
-
         for (const message of aiMessages) {
             const content = message.content || '';
             if (content.includes("# Questions") || content.includes("## Questions") || content.toLowerCase().includes("clarification")) {
@@ -75,7 +97,6 @@ const MysteryCreation = () => {
     };
 
     const loadExistingConversation = async (conversationId: string) => {
-        console.log("loadExistingConversation called with ID:", conversationId);
         try {
             setIsLoadingHistory(true);
             console.log("Loading conversation with ID:", conversationId);
@@ -168,6 +189,9 @@ const MysteryCreation = () => {
             if (isAuthenticated && user) {
                 let newConversationId = id;
 
+                // Create system instruction based on form data
+                const systemInstruction = createSystemMessage(data);
+
                 if (!isEditing) {
                     const { data: newConversation, error } = await supabase
                         .from("conversations")
@@ -175,6 +199,7 @@ const MysteryCreation = () => {
                             title: data.title || `${data.theme} Mystery`,
                             mystery_data: data,
                             user_id: user.id,
+                            system_instruction: systemInstruction  // Save the system instruction
                         })
                         .select()
                         .single();
@@ -193,6 +218,7 @@ const MysteryCreation = () => {
                             title: data.title || `${data.theme} Mystery`,
                             mystery_data: data,
                             updated_at: new Date().toISOString(),
+                            system_instruction: systemInstruction  // Update the system instruction
                         })
                         .eq("id", id);
 
@@ -242,8 +268,8 @@ const MysteryCreation = () => {
         }
     };
 
-    const handleGenerateMystery = () => {
-        console.log("conversationId when Finalize Mystery clicked:", conversationId);
+    const handleGenerateMystery = async (messages: Message[]) => {
+        console.log("conversationId when Generate Final Mystery clicked:", conversationId);
         if (conversationId) {
             navigate(`/mystery/preview/${conversationId}`);
         } else {
@@ -281,6 +307,7 @@ const MysteryCreation = () => {
                                     initialAdditionalDetails={formData?.additionalDetails}
                                     initialMessages={messages}
                                     isLoadingHistory={isLoadingHistory}
+                                    systemInstruction={createSystemMessage(formData)}
                                 />
                             ) : (
                                 <MysteryForm
@@ -291,16 +318,17 @@ const MysteryCreation = () => {
                         </CardContent>
                     </Card>
 
-                    <div className="mt-6 flex justify-center">
-                        {showChatUI && (
+                    <div className="mt-8 flex justify-center gap-4">
+                        {showChatUI ? (
                             <Button
-                                variant="default"
-                                size="lg"
-                                className="flex items-center gap-2"
-                                onClick={handleGenerateMystery}
+                                variant="outline"
+                                onClick={() => navigate("/dashboard")}
                             >
-                                <Wand2 className="w-4 h-4" />
-                                Finalize Mystery
+                                Back to Dashboard
+                            </Button>
+                        ) : (
+                            <Button variant="outline" onClick={() => navigate("/dashboard")}>
+                                Back to Dashboard
                             </Button>
                         )}
                     </div>
