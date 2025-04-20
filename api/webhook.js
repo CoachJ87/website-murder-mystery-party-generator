@@ -1,4 +1,6 @@
+// api/webhook.js
 import Stripe from 'stripe';
+import { createClient } from '@supabase/supabase-js';
 
 export const config = {
   runtime: 'edge',
@@ -10,11 +12,17 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
+// Create a Supabase client with the admin key
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
+
 export default async function handler(req) {
   if (req.method === 'POST') {
     let event;
     const signature = req.headers.get('stripe-signature');
-    const body = await req.text(); // Use req.text() to get the raw body as a string
+    const body = await req.text();
 
     try {
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
@@ -30,36 +38,43 @@ export default async function handler(req) {
 
       // Extract mysteryId from metadata
       const mysteryId = session.metadata?.mysteryId;
-      const userId = session.metadata?.userId; // Extract userId as well
+      const userId = session.metadata?.userId;
 
       if (mysteryId && userId) {
         console.log(`Checkout session completed for mystery ID: ${mysteryId} and user ID: ${userId}`);
 
-        // **TODO: Update your Supabase database here**
-        // 1. Use supabaseAdmin to interact with your database
-        const { error: userUpdateError } = await supabaseAdmin
-          .from('profiles')
-          .update({ has_purchased: true, purchase_date: new Date().toISOString() })
-          .eq('id', userId);
+        try {
+          // Update user profile
+          const { error: userUpdateError } = await supabaseAdmin
+            .from('profiles')
+            .update({ 
+              has_purchased: true, 
+              purchase_date: new Date().toISOString() 
+            })
+            .eq('id', userId);
 
-        if (userUpdateError) {
-          console.error('Error updating user profile:', userUpdateError);
-          return new Response('Failed to update user profile', { status: 500 });
+          if (userUpdateError) {
+            console.error('Error updating user profile:', userUpdateError);
+          }
+
+          // Update conversation
+          const { error: conversationUpdateError } = await supabaseAdmin
+            .from('conversations')
+            .update({ 
+              is_paid: true, 
+              purchase_date: new Date().toISOString() 
+            })
+            .eq('id', mysteryId);
+
+          if (conversationUpdateError) {
+            console.error('Error updating conversation:', conversationUpdateError);
+          }
+
+          return new Response(null, { status: 200 });
+        } catch (error) {
+          console.error('Error processing webhook:', error);
+          return new Response('Error processing webhook', { status: 500 });
         }
-
-        // Update conversations table if applicable
-        const { error: conversationUpdateError } = await supabaseAdmin
-          .from('conversations')
-          .update({ is_paid: true, purchase_date: new Date().toISOString() })
-          .eq('mystery_id', mysteryId)
-          .eq('user_id', userId); // Assuming you link conversation to user
-
-        if (conversationUpdateError) {
-          console.error('Error updating conversation:', conversationUpdateError);
-          // Decide if this is critical enough to fail the webhook response
-        }
-
-        return new Response(null, { status: 200 });
       } else {
         console.log('Missing mystery ID or user ID in checkout session metadata.');
         return new Response('Missing metadata', { status: 200 });
