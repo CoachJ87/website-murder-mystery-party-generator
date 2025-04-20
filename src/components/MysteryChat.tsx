@@ -67,16 +67,41 @@ const MysteryChat = ({
         });
 
         if (initialMessages.length > 0 && !messagesInitialized.current) {
+            // Add message content analysis to detect incorrect is_ai flags
+            console.log("DEBUG: Analyzing message contents for correct is_ai flags");
+            
+            const correctedMessages = initialMessages.map((msg, index) => {
+                // Simple heuristic to detect if a message looks like it might be from AI
+                const looksLikeAI = 
+                    // Contains markdown headings
+                    msg.content.includes("# ") || 
+                    msg.content.includes("## ") || 
+                    // Long explanatory text with typical AI structure
+                    (msg.content.length > 300 && 
+                     (msg.content.includes("Thank you for") || 
+                      msg.content.includes("CHARACTER LIST") || 
+                      msg.content.includes("PREMISE") ||
+                      msg.content.includes("VICTIM")));
+                
+                if (!msg.is_ai && looksLikeAI) {
+                    console.warn(`DEBUG: Message ${index} is marked as user but looks like AI content - correcting flag`);
+                    // Return a new message object with corrected flag
+                    return { ...msg, is_ai: true };
+                }
+                
+                return msg;
+            });
+
             console.log("DEBUG: Setting initial messages from props");
-            console.log("DEBUG: Initial messages content:", initialMessages.map(m => ({
+            console.log("DEBUG: Initial messages content:", correctedMessages.map(m => ({
                 is_ai: m.is_ai,
                 content_preview: m.content.substring(0, 30) + '...'
             })));
 
-            setMessages(initialMessages);
+            setMessages(correctedMessages);
 
-            if (initialMessages.length > 0) {
-                const lastMessage = initialMessages[initialMessages.length - 1];
+            if (correctedMessages.length > 0) {
+                const lastMessage = correctedMessages[correctedMessages.length - 1];
                 aiHasRespondedRef.current = !!lastMessage.is_ai;
                 console.log("DEBUG: Last message is from AI:", !!lastMessage.is_ai);
             }
