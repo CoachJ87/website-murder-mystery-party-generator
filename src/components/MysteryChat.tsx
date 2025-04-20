@@ -8,6 +8,7 @@ import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import { Message } from "@/components/types";
 import { Loader2, AlertCircle, Send } from "lucide-react";
+import { Wand2 } from "lucide-react";
 
 interface MysteryChatProps {
     initialTheme?: string;
@@ -621,7 +622,7 @@ const MysteryChat = ({
             {messages.length > 1 && !loading && (
                 <div className="p-4 border-t">
                     <Button onClick={handleGenerateFinalClick} variant="secondary">
-                        Generate Final Mystery
+                        <Wand2 className="h-4 w-4 mr-2" /> Generate Final Mystery
                     </Button>
                 </div>
             )}
