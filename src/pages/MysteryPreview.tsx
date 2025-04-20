@@ -5,9 +5,11 @@ import { supabase } from '@/lib/supabase';
 import { useUser } from '@/hooks/useUser';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertTriangle } from 'lucide-react';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import { CheckCircle } from 'lucide-react';
 
+// Define the MysteryPackage type to fix the missing import
 interface MysteryPackage {
   id: string;
   name: string;
@@ -24,51 +26,6 @@ export default function MysteryPreview() {
   const [mystery, setMystery] = useState<MysteryPackage | null>(null);
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const loadMysteryFromSupabase = useCallback(async () => {
-    if (!id) return null;
-
-    try {
-      const { data: conversation, error: conversationError } = await supabase
-        .from('conversations')
-        .select('*, messages(*)')
-        .eq('id', id)
-        .single();
-
-      if (conversationError) throw conversationError;
-      if (!conversation) throw new Error('No conversation found');
-
-      const aiMessages = conversation.messages?.filter(msg => msg.role === 'assistant') || [];
-      const latestMessage = aiMessages.length > 0 
-        ? aiMessages[aiMessages.length - 1] 
-        : null;
-
-      return {
-        id: conversation.id,
-        name: conversation.title || 'Custom Murder Mystery',
-        content: latestMessage?.content || 'Mystery content not available yet.',
-        theme: conversation.mystery_data?.theme || 'Classic',
-        num_players: conversation.mystery_data?.playerCount || 6,
-        premise: extractPremise(latestMessage?.content)
-      };
-    } catch (error) {
-      console.error('Error fetching mystery from Supabase:', error);
-      return null;
-    }
-  }, [id]);
-
-  const extractPremise = (content?: string) => {
-    if (!content) return '';
-    
-    const premiseMatch = content.match(/##?\s*PREMISE\s*\n([\s\S]*?)(?=##|\n\n|$)/i);
-    if (premiseMatch && premiseMatch[1]) {
-      return premiseMatch[1].trim();
-    }
-    
-    const paragraphs = content.split('\n\n');
-    return paragraphs[0] || '';
-  };
 
   const loadMystery = useCallback(async () => {
     if (!id) {
@@ -77,9 +34,9 @@ export default function MysteryPreview() {
     }
 
     setLoading(true);
-    setError(null);
 
     try {
+      // Check if user has already purchased this mystery
       if (user?.id) {
         const { data, error } = await supabase
           .from('profiles')
@@ -95,71 +52,27 @@ export default function MysteryPreview() {
         }
       }
 
-      const mysteryData = await loadMysteryFromSupabase();
-      
-      if (mysteryData) {
-        setMystery(mysteryData);
+      // Load mystery details - Changed to fetch from Vercel API
+      const response = await fetch(`/api/get-mystery/${id}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        toast.error(`Failed to load mystery preview: ${errorData?.error || 'Unknown error'}`);
         return;
       }
+      const mysteryData = await response.json();
+      setMystery(mysteryData);
 
-      try {
-        const response = await fetch(`/api/get-mystery/${id}`);
-        
-        if (!response.ok) {
-          throw new Error(`Failed to load mystery: ${response.status} ${response.statusText}`);
-        }
-        
-        const apiMysteryData = await response.json();
-        setMystery(apiMysteryData);
-      } catch (apiError: any) {
-        console.error('Error fetching from API:', apiError);
-        setError('Could not load mystery preview. Please try again later.');
-        toast.error('Failed to load mystery preview.');
-      }
-
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error in loadMystery:', error);
-      setError('An error occurred while loading the mystery.');
       toast.error('An error occurred while loading the mystery.');
     } finally {
       setLoading(false);
     }
-  }, [id, navigate, user?.id, loadMysteryFromSupabase]);
+  }, [id, navigate, user?.id]);
 
   useEffect(() => {
     loadMystery();
   }, [loadMystery]);
-
-  const simulatePurchase = async () => {
-    if (!user?.id) {
-      toast.error("Please sign in to purchase this mystery");
-      navigate("/sign-in");
-      return;
-    }
-
-    setPurchasing(true);
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          has_purchased: true,
-          purchase_date: new Date().toISOString()
-        })
-        .eq('id', user.id);
-
-      if (error) {
-        throw error;
-      }
-
-      toast.success("Purchase simulated successfully!");
-      navigate(`/mystery/${id}`);
-    } catch (error) {
-      console.error('Error simulating purchase:', error);
-      toast.error('Failed to simulate purchase. Please try again.');
-    } finally {
-      setPurchasing(false);
-    }
-  };
 
   const handlePurchase = async () => {
     if (!isAuthenticated || !user?.id) {
@@ -194,97 +107,147 @@ export default function MysteryPreview() {
     }
   };
 
+  const simulatePurchase = async () => {
+    if (!user?.id) {
+      toast.error("Please sign in to purchase this mystery");
+      navigate("/sign-in");
+      return;
+    }
+
+    setPurchasing(true);
+    try {
+      // Update the profiles table to mark the mystery as purchased
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          has_purchased: true,
+          purchase_date: new Date().toISOString()
+        })
+        .eq('id', user.id);
+
+      if (profileError) {
+        throw profileError;
+      }
+      
+      // Update the conversations table
+      const { error: convError } = await supabase
+        .from('conversations')
+        .update({
+          is_paid: true,
+          purchase_date: new Date().toISOString()
+        })
+        .eq('id', id);
+        
+      if (convError) {
+        console.error("Warning: Could not update conversation:", convError);
+      }
+
+      toast.success("Purchase simulated successfully!");
+      navigate(`/mystery/${id}`);
+    } catch (error) {
+      console.error('Error simulating purchase:', error);
+      toast.error('Failed to simulate purchase. Please try again.');
+    } finally {
+      setPurchasing(false);
+    }
+  };
+
   if (isUserLoading || loading) {
     return (
-      <div className="container mx-auto py-10">
-        <Skeleton className="h-10 w-80 mb-4" />
-        <Skeleton className="h-64 w-full rounded-md" />
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Skeleton className="h-48 rounded-md" />
-          <Skeleton className="h-48 rounded-md" />
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <div className="container mx-auto py-10 flex-1">
+          <Skeleton className="h-10 w-80 mb-4" />
+          <Skeleton className="h-64 w-full rounded-md" />
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Skeleton className="h-48 rounded-md" />
+            <Skeleton className="h-48 rounded-md" />
+          </div>
         </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="container mx-auto py-10 text-center">
-        <Alert variant="destructive" className="mb-4">
-          <AlertTriangle className="h-4 w-4 mr-2" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-        <Button onClick={() => navigate('/mystery')} className="mt-4">
-          Return to Mysteries
-        </Button>
+        <Footer />
       </div>
     );
   }
 
   if (!mystery) {
     return (
-      <div className="container mx-auto py-10 text-center">
-        <p className="text-lg text-muted-foreground">Mystery not found.</p>
-        <Button onClick={() => navigate('/mystery')} className="mt-4">
-          Return to Mysteries
-        </Button>
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <div className="container mx-auto py-10 flex-1 text-center">
+          <p className="text-lg text-muted-foreground">Mystery not found.</p>
+        </div>
+        <Footer />
       </div>
     );
   }
 
+  // Extract the premise without cutting it off
   const premise = mystery?.premise || mystery?.content.split('\n\n')[0] || '';
 
   return (
-    <div className="container mx-auto py-10">
-      <h1 className="text-3xl font-bold mb-4">{mystery?.name}</h1>
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      
+      <div className="container mx-auto py-10 flex-1">
+        <h1 className="text-3xl font-bold mb-4">{mystery?.name}</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div className="p-4 border rounded-md">
-          <h2 className="text-xl font-semibold mb-4">Preview</h2>
-          <p className="font-bold">Theme:</p>
-          <p className="mb-2">{mystery?.theme || 'Classic Murder Mystery'}</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div className="p-4 border rounded-md">
+            <h2 className="text-xl font-semibold mb-4">Preview</h2>
+            <p className="font-bold">Theme:</p>
+            <p className="mb-2">{mystery?.theme || 'Classic Murder Mystery'}</p>
 
-          <p className="font-bold">Number of Players:</p>
-          <p className="mb-2">{mystery?.num_players || 6}</p>
+            <p className="font-bold">Number of Players:</p>
+            <p className="mb-2">{mystery?.num_players || 6}</p>
 
-          <p className="font-bold">Premise:</p>
-          <p className="whitespace-pre-line">{premise}</p>
-        </div>
+            <p className="font-bold">Premise:</p>
+            <p className="whitespace-pre-line">{premise}</p>
+          </div>
 
-        <div className="p-4 border rounded-md">
-          <h2 className="text-xl font-semibold mb-4">What's Included</h2>
-          <ul className="list-disc ml-4 space-y-1">
-            <li>Full character profiles for all suspects</li>
-            <li>Host guide with step-by-step instructions</li>
-            <li>Printable character sheets</li>
-            <li>Evidence and clue cards</li>
-            <li>Timeline of events</li>
-            <li>Solution reveal script</li>
-            <li>PDF downloads of all materials</li>
-          </ul>
-
-          <div className="mt-6 p-3 bg-muted/50 rounded">
-            <h3 className="font-semibold">Important Notes</h3>
-            <ul className="text-sm list-disc ml-4 mt-2 space-y-1">
-              <li>This is a one-time purchase for this specific mystery package</li>
-              <li>You'll have permanent access to download all materials</li>
-              <li>Content is for personal use only, not for commercial redistribution</li>
-              <li>Need help? Contact our support at support@mysterygenerator.com</li>
+          <div className="p-4 border rounded-md">
+            <h2 className="text-xl font-semibold mb-4">What's Included</h2>
+            <ul className="space-y-2">
+              {[
+                "Full character profiles for all suspects",
+                "Host guide with step-by-step instructions",
+                "Printable character sheets",
+                "Evidence and clue cards",
+                "Timeline of events",
+                "Solution reveal script",
+                "PDF downloads of all materials"
+              ].map((item, index) => (
+                <li key={index} className="flex items-start gap-2">
+                  <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
+                  <span>{item}</span>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
-      </div>
+        
+        <div className="p-4 bg-muted/50 rounded-lg mb-6">
+          <h3 className="font-semibold">Important Notes</h3>
+          <ul className="text-sm list-disc ml-4 mt-2 space-y-1">
+            <li>This is a one-time purchase for this specific mystery package</li>
+            <li>You'll have permanent access to download all materials</li>
+            <li>Content is for personal use only, not for commercial redistribution</li>
+            <li>Need help? Contact our support at support@mysterygenerator.com</li>
+          </ul>
+        </div>
 
-      <div className="flex gap-4">
-        <Button onClick={handlePurchase} disabled={purchasing} className="flex-1">
-          {purchasing ? 'Processing...' : 'Purchase Now for $4.99'}
-        </Button>
-        {process.env.NODE_ENV !== 'production' && (
-          <Button onClick={simulatePurchase} variant="outline" disabled={purchasing} className="flex-1">
-            Simulate Purchase (Dev Only)
+        <div className="flex gap-4">
+          <Button onClick={handlePurchase} disabled={purchasing} className="flex-1">
+            {purchasing ? 'Processing...' : 'Purchase Now for $4.99'}
           </Button>
-        )}
+          {process.env.NODE_ENV !== 'production' && (
+            <Button onClick={simulatePurchase} variant="outline" disabled={purchasing} className="flex-1">
+              Simulate Purchase (Dev Only)
+            </Button>
+          )}
+        </div>
       </div>
+      
+      <Footer />
     </div>
   );
 }
