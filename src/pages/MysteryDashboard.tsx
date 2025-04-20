@@ -38,33 +38,51 @@ const MysteryDashboard = () => {
     applyFiltersAndSort();
   }, [mysteries, searchTerm, statusFilter, sortOrder]);
 
-  const extractTitleFromMessages = (messages: any[]) => {
-    if (!messages || messages.length === 0) return null;
-    
-    // Look through AI messages for titles
-    const titlePattern = /#\s*["']?([^"'\n#]+)["']?(?:\s*-\s*A MURDER MYSTERY)?/i;
-    const alternativeTitlePattern = /title:\s*["']?([^"'\n]+)["']?/i;
-    
-    for (const message of messages) {
-      if (message.role === 'assistant' || message.is_ai) {
-        const content = message.content || '';
-        
-        // Try to find title in markdown format
-        const titleMatch = content.match(titlePattern);
-        if (titleMatch && titleMatch[1]) {
-          return formatTitle(titleMatch[1]);
-        }
-        
-        // Try alternative format
-        const altMatch = content.match(alternativeTitlePattern);
-        if (altMatch && altMatch[1]) {
-          return formatTitle(altMatch[1]);
-        }
+const extractTitleFromMessages = (messages: any[]) => {
+  if (!messages || messages.length === 0) return null;
+  
+  // Filter out any clarification messages or questions
+  const filteredMessages = messages.filter(message => {
+    const content = (message.content || "").toLowerCase();
+    return !(
+      content.includes("initial questions") || 
+      content.includes("clarification") || 
+      content.includes("# questions") || 
+      content.includes("## questions")
+    );
+  });
+  
+  // Look through AI messages for titles
+  const titlePattern = /#\s*["']?([^"'\n#]+)["']?(?:\s*-\s*A MURDER MYSTERY)?/i;
+  const alternativeTitlePattern = /title:\s*["']?([^"'\n]+)["']?/i;
+  const quotedTitlePattern = /"([^"]+)"\s*(?:-\s*A\s+MURDER\s+MYSTERY)?/i;
+  
+  for (const message of filteredMessages) {
+    if (message.role === 'assistant' || message.is_ai) {
+      const content = message.content || '';
+      
+      // Try to find title in markdown format
+      const titleMatch = content.match(titlePattern);
+      if (titleMatch && titleMatch[1]) {
+        return formatTitle(titleMatch[1]);
+      }
+      
+      // Try quoted title format
+      const quotedMatch = content.match(quotedTitlePattern);
+      if (quotedMatch && quotedMatch[1]) {
+        return formatTitle(quotedMatch[1]);
+      }
+      
+      // Try alternative format
+      const altMatch = content.match(alternativeTitlePattern);
+      if (altMatch && altMatch[1]) {
+        return formatTitle(altMatch[1]);
       }
     }
-    
-    return null;
-  };
+  }
+  
+  return null;
+};
   
   const formatTitle = (title: string) => {
     // Convert to title case (first letter of each word capitalized)
