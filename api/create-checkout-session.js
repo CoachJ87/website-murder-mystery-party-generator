@@ -1,5 +1,6 @@
+// api/create-checkout-session.js
 import Stripe from 'stripe';
-import { createClient } from '@supabase/supabase-js'; // Import Supabase client
+import { createClient } from '@supabase/supabase-js';
 
 export const config = {
   runtime: 'edge',
@@ -11,13 +12,13 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY // Use service role key for admin privileges
+  process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
 export default async function handler(req) {
   if (req.method === 'POST') {
     try {
-      const { mysteryId, userId } = await req.json(); // Expect userId in the request body
+      const { mysteryId, userId } = await req.json();
 
       if (!userId) {
         return new Response(JSON.stringify({ error: 'User ID is required.' }), {
@@ -26,10 +27,14 @@ export default async function handler(req) {
         });
       }
 
+      // This is your Stripe Price ID
       const price = 'price_1RAvakKgSd73ikMWLbbjRicc';
       const productName = 'Murder Mystery Game Package';
-      const successUrl = `${process.env.NEXT_PUBLIC_VERCEL_URL}/mystery/${mysteryId}?purchase=success`;
-      const cancelUrl = `${process.env.NEXT_PUBLIC_VERCEL_URL}/mystery/preview/${mysteryId}?purchase=cancel`;
+      
+      // Build proper URLs
+      const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL || 'http://localhost:3000';
+      const successUrl = `${baseUrl}/mystery/${mysteryId}?purchase=success`;
+      const cancelUrl = `${baseUrl}/mystery/preview/${mysteryId}?purchase=cancel`;
 
       const session = await stripe.checkout.sessions.create({
         line_items: [
@@ -43,7 +48,7 @@ export default async function handler(req) {
         cancel_url: cancelUrl,
         metadata: {
           mysteryId: mysteryId,
-          userId: userId, // Store the Supabase User ID in metadata
+          userId: userId,
         },
       });
 
