@@ -1,4 +1,4 @@
-
+// src/services/aiService.ts
 import { supabase } from "@/lib/supabase";
 
 // Interface for messages sent to the API
@@ -18,6 +18,7 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
   try {
     console.log(`DEBUG: Starting getAIResponse with ${messages.length} messages`);
     console.log(`DEBUG: Prompt version: ${promptVersion}`);
+    console.log(`DEBUG: System instruction preview:`, systemInstruction ? `${systemInstruction.substring(0, 100)}...` : "none");
     
     // Convert messages to a standard format first
     const standardMessages = messages.map(msg => {
@@ -36,10 +37,12 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
     // Get system instruction (use the provided systemInstruction parameter or the default)
     const markdownInstruction = "Please format your response using Markdown syntax with headings (##, ###), lists (-, 1., 2.), bold (**), italic (*), and other formatting as appropriate to structure the information clearly. Do not use a title at the beginning of your response unless you are presenting a complete murder mystery concept with a title, premise, victim details, and character list.";
     
-    const effectiveSystemInstruction = systemInstruction || markdownInstruction;
+    // Create an enhanced system instruction that emphasizes not to ask about already provided information
+    const baseSystemInstruction = systemInstruction || markdownInstruction;
+    const enhancedSystemInstruction = `IMPORTANT: If the user has already specified preferences such as theme, player count, whether they want an accomplice, or script type, DO NOT ask about these again. Instead, create content based on these stated preferences. ${baseSystemInstruction}`;
     
     console.log(`DEBUG: Found ${userAndAssistantMessages.length} user/assistant messages`);
-    console.log(`DEBUG: System instruction (truncated): ${effectiveSystemInstruction.substring(0, 50)}...`);
+    console.log(`DEBUG: Enhanced system instruction (truncated): ${enhancedSystemInstruction.substring(0, 50)}...`);
 
     // First try using the Supabase Edge Function
     try {
@@ -48,7 +51,7 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
       // Format the request for the Edge Function - only send user/assistant messages
       const edgeFunctionPayload = {
         messages: userAndAssistantMessages,
-        system: effectiveSystemInstruction, // Send as top-level system parameter
+        system: enhancedSystemInstruction, // Send the enhanced system instruction
         promptVersion
       };
 
@@ -71,7 +74,7 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
           functionData.error.includes("Missing Anthropic API key")
         )) {
           console.log("DEBUG: Edge Function not configured, falling back to Vercel API");
-          return await fallbackToVercelApi(userAndAssistantMessages, effectiveSystemInstruction, promptVersion);
+          return await fallbackToVercelApi(userAndAssistantMessages, enhancedSystemInstruction, promptVersion);
         }
 
         // For successful responses, return the content
@@ -83,15 +86,15 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
       // Handle explicit errors from the Edge Function
       if (functionError) {
         console.log("DEBUG: Edge Function error, falling back to Vercel API:", functionError);
-        return await fallbackToVercelApi(userAndAssistantMessages, effectiveSystemInstruction, promptVersion);
+        return await fallbackToVercelApi(userAndAssistantMessages, enhancedSystemInstruction, promptVersion);
       }
 
       console.log("DEBUG: Invalid response format from Edge Function, falling back");
-      return await fallbackToVercelApi(userAndAssistantMessages, effectiveSystemInstruction, promptVersion);
+      return await fallbackToVercelApi(userAndAssistantMessages, enhancedSystemInstruction, promptVersion);
 
     } catch (edgeFunctionError) {
       console.log("DEBUG: Edge Function exception, falling back to Vercel API:", edgeFunctionError);
-      return await fallbackToVercelApi(userAndAssistantMessages, effectiveSystemInstruction, promptVersion);
+      return await fallbackToVercelApi(userAndAssistantMessages, enhancedSystemInstruction, promptVersion);
     }
   } catch (error) {
     console.error(`DEBUG: Error in getAIResponse: ${error.message}`);
@@ -110,7 +113,7 @@ const fallbackToVercelApi = async (
   // Format request for the Vercel API - ensure system is sent as a separate parameter
   const requestBody = {
     messages: userAndAssistantMessages,
-    system: systemInstruction, // Send as top-level system parameter
+    system: systemInstruction, // Send the enhanced system instruction
     promptVersion
   };
 
