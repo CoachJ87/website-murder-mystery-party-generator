@@ -7,8 +7,7 @@ import { getAIResponse } from "@/services/aiService";
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import { Message } from "@/components/types";
-import { Loader2, AlertCircle, Send } from "lucide-react";
-import { Wand2 } from "lucide-react";
+import { Loader2, AlertCircle, Send, Wand2 } from "lucide-react";
 
 interface MysteryChatProps {
     initialTheme?: string;
@@ -60,6 +59,32 @@ const MysteryChat = ({
         isLoadingHistory,
         hasSystemInstruction: !!systemInstruction
     });
+
+    // Create a strong system message function that emphasizes not asking about already provided info
+    const createSystemMessage = () => {
+        let systemMsg = "This is a murder mystery creation conversation. ";
+        systemMsg += "The user has ALREADY selected the following preferences, so DO NOT ask about these again: ";
+        
+        if (initialTheme) {
+            systemMsg += `Theme: ${initialTheme}. `;
+        }
+        if (initialPlayerCount) {
+            systemMsg += `Player count: ${initialPlayerCount}. `;
+        }
+        if (initialHasAccomplice !== undefined) {
+            systemMsg += `Accomplice: ${initialHasAccomplice ? "Yes" : "No"}. `;
+        }
+        if (initialScriptType) {
+            systemMsg += `Script type: ${initialScriptType}. `;
+        }
+        if (initialAdditionalDetails) {
+            systemMsg += `Additional details: ${initialAdditionalDetails}. `;
+        }
+        
+        systemMsg += "Please start directly with creating a suitable murder mystery based on these preferences without asking clarifying questions about these specified parameters. You may ask about other aspects of the mystery if needed.";
+        
+        return systemMsg;
+    };
 
     useEffect(() => {
         console.log("DEBUG: Initializing messages effect", {
@@ -426,7 +451,10 @@ const MysteryChat = ({
                 contentPreview: m.content.substring(0, 30) + '...'
             })), null, 2));
 
-            console.log("DEBUG: System instruction exists:", !!systemInstruction);
+            // Create a custom system instruction that emphasizes not to ask about already-provided preferences
+            const customSystemInstruction = systemInstruction || createSystemMessage();
+            console.log("DEBUG: System instruction exists:", !!customSystemInstruction);
+            console.log("DEBUG: System instruction (first 100 chars):", customSystemInstruction.substring(0, 100) + "...");
 
             try {
                 console.log("DEBUG: Calling getAIResponse with", {
@@ -437,7 +465,7 @@ const MysteryChat = ({
                 const response = await getAIResponse(
                     anthropicMessages,
                     'free',
-                    systemInstruction || undefined
+                    customSystemInstruction
                 );
 
                 console.log("DEBUG: Received AI response:", response ? response.substring(0, 50) + "..." : "null");
@@ -450,9 +478,28 @@ const MysteryChat = ({
                     throw new Error(response);
                 }
 
+                // Check if the response is asking about already-provided information
+                const responseText = response;
+                const askingAboutPlayerCount = responseText.toLowerCase().includes("how many players") || 
+                                              (responseText.toLowerCase().includes("player count") && responseText.includes("?"));
+                const askingAboutTheme = (responseText.toLowerCase().includes("theme") || 
+                                          responseText.toLowerCase().includes("setting")) && 
+                                          responseText.includes("?") && responseText.toLowerCase().includes("prefer");
+                const askingAboutAccomplice = responseText.toLowerCase().includes("accomplice") && responseText.includes("?");
+                
+                let finalResponse = response;
+                
+                if (askingAboutPlayerCount || askingAboutTheme || askingAboutAccomplice) {
+                    console.log("DEBUG: AI asking about already provided info, creating corrected response");
+                    // Create a modified response that acknowledges the preferences
+                    finalResponse = `I'll create a murder mystery based on your specifications: ${initialTheme} theme${initialPlayerCount ? `, ${initialPlayerCount} players` : ''}${initialHasAccomplice !== undefined ? (initialHasAccomplice ? ', with an accomplice' : ', without an accomplice') : ''}${initialScriptType ? `, with ${initialScriptType} scripts` : ''}.
+
+${responseText.split('\n\n').slice(1).join('\n\n')}`;
+                }
+
                 const aiMessage: Message = {
                     id: Date.now().toString(),
-                    content: response,
+                    content: finalResponse,
                     is_ai: true,
                     timestamp: new Date(),
                 };
