@@ -243,31 +243,18 @@ const MysteryChatCreator = () => {
                     </Card>
 
                     <div className="mt-8 flex justify-center gap-4">
-                        {showChatUI ? (
-                            <Button
-                                onClick={() => {
-                                    if (generating) return;
-                                    // Use our directly defined handleGenerateMystery function with the current chatMessages
-                                    handleGenerateMystery(chatMessages);
-                                }}
-                                disabled={generating}
-                                className="bg-[#F97316] hover:bg-[#FB923C] text-white font-semibold"
-                            >
-                                {generating ? (
-                                    <>
-                                        <span className="animate-spin mr-2">⏳</span> Generating...
-                                    </>
-                                ) : (
-                                    <>
-                                        <Wand2 className="mr-2 h-5 w-5" /> Generate Mystery
-                                    </>
-                                )}
-                            </Button>
-                        ) : (
-                            <Button variant="outline" onClick={() => navigate("/dashboard")}>
-                                Back to Dashboard
-                            </Button>
-                        )}
+                      {showChatUI ? (
+                        <Button
+                          variant="outline"
+                          onClick={() => navigate("/dashboard")}
+                        >
+                          Back to Dashboard
+                        </Button>
+                      ) : (
+                        <Button variant="outline" onClick={() => navigate("/dashboard")}>
+                          Back to Dashboard
+                        </Button>
+                      )}
                     </div>
                 </div>
             </main>
