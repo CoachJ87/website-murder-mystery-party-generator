@@ -516,9 +516,15 @@ const MysteryChat = ({
     const handleGenerateFinalClick = () => {
         console.log("DEBUG: Generate Final button clicked, sending all messages");
         if (onGenerateFinal) {
+            toast.success("Generating final mystery...");
             onGenerateFinal(messages);
+        } else if (savedMysteryId) {
+            // If onGenerateFinal is not provided but we have a mystery ID,
+            // redirect directly to the preview page
+            window.location.href = `/mystery/preview/${savedMysteryId}`;
+            toast.success("Redirecting to preview page...");
         } else {
-            toast.error("Final generation callback not provided.");
+            toast.error("Cannot generate final mystery: Missing mystery ID.");
         }
     };
 
@@ -620,7 +626,11 @@ const MysteryChat = ({
 
             {messages.length > 1 && !loading && (
                 <div className="p-4 border-t">
-                    <Button onClick={handleGenerateFinalClick} variant="secondary">
+                    <Button 
+                        onClick={handleGenerateFinalClick} 
+                        variant="secondary"
+                        className="bg-[#F97316] hover:bg-[#FB923C] text-white font-semibold"
+                    >
                         Generate Final Mystery
                     </Button>
                 </div>
