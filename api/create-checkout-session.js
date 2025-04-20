@@ -27,15 +27,34 @@ export default async function handler(req) {
         });
       }
 
+      if (!mysteryId) {
+        return new Response(JSON.stringify({ error: 'Mystery ID is required.' }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Make sure STRIPE_SECRET_KEY is set
+      if (!process.env.STRIPE_SECRET_KEY) {
+        console.error('STRIPE_SECRET_KEY environment variable is not set');
+        return new Response(JSON.stringify({ error: 'Payment service configuration error.' }), {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+
       // This is your Stripe Price ID
       const price = 'price_1RAvakKgSd73ikMWLbbjRicc';
       const productName = 'Murder Mystery Game Package';
       
       // Build proper URLs
-      const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL || 'http://localhost:3000';
+      const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL 
+        ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+        : 'http://localhost:3000';
       const successUrl = `${baseUrl}/mystery/${mysteryId}?purchase=success`;
       const cancelUrl = `${baseUrl}/mystery/preview/${mysteryId}?purchase=cancel`;
 
+      // Create checkout session
       const session = await stripe.checkout.sessions.create({
         line_items: [
           {
@@ -84,6 +103,9 @@ export default async function handler(req) {
       },
     });
   } else {
-    return new Response('Method Not Allowed', { status: 405 });
+    return new Response(JSON.stringify({ error: 'Method Not Allowed' }), { 
+      status: 405,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 }
