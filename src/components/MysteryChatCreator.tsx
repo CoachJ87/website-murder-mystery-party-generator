@@ -24,6 +24,7 @@ const MysteryChatCreator = () => {
     const isEditing = !!id;
     const { isAuthenticated, user } = useAuth();
     const [chatMessages, setChatMessages] = useState<Message[]>([]); // To hold chat messages
+    const [generating, setGenerating] = useState(false);
 
     useEffect(() => {
         if (isEditing) {
@@ -160,21 +161,43 @@ const MysteryChatCreator = () => {
             return;
         }
 
-        console.log("DEBUG (MysteryChatCreator): Generating final mystery with messages:", messages);
-        // Convert local Message format to ApiMessage format
-        const apiMessages = messages.map(msg => ({
-            role: msg.is_ai ? 'assistant' : 'user',
-            content: msg.content,
-        }));
-
+        setGenerating(true);
         try {
-            const response = await getAIResponse(apiMessages, 'paid'); // Using imported getAIResponse
-            console.log("DEBUG (MysteryChatCreator): AI Response received:", response);
-            navigate(`/mystery/preview/${conversationId}`); // Navigate after receiving response
-            // You might want to save the final response to the database here as well
+            console.log("DEBUG (MysteryChatCreator): Generating final mystery with messages:", messages);
+            // Convert local Message format to ApiMessage format
+            const apiMessages = messages.map(msg => ({
+                role: msg.is_ai ? 'assistant' : 'user',
+                content: msg.content,
+            }));
+
+            toast.info("Preparing your mystery preview...");
+
+            // Save a flag that the user requested the final generation
+            await supabase
+                .from("conversations")
+                .update({
+                    generation_requested: true,
+                    updated_at: new Date().toISOString(),
+                })
+                .eq("id", conversationId);
+
+            // Start the generation process
+            try {
+                // Use 'free' for the preview version to avoid charging until purchase
+                const response = await getAIResponse(apiMessages, 'free'); 
+                console.log("DEBUG (MysteryChatCreator): AI Response received:", response);
+                
+                // Navigate to preview page after successful generation
+                navigate(`/mystery/preview/${conversationId}`);
+            } catch (error: any) {
+                console.error("Error generating mystery:", error);
+                toast.error(error.message || "Failed to generate the final mystery.");
+            }
         } catch (error: any) {
-            console.error("Error generating mystery:", error);
-            toast.error(error.message || "Failed to generate the final mystery.");
+            console.error("Error preparing mystery generation:", error);
+            toast.error("Failed to prepare mystery preview. Please try again.");
+        } finally {
+            setGenerating(false);
         }
     };
 
@@ -223,17 +246,22 @@ const MysteryChatCreator = () => {
                         {showChatUI ? (
                             <Button
                                 onClick={() => {
-                                    // Trigger the final generation from MysteryChat
-                                    const chatComponent = document.querySelector('[data-testid="mystery-chat"]');
-                                    if (chatComponent && (chatComponent as any).__reactFiber$?.child?.stateNode?.handleSendMessage) {
-                                        (chatComponent as any).__reactFiber$?.child?.stateNode?.handleSendMessage("Generate the full murder mystery package.");
-                                    } else {
-                                        toast.error("Unable to trigger final generation.");
-                                    }
+                                    if (generating) return;
+                                    // Use our directly defined handleGenerateMystery function with the current chatMessages
+                                    handleGenerateMystery(chatMessages);
                                 }}
+                                disabled={generating}
                                 className="bg-[#F97316] hover:bg-[#FB923C] text-white font-semibold"
                             >
-                                <Wand2 className="mr-2 h-5 w-5" /> Generate Mystery
+                                {generating ? (
+                                    <>
+                                        <span className="animate-spin mr-2">⏳</span> Generating...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Wand2 className="mr-2 h-5 w-5" /> Generate Mystery
+                                    </>
+                                )}
                             </Button>
                         ) : (
                             <Button variant="outline" onClick={() => navigate("/dashboard")}>
