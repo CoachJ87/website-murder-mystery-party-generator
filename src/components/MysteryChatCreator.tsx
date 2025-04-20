@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -12,7 +11,6 @@ import MysteryChat from "@/components/MysteryChat";
 import { useAuth } from "@/context/AuthContext";
 import { Message, FormValues } from "@/components/types";
 import { Wand2 } from "lucide-react";
-import { getAIResponse } from "@/services/aiService"; // Import getAIResponse
 
 const MysteryChatCreator = () => {
     const [saving, setSaving] = useState(false);
@@ -82,6 +80,7 @@ const MysteryChatCreator = () => {
                             title: data.title || `${data.theme} Mystery`,
                             mystery_data: data,
                             user_id: user.id,
+                            status: "draft"
                         })
                         .select()
                         .single();
@@ -164,12 +163,7 @@ const MysteryChatCreator = () => {
         setGenerating(true);
         try {
             console.log("DEBUG (MysteryChatCreator): Generating final mystery with messages:", messages);
-            // Convert local Message format to ApiMessage format
-            const apiMessages = messages.map(msg => ({
-                role: msg.is_ai ? 'assistant' : 'user',
-                content: msg.content,
-            }));
-
+            
             toast.info("Preparing your mystery preview...");
 
             // Save a flag that the user requested the final generation
@@ -181,18 +175,8 @@ const MysteryChatCreator = () => {
                 })
                 .eq("id", conversationId);
 
-            // Start the generation process
-            try {
-                // Use 'free' for the preview version to avoid charging until purchase
-                const response = await getAIResponse(apiMessages, 'free'); 
-                console.log("DEBUG (MysteryChatCreator): AI Response received:", response);
-                
-                // Navigate to preview page after successful generation
-                navigate(`/mystery/preview/${conversationId}`);
-            } catch (error: any) {
-                console.error("Error generating mystery:", error);
-                toast.error(error.message || "Failed to generate the final mystery.");
-            }
+            // Navigate to preview page after successful generation
+            navigate(`/mystery/preview/${conversationId}`);
         } catch (error: any) {
             console.error("Error preparing mystery generation:", error);
             toast.error("Failed to prepare mystery preview. Please try again.");
