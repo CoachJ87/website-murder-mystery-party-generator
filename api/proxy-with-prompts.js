@@ -1,4 +1,3 @@
-
 export const config = {
   runtime: 'edge',
 };
@@ -12,7 +11,6 @@ export default async function handler(req) {
   if (req.method === 'OPTIONS') {
     console.log("Handling OPTIONS preflight request");
     return new Response(null, {
-      status: 200,
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
@@ -85,27 +83,23 @@ export default async function handler(req) {
     const promptVersion = requestBody.promptVersion || 'free';
     console.log(`Prompt Version: ${promptVersion}`);
 
+    // Get the max_tokens value, with a fallback
+    const maxTokens = requestBody.max_tokens || (promptVersion === 'paid' ? 8000 : 1000);
+    console.log(`Using max_tokens: ${maxTokens}`);
+
     // Get prompt from environment variables
     let systemPrompt;
-    if (promptVersion === 'paid') {
+    if (requestBody.system) {
+      systemPrompt = requestBody.system;
+    } else if (promptVersion === 'paid') {
       systemPrompt = process.env.MURDER_MYSTERY_PAID_PROMPT;
-      console.log("Using paid prompt");
     } else {
       systemPrompt = process.env.MURDER_MYSTERY_FREE_PROMPT;
-      console.log("Using free prompt");
-    }
-
-    if (!systemPrompt) {
-      console.error(`Environment variable for ${promptVersion} prompt is not set.`);
-      console.log("Using default system prompt due to missing environment variable");
-      systemPrompt = "You are an AI assistant that helps create murder mystery party games. Create an engaging storyline and suggest character ideas.";
     }
     
-    // If the request includes a system instruction, use it instead of or in addition to the environment variable prompt
-    if (requestBody.system) {
-      console.log("Request includes system instruction, appending to environment prompt");
-      systemPrompt = systemPrompt + "\n\n" + requestBody.system;
-    }
+    // Add a context reminder to help the AI maintain awareness of the user's preferences
+    const contextReminder = "Remember details the user has already provided and don't ask about them again. Be consistent in your responses.";
+    systemPrompt = systemPrompt + "\n\n" + contextReminder;
     
     console.log(`System prompt exists (first 100 chars): ${systemPrompt.substring(0, 100)}...`);
 
@@ -168,12 +162,12 @@ export default async function handler(req) {
     // Prepare Anthropic API request - using the system parameter at the top level, not as a message
     const anthropicRequest = {
       model: "claude-3-7-sonnet-20250219",
-      max_tokens: promptVersion === 'paid' ? 8000 : 2000,
+      max_tokens: maxTokens,
       messages: filteredMessages,
       system: systemPrompt
     };
 
-    console.log("Backend - anthropicRequest structure:", JSON.stringify({
+console.log("Backend - anthropicRequest structure:", JSON.stringify({
       model: anthropicRequest.model,
       max_tokens: anthropicRequest.max_tokens,
       message_count: anthropicRequest.messages.length,
@@ -241,10 +235,7 @@ export default async function handler(req) {
     console.log("Anthropic API response data (structure):", JSON.stringify({
       id: data.id,
       model: data.model,
-      type: data.type,
-      role: data.role,
-      content_length: data.content ? data.content.length : 'unknown',
-      usage: data.usage
+      contentLength: data.content[0].text.length
     }));
 
     // Format response to match expected structure
