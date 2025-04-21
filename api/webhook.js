@@ -10,8 +10,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2023-10-16',
 });
 
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-
 // Create a Supabase client with the admin key
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -25,6 +23,16 @@ export default async function handler(req) {
     const body = await req.text();
     
     console.log("Webhook received: ", signature ? "Valid signature" : "No signature");
+    
+    // Choose the appropriate webhook secret based on the mode
+    const isTestMode = process.env.NODE_ENV !== 'production' || 
+                      req.headers.get('stripe-mode') === 'test';
+    
+    const webhookSecret = isTestMode 
+      ? process.env.STRIPE_TEST_WEBHOOK_SECRET 
+      : process.env.STRIPE_WEBHOOK_SECRET;
+    
+    console.log("Using webhook secret for mode:", isTestMode ? "TEST" : "PRODUCTION");
 
     try {
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
