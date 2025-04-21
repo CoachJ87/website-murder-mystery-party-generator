@@ -23,9 +23,12 @@ export default async function handler(req) {
     let event;
     const signature = req.headers.get('stripe-signature');
     const body = await req.text();
+    
+    console.log("Webhook received: ", signature ? "Valid signature" : "No signature");
 
     try {
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+      console.log("Webhook event constructed: ", event.type);
     } catch (err) {
       console.error(`Webhook Error: ${err.message}`);
       return new Response(`Webhook Error: ${err.message}`, {
@@ -55,6 +58,8 @@ export default async function handler(req) {
 
           if (userUpdateError) {
             console.error('Error updating user profile:', userUpdateError);
+          } else {
+            console.log('User profile updated successfully for user ID:', userId);
           }
 
           // Update conversation
@@ -68,8 +73,11 @@ export default async function handler(req) {
 
           if (conversationUpdateError) {
             console.error('Error updating conversation:', conversationUpdateError);
+          } else {
+            console.log('Conversation updated successfully for mystery ID:', mysteryId);
           }
 
+          console.log("Database updates complete for mystery ID:", mysteryId);
           return new Response(null, { status: 200 });
         } catch (error) {
           console.error('Error processing webhook:', error);
@@ -77,6 +85,7 @@ export default async function handler(req) {
         }
       } else {
         console.log('Missing mystery ID or user ID in checkout session metadata.');
+        console.log('Session metadata:', session.metadata);
         return new Response('Missing metadata', { status: 200 });
       }
     } else {
