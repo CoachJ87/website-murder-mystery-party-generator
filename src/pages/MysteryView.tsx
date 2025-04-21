@@ -113,20 +113,35 @@ const MysteryView = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1 py-12 px-4">
-          <div className="container mx-auto max-w-4xl">
-            <div className="h-8 w-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-            <p className="text-center mt-4">Loading your mystery...</p>
+if (loading || generating) {
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <main className="flex-1 py-12 px-4">
+        <div className="container mx-auto max-w-4xl">
+          <div className="text-center">
+            {generating ? (
+              <>
+                <div className="h-16 w-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+                <h2 className="text-2xl font-bold mt-6">Generating Your Complete Murder Mystery</h2>
+                <p className="text-muted-foreground mt-2">
+                  This process takes 3-5 minutes. We're creating detailed character guides, 
+                  clues, game materials, and host instructions.
+                </p>
+              </>
+            ) : (
+              <>
+                <div className="h-8 w-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+                <p className="mt-4">Loading your mystery...</p>
+              </>
+            )}
           </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
+}
 
   // Helper function to extract a summary
   const extractSummary = (mystery: any) => {
