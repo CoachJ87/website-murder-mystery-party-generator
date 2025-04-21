@@ -152,8 +152,30 @@ export default function MysteryPreview() {
     openStripeCheckoutAndPoll("https://buy.stripe.com/6oE6rm1fT4BRdyM3cd");
   };
 
-  const handleSimulatePurchase = () => {
-    openStripeCheckoutAndPoll("https://buy.stripe.com/test_eVa17344p4056ju8ww");
+  const handleSimulatePurchase = async () => {
+    if (!user?.id) {
+      toast.error("Please sign in to simulate a purchase");
+      navigate("/sign-in");
+      return;
+    }
+    setPurchasing(true);
+    try {
+      const { error } = await supabase
+        .from('conversations')
+        .update({ is_paid: true, purchase_date: new Date().toISOString() })
+        .eq('id', id);
+
+      if (error) {
+        toast.error("Simulate purchase failed.");
+        setPurchasing(false);
+      } else {
+        toast.success("Simulated purchase complete! Unlocking your package...");
+        navigate(`/mystery/${id}`);
+      }
+    } catch (err) {
+      toast.error("Unexpected error during simulated purchase.");
+      setPurchasing(false);
+    }
   };
 
   if (isUserLoading || loading) {
