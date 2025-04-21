@@ -114,7 +114,8 @@ const fallbackToVercelApi = async (
   const requestBody = {
     messages: userAndAssistantMessages,
     system: systemInstruction, // Send the enhanced system instruction
-    promptVersion
+    promptVersion,
+    max_tokens: promptVersion === 'paid' ? 8000 : 1000
   };
 
   console.log("DEBUG: Sending to Vercel API:", {
