@@ -39,4 +39,5 @@ export interface Mystery {
   is_purchased?: boolean;
   ai_title?: string;
   premise?: string;
+  purchase_date?: string;
 }
