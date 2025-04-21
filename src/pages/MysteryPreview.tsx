@@ -26,6 +26,7 @@ export default function MysteryPreview() {
   const [mystery, setMystery] = useState<MysteryPackage | null>(null);
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
+  const [polling, setPolling] = useState(false);
 
   const extractPremiseFromMessages = (messages: any[]) => {
     const aiMessages = messages.filter(msg => msg.is_ai === true || msg.role === 'assistant');
@@ -106,8 +107,69 @@ export default function MysteryPreview() {
     loadMystery();
   }, [loadMystery]);
 
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+    if (polling && id) {
+      interval = setInterval(async () => {
+        try {
+          const { data, error } = await supabase
+            .from('conversations')
+            .select('is_paid')
+            .eq('id', id)
+            .single();
+
+          if (!error && data?.is_paid) {
+            toast.success("Payment confirmed! Loading your package...");
+            setPolling(false);
+            navigate(`/mystery/${id}`);
+          }
+        } catch (e) {
+          console.error("Polling failed:", e);
+        }
+      }, 2000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [polling, id, navigate]);
+
   const handlePurchase = async () => {
-    window.location.href = "https://buy.stripe.com/6oE6rm1fT4BRdyM3cd";
+    if (!user?.id) {
+      toast.error("Please sign in to purchase this mystery");
+      navigate("/sign-in");
+      return;
+    }
+    setPurchasing(true);
+    try {
+      setPolling(true);
+
+      const res = await fetch("/api/create-checkout-session.js", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          mysteryId: id,
+          userId: user.id
+        })
+      });
+
+      const json = await res.json();
+      if (!json.url) {
+        throw new Error(json.error || "Failed to create Stripe checkout session");
+      }
+
+      window.open(json.url, "_blank");
+      toast.info("Please complete your purchase in the newly opened Stripe window.");
+    } catch (err: any) {
+      setPolling(false);
+      toast.error(
+        err?.message || "Failed to connect to Stripe. Please try again or use Simulate Purchase."
+      );
+      console.error("Stripe start error:", err);
+    } finally {
+      setPurchasing(false);
+    }
   };
 
   const simulatePurchase = async () => {
