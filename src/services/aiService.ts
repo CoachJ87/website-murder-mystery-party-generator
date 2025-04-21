@@ -53,6 +53,7 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
         messages: userAndAssistantMessages,
         system: enhancedSystemInstruction, // Send the enhanced system instruction
         promptVersion
+        max_tokens: promptVersion === 'paid' ? 8000 : 1000 // Add this line for larger responses
       };
 
       console.log("DEBUG: Edge Function payload structure:", {
