@@ -17,12 +17,13 @@ const MysteryView = () => {
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [generationError, setGenerationError] = useState<string | null>(null);
+  const [generationProgress, setGenerationProgress] = useState(0);
+  const [generationStage, setGenerationStage] = useState("");
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated } = useAuth();
-  const [generationProgress, setGenerationProgress] = useState(0);
-
+  
   // Check if we've just completed a purchase
   const justPurchased = location.search.includes('purchase=success');
 
@@ -67,7 +68,8 @@ const MysteryView = () => {
             .eq("conversation_id", id)
             .single();
 
-          if (!packageError && packageData) {
+          if (!packageError && packageData && packageData.content) {
+            console.log("Found existing package content, length:", packageData.content.length);
             setPackageContent(packageData.content);
           } else {
             // If the flag is true but content is missing, regenerate
@@ -90,31 +92,6 @@ const MysteryView = () => {
     fetchMystery();
   }, [id, navigate, justPurchased]);
 
-  // Simulate progress for better UX during generation
-  useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
-    
-    if (generating) {
-      setGenerationProgress(0);
-      
-      interval = setInterval(() => {
-        setGenerationProgress(prev => {
-          // Slowly increase up to 90% (the remaining 10% will happen when generation completes)
-          const increment = Math.random() * 5; // Random increment between 0-5%
-          const newProgress = Math.min(prev + increment, 90);
-          return newProgress;
-        });
-      }, 3000); // Update every 3 seconds
-    } else if (generationProgress > 0 && generationProgress < 100) {
-      // When generation is done but progress isn't at 100%, set it to 100%
-      setGenerationProgress(100);
-    }
-    
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [generating]);
-
   const handleGeneratePackage = async () => {
     if (!id) {
       toast.error("Mystery ID is missing");
@@ -123,37 +100,40 @@ const MysteryView = () => {
 
     setGenerating(true);
     setGenerationError(null);
+    setGenerationProgress(0);
+    setGenerationStage("Initializing generation...");
+    
     try {
-      toast.info("Generating your complete murder mystery package. This may take a few minutes...");
+      toast.info("Generating your complete murder mystery package. This may take 3-5 minutes...");
       
-      const content = await generateCompletePackage(id);
+      // Use the client-side generation with progress updates
+      const content = await generateCompletePackage(id, (progress, stage) => {
+        console.log(`Generation progress: ${progress}%, Stage: ${stage}`);
+        setGenerationProgress(progress);
+        setGenerationStage(stage);
+      });
+      
+      if (!content) {
+        throw new Error("No content was generated");
+      }
+      
       setPackageContent(content);
-      
-      // Update the main conversation
-      await supabase
-        .from("conversations")
-        .update({ 
-          has_complete_package: true,
-          needs_package_generation: false,
-          package_generated_at: new Date().toISOString()
-        })
-        .eq("id", id);
-        
-      // Also save in mystery_packages table
-      await supabase
-        .from("mystery_packages")
-        .upsert({ 
-          conversation_id: id,
-          content: content,
-          created_at: new Date().toISOString()
-        });
-        
       toast.success("Your complete mystery package is ready!");
-      setGenerationProgress(100);
+      
     } catch (error: any) {
       console.error("Error generating package:", error);
-      setGenerationError(error.message || "Failed to generate complete package");
-      toast.error("There was an issue generating your package. Please try again.");
+      
+      // Format user-friendly error message
+      let errorMessage = "Failed to generate your mystery package. Please try again.";
+      
+      if (error.message.includes("TIMEOUT") || error.message.includes("504")) {
+        errorMessage = "Generation took too long. Please try again in a few minutes.";
+      } else if (error.message.includes("token")) {
+        errorMessage = "Your mystery is too complex for automatic generation. Please try again with a simpler mystery.";
+      }
+      
+      setGenerationError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setGenerating(false);
     }
@@ -192,8 +172,7 @@ const MysteryView = () => {
                   
                   <h2 className="text-2xl font-semibold mb-4">Creating Your Murder Mystery</h2>
                   <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-                    This process takes 3-5 minutes. We're creating detailed character guides, 
-                    clues, game materials, and host instructions.
+                    {generationStage || "Processing your mystery details..."}
                   </p>
                   
                   {/* Progress bar */}
@@ -204,10 +183,7 @@ const MysteryView = () => {
                     ></div>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    {generationProgress < 30 ? "Analyzing your mystery details..." : 
-                     generationProgress < 60 ? "Creating character profiles and plot elements..." : 
-                     generationProgress < 90 ? "Finalizing game materials and host guide..." :
-                     "Almost done..."}
+                    {generationProgress}% complete
                   </p>
                 </div>
               </CardContent>
