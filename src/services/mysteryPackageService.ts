@@ -1,4 +1,3 @@
-
 // src/services/mysteryPackageService.ts
 import { getAIResponse } from '@/services/aiService';
 import { supabase } from '@/lib/supabase';
@@ -13,8 +12,14 @@ interface Message {
 /**
  * Generates a complete murder mystery package based on an existing conversation
  */
-export const generateCompletePackage = async (mysteryId: string): Promise<string> => {
+export const generateCompletePackage = async (
+  mysteryId: string,
+  onProgress?: (progress: number, stage: string) => void
+): Promise<string> => {
   try {
+    // Update progress if the callback is provided
+    onProgress?.(5, "Loading conversation history...");
+    
     // 1. Fetch the original conversation
     const { data: conversations, error: convError } = await supabase
       .from("conversations")
@@ -26,6 +31,8 @@ export const generateCompletePackage = async (mysteryId: string): Promise<string
       console.error("Error fetching original conversation:", convError);
       throw new Error("Could not find the original conversation");
     }
+    
+    onProgress?.(15, "Processing conversation...");
     
     // 2. Fetch all messages from this conversation
     const { data: messagesData, error: msgError } = await supabase
@@ -39,6 +46,8 @@ export const generateCompletePackage = async (mysteryId: string): Promise<string
       throw new Error("Could not retrieve conversation messages");
     }
     
+    onProgress?.(25, "Creating your mystery package...");
+    
     // 3. Format messages for the AI service
     const messages: Message[] = messagesData.map(msg => ({
       is_ai: msg.is_ai,
@@ -48,52 +57,70 @@ export const generateCompletePackage = async (mysteryId: string): Promise<string
     // 4. Add a transition prompt to connect the free and paid versions
     const transitionPrompt: Message = {
       is_ai: false,
-      content: "Generate the complete murder mystery package based on our conversation above. Please include detailed character guides, host instructions, and all game materials."
+      content: `Generate the complete murder mystery package based on our conversation. Include:
+      - Detailed host instructions with timeline
+      - Character guides for all players
+      - Clues and evidence descriptions
+      - Full solution explanation
+      - All printable game materials`
     };
     
-    // 5. Call the AI service with the paid prompt version
-    const packageContent = await getAIResponse([...messages, transitionPrompt], "paid");
+    onProgress?.(35, "Generating your complete mystery package...");
     
-    // 6. Store the result in a new conversation
-    const { data: newConv, error: newConvError } = await supabase
-      .from("conversations")
-      .insert({
-        mystery_id: mysteryId,
-        prompt_version: "paid",
-        is_completed: true,
-        user_id: conversations.user_id  // Use the user_id from the original conversation
-      })
-      .select()
-      .single();
+    // 5. Call the AI service with the paid prompt version and high token limit
+    // Try client-side generation to avoid edge function timeout
+    try {
+      const packageContent = await getAIResponse(
+        [...messages, transitionPrompt], 
+        "paid", 
+        undefined,
+        12000 // Very high token limit to avoid truncation
+      );
       
-    if (newConvError) {
-      console.error("Error creating new conversation:", newConvError);
-      // Continue anyway to return the package to the user
-    } else {
-      // Store the messages
-      await supabase
-        .from("messages")
-        .insert([
-          {
-            conversation_id: newConv.id,
-            content: transitionPrompt.content,
-            is_ai: false,
-            role: "user"
-          },
-          {
-            conversation_id: newConv.id,
-            content: packageContent,
-            is_ai: true,
-            role: "assistant"
-          }
-        ]);
+      if (!packageContent) {
+        throw new Error("Failed to generate mystery content");
+      }
+      
+      onProgress?.(85, "Saving your mystery package...");
+      
+      // 6. Store the result in the mystery_packages table
+      const { error: packageError } = await supabase
+        .from("mystery_packages")
+        .upsert({
+          conversation_id: mysteryId,
+          content: packageContent,
+          created_at: new Date().toISOString()
+        });
+        
+      if (packageError) {
+        console.error("Error saving mystery package:", packageError);
+        // Continue anyway to return content to user
+      }
+
+      // 7. Update the conversation to mark it as completed
+      const { error: updateError } = await supabase
+        .from("conversations")
+        .update({
+          has_complete_package: true,
+          needs_package_generation: false,
+          package_generated_at: new Date().toISOString()
+        })
+        .eq("id", mysteryId);
+        
+      if (updateError) {
+        console.error("Error updating conversation status:", updateError);
+      }
+      
+      onProgress?.(100, "Your mystery is ready!");
+      
+      // 8. Return the generated package content
+      return packageContent;
+    } catch (aiError) {
+      console.error("Error during AI package generation:", aiError);
+      throw new Error(`Generation failed: ${aiError.message}`);
     }
-    
-    // 7. Return the generated package content
-    return packageContent;
-    
   } catch (error) {
     console.error("Error generating complete package:", error);
-    throw new Error("Failed to generate the complete mystery package");
+    throw new Error(`Failed to generate the complete mystery package: ${error.message}`);
   }
 };
