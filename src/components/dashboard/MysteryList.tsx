@@ -1,16 +1,16 @@
-
 import { Mystery } from "@/interfaces/mystery";
 import { MysteryCard } from "./MysteryCard";
 
 interface MysteryListProps {
   mysteries: Mystery[];
-  onStatusChange: (id: string, status: "draft" | "published" | "archived") => void;
+  onStatusChange: (id: string, status: "draft" | "published" | "archived" | "purchased") => void;
   onDelete: (id: string) => void;
   onEdit: (id: string) => void;
+  onView: (id: string) => void;
   loading: boolean;
 }
 
-export const MysteryList = ({ mysteries, onStatusChange, onDelete, onEdit, loading }: MysteryListProps) => {
+export const MysteryList = ({ mysteries, onStatusChange, onDelete, onEdit, onView, loading }: MysteryListProps) => {
   if (loading) {
     return (
       <div className="text-center py-8">
@@ -36,6 +36,7 @@ export const MysteryList = ({ mysteries, onStatusChange, onDelete, onEdit, loadi
           onStatusChange={onStatusChange}
           onDelete={onDelete}
           onEdit={onEdit}
+          onView={onView}
         />
       ))}
     </div>
