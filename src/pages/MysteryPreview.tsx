@@ -112,13 +112,17 @@ export default function MysteryPreview() {
     if (polling && id) {
       interval = setInterval(async () => {
         try {
+          console.log("Polling for payment status...");
           const { data, error } = await supabase
             .from('conversations')
             .select('is_paid')
             .eq('id', id)
             .single();
-
+  
+          console.log("Poll result:", data, error);
+          
           if (!error && data?.is_paid) {
+            console.log("Payment confirmed! Redirecting...");
             toast.success("Payment confirmed! Loading your package...");
             setPolling(false);
             navigate(`/mystery/${id}`);
