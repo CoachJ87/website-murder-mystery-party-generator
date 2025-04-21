@@ -133,87 +133,23 @@ export default function MysteryPreview() {
     };
   }, [polling, id, navigate]);
 
-  const handlePurchase = async () => {
+  const openStripeCheckoutAndPoll = (checkoutUrl: string) => {
     if (!user?.id) {
       toast.error("Please sign in to purchase this mystery");
       navigate("/sign-in");
       return;
     }
-    setPurchasing(true);
-    try {
-      setPolling(true);
-
-      const res = await fetch("/api/create-checkout-session.js", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          mysteryId: id,
-          userId: user.id
-        })
-      });
-
-      const json = await res.json();
-      if (!json.url) {
-        throw new Error(json.error || "Failed to create Stripe checkout session");
-      }
-
-      window.open(json.url, "_blank");
-      toast.info("Please complete your purchase in the newly opened Stripe window.");
-    } catch (err: any) {
-      setPolling(false);
-      toast.error(
-        err?.message || "Failed to connect to Stripe. Please try again or use Simulate Purchase."
-      );
-      console.error("Stripe start error:", err);
-    } finally {
-      setPurchasing(false);
-    }
+    setPolling(true);
+    window.open(checkoutUrl, "_blank");
+    toast.info("Please complete your purchase in the newly opened Stripe window. This page will unlock automatically when payment is complete.");
   };
 
-  const simulatePurchase = async () => {
-    if (!user?.id) {
-      toast.error("Please sign in to purchase this mystery");
-      navigate("/sign-in");
-      return;
-    }
+  const handleRealPurchase = () => {
+    openStripeCheckoutAndPoll("https://buy.stripe.com/6oE6rm1fT4BRdyM3cd");
+  };
 
-    setPurchasing(true);
-    try {
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({
-          has_purchased: true,
-          purchase_date: new Date().toISOString()
-        })
-        .eq('id', user.id);
-
-      if (profileError) {
-        throw profileError;
-      }
-      
-      const { error: convError } = await supabase
-        .from('conversations')
-        .update({
-          is_paid: true,
-          status: "published",
-          purchase_date: new Date().toISOString()
-        })
-        .eq('id', id);
-        
-      if (convError) {
-        console.error("Warning: Could not update conversation:", convError);
-      }
-
-      toast.success("Purchase simulated successfully!");
-      navigate(`/mystery/${id}`);
-    } catch (error) {
-      console.error('Error simulating purchase:', error);
-      toast.error('Failed to simulate purchase. Please try again.');
-    } finally {
-      setPurchasing(false);
-    }
+  const handleSimulatePurchase = () => {
+    openStripeCheckoutAndPoll("https://buy.stripe.com/test_eVa17344p4056ju8ww");
   };
 
   if (isUserLoading || loading) {
@@ -307,12 +243,23 @@ export default function MysteryPreview() {
                   </div>
                 ))}
               </div>
-              
-              <Button onClick={handlePurchase} disabled={purchasing} className="w-full mt-4">
-                {purchasing ? 'Processing...' : 'Purchase Now'}
+
+              <Button
+                onClick={handleRealPurchase}
+                disabled={purchasing}
+                className="w-full mt-4"
+                aria-label="Buy with Stripe (Production)"
+              >
+                Purchase Now
               </Button>
-              
-              <Button onClick={simulatePurchase} variant="outline" disabled={purchasing} className="w-full mt-2">
+
+              <Button
+                onClick={handleSimulatePurchase}
+                variant="outline"
+                disabled={purchasing}
+                className="w-full mt-2"
+                aria-label="Simulate Test Purchase"
+              >
                 Simulate Purchase (Dev Mode)
               </Button>
             </CardContent>
