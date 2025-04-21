@@ -168,7 +168,7 @@ export default async function handler(req) {
     // Prepare Anthropic API request - using the system parameter at the top level, not as a message
     const anthropicRequest = {
       model: "claude-3-7-sonnet-20250219",
-      max_tokens: 2000,
+      max_tokens: promptVersion === 'paid' ? 8000 : 2000,
       messages: filteredMessages,
       system: systemPrompt
     };
