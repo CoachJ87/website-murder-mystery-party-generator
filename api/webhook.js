@@ -83,7 +83,8 @@ export default async function handler(req) {
             .from('conversations')
             .update({ 
               is_paid: true, 
-              purchase_date: new Date().toISOString() 
+              purchase_date: new Date().toISOString()
+              needs_package_generation: true
             })
             .eq('id', mysteryId);
 
