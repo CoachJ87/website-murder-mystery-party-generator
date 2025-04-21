@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -8,20 +8,29 @@ import Footer from "@/components/Footer";
 import { supabase } from "@/lib/supabase";
 import { generateCompletePackage } from "@/services/mysteryPackageService";
 import { useAuth } from "@/context/AuthContext";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, AlertCircle, CheckCircle } from "lucide-react";
 import MysteryPackageTabView from "@/components/MysteryPackageTabView";
-
-// This component needs to be created (see code below)
-// import MysteryPackageTabView from "@/components/MysteryPackageTabView";
 
 const MysteryView = () => {
   const [mystery, setMystery] = useState<any | null>(null);
   const [packageContent, setPackageContent] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
+  const [generationError, setGenerationError] = useState<string | null>(null);
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { isAuthenticated } = useAuth();
+  const [generationProgress, setGenerationProgress] = useState(0);
+
+  // Check if we've just completed a purchase
+  const justPurchased = location.search.includes('purchase=success');
+
+  useEffect(() => {
+    if (justPurchased) {
+      toast.success("Purchase successful! Your mystery is being prepared...");
+    }
+  }, [justPurchased]);
 
   useEffect(() => {
     const fetchMystery = async () => {
@@ -60,7 +69,15 @@ const MysteryView = () => {
 
           if (!packageError && packageData) {
             setPackageContent(packageData.content);
+          } else {
+            // If the flag is true but content is missing, regenerate
+            console.log("Package marked as complete but content missing. Regenerating...");
+            handleGeneratePackage();
           }
+        } else if (justPurchased || conversation.needs_package_generation) {
+          // Auto-generate if just purchased or needs generation
+          console.log("Auto-generating package after purchase...");
+          handleGeneratePackage();
         }
       } catch (error) {
         console.error("Error:", error);
@@ -71,7 +88,32 @@ const MysteryView = () => {
     };
 
     fetchMystery();
-  }, [id, navigate]);
+  }, [id, navigate, justPurchased]);
+
+  // Simulate progress for better UX during generation
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+    
+    if (generating) {
+      setGenerationProgress(0);
+      
+      interval = setInterval(() => {
+        setGenerationProgress(prev => {
+          // Slowly increase up to 90% (the remaining 10% will happen when generation completes)
+          const increment = Math.random() * 5; // Random increment between 0-5%
+          const newProgress = Math.min(prev + increment, 90);
+          return newProgress;
+        });
+      }, 3000); // Update every 3 seconds
+    } else if (generationProgress > 0 && generationProgress < 100) {
+      // When generation is done but progress isn't at 100%, set it to 100%
+      setGenerationProgress(100);
+    }
+    
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [generating]);
 
   const handleGeneratePackage = async () => {
     if (!id) {
@@ -80,17 +122,19 @@ const MysteryView = () => {
     }
 
     setGenerating(true);
+    setGenerationError(null);
     try {
       toast.info("Generating your complete murder mystery package. This may take a few minutes...");
       
       const content = await generateCompletePackage(id);
       setPackageContent(content);
       
-      // Save the generated package
+      // Update the main conversation
       await supabase
         .from("conversations")
         .update({ 
           has_complete_package: true,
+          needs_package_generation: false,
           package_generated_at: new Date().toISOString()
         })
         .eq("id", id);
@@ -105,43 +149,75 @@ const MysteryView = () => {
         });
         
       toast.success("Your complete mystery package is ready!");
+      setGenerationProgress(100);
     } catch (error: any) {
       console.error("Error generating package:", error);
-      toast.error(error.message || "Failed to generate complete package");
+      setGenerationError(error.message || "Failed to generate complete package");
+      toast.error("There was an issue generating your package. Please try again.");
     } finally {
       setGenerating(false);
     }
   };
 
-if (loading || generating) {
-  return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1 py-12 px-4">
-        <div className="container mx-auto max-w-4xl">
-          <div className="text-center">
-            {generating ? (
-              <>
-                <div className="h-16 w-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-                <h2 className="text-2xl font-bold mt-6">Generating Your Complete Murder Mystery</h2>
-                <p className="text-muted-foreground mt-2">
-                  This process takes 3-5 minutes. We're creating detailed character guides, 
-                  clues, game materials, and host instructions.
-                </p>
-              </>
-            ) : (
-              <>
-                <div className="h-8 w-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-                <p className="mt-4">Loading your mystery...</p>
-              </>
-            )}
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-1 py-12 px-4">
+          <div className="container mx-auto max-w-4xl">
+            <div className="h-8 w-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+            <p className="text-center mt-4">Loading your mystery...</p>
           </div>
-        </div>
-      </main>
-      <Footer />
-    </div>
-  );
-}
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (generating) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-1 py-12 px-4">
+          <div className="container mx-auto max-w-4xl">
+            <div className="text-center mb-8">
+              <h1 className="text-3xl font-bold mb-2">{mystery?.title || "Your Murder Mystery"}</h1>
+              <p className="text-muted-foreground">Generating your complete murder mystery package</p>
+            </div>
+            
+            <Card className="mx-auto max-w-2xl">
+              <CardContent className="pt-6">
+                <div className="text-center py-8">
+                  <div className="h-16 w-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+                  
+                  <h2 className="text-2xl font-semibold mb-4">Creating Your Murder Mystery</h2>
+                  <p className="text-muted-foreground mb-8 max-w-md mx-auto">
+                    This process takes 3-5 minutes. We're creating detailed character guides, 
+                    clues, game materials, and host instructions.
+                  </p>
+                  
+                  {/* Progress bar */}
+                  <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2 max-w-md mx-auto">
+                    <div 
+                      className="bg-primary h-2.5 rounded-full transition-all duration-300" 
+                      style={{ width: `${generationProgress}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    {generationProgress < 30 ? "Analyzing your mystery details..." : 
+                     generationProgress < 60 ? "Creating character profiles and plot elements..." : 
+                     generationProgress < 90 ? "Finalizing game materials and host guide..." :
+                     "Almost done..."}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   // Helper function to extract a summary
   const extractSummary = (mystery: any) => {
@@ -183,6 +259,26 @@ if (loading || generating) {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                {generationError && (
+                  <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md flex items-start gap-3 mb-4">
+                    <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="text-sm font-medium text-red-800 dark:text-red-300">Generation Error</h4>
+                      <p className="text-sm text-red-700 dark:text-red-400 mt-1">{generationError}</p>
+                    </div>
+                  </div>
+                )}
+                
+                {generationProgress === 100 && !packageContent && (
+                  <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md flex items-start gap-3 mb-4">
+                    <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="text-sm font-medium text-green-800 dark:text-green-300">Generation Complete</h4>
+                      <p className="text-sm text-green-700 dark:text-green-400 mt-1">Your mystery package has been generated! Refresh the page to view it.</p>
+                    </div>
+                  </div>
+                )}
+                
                 <div className="p-4 bg-muted/30 rounded-md">
                   <h3 className="font-semibold mb-2">Mystery Summary</h3>
                   <p>{extractSummary(mystery)}</p>
@@ -202,14 +298,16 @@ if (loading || generating) {
                   
                   <Button
                     onClick={handleGeneratePackage}
-                    disabled={generating}
+                    disabled={generating || generationProgress === 100}
                     className="w-full mt-4"
                   >
                     {generating ? (
                       <>
                         <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                        Generating Full Package (This may take a few minutes)...
+                        Generating Full Package...
                       </>
+                    ) : generationProgress === 100 ? (
+                      "Refresh Page to View Package"
                     ) : (
                       "Generate Complete Mystery Package"
                     )}
