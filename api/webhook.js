@@ -17,6 +17,14 @@ const supabaseAdmin = createClient(
 );
 
 export default async function handler(req) {
+  // Simple response for GET requests to verify the endpoint exists
+  if (req.method === 'GET') {
+    return new Response(JSON.stringify({ status: 'Webhook endpoint is active' }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
   if (req.method === 'POST') {
     let event;
     const signature = req.headers.get('stripe-signature');
