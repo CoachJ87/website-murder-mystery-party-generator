@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { getAIResponse } from "@/services/aiService";
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import { Message } from "@/components/types";
@@ -543,9 +542,7 @@ import { Loader2, AlertCircle, Send, Wand2 } from "lucide-react";
                  if (askingAboutPlayerCount || askingAboutTheme || askingAboutAccomplice) {
                      console.log("DEBUG: AI asking about already provided info, creating corrected response");
                      // Create a modified response that acknowledges the preferences
-                     finalResponse = `I'll create a murder mystery based on your specifications: ${initialTheme} theme${initialPlayerCount ? `, ${initialPlayerCount} players` : ''}${initialHasAccomplice !== undefined ? (initialHasAccomplice ? ', with an accomplice' : ', without an accomplice') : ''}${initialScriptType ? `, with ${initialScriptType} scripts` : ''}.
- 
- ${responseText.split('\n\n').slice(1).join('\n\n')}`;
+                     finalResponse = `I'll create a murder mystery based on your specifications: ${initialTheme} theme${initialPlayerCount ? `, ${initialPlayerCount} players` : ''}${initialHasAccomplice !== undefined ? (initialHasAccomplice ? ', with an accomplice' : ', without an accomplice') : ''}${initialScriptType ? `, with ${initialScriptType} scripts` : ''}.\n \n ${responseText.split('\n\n').slice(1).join('\n\n')}`;
                  }
  
                  const aiMessage: Message = {
