@@ -1,3 +1,4 @@
+
 // src/services/mysteryPackageService.ts
 import { supabase } from '@/lib/supabase';
 import { MysteryData } from '@/interfaces/mystery';
@@ -8,12 +9,18 @@ interface Message {
   content: string;
 }
 
+interface GenerationOptions {
+  hasAccomplice: boolean;
+  scriptType: 'full' | 'pointForm';
+}
+
 /**
  * Generates a complete murder mystery package based on an existing conversation
  */
 export const generateCompletePackage = async (
   mysteryId: string,
-  onProgress?: (progress: number, stage: string) => void
+  onProgress?: (progress: number, stage: string) => void,
+  options?: GenerationOptions
 ): Promise<string> => {
   try {
     // Update progress if the callback is provided
@@ -54,12 +61,28 @@ export const generateCompletePackage = async (
     }));
     
     // 4. Add a transition prompt to connect the free and paid versions
-    const transitionPrompt = `Generate the complete murder mystery package based on our conversation. Include:
+    let transitionPrompt = `Generate the complete murder mystery package based on our conversation. Include:
       - Detailed host instructions with timeline
       - Character guides for all players
       - Clues and evidence descriptions
       - Full solution explanation
       - All printable game materials`;
+      
+    // Add options to the prompt if provided
+    if (options) {
+      if (options.hasAccomplice) {
+        transitionPrompt += `
+      - IMPORTANT: Include an accomplice mechanism where one player works with the murderer`;
+      }
+      
+      if (options.scriptType === 'full') {
+        transitionPrompt += `
+      - IMPORTANT: Create full detailed scripts for characters`;
+      } else if (options.scriptType === 'pointForm') {
+        transitionPrompt += `
+      - IMPORTANT: Create point form summary guides for characters instead of full scripts`;
+      }
+    }
     
     onProgress?.(35, "Generating your complete mystery package...");
     
