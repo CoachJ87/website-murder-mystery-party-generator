@@ -1,13 +1,14 @@
+import { getAIResponse, generateMysteryPreview } from "@/services/aiService";
 import { useState, useEffect, useRef } from "react";
- import { Button } from "@/components/ui/button";
- import { Card, CardContent } from "@/components/ui/card";
- import { Textarea } from "@/components/ui/textarea";
- import { toast } from "sonner";
- import { getAIResponse } from "@/services/aiService";
- import ReactMarkdown from 'react-markdown';
- import rehypeRaw from 'rehype-raw';
- import { Message } from "@/components/types";
- import { Loader2, AlertCircle, Send, Wand2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+import { getAIResponse } from "@/services/aiService";
+import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
+import { Message } from "@/components/types";
+import { Loader2, AlertCircle, Send, Wand2 } from "lucide-react";
  
  interface MysteryChatProps {
      initialTheme?: string;
@@ -370,6 +371,56 @@ import { useState, useEffect, useRef } from "react";
              setError(null);
              toast.info("AI is thinking...");
  
+            // Check if this is an initial mystery creation request
+             if (userMessage.includes("Let's create a murder mystery") && userMessage.includes("theme")) {
+                 // Extract theme and player count
+                 const themeMatch = userMessage.match(/with a (.*?) theme/);
+                 const playerCountMatch = userMessage.match(/for (\d+) players/);
+                 
+                 const theme = themeMatch ? themeMatch[1] : initialTheme || "Mystery";
+                 const playerCount = playerCountMatch ? parseInt(playerCountMatch[1]) : initialPlayerCount || 8;
+                 
+                 console.log("DEBUG: Detected initial mystery creation request, using two-step approach");
+                 console.log("DEBUG: Extracted theme:", theme, "player count:", playerCount);
+                 
+                 try {
+                     // Use the new two-step function
+                     const formattedMystery = await generateMysteryPreview({
+                         theme,
+                         playerCount,
+                         isPaid: false
+                     });
+                     
+                     const aiMessage: Message = {
+                         id: Date.now().toString(),
+                         content: formattedMystery,
+                         is_ai: true,
+                         timestamp: new Date(),
+                     };
+                     
+                     aiHasRespondedRef.current = true;
+                     
+                     setMessages(prev => {
+                         const updatedMessages = [...prev, aiMessage];
+                         
+                         if (onSave) {
+                             console.log("DEBUG: Calling onSave with AI message added");
+                             onSave(aiMessage);
+                         }
+                         
+                         return updatedMessages;
+                     });
+                     
+                     toast.success("AI response received!");
+                     setLoading(false);
+                     return;
+                 } catch (error) {
+                     console.error("DEBUG: Error in generateMysteryPreview:", error);
+                     console.log("DEBUG: Falling back to standard approach");
+                     // Continue with normal approach as fallback
+                 }
+             }
+          
              let anthropicMessages;
              
              // Use different context strategies based on whether this is a user-initiated message
