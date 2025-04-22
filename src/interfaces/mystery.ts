@@ -6,7 +6,7 @@ export interface MysteryData {
   hasAccomplice?: boolean;
   scriptType?: 'full' | 'summary';
   additionalDetails?: string;
-  status?: "draft" | "published" | "archived";
+  status?: "draft" | "published" | "archived" | "purchased";
   [key: string]: any;  // Allow for additional properties
 }
 
@@ -33,7 +33,7 @@ export interface Mystery {
   title: string;
   created_at: string;
   updated_at: string;
-  status: "draft" | "published" | "archived";
+  status: "draft" | "published" | "archived" | "purchased";
   theme?: string;
   guests?: number;
   is_purchased?: boolean;
