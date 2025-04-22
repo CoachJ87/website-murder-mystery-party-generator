@@ -26,10 +26,6 @@ const formSchema = z.object({
         .int()
         .min(2, { message: "Minimum 2 players required" })
         .max(40, { message: "Maximum 40 players allowed" }),
-    hasAccomplice: z.boolean().default(false),
-    scriptType: z.enum(["full", "pointForm"], {
-        required_error: "Please select a script type",
-    }),
     additionalDetails: z.string().optional(),
 });
 
@@ -61,8 +57,6 @@ const MysteryForm = ({ onSave, isSaving, initialData }: MysteryFormProps) => {
         defaultValues: {
             theme: initialData?.theme || "",
             playerCount: initialData?.playerCount || 8,
-            hasAccomplice: initialData?.hasAccomplice || false,
-            scriptType: initialData?.scriptType || "full",
             additionalDetails: initialData?.additionalDetails || "",
         },
     });
@@ -130,71 +124,6 @@ const MysteryForm = ({ onSave, isSaving, initialData }: MysteryFormProps) => {
                             <FormDescription>
                                 Enter a specific, whole number between 2 and 40.
                             </FormDescription>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="hasAccomplice"
-                    render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                            <div className="space-y-0.5">
-                                <FormLabel className="text-base">
-                                    Include an accomplice?
-                                </FormLabel>
-                                <FormDescription>
-                                    Would you like to include an accomplice
-                                    mechanism where two players work together as
-                                    the murderer and accomplice?
-                                </FormDescription>
-                            </div>
-                            <FormControl>
-                                <Switch
-                                    checked={field.value}
-                                    onCheckedChange={field.onChange}
-                                />
-                            </FormControl>
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="scriptType"
-                    render={({ field }) => (
-                        <FormItem className="space-y-3">
-                            <FormLabel>
-                                Would you prefer full scripts or point form
-                                summaries for character guidance?
-                            </FormLabel>
-                            <FormControl>
-                                <RadioGroup
-                                    onValueChange={field.onChange}
-                                    defaultValue={field.value}
-                                    className="flex flex-col space-y-1"
-                                >
-                                    <FormItem className="flex items-center space-x-3 space-y-0">
-                                        <FormControl>
-                                            <RadioGroupItem value="full" />
-                                        </FormControl>
-                                        <FormLabel className="font-normal">
-                                            Full Scripts (Detailed character
-                                            dialogue and directions)
-                                        </FormLabel>
-                                    </FormItem>
-                                    <FormItem className="flex items-center space-x-3 space-y-0">
-                                        <FormControl>
-                                            <RadioGroupItem value="pointForm" />
-                                        </FormControl>
-                                        <FormLabel className="font-normal">
-                                            Point Form Summaries (Bullet points
-                                            with key information)
-                                        </FormLabel>
-                                    </FormItem>
-                                </RadioGroup>
-                            </FormControl>
                             <FormMessage />
                         </FormItem>
                     )}
