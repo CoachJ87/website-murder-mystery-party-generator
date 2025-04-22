@@ -1,0 +1,47 @@
+// src/components/MysteryProgress.tsx
+import { useEffect, useState } from 'react';
+import { Loader2 } from 'lucide-react';
+import { GenerationProgress } from '@/services/aiService';
+
+interface MysteryProgressProps {
+  progress: GenerationProgress;
+}
+
+export default function MysteryProgress({ progress }: MysteryProgressProps) {
+  const [progressPercent, setProgressPercent] = useState(0);
+  
+  useEffect(() => {
+    if (progress.totalSteps > 0) {
+      setProgressPercent(Math.round((progress.completedSteps / progress.totalSteps) * 100));
+    }
+  }, [progress.completedSteps, progress.totalSteps]);
+
+  return (
+    <div className="w-full p-4 bg-background border rounded-lg">
+      <div className="flex justify-between items-center mb-2">
+        <h3 className="font-semibold">Generating Your Mystery</h3>
+        <span className="text-sm text-muted-foreground">{progressPercent}%</span>
+      </div>
+      
+      <div className="w-full bg-secondary h-2 rounded-full mb-4">
+        <div 
+          className="bg-primary h-2 rounded-full transition-all duration-300" 
+          style={{ width: `${progressPercent}%` }}
+        />
+      </div>
+      
+      <div className="flex items-center text-sm text-muted-foreground">
+        <Loader2 className={`h-4 w-4 mr-2 ${progress.error ? 'hidden' : 'animate-spin'}`} />
+        <span>{progress.error ? `Error: ${progress.error}` : progress.currentStep}</span>
+      </div>
+      
+      {progress.error && (
+        <div className="mt-4 p-3 bg-red-50 text-red-800 rounded-md text-sm">
+          <p>There was an error generating your mystery:</p>
+          <p className="font-mono mt-1">{progress.error}</p>
+          <p className="mt-2">Please try again with fewer characters or a simpler theme.</p>
+        </div>
+      )}
+    </div>
+  );
+}
