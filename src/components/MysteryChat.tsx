@@ -1,4 +1,4 @@
-import { getAIResponse, generateMysteryPreview } from "@/services/aiService";
+import { getAIResponse, generateMysteryPreview, generateInitialResponse } from "@/services/aiService";
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -379,20 +379,16 @@ import { Loader2, AlertCircle, Send, Wand2 } from "lucide-react";
                  const theme = themeMatch ? themeMatch[1] : initialTheme || "Mystery";
                  const playerCount = playerCountMatch ? parseInt(playerCountMatch[1]) : initialPlayerCount || 8;
                  
-                 console.log("DEBUG: Detected initial mystery creation request, using two-step approach");
-                 console.log("DEBUG: Extracted theme:", theme, "player count:", playerCount);
+                 console.log("DEBUG: Detected initial mystery creation request");
                  
+                 // For free prompts, use a pre-built template with the extracted theme/count
                  try {
-                     // Use the new two-step function
-                     const formattedMystery = await generateMysteryPreview({
-                         theme,
-                         playerCount,
-                         isPaid: false
-                     });
+                     // Try the direct template approach first - much faster and avoids API timeouts
+                     const templateResponse = await generateInitialResponse(theme, playerCount);
                      
                      const aiMessage: Message = {
                          id: Date.now().toString(),
-                         content: formattedMystery,
+                         content: templateResponse,
                          is_ai: true,
                          timestamp: new Date(),
                      };
@@ -403,20 +399,55 @@ import { Loader2, AlertCircle, Send, Wand2 } from "lucide-react";
                          const updatedMessages = [...prev, aiMessage];
                          
                          if (onSave) {
-                             console.log("DEBUG: Calling onSave with AI message added");
+                             console.log("DEBUG: Calling onSave with template AI message added");
                              onSave(aiMessage);
                          }
                          
                          return updatedMessages;
                      });
                      
-                     toast.success("AI response received!");
+                     toast.success("Mystery concept created!");
                      setLoading(false);
                      return;
                  } catch (error) {
-                     console.error("DEBUG: Error in generateMysteryPreview:", error);
-                     console.log("DEBUG: Falling back to standard approach");
-                     // Continue with normal approach as fallback
+                     console.error("DEBUG: Error in template response:", error);
+                     // Fall back to previous methods if template fails
+                     try {
+                         // Use the two-step function as a fallback
+                         const formattedMystery = await generateMysteryPreview({
+                             theme,
+                             playerCount,
+                             isPaid: false
+                         });
+                         
+                         const aiMessage: Message = {
+                             id: Date.now().toString(),
+                             content: formattedMystery,
+                             is_ai: true,
+                             timestamp: new Date(),
+                         };
+                         
+                         aiHasRespondedRef.current = true;
+                         
+                         setMessages(prev => {
+                             const updatedMessages = [...prev, aiMessage];
+                             
+                             if (onSave) {
+                                 console.log("DEBUG: Calling onSave with AI message added");
+                                 onSave(aiMessage);
+                             }
+                             
+                             return updatedMessages;
+                         });
+                         
+                         toast.success("AI response received!");
+                         setLoading(false);
+                         return;
+                     } catch (error) {
+                         console.error("DEBUG: Error in generateMysteryPreview:", error);
+                         console.log("DEBUG: Falling back to standard approach");
+                         // Continue with normal approach as fallback
+                     }
                  }
              }
           
@@ -664,7 +695,7 @@ import { Loader2, AlertCircle, Send, Wand2 } from "lucide-react";
                              }`}
                          >
                              <CardContent className="p-4">
-                                 <div className={`prose prose-sm ${message.is_ai ? 'prose-stone dark:prose-invert' : 'text-primary-foreground prose-invert'} max-w-none`}>
+<div className={`prose prose-sm ${message.is_ai ? 'prose-stone dark:prose-invert' : 'text-primary-foreground prose-invert'} max-w-none`}>
                                      {message.content && typeof message.content === 'string' ? (
                                          <ReactMarkdown
                                              rehypePlugins={[rehypeRaw]}
