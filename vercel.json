@@ -1,7 +1,7 @@
 {
   "functions": {
     "api/proxy-with-prompts.js": {
-      "maxDuration": 60
+      "maxDuration": 120
     }
   }
 }
