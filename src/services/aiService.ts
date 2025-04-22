@@ -14,12 +14,106 @@ interface Message {
   role?: string;
 }
 
+// New interface for mystery preferences
+export interface MysteryPreferences {
+  theme: string;
+  playerCount: number;
+  isPaid?: boolean;
+}
+
+// Add this new function for the two-step mystery generation
+export const generateMysteryPreview = async (preferences: MysteryPreferences): Promise<string> => {
+  try {
+    console.log("DEBUG: Starting generateMysteryPreview");
+    
+    // Step 1: Generate content
+    const contentPrompt = `
+      Based on a ${preferences.theme} murder mystery for ${preferences.playerCount} players:
+      1. Create a creative title
+      2. Write a compelling premise (2-3 paragraphs)
+      3. Design a memorable victim with description
+      4. List ${preferences.playerCount} characters with brief descriptions
+      5. Describe the murder method
+
+      FORMAT: Provide this as JSON with keys: title, theme, premise, victim, characters (array), murderMethod
+    `;
+    
+    // Use your existing function for the first step
+    const contentStep = await getAIResponse(
+      [{ role: "user", content: contentPrompt }],
+      'free',
+      "Generate structured mystery content in JSON format only",
+      2000
+    );
+    
+    let mysteryContent;
+    try {
+      // Extract JSON from the response
+      const jsonMatch = contentStep.match(/```json\n([\s\S]*)\n```/) || 
+                       contentStep.match(/{[\s\S]*}/);
+      
+      const jsonString = jsonMatch ? jsonMatch[1] || jsonMatch[0] : contentStep;
+      mysteryContent = JSON.parse(jsonString);
+    } catch (e) {
+      console.error("DEBUG: Error parsing JSON response:", e);
+      // Fallback to using the full response text if JSON parsing fails
+      mysteryContent = {
+        title: "Mystery Title",
+        theme: preferences.theme,
+        premise: contentStep.slice(0, 500),
+        victim: "Mystery Victim",
+        characters: Array(parseInt(preferences.playerCount.toString())).fill("Character"),
+        murderMethod: "Unknown"
+      };
+    }
+    
+    // Step 2: Format the content
+    const formattingPrompt = `
+      Format this murder mystery content into the required preview layout:
+      ${JSON.stringify(mysteryContent)}
+
+      EXACT FORMAT REQUIRED:
+      # "[TITLE]" - A [THEME] MURDER MYSTERY
+
+      ## PREMISE
+      [PREMISE]
+
+      ## VICTIM
+      [VICTIM]
+
+      ## CHARACTER LIST ([PLAYER COUNT] PLAYERS)
+      [NUMBERED CHARACTER LIST]
+
+      ## MURDER METHOD
+      [MURDER METHOD]
+
+      ## UPGRADE TO FULL VERSION
+      This is a preview of your custom murder mystery. Purchase the full package to receive detailed character guides, clues, and all game materials!
+    `;
+    
+    // Use your existing function for the second step (with a smaller model via lower token count)
+    const formattedMystery = await getAIResponse(
+      [{ role: "user", content: formattingPrompt }],
+      'free',
+      "Format the provided content exactly according to the specified structure without modification",
+      1000
+    );
+    
+    return formattedMystery;
+  } catch (error) {
+    console.error(`DEBUG: Error in generateMysteryPreview: ${error.message}`);
+    return `There was an error generating your mystery preview: ${error.message}. Please try again.`;
+  }
+};
+
+// Keep your existing getAIResponse function unchanged
 export const getAIResponse = async (
   messages: ApiMessage[] | Message[], 
   promptVersion: 'free' | 'paid', 
   systemInstruction?: string,
   maxTokens?: number
 ): Promise<string> => {
+  // Your existing implementation remains unchanged
   try {
     console.log(`DEBUG: Starting getAIResponse with ${messages.length} messages`);
     console.log(`DEBUG: Prompt version: ${promptVersion}`);
@@ -120,6 +214,7 @@ const fallbackToVercelApi = async (
   promptVersion: 'free' | 'paid',
   maxTokens: number
 ): Promise<string> => {
+  // Your existing implementation remains unchanged
   console.log("DEBUG: Using Vercel API fallback");
   const apiUrl = 'https://website-murder-mystery-party-generator.vercel.app/api/proxy-with-prompts';
 
