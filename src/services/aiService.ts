@@ -71,10 +71,13 @@ export const generateFullMysteryInChunks = async (
       [{
         role: "user",
         content: `Create a basic structure for a murder mystery with a ${preferences.theme} theme for ${preferences.playerCount} players. 
-        Return a JSON object with these fields:
-        1. title: A creative title for the mystery
-        2. premise: A brief 2-paragraph premise setting the scene
-        3. victim: Details about the murder victim including name, occupation, and why they were killed`
+        Return ONLY a valid JSON object with no additional text, in this exact format:
+        {
+          "title": "Mystery Title Here",
+          "premise": "Premise paragraph here...",
+          "victim": "Victim details here..."
+        }
+        Do not include code blocks, markdown formatting, or any other text outside the JSON object.`
       }],
       'paid',
       "Generate only valid JSON with the requested fields. Do not include any explanations or commentary outside the JSON object.",
