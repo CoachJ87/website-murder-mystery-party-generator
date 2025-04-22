@@ -4,9 +4,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Button } from "@/components/ui/button";
-import { useNavigate } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
 
 interface MysteryLoadingOptionsProps {
     onOptionsChange?: (options: { hasAccomplice: boolean; scriptType: 'full' | 'pointForm' }) => void;
@@ -16,7 +13,6 @@ interface MysteryLoadingOptionsProps {
 const MysteryLoadingOptions = ({ onOptionsChange, isLoading }: MysteryLoadingOptionsProps) => {
     const [hasAccomplice, setHasAccomplice] = useState(false);
     const [scriptType, setScriptType] = useState<'full' | 'pointForm'>('full');
-    const navigate = useNavigate();
 
     const handleAccompliceChange = (checked: boolean) => {
         setHasAccomplice(checked);
@@ -73,20 +69,6 @@ const MysteryLoadingOptions = ({ onOptionsChange, isLoading }: MysteryLoadingOpt
                     </div>
                 </CardContent>
             </Card>
-
-            {isLoading && (
-                <div className="flex justify-center">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                </div>
-            )}
-
-            <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => navigate('/dashboard')}
-            >
-                Back to Dashboard
-            </Button>
         </div>
     );
 };

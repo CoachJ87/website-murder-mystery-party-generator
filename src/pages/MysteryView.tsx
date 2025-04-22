@@ -19,12 +19,15 @@ const MysteryView = () => {
   const [generationError, setGenerationError] = useState<string | null>(null);
   const [generationProgress, setGenerationProgress] = useState(0);
   const [generationStage, setGenerationStage] = useState("");
+  const [loadingOptions, setLoadingOptions] = useState<{ hasAccomplice: boolean; scriptType: 'full' | 'pointForm' }>({
+    hasAccomplice: false,
+    scriptType: 'full'
+  });
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated } = useAuth();
   
-  // Check if we've just completed a purchase
   const justPurchased = location.search.includes('purchase=success');
 
   useEffect(() => {
@@ -39,7 +42,6 @@ const MysteryView = () => {
 
       setLoading(true);
       try {
-        // Get the conversation and check if it's paid
         const { data: conversation, error } = await supabase
           .from("conversations")
           .select("*, mystery_data, is_paid, has_complete_package")
@@ -52,7 +54,6 @@ const MysteryView = () => {
           return;
         }
 
-        // If not paid, redirect to preview
         if (!conversation.is_paid) {
           navigate(`/mystery/preview/${id}`);
           return;
@@ -60,7 +61,6 @@ const MysteryView = () => {
 
         setMystery(conversation);
 
-        // Check if we already have generated package content
         if (conversation.has_complete_package) {
           const { data: packageData, error: packageError } = await supabase
             .from("mystery_packages")
@@ -72,12 +72,10 @@ const MysteryView = () => {
             console.log("Found existing package content, length:", packageData.content.length);
             setPackageContent(packageData.content);
           } else {
-            // If the flag is true but content is missing, regenerate
             console.log("Package marked as complete but content missing. Regenerating...");
             handleGeneratePackage();
           }
         } else if (justPurchased || conversation.needs_package_generation) {
-          // Auto-generate if just purchased or needs generation
           console.log("Auto-generating package after purchase...");
           handleGeneratePackage();
         }
@@ -106,11 +104,13 @@ const MysteryView = () => {
     try {
       toast.info("Generating your complete murder mystery package. This may take 3-5 minutes...");
       
-      // Use the client-side generation with progress updates
       const content = await generateCompletePackage(id, (progress, stage) => {
         console.log(`Generation progress: ${progress}%, Stage: ${stage}`);
         setGenerationProgress(progress);
         setGenerationStage(stage);
+      }, {
+        hasAccomplice: loadingOptions.hasAccomplice,
+        scriptType: loadingOptions.scriptType
       });
       
       if (!content) {
@@ -123,7 +123,6 @@ const MysteryView = () => {
     } catch (error: any) {
       console.error("Error generating package:", error);
       
-      // Format user-friendly error message
       let errorMessage = "Failed to generate your mystery package. Please try again.";
       
       if (error.message.includes("TIMEOUT") || error.message.includes("504")) {
@@ -139,63 +138,10 @@ const MysteryView = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1 py-12 px-4">
-          <div className="container mx-auto max-w-4xl">
-            <div className="h-8 w-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-            <p className="text-center mt-4">Loading your mystery...</p>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
+  const handleOptionsChange = (options: { hasAccomplice: boolean; scriptType: 'full' | 'pointForm' }) => {
+    setLoadingOptions(options);
+  };
 
-  if (generating) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1 py-12 px-4">
-          <div className="container mx-auto max-w-4xl">
-            <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold mb-2">{mystery?.title || "Your Murder Mystery"}</h1>
-              <p className="text-muted-foreground">Generating your complete murder mystery package</p>
-            </div>
-            
-            <Card className="mx-auto max-w-2xl">
-              <CardContent className="pt-6">
-                <div className="text-center py-8">
-                  <div className="h-16 w-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-                  
-                  <h2 className="text-2xl font-semibold mb-4">Creating Your Murder Mystery</h2>
-                  <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-                    {generationStage || "Processing your mystery details..."}
-                  </p>
-                  
-                  {/* Progress bar */}
-                  <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2 max-w-md mx-auto">
-                    <div 
-                      className="bg-primary h-2.5 rounded-full transition-all duration-300" 
-                      style={{ width: `${generationProgress}%` }}
-                    ></div>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    {generationProgress}% complete
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-
-  // Helper function to extract a summary
   const extractSummary = (mystery: any) => {
     if (!mystery?.mystery_data) return "A murder mystery awaits...";
     
@@ -259,6 +205,11 @@ const MysteryView = () => {
                   <h3 className="font-semibold mb-2">Mystery Summary</h3>
                   <p>{extractSummary(mystery)}</p>
                 </div>
+                
+                <MysteryLoadingOptions
+                  onOptionsChange={handleOptionsChange}
+                  isLoading={generating}
+                />
                 
                 <div className="space-y-2">
                   <p>
