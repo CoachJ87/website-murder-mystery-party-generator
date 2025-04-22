@@ -82,10 +82,24 @@ export const generateFullMysteryInChunks = async (
     );
     
     // Extract JSON from response
-    const structureData = extractJsonFromResponse(basicStructure);
-    progress.title = structureData.title;
-    progress.premise = structureData.premise;
-    progress.victim = structureData.victim;
+    let structureData;
+    try {
+      structureData = extractJsonFromResponse(basicStructure);
+      progress.title = structureData.title;
+      progress.premise = structureData.premise;
+      progress.victim = structureData.victim;
+    } catch (error) {
+      console.error("Failed to parse JSON for basic structure, using fallback:", error);
+      // Create fallback data
+      structureData = {
+        title: `${preferences.theme} Murder Mystery`,
+        premise: `A thrilling murder mystery set in a ${preferences.theme} setting. The guests were enjoying themselves until tragedy struck.`,
+        victim: `The victim was found dead under mysterious circumstances. Everyone present is a suspect.`
+      };
+      progress.title = structureData.title;
+      progress.premise = structureData.premise;
+      progress.victim = structureData.victim;
+    }
     
     // Step 2: Generate characters
     progressCallback({...progress, completedSteps: 2, currentStep: "Creating characters..."});
@@ -239,11 +253,15 @@ function extractJsonFromResponse(response: string): any {
     if (!jsonMatch) {
       throw new Error("No JSON found in response");
     }
+
+    let jsonString = jsonMatch[1] || jsonMatch[0];
+    jsonString = jsonString.trim();
+    jsonString = jsonString.replace(/,\s*([}\]])/g, '$1');
     
-    const jsonString = jsonMatch[1] || jsonMatch[0];
     return JSON.parse(jsonString);
   } catch (error) {
     console.error("Error parsing JSON:", error);
+    console.error("Problematic response:", response);
     throw new Error("Failed to parse JSON response");
   }
 }
