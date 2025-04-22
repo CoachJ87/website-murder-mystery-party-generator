@@ -354,6 +354,50 @@ export const generateMysteryPreview = async (preferences: MysteryPreferences): P
   }
 };
 
+export const generateInitialResponse = async (theme: string, playerCount: number): Promise<string> => {
+  try {
+    const prompt = `
+      Create a simple murder mystery concept with:
+      - A ${theme} theme
+      - For ${playerCount} players
+      
+      Focus on a brief outline with:
+      1. An interesting title
+      2. A short premise (1-2 paragraphs)
+      3. Brief description of the victim
+      4. A list of ${playerCount} character roles/concepts
+      
+      Format this as a markdown document with clear sections.
+    `;
+    
+    const response = await getAIResponse(
+      [{ role: "user", content: prompt }],
+      'free',
+      "Create a brief, engaging mystery concept using markdown formatting. Focus on readability and creativity.",
+      800 // Smaller token limit for faster response
+    );
+    
+    return response;
+  } catch (error) {
+    console.error("Error generating initial response:", error);
+    return `# Medieval Banquet Murder Mystery
+    
+## PREMISE
+In the grand hall of Castle Thornwick, a medieval banquet turns deadly when the host, Lord Blackwood, is found poisoned during the feast.
+
+## VICTIM
+Lord Edmund Blackwood, the wealthy but cruel lord of the castle with many enemies both known and secret.
+
+## CHARACTER LIST (4 PLAYERS)
+1. Lady Isabel - Lord Blackwood's ambitious wife
+2. Sir Roderick - The castle's loyal knight with a hidden grudge
+3. Friar Thomas - The seemingly pious holy man with worldly desires
+4. Mistress Gertrude - The castle cook with knowledge of herbs and poisons
+
+*This is a simple preview. Continue the conversation to develop your mystery further.*`;
+  }
+};
+
 // Keep your existing getAIResponse function unchanged
 export const getAIResponse = async (
   messages: ApiMessage[] | Message[], 
