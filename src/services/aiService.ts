@@ -19,9 +19,236 @@ export interface MysteryPreferences {
   theme: string;
   playerCount: number;
   isPaid?: boolean;
+  hasAccomplice?: boolean;
+  scriptType?: "full" | "pointForm";
+  additionalDetails?: string;
 }
 
-// Add this new function for the two-step mystery generation
+// Add interfaces for chunked generation
+export interface GenerationStep {
+  status: 'pending' | 'processing' | 'completed' | 'error';
+  data?: any;
+  error?: string;
+}
+
+export interface GenerationProgress {
+  mysteryId: string;
+  title?: string;
+  premise?: string;
+  victim?: string;
+  characters?: any[];
+  murderMethod?: string;
+  clues?: any[];
+  secrets?: any[];
+  evidence?: any[];
+  fullPackage?: string;
+  completedSteps: number;
+  totalSteps: number;
+  currentStep: string;
+  error?: string;
+}
+
+// Function to generate full mystery in chunks
+export const generateFullMysteryInChunks = async (
+  preferences: MysteryPreferences,
+  progressCallback: (progress: GenerationProgress) => void
+): Promise<string> => {
+  // Create a unique ID for this generation
+  const mysteryId = `mystery_${Date.now()}`;
+  
+  // Initialize progress
+  const progress: GenerationProgress = {
+    mysteryId,
+    completedSteps: 0,
+    totalSteps: 6,
+    currentStep: "Generating basic mystery structure..."
+  };
+  
+  try {
+    // Step 1: Generate basic mystery structure (title, premise, victim)
+    progressCallback({...progress, completedSteps: 1, currentStep: "Creating murder scenario..."});
+    const basicStructure = await getAIResponse(
+      [{
+        role: "user",
+        content: `Create a basic structure for a murder mystery with a ${preferences.theme} theme for ${preferences.playerCount} players. 
+        Return a JSON object with these fields:
+        1. title: A creative title for the mystery
+        2. premise: A brief 2-paragraph premise setting the scene
+        3. victim: Details about the murder victim including name, occupation, and why they were killed`
+      }],
+      'paid',
+      "Generate only valid JSON with the requested fields. Do not include any explanations or commentary outside the JSON object.",
+      1000
+    );
+    
+    // Extract JSON from response
+    const structureData = extractJsonFromResponse(basicStructure);
+    progress.title = structureData.title;
+    progress.premise = structureData.premise;
+    progress.victim = structureData.victim;
+    
+    // Step 2: Generate characters
+    progressCallback({...progress, completedSteps: 2, currentStep: "Creating characters..."});
+    const charactersResponse = await getAIResponse(
+      [{
+        role: "user",
+        content: `For the murder mystery titled "${structureData.title}" with a ${preferences.theme} theme, 
+        create ${preferences.playerCount} distinct characters including the murderer${preferences.hasAccomplice ? ' and an accomplice' : ''}.
+        
+        For context, here's information about the premise and victim:
+        Premise: ${structureData.premise}
+        Victim: ${structureData.victim}
+        
+        Return the characters as a JSON array where each character has:
+        1. name: Character name (provide gender-neutral options)
+        2. occupation: Their role or job
+        3. appearance: Brief physical description
+        4. personality: Key personality traits
+        5. connection: How they knew the victim
+        6. motive: Why they might have wanted the victim dead
+        7. alibi: Their claimed whereabouts during the murder
+        8. isMurderer: true only for the actual murderer${preferences.hasAccomplice ? '\n9. isAccomplice: true only for the accomplice' : ''}`
+      }],
+      'paid',
+      "Generate only valid JSON with the requested fields. Make character descriptions concise but interesting.",
+      2000
+    );
+    
+    // Extract JSON from response
+    const charactersData = extractJsonFromResponse(charactersResponse);
+    progress.characters = charactersData;
+    
+    // Step 3: Generate clues and evidence
+    progressCallback({...progress, completedSteps: 3, currentStep: "Creating clues and evidence..."});
+    const cluesResponse = await getAIResponse(
+      [{
+        role: "user",
+        content: `For the murder mystery titled "${structureData.title}", create a set of clues and evidence.
+        
+        Based on these characters (focusing on the murderer${preferences.hasAccomplice ? ' and accomplice' : ''}):
+        ${JSON.stringify(charactersData.slice(0, 3))}... (and other characters)
+        
+        Return as JSON with:
+        1. murderMethod: Detailed description of how the murder was committed
+        2. clues: Array of 5-8 clues that players might discover
+        3. evidence: Array of physical evidence items that point to the murderer`
+      }],
+      'paid',
+      "Generate only valid JSON with the requested fields.",
+      1500
+    );
+    
+    // Extract JSON from response
+    const cluesData = extractJsonFromResponse(cluesResponse);
+    progress.murderMethod = cluesData.murderMethod;
+    progress.clues = cluesData.clues;
+    progress.evidence = cluesData.evidence;
+    
+    // Step 4: Generate character secrets
+    progressCallback({...progress, completedSteps: 4, currentStep: "Creating character secrets and details..."});
+    const secretsResponse = await getAIResponse(
+      [{
+        role: "user",
+        content: `For the murder mystery titled "${structureData.title}", create secrets and private information for each character.
+        
+        Based on the characters:
+        ${JSON.stringify(charactersData)}
+        
+        Return as JSON with:
+        1. secrets: Array of objects, each with 'characterName' and 'secretInfo' fields, one for each character`
+      }],
+      'paid',
+      "Generate only valid JSON with the requested fields.",
+      1500
+    );
+    
+    // Extract JSON from response
+    const secretsData = extractJsonFromResponse(secretsResponse);
+    progress.secrets = secretsData.secrets;
+    
+    // Step 5: Compile everything into a final package
+    progressCallback({...progress, completedSteps: 5, currentStep: "Compiling final package..."});
+    
+    // Prepare all data for final formatting
+    const completeData = {
+      title: progress.title,
+      theme: preferences.theme,
+      playerCount: preferences.playerCount,
+      hasAccomplice: preferences.hasAccomplice,
+      scriptType: preferences.scriptType,
+      premise: progress.premise,
+      victim: progress.victim,
+      characters: progress.characters,
+      murderMethod: progress.murderMethod,
+      clues: progress.clues,
+      evidence: progress.evidence,
+      secrets: progress.secrets
+    };
+    
+    // Final step: Format everything into a complete package
+    const finalPackageResponse = await getAIResponse(
+      [{
+        role: "user",
+        content: `Format this complete murder mystery data into a well-organized game package:
+        ${JSON.stringify(completeData)}
+        
+        Include these sections in the final output:
+        1. Introduction & Setup
+        2. Game Overview
+        3. Character Guides (including secrets, one for each character)
+        4. Host Instructions
+        5. Clue Sheet
+        6. Evidence Guide
+        7. Murder Solution
+        
+        Use ${preferences.scriptType === 'full' ? 'complete dialogue and paragraphs' : 'concise bullet points'} for character guides.`
+      }],
+      'paid',
+      "Format this as a complete, ready-to-play murder mystery package with clear sections using markdown.",
+      4000
+    );
+    
+    // Step 6: Return the completed package
+    progressCallback({
+      ...progress, 
+      completedSteps: 6, 
+      totalSteps: 6, 
+      currentStep: "Your mystery is ready!",
+      fullPackage: finalPackageResponse
+    });
+    
+    return finalPackageResponse;
+    
+  } catch (error) {
+    console.error("Error in chunked generation:", error);
+    progressCallback({
+      ...progress,
+      error: error instanceof Error ? error.message : "Unknown error occurred"
+    });
+    throw error;
+  }
+};
+
+// Helper function to extract JSON from text response
+function extractJsonFromResponse(response: string): any {
+  try {
+    // Try to find JSON block in markdown code blocks
+    const jsonMatch = response.match(/```(?:json)?\n?([\s\S]*?)\n?```/) || 
+                     response.match(/{[\s\S]*}/);
+    
+    if (!jsonMatch) {
+      throw new Error("No JSON found in response");
+    }
+    
+    const jsonString = jsonMatch[1] || jsonMatch[0];
+    return JSON.parse(jsonString);
+  } catch (error) {
+    console.error("Error parsing JSON:", error);
+    throw new Error("Failed to parse JSON response");
+  }
+}
+
+// The two-step mystery generation for free previews
 export const generateMysteryPreview = async (preferences: MysteryPreferences): Promise<string> => {
   try {
     console.log("DEBUG: Starting generateMysteryPreview");
@@ -91,7 +318,7 @@ export const generateMysteryPreview = async (preferences: MysteryPreferences): P
       This is a preview of your custom murder mystery. Purchase the full package to receive detailed character guides, clues, and all game materials!
     `;
     
-    // Use your existing function for the second step (with a smaller model via lower token count)
+    // Use your existing function for the second step
     const formattedMystery = await getAIResponse(
       [{ role: "user", content: formattingPrompt }],
       'free',
