@@ -10,7 +10,6 @@ import { generateCompletePackage } from "@/services/mysteryPackageService";
 import { useAuth } from "@/context/AuthContext";
 import { RefreshCw, AlertCircle, CheckCircle } from "lucide-react";
 import MysteryPackageTabView from "@/components/MysteryPackageTabView";
-import MysteryLoadingOptions from "@/components/MysteryLoadingOptions";
 
 const MysteryView = () => {
   const [mystery, setMystery] = useState<any | null>(null);
@@ -109,7 +108,10 @@ const MysteryView = () => {
         console.log(`Generation progress: ${progress}%, Stage: ${stage}`);
         setGenerationProgress(progress);
         setGenerationStage(stage);
-      }, loadingOptions);
+      }, {
+        hasAccomplice: loadingOptions.hasAccomplice,
+        scriptType: loadingOptions.scriptType
+      });
       
       if (!content) {
         throw new Error("No content was generated");

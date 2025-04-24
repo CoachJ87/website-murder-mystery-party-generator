@@ -1,10 +1,9 @@
-
 export interface MysteryData {
   title?: string;
   theme?: string;
   playerCount?: number;
   hasAccomplice?: boolean;
-  scriptType?: 'full' | 'summary' | 'pointForm';
+  scriptType?: 'full' | 'summary';
   additionalDetails?: string;
   status?: "draft" | "published" | "archived" | "purchased";
   [key: string]: any;  // Allow for additional properties

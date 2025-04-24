@@ -1,6 +1,6 @@
 // src/services/mysteryPackageService.ts
 import { supabase } from '@/lib/supabase';
-import { generateFullMysteryInChunks, MysteryPreferences } from './aiService';
+import { MysteryData } from '@/interfaces/mystery';
 
 // Interface for conversation messages
 interface Message {
@@ -8,27 +8,21 @@ interface Message {
   content: string;
 }
 
-interface GenerationOptions {
-  hasAccomplice: boolean;
-  scriptType: 'full' | 'pointForm';
-}
-
 /**
  * Generates a complete murder mystery package based on an existing conversation
  */
 export const generateCompletePackage = async (
   mysteryId: string,
-  onProgress?: (progress: number, stage: string) => void,
-  options?: GenerationOptions
+  onProgress?: (progress: number, stage: string) => void
 ): Promise<string> => {
   try {
     // Update progress if the callback is provided
-    onProgress?.(5, "Loading conversation data...");
+    onProgress?.(5, "Loading conversation history...");
     
     // 1. Fetch the original conversation
-    const { data: conversation, error: convError } = await supabase
+    const { data: conversations, error: convError } = await supabase
       .from("conversations")
-      .select("*, mystery_data, user_id")
+      .select("*, user_id")
       .eq("id", mysteryId)
       .single();
       
@@ -37,38 +31,88 @@ export const generateCompletePackage = async (
       throw new Error("Could not find the original conversation");
     }
     
-    onProgress?.(15, "Preparing generation...");
+    onProgress?.(15, "Processing conversation...");
     
-    // 2. Extract theme and player count from conversation data or messages
-    const mysteryData = conversation.mystery_data || {};
+    // 2. Fetch all messages from this conversation
+    const { data: messagesData, error: msgError } = await supabase
+      .from("messages")
+      .select("*")
+      .eq("conversation_id", conversations.id)
+      .order("created_at", { ascending: true });
+      
+    if (msgError) {
+      console.error("Error fetching messages:", msgError);
+      throw new Error("Could not retrieve conversation messages");
+    }
     
-    // Create mystery preferences from conversation data
-    const preferences: MysteryPreferences = {
-      theme: mysteryData.theme || "Classic Mystery",
-      playerCount: mysteryData.playerCount || 8,
-      hasAccomplice: options?.hasAccomplice || mysteryData.hasAccomplice || false,
-      scriptType: options?.scriptType || mysteryData.scriptType || "full",
-      isPaid: true
+    onProgress?.(25, "Creating your mystery package...");
+    
+    // 3. Format messages for the API call
+    const messages: Message[] = messagesData.map(msg => ({
+      is_ai: msg.is_ai,
+      content: msg.content
+    }));
+    
+    // 4. Add a transition prompt to connect the free and paid versions
+    const transitionPrompt = `Generate the complete murder mystery package based on our conversation. Include:
+      - Detailed host instructions with timeline
+      - Character guides for all players
+      - Clues and evidence descriptions
+      - Full solution explanation
+      - All printable game materials`;
+    
+    onProgress?.(35, "Generating your complete mystery package...");
+    
+    // 5. Use the Vercel API endpoint directly instead of the Edge Function
+    const apiUrl = 'https://website-murder-mystery-party-generator.vercel.app/api/proxy-with-prompts';
+    
+    // Format messages for the API call
+    const formattedMessages = messages.map(msg => ({
+      role: msg.is_ai ? "assistant" : "user",
+      content: msg.content
+    }));
+    
+    // Add the transition prompt
+    formattedMessages.push({
+      role: "user",
+      content: transitionPrompt
+    });
+    
+    // Create the request body
+    const requestBody = {
+      messages: formattedMessages,
+      system: "You are an expert murder mystery creator who specializes in detailed, comprehensive packages. Create a complete murder mystery game package with all necessary materials for hosting the event.",
+      promptVersion: "paid",
+      max_tokens: 12000
     };
     
-    console.log("Using mystery preferences:", preferences);
-    onProgress?.(25, "Starting chunked generation...");
+    console.log("Sending request to Vercel API with message count:", formattedMessages.length);
     
-    // 3. Use the chunked generation approach with progress updates
-    const packageContent = await generateFullMysteryInChunks(
-      preferences,
-      (progress) => {
-        // Map the chunked progress (0-6 steps) to overall progress (25-85%)
-        const progressPercent = 25 + Math.round((progress.completedSteps / progress.totalSteps) * 60);
-        onProgress?.(progressPercent, progress.currentStep);
-        
-        console.log(`Generation progress: ${progressPercent}%, Step ${progress.completedSteps}/${progress.totalSteps}: ${progress.currentStep}`);
-      }
-    );
+    // Call the Vercel API
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestBody)
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`API returned status ${response.status}:`, errorText);
+      throw new Error(`API returned status ${response.status}: ${errorText}`);
+    }
+    
+    const data = await response.json();
+    
+    if (!data?.choices?.[0]?.message?.content) {
+      console.error("Invalid response format from API:", data);
+      throw new Error("Invalid response format from API");
+    }
+    
+    const packageContent = data.choices[0].message.content;
     
     onProgress?.(85, "Saving your mystery package...");
     
-    // 4. Store the result in the mystery_packages table
+    // 6. Store the result in the mystery_packages table
     const { error: packageError } = await supabase
       .from("mystery_packages")
       .upsert({
@@ -82,7 +126,7 @@ export const generateCompletePackage = async (
       // Continue anyway to return content to user
     }
 
-    // 5. Update the conversation to mark it as completed
+    // 7. Update the conversation to mark it as completed
     const { error: updateError } = await supabase
       .from("conversations")
       .update({
@@ -98,7 +142,7 @@ export const generateCompletePackage = async (
     
     onProgress?.(100, "Your mystery is ready!");
     
-    // 6. Return the generated package content
+    // 8. Return the generated package content
     return packageContent;
   } catch (error) {
     console.error("Error generating complete package:", error);
