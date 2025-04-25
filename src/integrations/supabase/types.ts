@@ -12,11 +12,14 @@ export type Database = {
       conversations: {
         Row: {
           created_at: string | null
+          has_complete_package: boolean | null
           id: string
           is_completed: boolean | null
           is_paid: boolean | null
           mystery_data: Json | null
           mystery_id: string | null
+          needs_package_generation: boolean | null
+          package_generated_at: string | null
           prompt_version: string | null
           purchase_date: string | null
           system_instruction: string | null
@@ -26,11 +29,14 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          has_complete_package?: boolean | null
           id?: string
           is_completed?: boolean | null
           is_paid?: boolean | null
           mystery_data?: Json | null
           mystery_id?: string | null
+          needs_package_generation?: boolean | null
+          package_generated_at?: string | null
           prompt_version?: string | null
           purchase_date?: string | null
           system_instruction?: string | null
@@ -40,11 +46,14 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          has_complete_package?: boolean | null
           id?: string
           is_completed?: boolean | null
           is_paid?: boolean | null
           mystery_data?: Json | null
           mystery_id?: string | null
+          needs_package_generation?: boolean | null
+          package_generated_at?: string | null
           prompt_version?: string | null
           purchase_date?: string | null
           system_instruction?: string | null
@@ -97,6 +106,38 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mystery_packages: {
+        Row: {
+          content: string
+          conversation_id: string | null
+          created_at: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          content: string
+          conversation_id?: string | null
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Update: {
+          content?: string
+          conversation_id?: string | null
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mystery_packages_conversation_id_fkey"
             columns: ["conversation_id"]
             isOneToOne: false
             referencedRelation: "conversations"
