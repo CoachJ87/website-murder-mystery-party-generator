@@ -10,8 +10,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2023-10-16',
 });
 
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-
 // Create a Supabase client with the admin key
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -19,13 +17,34 @@ const supabaseAdmin = createClient(
 );
 
 export default async function handler(req) {
+  // Simple response for GET requests to verify the endpoint exists
+  if (req.method === 'GET') {
+    return new Response(JSON.stringify({ status: 'Webhook endpoint is active' }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
   if (req.method === 'POST') {
     let event;
     const signature = req.headers.get('stripe-signature');
     const body = await req.text();
+    
+    console.log("Webhook received: ", signature ? "Valid signature" : "No signature");
+    
+    // Choose the appropriate webhook secret based on the mode
+    const isTestMode = process.env.NODE_ENV !== 'production' || 
+                      req.headers.get('stripe-mode') === 'test';
+    
+    const webhookSecret = isTestMode 
+      ? process.env.STRIPE_TEST_WEBHOOK_SECRET 
+      : process.env.STRIPE_WEBHOOK_SECRET;
+    
+    console.log("Using webhook secret for mode:", isTestMode ? "TEST" : "PRODUCTION");
 
     try {
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+      console.log("Webhook event constructed: ", event.type);
     } catch (err) {
       console.error(`Webhook Error: ${err.message}`);
       return new Response(`Webhook Error: ${err.message}`, {
@@ -55,6 +74,8 @@ export default async function handler(req) {
 
           if (userUpdateError) {
             console.error('Error updating user profile:', userUpdateError);
+          } else {
+            console.log('User profile updated successfully for user ID:', userId);
           }
 
           // Update conversation
@@ -68,8 +89,11 @@ export default async function handler(req) {
 
           if (conversationUpdateError) {
             console.error('Error updating conversation:', conversationUpdateError);
+          } else {
+            console.log('Conversation updated successfully for mystery ID:', mysteryId);
           }
 
+          console.log("Database updates complete for mystery ID:", mysteryId);
           return new Response(null, { status: 200 });
         } catch (error) {
           console.error('Error processing webhook:', error);
@@ -77,6 +101,7 @@ export default async function handler(req) {
         }
       } else {
         console.log('Missing mystery ID or user ID in checkout session metadata.');
+        console.log('Session metadata:', session.metadata);
         return new Response('Missing metadata', { status: 200 });
       }
     } else {
