@@ -1,4 +1,3 @@
-
 export interface MysteryData {
   title?: string; // Making title optional to fix the type error
   theme?: string;
@@ -38,7 +37,16 @@ export interface Mystery {
   theme?: string;
   guests?: number;
   is_purchased?: boolean;
-  is_paid?: boolean;  // Added this property to match what's being used in MysteryCard
   ai_title?: string;
   premise?: string;
+  package_generation_status?: {
+    status: 'pending' | 'in_progress' | 'completed' | 'failed';
+    progress: number;
+    currentStep: string;
+    sections?: {
+      hostGuide: boolean;
+      characters: boolean;
+      clues: boolean;
+    };
+  };
 }

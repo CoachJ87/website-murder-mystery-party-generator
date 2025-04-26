@@ -30,6 +30,7 @@ const MysteryPreview = () => {
     const [testModeEnabled, setTestModeEnabled] = useState(false);
     const [resumable, setResumable] = useState(false);
     const [generationAbandoned, setGenerationAbandoned] = useState(false);
+    const [generationStatus, setGenerationStatus] = useState<any | null>(null);
 
     useEffect(() => {
         if (!id) return;
@@ -165,7 +166,54 @@ const MysteryPreview = () => {
         fetchMystery();
     }, [id, user, navigate]);
 
-    const handleGenerateClick = async () => {
+    const checkGenerationStatus = async () => {
+      if (!id) return;
+      try {
+        const status = await getPackageGenerationStatus(id);
+        setGenerationStatus(status);
+        
+        if (status.status === 'completed') {
+          navigate(`/mystery/${id}`);
+        }
+      } catch (error) {
+        console.error("Error checking generation status:", error);
+      }
+    };
+    
+    useEffect(() => {
+      checkGenerationStatus();
+      const interval = setInterval(checkGenerationStatus, 5000);
+      return () => clearInterval(interval);
+    }, [id, navigate]);
+
+  const renderGenerationProgress = () => {
+    if (!generationStatus) return null;
+
+    return (
+      <div className="space-y-4 mb-6">
+        <div className="space-y-2">
+          <div className="flex justify-between text-sm">
+            <span>{generationStatus.currentStep}</span>
+            <span>{generationStatus.progress}%</span>
+          </div>
+          <Progress value={generationStatus.progress} className="h-2" />
+        </div>
+        <div className="flex gap-2 flex-wrap">
+          {Object.entries(generationStatus.sections || {}).map(([key, isComplete]) => (
+            <Badge 
+              key={key}
+              variant={isComplete ? "default" : "outline"}
+              className={isComplete ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300" : ""}
+            >
+              {key.charAt(0).toUpperCase() + key.slice(1)} {isComplete ? "✓" : "..."}
+            </Badge>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const handleGenerateClick = async () => {
         if (!isAuthenticated) {
             toast.error("Please sign in to generate a complete mystery package");
             navigate("/sign-in");
@@ -189,28 +237,35 @@ const MysteryPreview = () => {
             { duration: 7000 }
         );
 
-        try {
-            setGenerating(true);
-            
-            // Generate with or without test mode
-            if (!resumable) {
-                // Start new generation
-                await generateCompletePackage(id, testModeEnabled);
-                toast.success("Generation started successfully!");
-            } else {
-                // Resume previous generation
-                await resumePackageGeneration(id, testModeEnabled);
-                toast.success("Generation resumed successfully!");
-            }
-            
-            // Navigate to the view page to see results and progress
-            navigate(`/mystery/${id}`);
-        } catch (error) {
-            console.error("Error generating mystery:", error);
-            setGenerating(false);
-            toast.error("Failed to start generation. Please try again.");
-        }
-    };
+    
+    try {
+      setGenerating(true);
+      
+      const status = await getPackageGenerationStatus(id);
+      const isResuming = status.status === 'in_progress' || status.status === 'failed';
+      
+      toast.info(
+        <div className="space-y-2">
+          <div className="font-semibold">
+            {isResuming ? "Resuming generation..." : "Starting generation..."}
+          </div>
+          <p className="text-sm">This will take about 5-10 minutes. Please keep this browser tab open.</p>
+        </div>
+      );
+      
+      if (isResuming) {
+        await resumePackageGeneration(id);
+      } else {
+        await generateCompletePackage(id);
+      }
+      
+      // Success will be handled by the status polling
+    } catch (error) {
+      console.error("Error generating package:", error);
+      setGenerating(false);
+      toast.error("Failed to generate package. Please try again.");
+    }
+  };
 
     const handleTestModeChange = (enabled: boolean) => {
         setTestModeEnabled(enabled);
@@ -311,58 +366,45 @@ const MysteryPreview = () => {
                         </CardContent>
                     </Card>
 
-                    <Card className="mb-6">
-                        <CardHeader>
-                            <CardTitle>Generate Your Mystery Package</CardTitle>
-                            <CardDescription>
-                                Get complete character guides, host instructions, and game materials
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <Alert className="mb-4">
-                                <InfoIcon className="h-4 w-4" />
-                                <AlertTitle>Important Information</AlertTitle>
-                                <AlertDescription className="space-y-2">
-                                    <p>Generating a complete mystery package takes 5-10 minutes. Your browser tab must remain open during generation.</p>
-                                    <p>Closing the browser or putting your computer to sleep will interrupt the process, but you can resume later.</p>
-                                </AlertDescription>
-                            </Alert>
-                            
-                            <div className="mt-4 flex items-center space-x-2">
-                                <Label htmlFor="test-mode">Test Mode (Shorter Content)</Label>
-                                <Switch 
-                                    id="test-mode" 
-                                    checked={testModeEnabled}
-                                    onCheckedChange={handleTestModeChange}
-                                />
-                            </div>
-                            
-                            <p className="text-xs text-muted-foreground mt-2">
-                                Test mode generates a shorter mystery package that uses less AI credits, perfect for testing.
-                            </p>
-                        </CardContent>
-                        <CardFooter className="flex justify-end">
-                            <Button 
-                                onClick={handleGenerateClick} 
-                                disabled={generating}
-                                className="w-full sm:w-auto"
-                            >
-                                {generating ? (
-                                    <>
-                                        <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                                        Generating...
-                                    </>
-                                ) : (
-                                    "Generate Package"
-                                )}
-                            </Button>
-                        </CardFooter>
-                    </Card>
-                </div>
-            </main>
-            <Footer />
+        {generationStatus?.status === 'in_progress' && renderGenerationProgress()}
+        
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>
+              {generationStatus?.status === 'in_progress' ? 'Generating Your Mystery Package' : 'Generate Your Mystery Package'}
+            </CardTitle>
+            <CardDescription>
+              {generationStatus?.status === 'in_progress' 
+                ? 'Your mystery package is being generated. Please keep this browser tab open.'
+                : 'Start generating your custom murder mystery package with all materials included.'}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button
+              onClick={handleGenerateClick}
+              disabled={generating}
+              className="w-full sm:w-auto"
+            >
+              {generating ? (
+                <>
+                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                  {generationStatus?.status === 'in_progress' ? "Resuming..." : "Generating..."}
+                </>
+              ) : (
+                generationStatus?.status === 'in_progress' ? "Resume Generation" : "Generate Package"
+              )}
+            </Button>
+          </CardContent>
+        </Card>
+
+        <div className="flex justify-center mt-8">
+          <Button variant="outline" onClick={() => navigate("/dashboard")}>
+            Back to Dashboard
+          </Button>
         </div>
-    );
+      </div>
+    </main>
+  );
 };
 
 export default MysteryPreview;

@@ -13,22 +13,24 @@ interface MysteryCardProps {
 }
 
 export const MysteryCard = ({ mystery, onStatusChange, onDelete, onEdit }: MysteryCardProps) => {
-  const isPurchased = mystery.status === "purchased" || mystery.is_purchased || mystery.is_paid;
+  const isPurchased = mystery.status === "purchased" || mystery.is_purchased === true;
 
   return (
-    <Card className={`${isPurchased ? "border-primary/30" : "bg-card"}`}>
+    <Card className={`${isPurchased ? "border-primary" : ""}`}>
       <CardHeader>
         <CardTitle className="flex justify-between items-start gap-2">
           <span className="truncate">{mystery.title}</span>
           <div>
-            {isPurchased && (
+            {isPurchased ? (
               <Badge variant="default" className="bg-primary">
                 <CheckCircle2 className="h-3 w-3 mr-1" />
                 Purchased
               </Badge>
+            ) : mystery.status === "archived" ? (
+              <Badge variant="outline">Archived</Badge>
+            ) : (
+              <Badge variant="secondary">Draft</Badge>
             )}
-            {mystery.status === "draft" && !isPurchased && <Badge variant="secondary">Draft</Badge>}
-            {mystery.status === "archived" && <Badge variant="outline">Archived</Badge>}
           </div>
         </CardTitle>
       </CardHeader>
@@ -52,31 +54,28 @@ export const MysteryCard = ({ mystery, onStatusChange, onDelete, onEdit }: Myste
           </p>
         )}
         
-        
-      
-      <div className="flex flex-wrap justify-end gap-2 pt-2">
-        <Button
-          size="sm"
-          variant={isPurchased ? "default" : "secondary"}
-          onClick={() => isPurchased ? window.location.href = `/mystery/${mystery.id}` : onEdit(mystery.id)}
-          className="flex-1 min-w-[80px]"
-        >
-          {isPurchased ? (
+        <div className="flex flex-wrap justify-end gap-2 pt-2">
+          <Button
+            size="sm"
+            variant={isPurchased ? "default" : "secondary"}
+            onClick={() => isPurchased ? window.location.href = `/mystery/${mystery.id}` : onEdit(mystery.id)}
+            className="flex-1 min-w-[80px]"
+          >
+            {isPurchased ? (
+              <>
+                <Eye className="h-4 w-4 mr-2" />
+                View Mystery
+              </>
+            ) : (
+              <>
+                <Edit className="h-4 w-4 mr-2" />
+                Edit
+              </>
+            )}
+          </Button>
+          
+          {!isPurchased && (
             <>
-              <Eye className="h-4 w-4 mr-2" />
-              View Mystery
-            </>
-          ) : (
-            <>
-              <Edit className="h-4 w-4 mr-2" />
-              Edit
-            </>
-          )}
-        </Button>
-        
-        
-        {!isPurchased && (
-          <>
               {mystery.status !== "archived" ? (
                 <Button
                   size="sm"
@@ -126,9 +125,8 @@ export const MysteryCard = ({ mystery, onStatusChange, onDelete, onEdit }: Myste
                 </AlertDialogContent>
               </AlertDialog>
             </>
-          
-        )}
-      </div>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
