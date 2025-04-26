@@ -12,7 +12,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
 import { Message } from "@/components/types";
 import ReactMarkdown from 'react-markdown';
-import { InfoIcon, AlertTriangleIcon, ClockIcon, LoaderIcon, PlayIcon } from "lucide-react";
+import { InfoIcon, AlertTriangleIcon, ClockIcon, LoaderIcon, PlayIcon, RefreshCw } from "lucide-react";
 import { generateCompletePackage, resumePackageGeneration, getPackageGenerationStatus, toggleTestMode, getTestModeEnabled } from "@/services/mysteryPackageService";
 import { Separator } from "@/components/ui/separator";
 
@@ -313,7 +313,7 @@ const MysteryPreview = () => {
 
                     <Card className="mb-6">
                         <CardHeader>
-                            <CardTitle>Generate Full Mystery Package</CardTitle>
+                            <CardTitle>Generate Your Mystery Package</CardTitle>
                             <CardDescription>
                                 Get complete character guides, host instructions, and game materials
                             </CardDescription>
@@ -341,36 +341,20 @@ const MysteryPreview = () => {
                                 Test mode generates a shorter mystery package that uses less AI credits, perfect for testing.
                             </p>
                         </CardContent>
-                        <CardFooter className="flex justify-between flex-col sm:flex-row gap-4">
-                            <div>
-                                <Button 
-                                    onClick={handleGenerateClick} 
-                                    disabled={generating}
-                                    className="w-full sm:w-auto"
-                                    variant="default"
-                                >
-                                    {resumable ? (
-                                        <>
-                                            <PlayIcon className="mr-2 h-4 w-4" />
-                                            Resume Generation
-                                        </>
-                                    ) : (
-                                        <>
-                                            <ClockIcon className="mr-2 h-4 w-4" />
-                                            Generate Package
-                                        </>
-                                    )}
-                                </Button>
-                                <p className="text-xs text-muted-foreground mt-2">
-                                    {resumable ? "Continue from where you left off." : "Takes 5-10 minutes with this browser tab open."}
-                                </p>
-                            </div>
+                        <CardFooter className="flex justify-end">
                             <Button 
-                                variant="outline" 
-                                onClick={() => navigate(`/mystery/edit/${id}`)}
+                                onClick={handleGenerateClick} 
+                                disabled={generating}
                                 className="w-full sm:w-auto"
                             >
-                                Back to Editing
+                                {generating ? (
+                                    <>
+                                        <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                                        Generating...
+                                    </>
+                                ) : (
+                                    "Generate Package"
+                                )}
                             </Button>
                         </CardFooter>
                     </Card>

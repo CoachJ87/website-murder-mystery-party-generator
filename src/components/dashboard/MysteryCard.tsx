@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -53,28 +52,31 @@ export const MysteryCard = ({ mystery, onStatusChange, onDelete, onEdit }: Myste
           </p>
         )}
         
-        <div className="flex flex-wrap justify-end gap-2 pt-2">
-          <Button
-            size="sm"
-            variant={isPurchased ? "default" : "secondary"}
-            onClick={() => isPurchased ? window.location.href = `/mystery/${mystery.id}` : onEdit(mystery.id)}
-            className="flex-1 min-w-[80px]"
-          >
-            {isPurchased ? (
-              <>
-                <Eye className="h-4 w-4 mr-2" />
-                View Mystery
-              </>
-            ) : (
-              <>
-                <Edit className="h-4 w-4 mr-2" />
-                Edit
-              </>
-            )}
-          </Button>
-          
-          {!isPurchased && (
+        
+      
+      <div className="flex flex-wrap justify-end gap-2 pt-2">
+        <Button
+          size="sm"
+          variant={isPurchased ? "default" : "secondary"}
+          onClick={() => isPurchased ? window.location.href = `/mystery/${mystery.id}` : onEdit(mystery.id)}
+          className="flex-1 min-w-[80px]"
+        >
+          {isPurchased ? (
             <>
+              <Eye className="h-4 w-4 mr-2" />
+              View Mystery
+            </>
+          ) : (
+            <>
+              <Edit className="h-4 w-4 mr-2" />
+              Edit
+            </>
+          )}
+        </Button>
+        
+        
+        {!isPurchased && (
+          <>
               {mystery.status !== "archived" ? (
                 <Button
                   size="sm"
@@ -124,8 +126,9 @@ export const MysteryCard = ({ mystery, onStatusChange, onDelete, onEdit }: Myste
                 </AlertDialogContent>
               </AlertDialog>
             </>
-          )}
-        </div>
+          
+        )}
+      </div>
       </CardContent>
     </Card>
   );

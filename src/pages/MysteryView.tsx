@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -32,10 +31,8 @@ const MysteryView = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
 
-  // Define a function to check if the page is visible
   const isPageVisible = () => document.visibilityState === 'visible';
 
-  // Handle tab visibility changes 
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (isPageVisible()) {
@@ -52,7 +49,6 @@ const MysteryView = () => {
     };
   }, [id]);
 
-  // Function to check generation status
   const checkGenerationStatus = useCallback(async () => {
     if (!id) return;
     
@@ -62,7 +58,6 @@ const MysteryView = () => {
       setLastUpdate(new Date());
       
       if (status.status === 'completed') {
-        // Package generation complete, fetch content
         const { data: packageData } = await supabase
           .from("mystery_packages")
           .select("content")
@@ -73,6 +68,17 @@ const MysteryView = () => {
           setPackageContent(packageData.content);
           clearStatusPolling();
           toast.success("Your mystery package is ready!");
+          await supabase
+            .from("conversations")
+            .update({
+              status: "purchased",
+              is_paid: true,
+              display_status: "purchased"
+            })
+            .eq("id", id);
+          if (window.location.pathname.includes('/preview/')) {
+            navigate(`/mystery/${id}`);
+          }
         }
       } else if (status.status === 'failed') {
         clearStatusPolling();
@@ -94,7 +100,7 @@ const MysteryView = () => {
     } catch (error) {
       console.error("Error checking generation status:", error);
     }
-  }, [id]);
+  }, [id, navigate]);
 
   const clearStatusPolling = () => {
     if (statusCheckInterval) {
@@ -104,13 +110,8 @@ const MysteryView = () => {
   };
 
   const startStatusPolling = useCallback(() => {
-    // Clear any existing interval
     clearStatusPolling();
-    
-    // Check status every 5 seconds
     const intervalId = window.setInterval(checkGenerationStatus, 5000);
-    
-    // Store the numeric ID of the interval in state
     setStatusCheckInterval(intervalId);
   }, [checkGenerationStatus]);
 
@@ -120,7 +121,6 @@ const MysteryView = () => {
 
       setLoading(true);
       try {
-        // Get the conversation and check if it's paid
         const { data: conversation, error } = await supabase
           .from("conversations")
           .select("*, mystery_data, is_paid, has_complete_package, needs_package_generation")
@@ -133,27 +133,18 @@ const MysteryView = () => {
           return;
         }
 
-        // If not paid, redirect to preview
-        if (!conversation.is_paid) {
-          navigate(`/mystery/preview/${id}`);
-          return;
-        }
-
         setMystery(conversation);
 
-        // Check if we need to show generation status
         if (conversation.needs_package_generation) {
           const status = await getPackageGenerationStatus(id);
           setGenerationStatus(status);
           setLastUpdate(new Date());
           
-          // Start status polling
           if (status.status === 'in_progress') {
             startStatusPolling();
           }
         }
 
-        // Check if we already have generated package content
         if (conversation.has_complete_package) {
           const { data: packageData, error: packageError } = await supabase
             .from("mystery_packages")
@@ -175,14 +166,12 @@ const MysteryView = () => {
 
     fetchMystery();
     
-    // Set up user interaction detection
     const handleUserInteraction = () => {
       setHasUserInteracted(true);
     };
     window.addEventListener('click', handleUserInteraction);
     window.addEventListener('keydown', handleUserInteraction);
     
-    // Cleanup
     return () => {
       if (statusCheckInterval) {
         clearInterval(statusCheckInterval);
@@ -192,7 +181,6 @@ const MysteryView = () => {
     };
   }, [id, navigate, startStatusPolling]);
 
-  // Reset user interaction flag when checking status
   useEffect(() => {
     if (lastUpdate) {
       setHasUserInteracted(false);
@@ -209,7 +197,6 @@ const MysteryView = () => {
     try {
       toast.info("Resuming your mystery generation. This may take 5-10 minutes...");
       
-      // Start resuming from the last saved point
       resumePackageGeneration(id)
         .then(content => {
           setPackageContent(content);
@@ -222,7 +209,6 @@ const MysteryView = () => {
           toast.error("There was an issue generating your package. Please try again.");
         });
       
-      // Start polling for status updates
       const initialStatus = await getPackageGenerationStatus(id);
       setGenerationStatus(initialStatus);
       startStatusPolling();
@@ -249,7 +235,6 @@ const MysteryView = () => {
         </div>
       );
       
-      // Start generation
       generateCompletePackage(id)
         .then(content => {
           setPackageContent(content);
@@ -262,7 +247,6 @@ const MysteryView = () => {
           toast.error("There was an issue generating your package. Please try again.");
         });
       
-      // Start polling for status updates
       const initialStatus = await getPackageGenerationStatus(id);
       setGenerationStatus(initialStatus);
       startStatusPolling();
@@ -398,19 +382,12 @@ const MysteryView = () => {
       <Header />
       <main className="flex-1 py-12 px-4">
         <div className="container mx-auto max-w-4xl">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">{mystery?.title || "Mystery Package"}</h1>
-            <p className="text-muted-foreground">{extractSummary(mystery)}</p>
-          </div>
-
-          {packageContent ? (
+          {!window.location.pathname.includes('/preview/') && packageContent ? (
             <MysteryPackageTabView 
               packageContent={packageContent} 
               mysteryTitle={mystery?.title || "Mystery Package"} 
               generationStatus={generationStatus || undefined}
             />
-          ) : generationStatus ? (
-            renderGenerationProgress()
           ) : (
             <Card className="mb-6">
               <CardHeader>
@@ -440,7 +417,7 @@ const MysteryView = () => {
               </CardContent>
             </Card>
           )}
-
+          
           <div className="flex justify-center mt-8">
             <Button variant="outline" onClick={() => navigate("/dashboard")}>
               Back to Dashboard
