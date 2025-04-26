@@ -185,86 +185,85 @@ const MysteryPreview = () => {
       return () => clearInterval(interval);
     }, [id, navigate]);
 
-  const renderGenerationProgress = () => {
-    if (!generationStatus) return null;
+    const renderGenerationProgress = () => {
+      if (!generationStatus) return null;
 
-    return (
-      <div className="space-y-4 mb-6">
-        <div className="space-y-2">
-          <div className="flex justify-between text-sm">
-            <span>{generationStatus.currentStep}</span>
-            <span>{generationStatus.progress}%</span>
+      return (
+        <div className="space-y-4 mb-6">
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span>{generationStatus.currentStep}</span>
+              <span>{generationStatus.progress}%</span>
+            </div>
+            <Progress value={generationStatus.progress} className="h-2" />
           </div>
-          <Progress value={generationStatus.progress} className="h-2" />
-        </div>
-        <div className="flex gap-2 flex-wrap">
-          {Object.entries(generationStatus.sections || {}).map(([key, isComplete]) => (
-            <Badge 
-              key={key}
-              variant={isComplete ? "default" : "outline"}
-              className={isComplete ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300" : ""}
-            >
-              {key.charAt(0).toUpperCase() + key.slice(1)} {isComplete ? "✓" : "..."}
-            </Badge>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  const handleGenerateClick = async () => {
-        if (!isAuthenticated) {
-            toast.error("Please sign in to generate a complete mystery package");
-            navigate("/sign-in");
-            return;
-        }
-
-        if (!id) {
-            toast.error("Mystery ID is missing");
-            return;
-        }
-
-        // Warning message toast
-        toast.info(
-            <div className="space-y-2">
-                <div className="font-semibold flex items-center gap-2">
-                    <AlertTriangleIcon className="h-4 w-4" />
-                    <span>Please keep this tab open</span>
-                </div>
-                <p className="text-sm">Generation takes 5-10 minutes and requires this browser tab to remain open and active. Closing will interrupt the process.</p>
-            </div>,
-            { duration: 7000 }
-        );
-
-    
-    try {
-      setGenerating(true);
-      
-      const status = await getPackageGenerationStatus(id);
-      const isResuming = status.status === 'in_progress' || status.status === 'failed';
-      
-      toast.info(
-        <div className="space-y-2">
-          <div className="font-semibold">
-            {isResuming ? "Resuming generation..." : "Starting generation..."}
+          <div className="flex gap-2 flex-wrap">
+            {Object.entries(generationStatus.sections || {}).map(([key, isComplete]) => (
+              <Badge 
+                key={key}
+                variant={isComplete ? "default" : "outline"}
+                className={isComplete ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300" : ""}
+              >
+                {key.charAt(0).toUpperCase() + key.slice(1)} {isComplete ? "✓" : "..."}
+              </Badge>
+            ))}
           </div>
-          <p className="text-sm">This will take about 5-10 minutes. Please keep this browser tab open.</p>
         </div>
       );
-      
-      if (isResuming) {
-        await resumePackageGeneration(id);
-      } else {
-        await generateCompletePackage(id);
+    };
+
+    const handleGenerateClick = async () => {
+      if (!isAuthenticated) {
+        toast.error("Please sign in to generate a complete mystery package");
+        navigate("/sign-in");
+        return;
       }
-      
-      // Success will be handled by the status polling
-    } catch (error) {
-      console.error("Error generating package:", error);
-      setGenerating(false);
-      toast.error("Failed to generate package. Please try again.");
-    }
-  };
+
+      if (!id) {
+        toast.error("Mystery ID is missing");
+        return;
+      }
+
+      // Warning message toast
+      toast.info(
+        <div className="space-y-2">
+          <div className="font-semibold flex items-center gap-2">
+            <AlertTriangleIcon className="h-4 w-4" />
+            <span>Please keep this tab open</span>
+          </div>
+          <p className="text-sm">Generation takes 5-10 minutes and requires this browser tab to remain open and active. Closing will interrupt the process.</p>
+        </div>,
+        { duration: 7000 }
+      );
+
+      try {
+        setGenerating(true);
+        
+        const status = await getPackageGenerationStatus(id);
+        const isResuming = status.status === 'in_progress' || status.status === 'failed';
+        
+        toast.info(
+          <div className="space-y-2">
+            <div className="font-semibold">
+              {isResuming ? "Resuming generation..." : "Starting generation..."}
+            </div>
+            <p className="text-sm">This will take about 5-10 minutes. Please keep this browser tab open.</p>
+          </div>
+        );
+        
+        if (isResuming) {
+          await resumePackageGeneration(id);
+        } else {
+          await generateCompletePackage(id);
+        }
+        
+        // Success will be handled by the status polling
+      } catch (error) {
+        console.error("Error generating package:", error);
+        setGenerating(false);
+        toast.error("Failed to generate package. Please try again.");
+      }
+    };
 
     const handleTestModeChange = (enabled: boolean) => {
         setTestModeEnabled(enabled);
@@ -277,7 +276,6 @@ const MysteryPreview = () => {
         }
     };
 
-    // Extract premise from mystery preview for display
     const extractPremise = (content: string): string => {
         if (!content) return "";
         
@@ -293,7 +291,6 @@ const MysteryPreview = () => {
         return "";
     };
 
-    // Simple function to sanitize and format the mystery title
     const formatTitle = (title: string): string => {
         return title.replace(/["']/g, '').trim();
     };
@@ -365,45 +362,47 @@ const MysteryPreview = () => {
                         </CardContent>
                     </Card>
 
-        {generationStatus?.status === 'in_progress' && renderGenerationProgress()}
-        
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>
-              {generationStatus?.status === 'in_progress' ? 'Generating Your Mystery Package' : 'Generate Your Mystery Package'}
-            </CardTitle>
-            <CardDescription>
-              {generationStatus?.status === 'in_progress' 
-                ? 'Your mystery package is being generated. Please keep this browser tab open.'
-                : 'Start generating your custom murder mystery package with all materials included.'}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button
-              onClick={handleGenerateClick}
-              disabled={generating}
-              className="w-full sm:w-auto"
-            >
-              {generating ? (
-                <>
-                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                  {generationStatus?.status === 'in_progress' ? "Resuming..." : "Generating..."}
-                </>
-              ) : (
-                generationStatus?.status === 'in_progress' ? "Resume Generation" : "Generate Package"
-              )}
-            </Button>
-          </CardContent>
-        </Card>
+                    {generationStatus?.status === 'in_progress' && renderGenerationProgress()}
+                    
+                    <Card className="mb-6">
+                        <CardHeader>
+                            <CardTitle>
+                                {generationStatus?.status === 'in_progress' ? 'Generating Your Mystery Package' : 'Generate Your Mystery Package'}
+                            </CardTitle>
+                            <CardDescription>
+                                {generationStatus?.status === 'in_progress' 
+                                    ? 'Your mystery package is being generated. Please keep this browser tab open.'
+                                    : 'Start generating your custom murder mystery package with all materials included.'}
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <Button
+                                onClick={handleGenerateClick}
+                                disabled={generating}
+                                className="w-full sm:w-auto"
+                            >
+                                {generating ? (
+                                    <>
+                                        <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                                        {generationStatus?.status === 'in_progress' ? "Resuming..." : "Generating..."}
+                                    </>
+                                ) : (
+                                    generationStatus?.status === 'in_progress' ? "Resume Generation" : "Generate Package"
+                                )}
+                            </Button>
+                        </CardContent>
+                    </Card>
 
-        <div className="flex justify-center mt-8">
-          <Button variant="outline" onClick={() => navigate("/dashboard")}>
-            Back to Dashboard
-          </Button>
+                    <div className="flex justify-center mt-8">
+                        <Button variant="outline" onClick={() => navigate("/dashboard")}>
+                            Back to Dashboard
+                        </Button>
+                    </div>
+                </div>
+            </main>
+            <Footer />
         </div>
-      </div>
-    </main>
-  );
+    );
 };
 
 export default MysteryPreview;
