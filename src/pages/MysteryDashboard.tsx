@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -38,54 +37,48 @@ const MysteryDashboard = () => {
     applyFiltersAndSort();
   }, [mysteries, searchTerm, statusFilter, sortOrder]);
 
-const extractTitleFromMessages = (messages: any[]) => {
-  if (!messages || messages.length === 0) return null;
-  
-  // Filter out any clarification messages or questions
-  const filteredMessages = messages.filter(message => {
-    const content = (message.content || "").toLowerCase();
-    return !(
-      content.includes("initial questions") || 
-      content.includes("clarification") || 
-      content.includes("# questions") || 
-      content.includes("## questions")
-    );
-  });
-  
-  // Look through AI messages for titles
-  const titlePattern = /#\s*["']?([^"'\n#]+)["']?(?:\s*-\s*A MURDER MYSTERY)?/i;
-  const alternativeTitlePattern = /title:\s*["']?([^"'\n]+)["']?/i;
-  const quotedTitlePattern = /"([^"]+)"\s*(?:-\s*A\s+MURDER\s+MYSTERY)?/i;
-  
-  for (const message of filteredMessages) {
-    if (message.role === 'assistant' || message.is_ai) {
-      const content = message.content || '';
-      
-      // Try to find title in markdown format
-      const titleMatch = content.match(titlePattern);
-      if (titleMatch && titleMatch[1]) {
-        return formatTitle(titleMatch[1]);
-      }
-      
-      // Try quoted title format
-      const quotedMatch = content.match(quotedTitlePattern);
-      if (quotedMatch && quotedMatch[1]) {
-        return formatTitle(quotedMatch[1]);
-      }
-      
-      // Try alternative format
-      const altMatch = content.match(alternativeTitlePattern);
-      if (altMatch && altMatch[1]) {
-        return formatTitle(altMatch[1]);
+  const extractTitleFromMessages = (messages: any[]) => {
+    if (!messages || messages.length === 0) return null;
+    
+    const filteredMessages = messages.filter(message => {
+      const content = (message.content || "").toLowerCase();
+      return !(
+        content.includes("initial questions") || 
+        content.includes("clarification") || 
+        content.includes("# questions") || 
+        content.includes("## questions")
+      );
+    });
+    
+    const titlePattern = /#\s*["']?([^"'\n#]+)["']?(?:\s*-\s*A MURDER MYSTERY)?/i;
+    const alternativeTitlePattern = /title:\s*["']?([^"'\n]+)["']?/i;
+    const quotedTitlePattern = /"([^"]+)"\s*(?:-\s*A\s+MURDER\s+MYSTERY)?/i;
+    
+    for (const message of filteredMessages) {
+      if (message.role === 'assistant' || message.is_ai) {
+        const content = message.content || '';
+        
+        const titleMatch = content.match(titlePattern);
+        if (titleMatch && titleMatch[1]) {
+          return formatTitle(titleMatch[1]);
+        }
+        
+        const quotedMatch = content.match(quotedTitlePattern);
+        if (quotedMatch && quotedMatch[1]) {
+          return formatTitle(quotedMatch[1]);
+        }
+        
+        const altMatch = content.match(alternativeTitlePattern);
+        if (altMatch && altMatch[1]) {
+          return formatTitle(altMatch[1]);
+        }
       }
     }
-  }
-  
-  return null;
-};
+    
+    return null;
+  };
   
   const formatTitle = (title: string) => {
-    // Convert to title case (first letter of each word capitalized)
     return title
       .trim()
       .split(' ')
@@ -111,7 +104,6 @@ const extractTitleFromMessages = (messages: any[]) => {
         return;
       }
 
-      // Fetch messages for each conversation to extract titles
       const mysteriesWithMessages = await Promise.all(
         conversationsData.map(async (conversation: any) => {
           const { data: messagesData } = await supabase
@@ -124,7 +116,6 @@ const extractTitleFromMessages = (messages: any[]) => {
           const mysteryData = conversation.mystery_data || {};
           const theme = mysteryData.theme || 'Unknown';
           
-          // Use AI extracted title, or fall back to conversation title, or theme + Mystery
           const title = aiTitle || conversation.title || `${theme} Mystery`;
           
           return {
@@ -198,25 +189,20 @@ const extractTitleFromMessages = (messages: any[]) => {
     }
   };
 
-  const handleStatusChange = async (id: string, newStatus: "draft" | "published" | "archived") => {
+  const handleStatusChange = async (id: string, newStatus: "draft" | "purchased" | "archived") => {
     try {
       const mysteryToUpdate = mysteries.find(mystery => mystery.id === id);
       if (!mysteryToUpdate) return;
       
-      const updatedMysteryData = {
-        ...mysteryToUpdate,
-        status: newStatus,
-        updated_at: new Date().toISOString()
-      };
-      
       const { error } = await supabase
         .from("conversations")
         .update({
+          display_status: newStatus,
+          updated_at: new Date().toISOString(),
           mystery_data: {
             ...mysteryToUpdate,
             status: newStatus
-          },
-          updated_at: new Date().toISOString()
+          }
         })
         .eq("id", id);
       
@@ -276,7 +262,7 @@ const extractTitleFromMessages = (messages: any[]) => {
                   <TabsList className="w-full justify-start bg-muted/50 rounded-lg p-1 flex-nowrap overflow-x-auto">
                     <TabsTrigger value="all" className="flex-shrink-0">All</TabsTrigger>
                     <TabsTrigger value="draft" className="flex-shrink-0">Drafts</TabsTrigger>
-                    <TabsTrigger value="published" className="flex-shrink-0">Published</TabsTrigger>
+                    <TabsTrigger value="purchased" className="flex-shrink-0">Purchased</TabsTrigger>
                     <TabsTrigger value="archived" className="flex-shrink-0">Archived</TabsTrigger>
                   </TabsList>
                 </div>

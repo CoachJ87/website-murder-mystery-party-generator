@@ -12,6 +12,7 @@ export type Database = {
       conversations: {
         Row: {
           created_at: string | null
+          display_status: string | null
           has_complete_package: boolean | null
           id: string
           is_completed: boolean | null
@@ -29,6 +30,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          display_status?: string | null
           has_complete_package?: boolean | null
           id?: string
           is_completed?: boolean | null
@@ -46,6 +48,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          display_status?: string | null
           has_complete_package?: boolean | null
           id?: string
           is_completed?: boolean | null
@@ -118,21 +121,27 @@ export type Database = {
           content: string
           conversation_id: string | null
           created_at: string | null
+          generation_status: Json | null
           id: string
+          partial_content: Json | null
           updated_at: string | null
         }
         Insert: {
           content: string
           conversation_id?: string | null
           created_at?: string | null
+          generation_status?: Json | null
           id?: string
+          partial_content?: Json | null
           updated_at?: string | null
         }
         Update: {
           content?: string
           conversation_id?: string | null
           created_at?: string | null
+          generation_status?: Json | null
           id?: string
+          partial_content?: Json | null
           updated_at?: string | null
         }
         Relationships: [

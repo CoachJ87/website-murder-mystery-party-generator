@@ -1,4 +1,3 @@
-
 export interface MysteryData {
   title?: string; // Making title optional to fix the type error
   theme?: string;
@@ -33,7 +32,7 @@ export interface Mystery {
   title: string;
   created_at: string;
   updated_at: string;
-  status: "draft" | "published" | "archived";
+  status: "draft" | "purchased" | "archived";
   theme?: string;
   guests?: number;
   is_purchased?: boolean;

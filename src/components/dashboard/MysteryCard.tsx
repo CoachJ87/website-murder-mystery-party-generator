@@ -1,19 +1,20 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Calendar, Clock, Edit, Archive, Trash } from "lucide-react";
+import { Calendar, Clock, Edit, Archive, Trash, Eye } from "lucide-react";
 import { Mystery } from "@/interfaces/mystery";
 
 interface MysteryCardProps {
   mystery: Mystery;
-  onStatusChange: (id: string, status: "draft" | "published" | "archived") => void;
+  onStatusChange: (id: string, status: "draft" | "purchased" | "archived") => void;
   onDelete: (id: string) => void;
   onEdit: (id: string) => void;
 }
 
 export const MysteryCard = ({ mystery, onStatusChange, onDelete, onEdit }: MysteryCardProps) => {
+  const isPurchased = mystery.status === "purchased" || mystery.is_purchased;
+
   return (
     <Card className="bg-card">
       <CardHeader>
@@ -21,7 +22,7 @@ export const MysteryCard = ({ mystery, onStatusChange, onDelete, onEdit }: Myste
           <span className="truncate">{mystery.title}</span>
           <div>
             {mystery.status === "draft" && <Badge variant="secondary">Draft</Badge>}
-            {mystery.status === "published" && <Badge>Published</Badge>}
+            {mystery.status === "purchased" && <Badge>Purchased</Badge>}
             {mystery.status === "archived" && <Badge variant="outline">Archived</Badge>}
           </div>
         </CardTitle>
@@ -50,11 +51,20 @@ export const MysteryCard = ({ mystery, onStatusChange, onDelete, onEdit }: Myste
           <Button
             size="sm"
             variant="secondary"
-            onClick={() => onEdit(mystery.id)}
+            onClick={() => isPurchased ? window.location.href = `/mystery/view/${mystery.id}` : onEdit(mystery.id)}
             className="flex-1 min-w-[80px]"
           >
-            <Edit className="h-4 w-4 mr-2" />
-            Edit
+            {isPurchased ? (
+              <>
+                <Eye className="h-4 w-4 mr-2" />
+                View
+              </>
+            ) : (
+              <>
+                <Edit className="h-4 w-4 mr-2" />
+                Edit
+              </>
+            )}
           </Button>
           {mystery.status !== "archived" ? (
             <Button
