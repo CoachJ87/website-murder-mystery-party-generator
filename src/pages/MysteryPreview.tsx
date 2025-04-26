@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge"; // Added the Badge import
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -36,6 +35,33 @@ const MysteryPreview = () => {
     const [generationStatus, setGenerationStatus] = useState<any | null>(null);
     const [currentContent, setCurrentContent] = useState("");
     const [activeTab, setActiveTab] = useState("host-guide");
+
+    useEffect(() => {
+        const checkPurchaseStatus = async () => {
+            if (!id || !user) return;
+            
+            try {
+                const { data: conversation, error } = await supabase
+                    .from("conversations")
+                    .select("is_paid, display_status")
+                    .eq("id", id)
+                    .single();
+                
+                if (error) throw error;
+                
+                if (!conversation.is_paid && conversation.display_status !== "purchased") {
+                    toast.error("Please purchase this mystery to generate content");
+                    navigate(`/mystery/purchase/${id}`);
+                    return;
+                }
+            } catch (error) {
+                console.error("Error checking purchase status:", error);
+                toast.error("Failed to verify purchase status");
+            }
+        };
+
+        checkPurchaseStatus();
+    }, [id, user, navigate]);
 
     useEffect(() => {
         if (!id) return;

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -175,8 +176,8 @@ const MysteryChatCreator = () => {
                 })
                 .eq("id", conversationId);
 
-            // Navigate to preview page after successful generation
-            navigate(`/mystery/preview/${conversationId}`);
+            // Navigate to purchase page instead of preview
+            navigate(`/mystery/purchase/${conversationId}`);
         } catch (error: any) {
             console.error("Error preparing mystery generation:", error);
             toast.error("Failed to prepare mystery preview. Please try again.");

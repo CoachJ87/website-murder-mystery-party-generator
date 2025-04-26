@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -26,49 +25,27 @@ const MysteryPurchase = () => {
     try {
       setProcessing(true);
       
-      // Simulate payment processing
-      toast.loading("Processing payment...");
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Create a checkout session with Stripe
+      const response = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          mysteryId: id,
+          userId: user?.id,
+        }),
+      });
+
+      const { url, error } = await response.json();
       
-      const purchaseDate = new Date().toISOString();
-      
-      // Update the conversation to mark it as purchased with ALL purchase-related fields
-      if (user && id) {
-        const { error: conversationError } = await supabase
-          .from("conversations")
-          .update({ 
-            is_purchased: true,
-            is_paid: true,
-            display_status: "purchased",
-            purchase_date: purchaseDate,
-            mystery_data: {
-              status: "purchased"
-            }
-          })
-          .eq("id", id);
-          
-        if (conversationError) {
-          console.error("Error updating conversation:", conversationError);
-          throw new Error("Failed to update purchase status");
-        }
-        
-        // If user has profile table, update it too
-        const { error: profileError } = await supabase
-          .from("profiles")
-          .upsert({ 
-            id: user.id,
-            has_purchased: true,
-            updated_at: purchaseDate
-          });
-          
-        if (profileError) {
-          console.error("Error updating profile:", profileError);
-          // Don't throw here, as the purchase was successful even if profile update fails
-        }
+      if (error) {
+        throw new Error(error);
       }
+
+      // Redirect to Stripe checkout
+      window.location.href = url;
       
-      toast.success("Purchase successful! You now have access to the full mystery package.");
-      navigate(`/mystery/${id}`);
     } catch (error) {
       console.error("Error processing payment:", error);
       toast.error("Payment failed. Please try again.");
