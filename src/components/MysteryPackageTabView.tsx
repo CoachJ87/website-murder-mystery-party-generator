@@ -28,7 +28,7 @@ const MysteryPackageTabView = ({ packageContent, mysteryTitle, generationStatus 
   // Check if any sections are incomplete
   const hasIncompleteContent = generationStatus?.status === 'failed' || 
                               (!sections.overview || !sections.host || !sections.characters || 
-                               !sections.clues || !sections.solution);
+                               !sections.clues);
 
   const handleDownloadText = () => {
     const blob = new Blob([packageContent], { type: 'text/plain' });
@@ -80,8 +80,7 @@ const MysteryPackageTabView = ({ packageContent, mysteryTitle, generationStatus 
       "overview": generationStatus.sections.hostGuide,
       "host": generationStatus.sections.hostGuide,
       "characters": generationStatus.sections.characters,
-      "clues": generationStatus.sections.clues,
-      "solution": generationStatus.sections.solution
+      "clues": generationStatus.sections.clues
     };
     
     const isComplete = sectionMap[sectionType];
@@ -133,7 +132,7 @@ const MysteryPackageTabView = ({ packageContent, mysteryTitle, generationStatus 
       </div>
 
       <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-5 w-full">
+        <TabsList className="grid grid-cols-4 w-full">
           <TabsTrigger value="overview">
             Overview
             {getSectionStatus("overview")}
@@ -149,10 +148,6 @@ const MysteryPackageTabView = ({ packageContent, mysteryTitle, generationStatus 
           <TabsTrigger value="clues">
             Clues & Evidence
             {getSectionStatus("clues")}
-          </TabsTrigger>
-          <TabsTrigger value="solution">
-            Solution
-            {getSectionStatus("solution")}
           </TabsTrigger>
         </TabsList>
         
@@ -199,17 +194,6 @@ const MysteryPackageTabView = ({ packageContent, mysteryTitle, generationStatus 
             )}
           </div>
         </TabsContent>
-        
-        <TabsContent value="solution" className="p-4 border rounded-md mt-4">
-          <div className="prose max-w-none">
-            <h2>Solution</h2>
-            {sections.solution ? (
-              <div dangerouslySetInnerHTML={{ __html: markdownToHtml(sections.solution) }} />
-            ) : (
-              <p className="text-muted-foreground">Solution is still being generated or is unavailable.</p>
-            )}
-          </div>
-        </TabsContent>
       </Tabs>
 
       <SendToGuestsDialog 
@@ -228,7 +212,6 @@ function parsePackageContent(content: string) {
     host: '',
     characters: '',
     clues: '',
-    solution: ''
   };
   
   // Extract overview section
@@ -253,12 +236,6 @@ function parsePackageContent(content: string) {
   const cluesMatch = content.match(/## (?:Clues|Evidence|Props).*?\n\n([\s\S]*?)(?=\n## (?!Clue|Evidence|Prop)|$)/i);
   if (cluesMatch) {
     sections.clues = cluesMatch[1].trim();
-  }
-  
-  // Extract solution section
-  const solutionMatch = content.match(/## (?:Solution|Resolution).*?\n\n([\s\S]*?)(?=\n## (?!Solution|Resolution)|$)/i);
-  if (solutionMatch) {
-    sections.solution = solutionMatch[1].trim();
   }
   
   return sections;

@@ -1,3 +1,4 @@
+
 // src/components/MysteryPackage.tsx
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,8 @@ import { supabase } from "@/lib/supabase";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import MysteryPackageTabView from "@/components/MysteryPackageTabView";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface MysteryPackageProps {
   mysteryId: string;
@@ -21,6 +24,7 @@ const MysteryPackage = ({ mysteryId, title }: MysteryPackageProps) => {
   const [generating, setGenerating] = useState(false);
   const [generationStatus, setGenerationStatus] = useState<GenerationStatus | null>(null);
   const [statusCheckInterval, setStatusCheckInterval] = useState<number | null>(null);
+  const [testMode, setTestMode] = useState<boolean>(false);
 
   useEffect(() => {
     const checkForExistingPackage = async () => {
@@ -123,14 +127,21 @@ const MysteryPackage = ({ mysteryId, title }: MysteryPackageProps) => {
   const handleGeneratePackage = async () => {
     try {
       setGenerating(true);
-      toast.info("Generating your complete murder mystery package. This may take a few minutes...");
+      
+      const toastMessage = testMode 
+        ? "Generating test version of your murder mystery package..."
+        : "Generating your complete murder mystery package. This may take a few minutes...";
+        
+      toast.info(toastMessage);
       
       // Start generation
-      generateCompletePackage(mysteryId)
+      generateCompletePackage(mysteryId, testMode)
         .then(content => {
           setPackageContent(content);
           setGenerating(false);
-          toast.success("Your complete mystery package is ready!");
+          toast.success(testMode 
+            ? "Your test mystery package is ready!"
+            : "Your complete mystery package is ready!");
         })
         .catch(error => {
           console.error("Error in package generation:", error);
@@ -183,16 +194,18 @@ const MysteryPackage = ({ mysteryId, title }: MysteryPackageProps) => {
         
         <div className="flex gap-2 mt-2 flex-wrap">
           {Object.entries(generationStatus.sections || {}).map(([key, isComplete]) => (
-            <Badge 
-              key={key}
-              variant={isComplete ? "secondary" : "outline"}
-              className={isComplete ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300" : ""}
-            >
-              {key === "hostGuide" ? "Host Guide" : 
-               key === "characters" ? "Characters" :
-               key === "clues" ? "Clues" : "Solution"}
-              {isComplete ? " ✓" : ""}
-            </Badge>
+            key !== 'solution' && (
+              <Badge 
+                key={key}
+                variant={isComplete ? "secondary" : "outline"}
+                className={isComplete ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300" : ""}
+              >
+                {key === "hostGuide" ? "Host Guide" : 
+                 key === "characters" ? "Characters" :
+                 key === "clues" ? "Clues" : ""}
+                {isComplete ? " ✓" : ""}
+              </Badge>
+            )
           ))}
         </div>
       </div>
@@ -229,20 +242,30 @@ const MysteryPackage = ({ mysteryId, title }: MysteryPackageProps) => {
             
             {generationStatus?.status === 'failed' && (
               <div className="flex justify-end mt-4">
-                <Button 
-                  onClick={handleGeneratePackage} 
-                  disabled={generating}
-                  variant="outline"
-                >
-                  {generating ? (
-                    <>
-                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                      Regenerating...
-                    </>
-                  ) : (
-                    "Regenerate Package"
-                  )}
-                </Button>
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-2">
+                    <Switch 
+                      id="test-mode" 
+                      checked={testMode} 
+                      onCheckedChange={setTestMode}
+                    />
+                    <Label htmlFor="test-mode">Test Mode (Faster, Less Content)</Label>
+                  </div>
+                  <Button 
+                    onClick={handleGeneratePackage} 
+                    disabled={generating}
+                    variant="outline"
+                  >
+                    {generating ? (
+                      <>
+                        <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                        Regenerating...
+                      </>
+                    ) : (
+                      "Regenerate Package"
+                    )}
+                  </Button>
+                </div>
               </div>
             )}
           </div>
@@ -262,20 +285,35 @@ const MysteryPackage = ({ mysteryId, title }: MysteryPackageProps) => {
                 {renderGenerationProgress()}
               </div>
             ) : (
-              <Button 
-                onClick={handleGeneratePackage} 
-                disabled={generating}
-                className="w-full"
-              >
-                {generating ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Starting Generation...
-                  </>
-                ) : (
-                  "Generate Full Mystery Package"
-                )}
-              </Button>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Switch 
+                    id="test-mode" 
+                    checked={testMode} 
+                    onCheckedChange={setTestMode}
+                  />
+                  <Label htmlFor="test-mode">Test Mode (Faster, Less Content)</Label>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {testMode ? 
+                    "Test mode generates a smaller package with condensed content to verify the generation flow works correctly. Ideal for testing." :
+                    "Standard mode generates a complete package with full detailed content for actual use."}
+                </p>
+                <Button 
+                  onClick={handleGeneratePackage} 
+                  disabled={generating}
+                  className="w-full"
+                >
+                  {generating ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Starting Generation...
+                    </>
+                  ) : (
+                    testMode ? "Generate Test Package" : "Generate Full Mystery Package"
+                  )}
+                </Button>
+              </div>
             )}
           </div>
         )}

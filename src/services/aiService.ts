@@ -12,9 +12,9 @@ interface Message {
   role?: string;
 }
 
-export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVersion: 'free' | 'paid', systemInstruction?: string): Promise<string> => {
+export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVersion: 'free' | 'paid', systemInstruction?: string, testMode: boolean = false): Promise<string> => {
   try {
-    console.log(`DEBUG: Starting getAIResponse with ${messages.length} messages, promptVersion: ${promptVersion}`);
+    console.log(`DEBUG: Starting getAIResponse with ${messages.length} messages, promptVersion: ${promptVersion}, testMode: ${testMode}`);
     
     if (systemInstruction) {
       console.log(`DEBUG: Using custom system instruction (first 100 chars): ${systemInstruction.substring(0, 100)}...`);
@@ -25,12 +25,15 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
       if ('is_ai' in msg) {
         return {
           role: msg.is_ai ? "assistant" : "user",
-          content: msg.content
+          content: msg.content || "" // Ensure content is never undefined
         };
       }
       return msg;
-    });
+    })
+    // Filter out messages with empty content to prevent API errors
+    .filter(msg => msg.content && msg.content.trim() !== '');
     
+    console.log(`DEBUG: Filtered to ${standardMessages.length} valid messages`);
     console.log("DEBUG: Calling mystery-ai Edge Function");
 
     let attempts = 0;
@@ -46,8 +49,12 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
     );
     
     // Set appropriate chunk size with safe limits to avoid token issues
-    const chunkSize = isLargeRequest ? 1500 : 1000;
-    console.log(`DEBUG: Request classified as ${isLargeRequest ? 'large' : 'standard'}, chunk size: ${chunkSize}`);
+    // In test mode, use much smaller chunks
+    const chunkSize = testMode ? 
+      800 : // Small size for test mode
+      isLargeRequest ? 1500 : 1000;
+      
+    console.log(`DEBUG: Request classified as ${isLargeRequest ? 'large' : 'standard'}, chunk size: ${chunkSize}, test mode: ${testMode}`);
     
     while (attempts < maxAttempts) {
       attempts++;
@@ -59,7 +66,10 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
         const timeoutId = setTimeout(() => abortController.abort(), 180000); // 3 minute timeout for safety
         
         // Always use smaller chunk sizes for more reliable responses
-        const adjustedChunkSize = Math.min(2000, chunkSize * attempts); 
+        const adjustedChunkSize = testMode ? 
+          Math.min(1000, chunkSize) : // Keep test mode chunks small
+          Math.min(2000, chunkSize * attempts);
+          
         console.log(`DEBUG: Using chunk size: ${adjustedChunkSize} with streaming: ${isLargeRequest}`);
         
         // Use streaming for large requests
@@ -70,7 +80,8 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
             promptVersion,
             requireFormatValidation: promptVersion === 'free', // Only enforce strict validation for free prompts
             chunkSize: adjustedChunkSize,
-            stream: isLargeRequest // Enable streaming for large requests
+            stream: isLargeRequest, // Enable streaming for large requests
+            testMode // Pass test mode flag to the edge function
           }
         });
         
@@ -139,7 +150,8 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
                 system: systemInstruction,
                 promptVersion,
                 requireFormatValidation: false,
-                chunkSize: 800 // Use a very small chunk size for last resort
+                chunkSize: 800, // Use a very small chunk size for last resort
+                testMode: true // Force test mode for fallback
               }
             });
             

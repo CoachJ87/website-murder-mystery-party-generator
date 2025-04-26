@@ -70,7 +70,7 @@ serve(async (req) => {
 
     const anthropic = new Anthropic({ apiKey: anthropicApiKey });
     
-    const { messages, system, promptVersion, requireFormatValidation, chunkSize, stream: shouldStream = false } = await req.json();
+    const { messages, system, promptVersion, requireFormatValidation, chunkSize, stream: shouldStream = false, testMode = false } = await req.json();
     
     if (!messages || !Array.isArray(messages)) {
       throw new Error("Missing or invalid messages parameter");
@@ -79,6 +79,14 @@ serve(async (req) => {
     console.log(`Processing request with ${messages.length} messages and prompt version: ${promptVersion}`);
     console.log(`Chunk size requested: ${chunkSize || 'default'}`);
     console.log(`Streaming requested: ${shouldStream}`);
+    console.log(`Test mode: ${testMode}`);
+
+    // Filter out any messages with empty content
+    const validMessages = messages.filter(msg => msg.content && msg.content.trim() !== '');
+    
+    if (validMessages.length === 0) {
+      throw new Error("No valid messages with content provided");
+    }
 
     // Combine system prompts to ensure format is preserved
     let finalSystemPrompt = "";
@@ -124,6 +132,11 @@ Present your murder mystery preview in an engaging, dramatic format that will ex
       finalSystemPrompt += "\n\nIMPORTANT: Your response MUST follow the OUTPUT FORMAT specified above. Include all required sections in the order specified.";
     }
 
+    // For test mode, add optimization instructions
+    if (testMode) {
+      finalSystemPrompt += "\n\nTEST MODE: Generate significantly shorter content for testing. Keep responses concise and limit each section to 1-2 sentences. This is for testing system flow only.";
+    }
+
     console.log("System prompt length:", finalSystemPrompt.length);
     console.log("System prompt preview:", finalSystemPrompt.substring(0, 100) + "...");
     
@@ -132,7 +145,11 @@ Present your murder mystery preview in an engaging, dramatic format that will ex
     
     // Ensure we never exceed the max token limit for the model
     // Claude-3-opus has a limit of 4096 output tokens
-    const maxTokens = Math.min(4000, chunkSize ? chunkSize * 2 : 2000);
+    // For test mode, use a much smaller token limit
+    const maxTokens = testMode ? 
+      Math.min(1000, chunkSize ? chunkSize : 800) : 
+      Math.min(4000, chunkSize ? chunkSize * 2 : 2000);
+    
     const temperature = promptVersion === 'paid' ? 0.7 : 0.3;
     
     console.log(`Using model: ${model} with max tokens: ${maxTokens}`);
@@ -142,7 +159,7 @@ Present your murder mystery preview in an engaging, dramatic format that will ex
       const stream = await anthropic.messages.create({
         model,
         system: finalSystemPrompt,
-        messages,
+        messages: validMessages,
         max_tokens: maxTokens,
         temperature,
         stream: true,
@@ -173,7 +190,7 @@ Present your murder mystery preview in an engaging, dramatic format that will ex
       const response = await anthropic.messages.create({
         model,
         system: finalSystemPrompt,
-        messages,
+        messages: validMessages,
         max_tokens: maxTokens,
         temperature,
       });

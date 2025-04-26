@@ -20,7 +20,7 @@ export interface GenerationStatus {
     hostGuide: boolean;
     characters: boolean;
     clues: boolean;
-    solution: boolean;
+    solution?: boolean;  // Make solution optional
   };
 }
 
@@ -28,7 +28,10 @@ export interface GenerationStatus {
  * Generates a complete murder mystery package based on an existing conversation
  * using a chunked approach to avoid timeouts
  */
-export const generateCompletePackage = async (mysteryId: string): Promise<string> => {
+export const generateCompletePackage = async (
+  mysteryId: string, 
+  testMode: boolean = false
+): Promise<string> => {
   try {
     // 1. Fetch the original conversation
     const { data: conversations, error: convError } = await supabase
@@ -83,8 +86,7 @@ export const generateCompletePackage = async (mysteryId: string): Promise<string
             sections: {
               hostGuide: false,
               characters: false,
-              clues: false,
-              solution: false
+              clues: false
             }
           },
           updated_at: new Date().toISOString()
@@ -104,8 +106,7 @@ export const generateCompletePackage = async (mysteryId: string): Promise<string
             sections: {
               hostGuide: false,
               characters: false,
-              clues: false,
-              solution: false
+              clues: false
             }
           },
           created_at: new Date().toISOString()
@@ -132,7 +133,7 @@ export const generateCompletePackage = async (mysteryId: string): Promise<string
       .eq("id", mysteryId);
     
     // 6. Generate the package in smaller chunks with improved retry logic
-    const packageContent = await generatePackageInChunks(messages, mysteryId, packageId);
+    const packageContent = await generatePackageInChunks(messages, mysteryId, packageId, testMode);
     
     // 7. Store the final result
     await supabase
@@ -155,8 +156,7 @@ export const generateCompletePackage = async (mysteryId: string): Promise<string
           sections: {
             hostGuide: true,
             characters: true,
-            clues: true,
-            solution: true
+            clues: true
           }
         },
         updated_at: new Date().toISOString()
@@ -202,8 +202,7 @@ export const getPackageGenerationStatus = async (mysteryId: string): Promise<Gen
         sections: {
           hostGuide: false,
           characters: false,
-          clues: false,
-          solution: false
+          clues: false
         }
       };
     }
@@ -232,8 +231,7 @@ export const getPackageGenerationStatus = async (mysteryId: string): Promise<Gen
         sections: {
           hostGuide: true,
           characters: true,
-          clues: true,
-          solution: true
+          clues: true
         }
       };
     }
@@ -253,8 +251,7 @@ export const getPackageGenerationStatus = async (mysteryId: string): Promise<Gen
         sections: {
           hostGuide: progress >= 25,
           characters: progress >= 50,
-          clues: progress >= 75,
-          solution: progress >= 90
+          clues: progress >= 75
         }
       };
     }
@@ -266,8 +263,7 @@ export const getPackageGenerationStatus = async (mysteryId: string): Promise<Gen
       sections: {
         hostGuide: false,
         characters: false,
-        clues: false,
-        solution: false
+        clues: false
       }
     };
     
@@ -281,8 +277,7 @@ export const getPackageGenerationStatus = async (mysteryId: string): Promise<Gen
       sections: {
         hostGuide: false,
         characters: false,
-        clues: false,
-        solution: false
+        clues: false
       }
     };
   }
@@ -294,15 +289,39 @@ export const getPackageGenerationStatus = async (mysteryId: string): Promise<Gen
 const generatePackageInChunks = async (
   messages: Message[], 
   mysteryId: string,
-  packageId: string
+  packageId: string,
+  testMode: boolean = false
 ): Promise<string> => {
   let fullPackage = "";
   const maxRetries = 4; // Increased for more reliability
   const backoffFactor = 1.5; // Exponential backoff factor
   
   try {
-    // Split generation into 5 smaller sections for more reliability
-    const sections = [
+    // Use a reduced set of sections for test mode
+    const sections = testMode ? [
+      {
+        name: "Host Guide",
+        prompt: "Based on our previous conversation, generate a concise host guide for this murder mystery package. Keep it very brief since this is for testing.",
+        progress: 25,
+        sectionKey: "hostGuide",
+        partial: false
+      },
+      {
+        name: "Character Guides",
+        prompt: "Based on our previous conversation, generate brief character guides for this murder mystery. Include just enough detail to test the system.",
+        progress: 65,
+        sectionKey: "characters",
+        partial: false
+      },
+      {
+        name: "Clues and Evidence",
+        prompt: "Generate a condensed clues and evidence section, including just the essential details for testing purposes.",
+        progress: 95,
+        sectionKey: "clues",
+        partial: false
+      }
+    ] : [
+      // Full sections for normal mode
       {
         name: "Host Guide Introduction",
         prompt: "Based on our previous conversation, generate the introduction and setup section of the host guide for this murder mystery package. Include basic setup instructions and overview of the mystery.",
@@ -344,13 +363,6 @@ const generatePackageInChunks = async (
         progress: 85,
         sectionKey: "clues",
         partial: false
-      },
-      {
-        name: "Solution and Wrap-up",
-        prompt: "Generate the solution section explaining how the murder was committed, all evidence pointing to the killer, and instructions for the reveal and wrap-up of the mystery event.",
-        progress: 95,
-        sectionKey: "solution",
-        partial: false
       }
     ];
     
@@ -358,8 +370,7 @@ const generatePackageInChunks = async (
     let completedSections = {
       hostGuide: false,
       characters: false,
-      clues: false,
-      solution: false
+      clues: false
     };
     
     // Process each section sequentially with retry logic
@@ -396,7 +407,8 @@ const generatePackageInChunks = async (
           sectionContent = await getAIResponse(
             contextMessages,
             "paid",
-            "You are an expert murder mystery creator tasked with creating detailed content for a specific section of a murder mystery package."
+            "You are an expert murder mystery creator tasked with creating detailed content for a specific section of a murder mystery package.",
+            testMode
           );
           
           // Update our accumulated content
@@ -440,8 +452,7 @@ const generatePackageInChunks = async (
     completedSections = {
       hostGuide: true,
       characters: true, 
-      clues: true,
-      solution: true
+      clues: true
     };
     
     return fullPackage;
@@ -454,8 +465,7 @@ const generatePackageInChunks = async (
       await updateGenerationStatus(mysteryId, packageId, -1, "Generation failed - partial content available", {
         hostGuide: fullPackage.includes("Host Guide"),
         characters: fullPackage.includes("Character"),
-        clues: fullPackage.includes("Clues") || fullPackage.includes("Evidence"),
-        solution: fullPackage.includes("Solution")
+        clues: fullPackage.includes("Clues") || fullPackage.includes("Evidence")
       }, true);
       
       console.log("Returning partial content after error");
@@ -494,8 +504,7 @@ const updateGenerationStatus = async (
   sections = {
     hostGuide: false,
     characters: false,
-    clues: false,
-    solution: false
+    clues: false
   },
   isFailed = false
 ): Promise<void> => {
