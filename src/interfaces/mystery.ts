@@ -38,6 +38,7 @@ export interface Mystery {
   theme?: string;
   guests?: number;
   is_purchased?: boolean;
+  is_paid?: boolean;  // Added this property to match what's being used in MysteryCard
   ai_title?: string;
   premise?: string;
 }
