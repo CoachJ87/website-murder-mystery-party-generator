@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,7 @@ import { toast } from "sonner";
 import { CheckCircle, CreditCard, ArrowRight } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
-import type { Mystery } from "@/interfaces/mystery";
+import type { Mystery, Conversation } from "@/interfaces/mystery";
 import { Badge } from "@/components/ui/badge";
 
 const MysteryPurchase = () => {
@@ -20,8 +21,9 @@ const MysteryPurchase = () => {
 
   useEffect(() => {
     const fetchMystery = async () => {
+      // Fetch from the conversations table instead of mysteries
       const { data, error } = await supabase
-        .from('mysteries')
+        .from('conversations')
         .select('*')
         .eq('id', id)
         .maybeSingle();
@@ -38,7 +40,22 @@ const MysteryPurchase = () => {
         return;
       }
 
-      setMystery(data);
+      // Map conversation data to Mystery type
+      const mysteryData: Mystery = {
+        id: data.id,
+        title: data.title || "Custom Murder Mystery",
+        created_at: data.created_at,
+        updated_at: data.updated_at,
+        status: data.display_status || "draft",
+        // Extract theme and guests from mystery_data if available
+        theme: data.mystery_data?.theme || "",
+        guests: data.mystery_data?.playerCount || 0,
+        premise: data.mystery_data?.premise || "",
+        purchase_date: data.purchase_date,
+        is_purchased: data.is_paid
+      };
+
+      setMystery(mysteryData);
     };
 
     fetchMystery();
@@ -117,7 +134,7 @@ const MysteryPurchase = () => {
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle>{mystery.title || mystery.ai_title}</CardTitle>
+                  <CardTitle>{mystery.title}</CardTitle>
                   {mystery.theme && (
                     <Badge variant="secondary">{mystery.theme}</Badge>
                   )}
