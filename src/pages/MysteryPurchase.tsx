@@ -9,7 +9,7 @@ import { CheckCircle, CreditCard, ArrowRight } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
 import type { Mystery } from "@/interfaces/mystery";
-import { Separator } from "@/components/ui/separator";
+import MysteryPreviewCard from "@/components/purchase/MysteryPreviewCard";
 
 interface Character {
   name: string;
@@ -29,43 +29,48 @@ const MysteryPurchase = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
 
-  // Helper function to extract first two sentences
   const extractFirstTwoSentences = (text: string) => {
-    const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
+    const cleanText = text.trim().replace(/^\s*[-*]\s*/, '');
+    const sentences = cleanText.match(/[^.!?]+[.!?]+/g) || [];
     return sentences.slice(0, 2).join(' ').trim();
   };
 
-  // Helper function to parse characters from AI response
   const parseCharacters = (content: string): Character[] => {
     const characters: Character[] = [];
-    // Look for the character list section (both uppercase and lowercase)
-    const characterSection = content.match(/## (?:CHARACTER LIST|Characters)([\s\S]*?)(?=##|$)/i)?.[1] || '';
     
-    // Match numbered character entries in the format: "1. **Name** - Description"
-    const characterEntries = characterSection.match(/\d+\.\s+\*\*(.*?)\*\*\s+-\s+(.*?)(?=\d+\.|$)/g) || [];
+    const characterSections = content.match(/##\s*(?:CHARACTER LIST|Characters|CHARACTERS)([\s\S]*?)(?=##|$)/i);
     
-    characterEntries.forEach(entry => {
-      // Remove the number and clean up the entry
-      const cleanEntry = entry.replace(/^\d+\.\s+/, '');
-      const [name, description] = cleanEntry.split(/\*\*\s*-\s*/).map(s => s.trim().replace(/\*\*/g, ''));
+    if (!characterSections?.[1]) return characters;
+    
+    const characterSection = characterSections[1];
+    
+    const characterMatches = characterSection.matchAll(/(?:\d+\.|\*)\s*\*\*([^*]+)\*\*\s*[-–]\s*([^#\n]+)/g);
+    
+    for (const match of Array.from(characterMatches)) {
+      const [_, name, description] = match;
       if (name && description) {
-        // Take only the first sentence of the description
-        const firstSentence = description.split(/[.!?]/)[0] + '.';
-        characters.push({ name, description: firstSentence });
+        const cleanName = name.trim();
+        const firstSentence = description.split(/[.!?]/)[0].trim() + '.';
+        characters.push({
+          name: cleanName,
+          description: firstSentence
+        });
       }
-    });
+    }
 
     return characters;
   };
 
-  // Helper function to parse premise from AI response
   const parsePremise = (content: string): string => {
-    // Look for the premise section (both uppercase and lowercase)
-    const premiseMatch = content.match(/## (?:PREMISE|Premise)([\s\S]*?)(?=##|$)/i);
-    if (premiseMatch) {
-      return extractFirstTwoSentences(premiseMatch[1].trim());
-    }
-    return '';
+    const premiseMatch = content.match(/##\s*(?:PREMISE|Background|Setting)([\s\S]*?)(?=##|$)/i);
+    
+    if (!premiseMatch?.[1]) return '';
+    
+    const premiseText = premiseMatch[1].trim()
+      .replace(/^\s*[-*]\s*/, '')
+      .replace(/\n+/g, ' ');
+
+    return extractFirstTwoSentences(premiseText);
   };
 
   useEffect(() => {
@@ -88,7 +93,6 @@ const MysteryPurchase = () => {
         return;
       }
 
-      // Map conversation data to Mystery type
       const mysteryData: Mystery = {
         id: conversation.id,
         title: conversation.title || "Custom Murder Mystery",
@@ -96,6 +100,7 @@ const MysteryPurchase = () => {
         updated_at: conversation.updated_at,
         status: conversation.display_status || "draft",
         guests: conversation.mystery_data?.playerCount || 0,
+        theme: conversation.mystery_data?.theme || "",
         premise: "",
         purchase_date: conversation.purchase_date,
         is_purchased: conversation.is_paid
@@ -103,22 +108,22 @@ const MysteryPurchase = () => {
 
       setMystery(mysteryData);
 
-      // Find the last AI message that contains the full mystery description
       if (conversation.messages) {
-        const lastDetailedAIMessage = [...conversation.messages]
-          .reverse()
-          .find(m => 
-            m.is_ai && 
-            (m.content.includes('## PREMISE') || 
-             m.content.includes('## Premise') ||
-             m.content.includes('## CHARACTER LIST') ||
-             m.content.includes('## Characters'))
+        const detailedAIMessages = conversation.messages
+          .filter(m => m.is_ai)
+          .filter(m => 
+            m.content.includes('## PREMISE') || 
+            m.content.includes('## Premise') ||
+            m.content.includes('## CHARACTER') ||
+            m.content.includes('## Characters')
           );
 
-        if (lastDetailedAIMessage) {
+        const lastDetailedMessage = detailedAIMessages[detailedAIMessages.length - 1];
+
+        if (lastDetailedMessage) {
           const details = {
-            premise: parsePremise(lastDetailedAIMessage.content),
-            characters: parseCharacters(lastDetailedAIMessage.content)
+            premise: parsePremise(lastDetailedMessage.content),
+            characters: parseCharacters(lastDetailedMessage.content)
           };
           setParsedDetails(details);
         }
@@ -138,7 +143,6 @@ const MysteryPurchase = () => {
     try {
       setProcessing(true);
       
-      // Create a checkout session with Stripe
       const response = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: {
@@ -156,7 +160,6 @@ const MysteryPurchase = () => {
         throw new Error(error);
       }
 
-      // Redirect to Stripe checkout
       window.location.href = url;
       
     } catch (error) {
@@ -197,62 +200,8 @@ const MysteryPurchase = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Mystery Preview Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle>{mystery.title}</CardTitle>
-                <CardDescription>
-                  Custom murder mystery for {mystery.guests} players
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  {/* Details Section */}
-                  <div>
-                    <h3 className="font-semibold mb-3">Details</h3>
-                    <div className="space-y-2">
-                      {mystery.guests > 0 && (
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Players:</span>
-                          <span>{mystery.guests} players</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <Separator />
+            <MysteryPreviewCard mystery={mystery} parsedDetails={parsedDetails} />
 
-                  {/* Premise Section */}
-                  {parsedDetails?.premise && (
-                    <div>
-                      <h3 className="font-semibold mb-2">Premise</h3>
-                      <p className="text-muted-foreground">
-                        {parsedDetails.premise}
-                      </p>
-                    </div>
-                  )}
-
-                  <Separator />
-
-                  {/* Characters Preview Section */}
-                  {parsedDetails?.characters && parsedDetails.characters.length > 0 && (
-                    <div>
-                      <h3 className="font-semibold mb-3">Character Preview</h3>
-                      <div className="space-y-3">
-                        {parsedDetails.characters.map((character, index) => (
-                          <div key={index} className="space-y-1">
-                            <h4 className="text-sm font-medium">{character.name}</h4>
-                            <p className="text-sm text-muted-foreground">{character.description}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Purchase Info Section */}
             <div className="space-y-6">
               <Card>
                 <CardHeader>
