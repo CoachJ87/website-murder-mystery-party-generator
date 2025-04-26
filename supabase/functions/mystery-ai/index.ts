@@ -1,6 +1,7 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { Anthropic } from "https://esm.sh/@anthropic-ai/sdk@0.39.0";
+import { streamSSE } from "https://deno.land/x/stream_sse@v1.0.0/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -19,16 +20,13 @@ serve(async (req) => {
     const freeMysteryPrompt = Deno.env.get('MYSTERY_FREE_PROMPT');
     const paidMysteryPrompt = Deno.env.get('MYSTERY_PAID_PROMPT');
     
-    console.log(`Free prompt loaded: ${freeMysteryPrompt ? 'YES (length: ' + freeMysteryPrompt.length + ')' : 'NO'}`);
-    console.log(`Paid prompt loaded: ${paidMysteryPrompt ? 'YES (length: ' + paidMysteryPrompt.length + ')' : 'NO'}`);
-    
     if (!anthropicApiKey) {
       throw new Error("Missing Anthropic API key");
     }
 
     const anthropic = new Anthropic({ apiKey: anthropicApiKey });
     
-    const { messages, system, promptVersion, requireFormatValidation, chunkSize } = await req.json();
+    const { messages, system, promptVersion, requireFormatValidation, chunkSize, stream: shouldStream = false } = await req.json();
     
     if (!messages || !Array.isArray(messages)) {
       throw new Error("Missing or invalid messages parameter");
@@ -36,6 +34,7 @@ serve(async (req) => {
 
     console.log(`Processing request with ${messages.length} messages and prompt version: ${promptVersion}`);
     console.log(`Chunk size requested: ${chunkSize || 'default'}`);
+    console.log(`Streaming requested: ${shouldStream}`);
 
     // Combine system prompts to ensure format is preserved
     let finalSystemPrompt = "";
@@ -85,21 +84,48 @@ Present your murder mystery preview in an engaging, dramatic format that will ex
     console.log("System prompt preview:", finalSystemPrompt.substring(0, 100) + "...");
     
     // Determine model and parameters based on the request
-    let model = "claude-3-opus-20240229";
-    let maxTokens = promptVersion === 'paid' ? 15000 : 4000;
-    let temperature = promptVersion === 'paid' ? 0.7 : 0.3;
+    const model = "claude-3-opus-20240229";
     
-    // If we're requesting a larger chunk size, adjust parameters for generating package parts
-    if (chunkSize && chunkSize > 1000) {
-      maxTokens = Math.min(30000, chunkSize * 4); // Scale up tokens for larger chunks with a cap
-      temperature = 0.6; // Middle ground temperature for consistency in package generation
-      console.log(`Adjusted max tokens to ${maxTokens} for large chunk generation`);
+    // Ensure we never exceed the max token limit for the model
+    // Claude-3-opus has a limit of 4096 output tokens
+    const maxTokens = Math.min(4000, chunkSize ? chunkSize * 2 : 2000);
+    const temperature = promptVersion === 'paid' ? 0.7 : 0.3;
+    
+    console.log(`Using model: ${model} with max tokens: ${maxTokens}`);
+    
+    // Handle streaming responses if requested
+    if (shouldStream) {
+      const stream = await anthropic.messages.create({
+        model,
+        system: finalSystemPrompt,
+        messages,
+        max_tokens: maxTokens,
+        temperature,
+        stream: true,
+      });
+
+      return streamSSE(stream, {
+        headers: corsHeaders,
+        onChunk: (chunk) => {
+          if (chunk.type === "content_block_delta" && chunk.delta.type === "text_delta") {
+            return {
+              data: JSON.stringify({
+                choices: [{
+                  delta: { content: chunk.delta.text }
+                }]
+              })
+            };
+          }
+          return null;
+        },
+        onEnd: () => ({
+          data: JSON.stringify({ done: true })
+        })
+      });
     }
     
+    // Non-streaming response
     try {
-      // Set a longer timeout for large responses
-      const timeout = promptVersion === 'paid' ? 90000 : 25000; // 90s for paid, 25s for free
-      
       const response = await anthropic.messages.create({
         model,
         system: finalSystemPrompt,
@@ -121,9 +147,6 @@ Present your murder mystery preview in an engaging, dramatic format that will ex
       
       if (!hasRequiredFormat && requireFormatValidation) {
         console.warn("Response does not follow required format! Response preview:", content.substring(0, 300));
-        
-        // We'll still return the response instead of throwing an error
-        // This is to prevent failures when the format is slightly different
         console.log("Returning response anyway to avoid disrupting user experience");
       }
 

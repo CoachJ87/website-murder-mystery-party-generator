@@ -34,7 +34,7 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
     console.log("DEBUG: Calling mystery-ai Edge Function");
 
     let attempts = 0;
-    const maxAttempts = 3; // Increased from 2 to 3
+    const maxAttempts = 3; // Increased to 3 for reliability
     let responseContent = '';
     
     // Estimate if this is likely a large request
@@ -45,35 +45,33 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
       msg.content.includes("clues and evidence")
     );
     
-    // For large requests, we'll use chunk sizes
-    let chunkSize = isLargeRequest ? 2500 : undefined;
-    console.log(`DEBUG: Request classified as ${isLargeRequest ? 'large' : 'standard'}`);
+    // Set appropriate chunk size with safe limits to avoid token issues
+    const chunkSize = isLargeRequest ? 1500 : 1000;
+    console.log(`DEBUG: Request classified as ${isLargeRequest ? 'large' : 'standard'}, chunk size: ${chunkSize}`);
     
     while (attempts < maxAttempts) {
       attempts++;
       console.log(`DEBUG: Attempt ${attempts} of ${maxAttempts}`);
       
       try {
-        // Set a longer timeout for the function call
+        // Set a longer timeout for the function call - not needed since we'll use streaming
         const abortController = new AbortController();
-        const timeoutId = setTimeout(() => abortController.abort(), 120000); // 2 minute timeout
+        const timeoutId = setTimeout(() => abortController.abort(), 180000); // 3 minute timeout for safety
         
-        // If we're on a retry attempt and it might be due to size, increase the chunk size
-        if (attempts > 1 && isLargeRequest) {
-          chunkSize = 2000 * attempts; // Get more aggressive with chunk size on retries
-          console.log(`DEBUG: Retry with increased chunk size: ${chunkSize}`);
-        }
+        // Always use smaller chunk sizes for more reliable responses
+        const adjustedChunkSize = Math.min(2000, chunkSize * attempts); 
+        console.log(`DEBUG: Using chunk size: ${adjustedChunkSize} with streaming: ${isLargeRequest}`);
         
-        // Remove the signal from options - it's not supported in the Supabase FunctionInvokeOptions type
+        // Use streaming for large requests
         const { data: functionData, error: functionError } = await supabase.functions.invoke('mystery-ai', {
           body: {
             messages: standardMessages,
             system: systemInstruction,
             promptVersion,
             requireFormatValidation: promptVersion === 'free', // Only enforce strict validation for free prompts
-            chunkSize: chunkSize // Send a hint about how much content we expect to generate
+            chunkSize: adjustedChunkSize,
+            stream: isLargeRequest // Enable streaming for large requests
           }
-          // Removed signal property as it's not supported in the type definition
         });
         
         clearTimeout(timeoutId);
@@ -140,7 +138,8 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
                 ],
                 system: systemInstruction,
                 promptVersion,
-                requireFormatValidation: false
+                requireFormatValidation: false,
+                chunkSize: 800 // Use a very small chunk size for last resort
               }
             });
             
@@ -159,7 +158,7 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
         }
         
         console.warn(`DEBUG: Error in attempt ${attempts}, retrying: ${error.message}`);
-        await new Promise(resolve => setTimeout(resolve, 2000)); // Wait longer before retrying
+        await new Promise(resolve => setTimeout(resolve, 2000 * attempts)); // Exponential backoff
       }
     }
     

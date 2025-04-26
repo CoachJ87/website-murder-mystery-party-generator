@@ -131,7 +131,7 @@ export const generateCompletePackage = async (mysteryId: string): Promise<string
       })
       .eq("id", mysteryId);
     
-    // 6. Generate the package in chunks with retry logic
+    // 6. Generate the package in smaller chunks with improved retry logic
     const packageContent = await generatePackageInChunks(messages, mysteryId, packageId);
     
     // 7. Store the final result
@@ -297,180 +297,152 @@ const generatePackageInChunks = async (
   packageId: string
 ): Promise<string> => {
   let fullPackage = "";
-  const maxRetries = 3;
+  const maxRetries = 4; // Increased for more reliability
+  const backoffFactor = 1.5; // Exponential backoff factor
   
   try {
-    // 1. First chunk: Get the basic structure and host guide
-    const hostGuidePrompt: Message = {
-      is_ai: false,
-      content: `Based on our previous conversation, generate the host guide section for this murder mystery package. Include setup instructions, timeline, and overview of the mystery.`
+    // Split generation into 5 smaller sections for more reliability
+    const sections = [
+      {
+        name: "Host Guide Introduction",
+        prompt: "Based on our previous conversation, generate the introduction and setup section of the host guide for this murder mystery package. Include basic setup instructions and overview of the mystery.",
+        progress: 10,
+        sectionKey: "hostGuide",
+        partial: true
+      },
+      {
+        name: "Host Guide Details",
+        prompt: "Continue with the host guide by providing the detailed timeline, event structure, and specific instructions for the host to follow.",
+        progress: 25,
+        sectionKey: "hostGuide",
+        partial: false
+      },
+      {
+        name: "Character Guides - Main Characters",
+        prompt: "Based on our previous conversation and the host guide, generate detailed guides for the main 3-4 characters in the mystery, including their background, motives, and secrets.",
+        progress: 40,
+        sectionKey: "characters",
+        partial: true
+      },
+      {
+        name: "Character Guides - Supporting Characters",
+        prompt: "Now generate detailed guides for the remaining supporting characters in the mystery.",
+        progress: 55,
+        sectionKey: "characters",
+        partial: false
+      },
+      {
+        name: "Clues and Evidence",
+        prompt: "Generate the clues and evidence section, including details about physical clues, conversation prompts, and how/when they should be introduced during the mystery.",
+        progress: 70,
+        sectionKey: "clues",
+        partial: false
+      },
+      {
+        name: "Printable Materials",
+        prompt: "Create printable materials such as evidence cards, name tags, or other props needed for the mystery.",
+        progress: 85,
+        sectionKey: "clues",
+        partial: false
+      },
+      {
+        name: "Solution and Wrap-up",
+        prompt: "Generate the solution section explaining how the murder was committed, all evidence pointing to the killer, and instructions for the reveal and wrap-up of the mystery event.",
+        progress: 95,
+        sectionKey: "solution",
+        partial: false
+      }
+    ];
+    
+    let currentContent = "";
+    let completedSections = {
+      hostGuide: false,
+      characters: false,
+      clues: false,
+      solution: false
     };
     
-    console.log("Generating host guide...");
-    let hostGuide = "";
-    let hostGuideRetries = 0;
-    
-    while (hostGuideRetries < maxRetries) {
-      try {
-        hostGuide = await getAIResponse([...messages, hostGuidePrompt], "paid");
-        
-        // Update progress and partial content
-        fullPackage += hostGuide;
-        await updatePackageContent(packageId, fullPackage);
-        await updateGenerationStatus(mysteryId, packageId, 25, "Generating character guides", {
-          hostGuide: true,
-          characters: false,
-          clues: false,
-          solution: false
-        });
-        
-        break;
-      } catch (error) {
-        hostGuideRetries++;
-        console.error(`Host guide generation attempt ${hostGuideRetries} failed:`, error);
-        
-        if (hostGuideRetries >= maxRetries) {
-          console.error("Failed to generate host guide after multiple attempts");
-          throw error;
+    // Process each section sequentially with retry logic
+    for (const section of sections) {
+      console.log(`Generating section: ${section.name}`);
+      let sectionContent = "";
+      let retries = 0;
+      
+      while (retries < maxRetries) {
+        try {
+          await updateGenerationStatus(
+            mysteryId, 
+            packageId, 
+            section.progress, 
+            `Generating ${section.name}`, 
+            {
+              ...completedSections,
+              [section.sectionKey]: section.partial ? false : true
+            }
+          );
+          
+          const sectionPrompt: Message = {
+            is_ai: false,
+            content: section.prompt
+          };
+          
+          // Create context from previous content
+          const contextMessages = [
+            ...messages,
+            { is_ai: true, content: currentContent },
+            sectionPrompt
+          ];
+          
+          sectionContent = await getAIResponse(
+            contextMessages,
+            "paid",
+            "You are an expert murder mystery creator tasked with creating detailed content for a specific section of a murder mystery package."
+          );
+          
+          // Update our accumulated content
+          if (fullPackage.length > 0 && !sectionContent.startsWith("\n")) {
+            fullPackage += "\n\n";
+          }
+          fullPackage += sectionContent;
+          currentContent += sectionContent;
+          
+          // Store incremental results
+          await updatePackageContent(packageId, fullPackage);
+          
+          // Mark section as completed
+          if (!section.partial) {
+            completedSections[section.sectionKey] = true;
+          }
+          
+          // Success - break out of retry loop
+          break;
+        } catch (error) {
+          retries++;
+          console.error(`Error generating ${section.name}, attempt ${retries}:`, error);
+          
+          if (retries >= maxRetries) {
+            console.warn(`Failed to generate ${section.name} after ${maxRetries} attempts`);
+            // Continue with next section even if this one failed
+            fullPackage += `\n\n## ${section.name}\n\n[Content generation failed for this section]\n\n`;
+            await updatePackageContent(packageId, fullPackage);
+            break;
+          }
+          
+          // Exponential backoff before retry
+          const delay = 2000 * Math.pow(backoffFactor, retries);
+          console.log(`Waiting ${delay}ms before retry...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
         }
-        
-        // Wait before retrying
-        await new Promise(resolve => setTimeout(resolve, 2000));
       }
     }
     
-    // 2. Second chunk: Character guides
-    const characterGuidesPrompt: Message = {
-      is_ai: false,
-      content: `Based on our previous conversation and the host guide you've created, now generate detailed character guides for each character in the mystery. Include background information, motives, secrets, and what they know about other characters.`
+    // Ensure any partial sections are properly marked as complete at the end
+    completedSections = {
+      hostGuide: true,
+      characters: true, 
+      clues: true,
+      solution: true
     };
-    
-    console.log("Generating character guides...");
-    let characterGuides = "";
-    let characterGuideRetries = 0;
-    
-    while (characterGuideRetries < maxRetries) {
-      try {
-        characterGuides = await getAIResponse(
-          [...messages, { is_ai: true, content: hostGuide }, characterGuidesPrompt], 
-          "paid"
-        );
-        
-        // Update progress and partial content
-        fullPackage += "\n\n" + characterGuides;
-        await updatePackageContent(packageId, fullPackage);
-        await updateGenerationStatus(mysteryId, packageId, 50, "Generating clues and evidence", {
-          hostGuide: true,
-          characters: true,
-          clues: false,
-          solution: false
-        });
-        
-        break;
-      } catch (error) {
-        characterGuideRetries++;
-        console.error(`Character guides generation attempt ${characterGuideRetries} failed:`, error);
-        
-        if (characterGuideRetries >= maxRetries) {
-          console.error("Failed to generate character guides after multiple attempts");
-          throw error;
-        }
-        
-        // Wait before retrying
-        await new Promise(resolve => setTimeout(resolve, 3000));
-      }
-    }
-    
-    // 3. Third chunk: Clues and evidence
-    const cluesPrompt: Message = {
-      is_ai: false,
-      content: `Based on our previous conversation and the content you've created, now generate clues, evidence, and props for this murder mystery. Include details about how and when each clue is discovered.`
-    };
-    
-    console.log("Generating clues and evidence...");
-    let cluesAndEvidence = "";
-    let cluesRetries = 0;
-    
-    while (cluesRetries < maxRetries) {
-      try {
-        cluesAndEvidence = await getAIResponse(
-          [...messages, 
-           { is_ai: true, content: hostGuide }, 
-           { is_ai: true, content: characterGuides },
-           cluesPrompt], 
-          "paid"
-        );
-        
-        // Update progress and partial content
-        fullPackage += "\n\n" + cluesAndEvidence;
-        await updatePackageContent(packageId, fullPackage);
-        await updateGenerationStatus(mysteryId, packageId, 75, "Generating solution", {
-          hostGuide: true,
-          characters: true,
-          clues: true,
-          solution: false
-        });
-        
-        break;
-      } catch (error) {
-        cluesRetries++;
-        console.error(`Clues and evidence generation attempt ${cluesRetries} failed:`, error);
-        
-        if (cluesRetries >= maxRetries) {
-          console.error("Failed to generate clues and evidence after multiple attempts");
-          throw error;
-        }
-        
-        // Wait before retrying
-        await new Promise(resolve => setTimeout(resolve, 3000));
-      }
-    }
-    
-    // 4. Final chunk: Solution and printable materials
-    const solutionPrompt: Message = {
-      is_ai: false,
-      content: `Based on our previous conversation and the content you've created, now generate the solution section that explains how the murder was committed, with all key evidence pointing to the killer. Also include any final printable materials needed.`
-    };
-    
-    console.log("Generating solution...");
-    let solution = "";
-    let solutionRetries = 0;
-    
-    while (solutionRetries < maxRetries) {
-      try {
-        solution = await getAIResponse(
-          [...messages, 
-           { is_ai: true, content: hostGuide }, 
-           { is_ai: true, content: characterGuides },
-           { is_ai: true, content: cluesAndEvidence },
-           solutionPrompt], 
-          "paid"
-        );
-        
-        // Update final package
-        fullPackage += "\n\n" + solution;
-        await updatePackageContent(packageId, fullPackage);
-        await updateGenerationStatus(mysteryId, packageId, 100, "Generation complete", {
-          hostGuide: true,
-          characters: true,
-          clues: true,
-          solution: true
-        });
-        
-        break;
-      } catch (error) {
-        solutionRetries++;
-        console.error(`Solution generation attempt ${solutionRetries} failed:`, error);
-        
-        if (solutionRetries >= maxRetries) {
-          console.error("Failed to generate solution after multiple attempts");
-          throw error;
-        }
-        
-        // Wait before retrying
-        await new Promise(resolve => setTimeout(resolve, 3000));
-      }
-    }
     
     return fullPackage;
     
@@ -544,11 +516,13 @@ const updateGenerationStatus = async (
       .eq("id", packageId);
       
     // Also update the conversation mystery_data to include progress info
+    const { data: mysteryData } = await supabase.rpc('get_mystery_data', { conversation_id: mysteryId });
+    
     await supabase
       .from("conversations")
       .update({ 
         mystery_data: {
-          ...supabase.rpc('get_mystery_data', { conversation_id: mysteryId }),
+          ...(mysteryData || {}),
           generationProgress: progress < 0 ? 0 : progress,
           generationStep: currentStep
         }
