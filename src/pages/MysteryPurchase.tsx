@@ -38,22 +38,45 @@ const MysteryPurchase = () => {
   const parseCharacters = (content: string): Character[] => {
     const characters: Character[] = [];
     
-    const characterSections = content.match(/##\s*(?:CHARACTER LIST|Characters|CHARACTERS)([\s\S]*?)(?=##|$)/i);
+    const characterSections = content.match(/(?:##\s*(?:CHARACTER LIST|Characters|CHARACTERS|CHARACTER|SUSPECTS))([\s\S]*?)(?=##|$)/i);
     
     if (!characterSections?.[1]) return characters;
     
     const characterSection = characterSections[1];
     
-    const characterMatches = characterSection.matchAll(/(?:\d+\.|\*)\s*\*\*([^*]+)\*\*\s*[-–]\s*([^#\n]+)/g);
+    const formatOneMatches = Array.from(characterSection.matchAll(/(?:\d+\.|\*|\-)\s*\*\*([^*]+)\*\*\s*[-–:]\s*([^#\n]+)/g));
     
-    for (const match of Array.from(characterMatches)) {
+    const formatTwoMatches = Array.from(characterSection.matchAll(/\*\*([^*]+)\*\*\s*[-–:]\s*([^#\n]+)/g));
+    
+    const allMatches = formatOneMatches.length > 0 ? formatOneMatches : formatTwoMatches;
+    
+    for (const match of allMatches) {
       const [_, name, description] = match;
       if (name && description) {
         const cleanName = name.trim();
-        const firstSentence = description.split(/[.!?]/)[0].trim() + '.';
+        let cleanDescription = description.trim();
+        if (cleanDescription.length > 150) {
+          const firstSentence = description.split(/[.!?]/)[0].trim() + '.';
+          cleanDescription = firstSentence;
+        }
         characters.push({
           name: cleanName,
-          description: firstSentence
+          description: cleanDescription
+        });
+      }
+    }
+
+    if (characters.length === 0) {
+      const nameOnlyMatches = characterSection.match(/\*\*([^*]+)\*\*/g);
+      if (nameOnlyMatches) {
+        nameOnlyMatches.forEach(match => {
+          const name = match.replace(/\*\*/g, '').trim();
+          if (name) {
+            characters.push({
+              name,
+              description: "Character details will be revealed in the full package."
+            });
+          }
         });
       }
     }
@@ -62,9 +85,15 @@ const MysteryPurchase = () => {
   };
 
   const parsePremise = (content: string): string => {
-    const premiseMatch = content.match(/##\s*(?:PREMISE|Background|Setting)([\s\S]*?)(?=##|$)/i);
+    const premiseMatch = content.match(/(?:##\s*(?:PREMISE|Background|Setting|SETTING|SCENARIO|Scenario|THE STORY|Story))([\s\S]*?)(?=##|$)/i);
     
-    if (!premiseMatch?.[1]) return '';
+    if (!premiseMatch?.[1]) {
+      const fallbackMatch = content.match(/^([^#]+)/);
+      if (fallbackMatch?.[1] && fallbackMatch[1].trim().length > 20) {
+        return extractFirstTwoSentences(fallbackMatch[1]);
+      }
+      return '';
+    }
     
     const premiseText = premiseMatch[1].trim()
       .replace(/^\s*[-*]\s*/, '')
@@ -75,58 +104,95 @@ const MysteryPurchase = () => {
 
   useEffect(() => {
     const fetchMysteryAndMessages = async () => {
-      const { data: conversation, error: convError } = await supabase
-        .from('conversations')
-        .select('*, messages(*)')
-        .eq('id', id)
-        .maybeSingle();
+      try {
+        const { data: conversation, error: convError } = await supabase
+          .from('conversations')
+          .select('*, messages(*)')
+          .eq('id', id)
+          .maybeSingle();
 
-      if (convError) {
-        console.error("Error fetching mystery:", convError);
-        toast.error("Failed to load mystery details");
-        return;
-      }
-
-      if (!conversation) {
-        toast.error("Mystery not found");
-        navigate('/dashboard');
-        return;
-      }
-
-      const mysteryData: Mystery = {
-        id: conversation.id,
-        title: conversation.title || "Custom Murder Mystery",
-        created_at: conversation.created_at,
-        updated_at: conversation.updated_at,
-        status: conversation.display_status || "draft",
-        guests: conversation.mystery_data?.playerCount || 0,
-        theme: conversation.mystery_data?.theme || "",
-        premise: "",
-        purchase_date: conversation.purchase_date,
-        is_purchased: conversation.is_paid
-      };
-
-      setMystery(mysteryData);
-
-      if (conversation.messages) {
-        const detailedAIMessages = conversation.messages
-          .filter(m => m.is_ai)
-          .filter(m => 
-            m.content.includes('## PREMISE') || 
-            m.content.includes('## Premise') ||
-            m.content.includes('## CHARACTER') ||
-            m.content.includes('## Characters')
-          );
-
-        const lastDetailedMessage = detailedAIMessages[detailedAIMessages.length - 1];
-
-        if (lastDetailedMessage) {
-          const details = {
-            premise: parsePremise(lastDetailedMessage.content),
-            characters: parseCharacters(lastDetailedMessage.content)
-          };
-          setParsedDetails(details);
+        if (convError) {
+          console.error("Error fetching mystery:", convError);
+          toast.error("Failed to load mystery details");
+          return;
         }
+
+        if (!conversation) {
+          toast.error("Mystery not found");
+          navigate('/dashboard');
+          return;
+        }
+
+        console.log("Conversation data:", conversation);
+
+        const mysteryData: Mystery = {
+          id: conversation.id,
+          title: conversation.title || "Custom Murder Mystery",
+          created_at: conversation.created_at,
+          updated_at: conversation.updated_at,
+          status: conversation.display_status || "draft",
+          guests: conversation.mystery_data?.playerCount || 0,
+          theme: conversation.mystery_data?.theme || "",
+          premise: "",
+          purchase_date: conversation.purchase_date,
+          is_purchased: conversation.is_paid
+        };
+
+        setMystery(mysteryData);
+
+        if (conversation.messages && conversation.messages.length > 0) {
+          const aiMessages = conversation.messages
+            .filter(m => m.is_ai)
+            .sort((a, b) => new Date(b.created_at || b.timestamp).getTime() - new Date(a.created_at || a.timestamp).getTime());
+
+          console.log("AI messages found:", aiMessages.length);
+          
+          let detailedMessage = null;
+          
+          for (const msg of aiMessages) {
+            const hasPremise = /(?:##\s*(?:PREMISE|Background|Setting|SETTING|SCENARIO|Scenario|THE STORY|Story))/i.test(msg.content);
+            const hasCharacters = /(?:##\s*(?:CHARACTER LIST|Characters|CHARACTERS|CHARACTER|SUSPECTS))/i.test(msg.content);
+            
+            if (hasPremise && hasCharacters) {
+              detailedMessage = msg;
+              console.log("Found complete message with premise and characters");
+              break;
+            }
+          }
+          
+          if (!detailedMessage) {
+            for (const msg of aiMessages) {
+              const hasSomeDetails = /(?:##\s*(?:PREMISE|Background|Setting|CHARACTER LIST|Characters|CHARACTERS|VICTIM|MURDER|SCENARIO))/i.test(msg.content);
+              if (hasSomeDetails) {
+                detailedMessage = msg;
+                console.log("Using message with partial details");
+                break;
+              }
+            }
+          }
+
+          if (!detailedMessage && aiMessages.length > 0) {
+            detailedMessage = aiMessages[0];
+            console.log("Falling back to most recent AI message");
+          }
+
+          if (detailedMessage) {
+            console.log("Processing detailed message:", detailedMessage.content.substring(0, 100) + "...");
+            
+            const details = {
+              premise: parsePremise(detailedMessage.content),
+              characters: parseCharacters(detailedMessage.content)
+            };
+            
+            console.log("Parsed details:", details);
+            setParsedDetails(details);
+          } else {
+            console.log("No suitable AI message found");
+          }
+        }
+      } catch (error) {
+        console.error("Error in fetchMysteryAndMessages:", error);
+        toast.error("An error occurred while loading mystery details");
       }
     };
 
