@@ -404,7 +404,11 @@ const MysteryView = () => {
           </div>
 
           {packageContent ? (
-            <MysteryPackageTabView content={packageContent} />
+            <MysteryPackageTabView 
+              packageContent={packageContent} 
+              mysteryTitle={mystery?.title || "Mystery Package"} 
+              generationStatus={generationStatus || undefined}
+            />
           ) : generationStatus ? (
             renderGenerationProgress()
           ) : (
