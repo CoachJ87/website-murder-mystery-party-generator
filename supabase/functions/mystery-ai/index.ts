@@ -99,8 +99,6 @@ Present your murder mystery preview in an engaging, dramatic format that will ex
     try {
       // Set a longer timeout for large responses
       const timeout = promptVersion === 'paid' ? 55000 : 25000; // 55s for paid, 25s for free
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), timeout);
       
       const response = await anthropic.messages.create({
         model,
@@ -109,8 +107,6 @@ Present your murder mystery preview in an engaging, dramatic format that will ex
         max_tokens: maxTokens,
         temperature,
       });
-      
-      clearTimeout(timeoutId);
       
       console.log("Received response from Anthropic API");
       console.log(`Response length: ${response.content[0].text.length} characters`);
@@ -141,12 +137,6 @@ Present your murder mystery preview in an engaging, dramatic format that will ex
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     } catch (apiError) {
-      // Check if it was an abort error
-      if (apiError.name === 'AbortError') {
-        console.error("Request timed out");
-        throw new Error("Request timed out while waiting for Anthropic response");
-      }
-      
       console.error("Error calling Anthropic API:", apiError);
       throw apiError;
     }

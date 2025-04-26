@@ -43,9 +43,10 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
       
       try {
         // Set a longer timeout for the function call
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 seconds timeout
+        const abortController = new AbortController();
+        const timeoutId = setTimeout(() => abortController.abort(), 60000); // 60 seconds timeout
         
+        // Remove the signal from options - it's not supported in the Supabase FunctionInvokeOptions type
         const { data: functionData, error: functionError } = await supabase.functions.invoke('mystery-ai', {
           body: {
             messages: standardMessages,
@@ -53,8 +54,8 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
             promptVersion,
             requireFormatValidation: promptVersion === 'free', // Only enforce strict validation for free prompts
             chunkSize: 2000 // Send a hint that we want to generate a lot of content
-          },
-          signal: controller.signal
+          }
+          // Removed signal property as it's not supported in the type definition
         });
         
         clearTimeout(timeoutId);

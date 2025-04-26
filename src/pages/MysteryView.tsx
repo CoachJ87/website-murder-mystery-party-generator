@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -99,7 +98,7 @@ const MysteryView = () => {
     }
     
     // Check status every 5 seconds
-    const interval = setInterval(async () => {
+    const intervalId = window.setInterval(async () => {
       if (!id) return;
       
       try {
@@ -116,12 +115,12 @@ const MysteryView = () => {
             
           if (packageData) {
             setPackageContent(packageData.content);
-            clearInterval(interval);
+            clearInterval(intervalId);
             setStatusCheckInterval(null);
             toast.success("Your mystery package is ready!");
           }
         } else if (status.status === 'failed') {
-          clearInterval(interval);
+          clearInterval(intervalId);
           setStatusCheckInterval(null);
           toast.error("There was an issue generating your package");
         }
@@ -130,7 +129,8 @@ const MysteryView = () => {
       }
     }, 5000);
     
-    setStatusCheckInterval(interval);
+    // Store the numeric ID of the interval in state
+    setStatusCheckInterval(intervalId);
   };
 
   const handleGeneratePackage = async () => {
@@ -183,7 +183,6 @@ const MysteryView = () => {
     );
   }
 
-  // Helper function to extract a summary
   const extractSummary = (mystery: any) => {
     if (!mystery?.mystery_data) return "A murder mystery awaits...";
     
@@ -196,7 +195,6 @@ const MysteryView = () => {
     return summary;
   };
 
-  // Show in-progress generation UI
   const renderGenerationProgress = () => {
     if (!generationStatus) return null;
     
@@ -239,7 +237,6 @@ const MysteryView = () => {
             </p>
           </div>
 
-          {/* Show generation progress if applicable */}
           {generationStatus && generationStatus.status === 'in_progress' && renderGenerationProgress()}
 
           {packageContent ? (
