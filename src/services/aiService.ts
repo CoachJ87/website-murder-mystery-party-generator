@@ -17,7 +17,7 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
     console.log(`DEBUG: Starting getAIResponse with ${messages.length} messages, promptVersion: ${promptVersion}`);
     
     if (systemInstruction) {
-      console.log(`DEBUG: Using custom system instruction (first 50 chars): ${systemInstruction.substring(0, 50)}...`);
+      console.log(`DEBUG: Using custom system instruction (first 100 chars): ${systemInstruction.substring(0, 100)}...`);
     }
     
     // Convert messages to a standard format first
@@ -37,7 +37,8 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
       body: {
         messages: standardMessages,
         system: systemInstruction,
-        promptVersion
+        promptVersion,
+        requireFormatValidation: true // New flag to enforce format validation
       }
     });
 
@@ -52,7 +53,20 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
     }
 
     const responseContent = functionData.choices[0].message.content;
-    console.log(`DEBUG: Received response (first 50 chars): ${responseContent.substring(0, 50)}...`);
+    console.log(`DEBUG: Received response (first 100 chars): ${responseContent.substring(0, 100)}...`);
+    
+    // Validate response format
+    const hasRequiredSections = 
+      responseContent.includes("# ") && 
+      responseContent.includes("## PREMISE") &&
+      responseContent.includes("## VICTIM") &&
+      responseContent.includes("## CHARACTER LIST");
+    
+    if (!hasRequiredSections) {
+      console.error("DEBUG: Response does not follow required format, retrying...");
+      // You could implement a retry mechanism here if needed
+      throw new Error("AI response did not follow the required format");
+    }
     
     return responseContent;
   } catch (error) {

@@ -53,7 +53,6 @@ export const ConversationManager = ({
         console.log("Loaded messages:", data.messages?.length || 0);
         console.log("System instruction loaded:", !!data.system_instruction);
         
-        // Store the system instruction if available
         if (data.system_instruction) {
           setSystemInstruction(data.system_instruction);
         }
@@ -65,12 +64,10 @@ export const ConversationManager = ({
           timestamp: new Date(msg.created_at || Date.now())
         }));
         
-        // Sort messages by timestamp to ensure proper order
         formattedMessages.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
         
         setMessages(formattedMessages);
         
-        // If there's form data and first message is from user, ensure it's included in the history
         if (formData && formData.additionalDetails && (!formattedMessages[0] || formattedMessages[0].is_ai)) {
           const initialUserMessage = constructInitialMessage(formData);
           if (initialUserMessage) {
@@ -80,7 +77,6 @@ export const ConversationManager = ({
       } else {
         console.log("No messages found for conversation:", id);
         
-        // If no messages but we have form data, construct the initial message
         if (formData) {
           const initialUserMessage = constructInitialMessage(formData);
           if (initialUserMessage) {
@@ -96,7 +92,6 @@ export const ConversationManager = ({
     }
   };
 
-  // Helper to construct the initial message from form data
   const constructInitialMessage = (data: FormValues): Message | null => {
     let initialChatMessage = `Let's create a murder mystery`;
     if (data.theme) {
@@ -120,11 +115,10 @@ export const ConversationManager = ({
       id: "initial-message",
       content: initialChatMessage,
       is_ai: false,
-      timestamp: new Date(0), // Use oldest possible date to ensure it's first
+      timestamp: new Date(0),
     };
   };
 
-  // Adapter function to handle the updated onSave prop type
   const handleSaveMessage = (message: Message) => {
     if (onSaveMessages) {
       return onSaveMessages(message);
@@ -132,35 +126,50 @@ export const ConversationManager = ({
     return Promise.resolve();
   };
 
-  // Create a special system message to help maintain context
-  const createSystemMessage = (formData: FormValues | null) => {
-    if (!formData) return systemInstruction || "";
+  const createSystemMessage = (data: FormValues) => {
+    let systemMsg = "This is a murder mystery creation conversation. ";
+    systemMsg += "The user has ALREADY selected the following preferences, so DO NOT ask about these again: ";
     
-    if (systemInstruction) {
-      console.log("Using stored system instruction from database");
-      return systemInstruction;
+    if (data.theme) {
+      systemMsg += `Theme: ${data.theme}. `;
+    }
+    if (data.playerCount) {
+      systemMsg += `Player count: ${data.playerCount}. `;
+    }
+    if (data.hasAccomplice !== undefined) {
+      systemMsg += `Accomplice: ${data.hasAccomplice ? "Yes" : "No"}. `;
+    }
+    if (data.scriptType) {
+      systemMsg += `Script type: ${data.scriptType}. `;
+    }
+    if (data.additionalDetails) {
+      systemMsg += `Additional details: ${data.additionalDetails}. `;
     }
     
-    let customSystemMessage = "This is a murder mystery creation conversation. ";
-    customSystemMessage += "Here are the user's confirmed preferences that you should remember and not ask about again: ";
-    
-    if (formData.theme) {
-      customSystemMessage += `Theme: ${formData.theme}. `;
-    }
-    if (formData.playerCount) {
-      customSystemMessage += `Player count: ${formData.playerCount}. `;
-    }
-    if (formData.hasAccomplice !== undefined) {
-      customSystemMessage += `Accomplice: ${formData.hasAccomplice ? "Yes" : "No"}. `;
-    }
-    if (formData.scriptType) {
-      customSystemMessage += `Script type: ${formData.scriptType}. `;
-    }
-    
-    customSystemMessage += "Please remember these details throughout our conversation and don't ask about them again.";
-    customSystemMessage += "\n\nYou MUST follow the OUTPUT FORMAT specified in your instructions exactly for all responses.";
-    
-    return customSystemMessage;
+    systemMsg += `\n\nYou MUST follow this exact output format for ALL your responses:
+
+## OUTPUT FORMAT
+Present your mystery preview in an engaging, dramatic format that will excite the user. Include:
+
+# "[CREATIVE TITLE]" - A [THEME] MURDER MYSTERY
+
+## PREMISE
+[2-3 paragraphs setting the scene, describing the event where the murder takes place, and creating dramatic tension]
+
+## VICTIM
+**[Victim Name]** - [Vivid description of the victim, their role in the story, personality traits, and why they might have made enemies]
+
+## CHARACTER LIST ([PLAYER COUNT] PLAYERS)
+1. **[Character 1 Name]** - [Engaging one-sentence description including profession and connection to victim]
+2. **[Character 2 Name]** - [Engaging one-sentence description including profession and connection to victim]
+[Continue for all characters]
+
+## MURDER METHOD
+[Paragraph describing how the murder was committed, interesting details about the method, and what clues might be found]
+
+[After presenting the mystery concept, ask if the concept works for them and explain that they can continue to make edits and that once they are done they can press the 'Generate Mystery' button where they can create a complete game package with detailed character guides, host instructions, and game materials if they choose to purchase.]`;
+
+    return systemMsg;
   };
 
   return (
@@ -180,3 +189,5 @@ export const ConversationManager = ({
     </div>
   );
 };
+
+export default ConversationManager;
