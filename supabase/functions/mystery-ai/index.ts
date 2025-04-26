@@ -1,7 +1,6 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { Anthropic } from "https://esm.sh/@anthropic-ai/sdk@0.39.0";
-import { streamSSE } from "https://deno.land/x/stream_sse@v1.0.0/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -9,6 +8,51 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': '*',
   'Access-Control-Max-Age': '86400',
 };
+
+// Custom implementation of SSE streaming since the module is not available
+function streamSSE(stream, options) {
+  const { headers = {}, onChunk, onEnd } = options || {};
+  
+  const encoder = new TextEncoder();
+  const body = new ReadableStream({
+    async start(controller) {
+      try {
+        for await (const chunk of stream) {
+          if (chunk && onChunk) {
+            const event = onChunk(chunk);
+            if (event) {
+              const formattedEvent = `data: ${event.data}\n\n`;
+              controller.enqueue(encoder.encode(formattedEvent));
+            }
+          }
+        }
+        
+        if (onEnd) {
+          const event = onEnd();
+          if (event) {
+            const formattedEvent = `data: ${event.data}\n\n`;
+            controller.enqueue(encoder.encode(formattedEvent));
+          }
+        }
+      } catch (error) {
+        console.error("Streaming error:", error);
+        controller.error(error);
+      } finally {
+        controller.close();
+      }
+    }
+  });
+
+  return new Response(body, {
+    headers: {
+      ...corsHeaders,
+      ...headers,
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      "Connection": "keep-alive"
+    }
+  });
+}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
