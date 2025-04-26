@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -9,8 +8,7 @@ import { toast } from "sonner";
 import { CheckCircle, CreditCard, ArrowRight } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
-import type { Mystery, Conversation } from "@/interfaces/mystery";
-import { Badge } from "@/components/ui/badge";
+import type { Mystery } from "@/interfaces/mystery";
 import { Separator } from "@/components/ui/separator";
 
 interface Character {
@@ -37,28 +35,33 @@ const MysteryPurchase = () => {
     return sentences.slice(0, 2).join(' ').trim();
   };
 
-  // Helper function to parse markdown content for characters
-  const parseCharacters = (content: string) => {
+  // Helper function to parse characters from AI response
+  const parseCharacters = (content: string): Character[] => {
     const characters: Character[] = [];
-    const characterSection = content.match(/## Characters([\s\S]*?)(?=##|$)/i)?.[1] || '';
+    // Look for the character list section (both uppercase and lowercase)
+    const characterSection = content.match(/## (?:CHARACTER LIST|Characters)([\s\S]*?)(?=##|$)/i)?.[1] || '';
     
-    // Look for character entries that typically follow a format like:
-    // - **Name**: Description
-    const characterEntries = characterSection.match(/\*\*(.*?)\*\*:(.*?)(?=\n|$)/g) || [];
+    // Match numbered character entries in the format: "1. **Name** - Description"
+    const characterEntries = characterSection.match(/\d+\.\s+\*\*(.*?)\*\*\s+-\s+(.*?)(?=\d+\.|$)/g) || [];
     
     characterEntries.forEach(entry => {
-      const [name, description] = entry.split('**:').map(s => s.trim().replace(/\*\*/g, ''));
+      // Remove the number and clean up the entry
+      const cleanEntry = entry.replace(/^\d+\.\s+/, '');
+      const [name, description] = cleanEntry.split(/\*\*\s*-\s*/).map(s => s.trim().replace(/\*\*/g, ''));
       if (name && description) {
-        characters.push({ name, description });
+        // Take only the first sentence of the description
+        const firstSentence = description.split(/[.!?]/)[0] + '.';
+        characters.push({ name, description: firstSentence });
       }
     });
 
     return characters;
   };
 
-  // Helper function to parse premise from chat content
-  const parsePremise = (content: string) => {
-    const premiseMatch = content.match(/## Premise([\s\S]*?)(?=##|$)/i);
+  // Helper function to parse premise from AI response
+  const parsePremise = (content: string): string => {
+    // Look for the premise section (both uppercase and lowercase)
+    const premiseMatch = content.match(/## (?:PREMISE|Premise)([\s\S]*?)(?=##|$)/i);
     if (premiseMatch) {
       return extractFirstTwoSentences(premiseMatch[1].trim());
     }
@@ -67,7 +70,6 @@ const MysteryPurchase = () => {
 
   useEffect(() => {
     const fetchMysteryAndMessages = async () => {
-      // Fetch conversation details
       const { data: conversation, error: convError } = await supabase
         .from('conversations')
         .select('*, messages(*)')
@@ -93,7 +95,6 @@ const MysteryPurchase = () => {
         created_at: conversation.created_at,
         updated_at: conversation.updated_at,
         status: conversation.display_status || "draft",
-        theme: conversation.mystery_data?.theme || "",
         guests: conversation.mystery_data?.playerCount || 0,
         premise: "",
         purchase_date: conversation.purchase_date,
@@ -102,12 +103,17 @@ const MysteryPurchase = () => {
 
       setMystery(mysteryData);
 
-      // Parse the messages to extract premise and characters
+      // Find the last AI message that contains the full mystery description
       if (conversation.messages) {
-        // Find the last AI message that contains the full mystery description
         const lastDetailedAIMessage = [...conversation.messages]
           .reverse()
-          .find(m => m.is_ai && (m.content.includes('## Premise') || m.content.includes('## Characters')));
+          .find(m => 
+            m.is_ai && 
+            (m.content.includes('## PREMISE') || 
+             m.content.includes('## Premise') ||
+             m.content.includes('## CHARACTER LIST') ||
+             m.content.includes('## Characters'))
+          );
 
         if (lastDetailedAIMessage) {
           const details = {
@@ -194,14 +200,9 @@ const MysteryPurchase = () => {
             {/* Mystery Preview Card */}
             <Card>
               <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle>{mystery.title}</CardTitle>
-                  {mystery.theme && (
-                    <Badge variant="secondary">{mystery.theme}</Badge>
-                  )}
-                </div>
+                <CardTitle>{mystery.title}</CardTitle>
                 <CardDescription>
-                  {mystery.guests ? `For ${mystery.guests} players` : 'Custom murder mystery'}
+                  Custom murder mystery for {mystery.guests} players
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -210,12 +211,6 @@ const MysteryPurchase = () => {
                   <div>
                     <h3 className="font-semibold mb-3">Details</h3>
                     <div className="space-y-2">
-                      {mystery.theme && (
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Theme:</span>
-                          <span>{mystery.theme}</span>
-                        </div>
-                      )}
                       {mystery.guests > 0 && (
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">Players:</span>
