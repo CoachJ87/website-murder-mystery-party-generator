@@ -25,6 +25,10 @@ serve(async (req) => {
     const freeMysteryPrompt = Deno.env.get('MYSTERY_FREE_PROMPT');
     const paidMysteryPrompt = Deno.env.get('MYSTERY_PAID_PROMPT');
     
+    // Log prompt details (without revealing full content for security)
+    console.log(`Free prompt loaded: ${freeMysteryPrompt ? 'YES (length: ' + freeMysteryPrompt.length + ')' : 'NO'}`);
+    console.log(`Paid prompt loaded: ${paidMysteryPrompt ? 'YES (length: ' + paidMysteryPrompt.length + ')' : 'NO'}`);
+    
     if (!anthropicApiKey) {
       console.error("Missing Anthropic API key in environment variables");
       return new Response(
@@ -47,7 +51,8 @@ serve(async (req) => {
       requestBody = await req.json();
       console.log("Received request with data:", JSON.stringify({
         messageCount: requestBody.messages?.length || 0,
-        promptVersion: requestBody.promptVersion
+        promptVersion: requestBody.promptVersion,
+        hasSystemOverride: !!requestBody.system
       }));
     } catch (e) {
       console.error("Failed to parse request body:", e);
@@ -75,21 +80,50 @@ serve(async (req) => {
     console.log(`Processing request with ${messages.length} messages and prompt version: ${promptVersion}`);
 
     // Determine system prompt
-    const systemPrompt = system || 
-      (promptVersion === 'paid' 
-        ? (paidMysteryPrompt || "You are an AI assistant that helps create detailed murder mystery party games. Provide complete character details, clues, and all game materials.")
-        : (freeMysteryPrompt || "You are an AI assistant that helps create murder mystery party games. Create an engaging storyline and suggest character ideas, but don't provide complete details as this is a preview."));
+    let systemPrompt = system;
+    
+    if (!systemPrompt) {
+      // If no system prompt was provided in the request, use the environment variable
+      if (promptVersion === 'paid') {
+        systemPrompt = paidMysteryPrompt || "You are an AI assistant that helps create detailed murder mystery party games. Provide complete character details, clues, and all game materials.";
+        console.log("Using PAID prompt from environment (or default)");
+      } else {
+        systemPrompt = freeMysteryPrompt || "You are an AI assistant that helps create murder mystery party games. Create an engaging storyline and suggest character ideas, but don't provide complete details as this is a preview.";
+        console.log("Using FREE prompt from environment (or default)");
+      }
+      
+      // Log the first 50 characters of the prompt for debugging
+      console.log("First 50 chars of system prompt:", systemPrompt.substring(0, 50));
+    } else {
+      console.log("Using CUSTOM system prompt from request");
+    }
 
     try {
+      console.log("Sending request to Anthropic API with system prompt length:", systemPrompt.length);
+      
       const response = await anthropic.messages.create({
         model: "claude-3-opus-20240229",
         system: systemPrompt,
         messages: messages,
         max_tokens: 4000,
-        temperature: 0.7,
+        temperature: 0.2, // Lower temperature for better format adherence
       });
       
       console.log("Received response from Anthropic API");
+      
+      // Validate response format
+      const content = response.content[0].text;
+      const hasExpectedFormat = 
+        content.includes("# ") || 
+        content.includes("## PREMISE") || 
+        content.includes("## VICTIM") || 
+        content.includes("## CHARACTER LIST");
+      
+      if (!hasExpectedFormat && !system) {
+        console.warn("Response does not follow expected format!");
+      } else {
+        console.log("Response format validation passed");
+      }
 
       return new Response(JSON.stringify({
         choices: [{
@@ -119,4 +153,3 @@ serve(async (req) => {
     );
   }
 });
-

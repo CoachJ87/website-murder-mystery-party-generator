@@ -14,7 +14,11 @@ interface Message {
 
 export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVersion: 'free' | 'paid', systemInstruction?: string): Promise<string> => {
   try {
-    console.log(`DEBUG: Starting getAIResponse with ${messages.length} messages`);
+    console.log(`DEBUG: Starting getAIResponse with ${messages.length} messages, promptVersion: ${promptVersion}`);
+    
+    if (systemInstruction) {
+      console.log(`DEBUG: Using custom system instruction (first 50 chars): ${systemInstruction.substring(0, 50)}...`);
+    }
     
     // Convert messages to a standard format first
     const standardMessages = messages.map(msg => {
@@ -47,7 +51,10 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
       throw new Error("Invalid response format from Edge Function");
     }
 
-    return functionData.choices[0].message.content;
+    const responseContent = functionData.choices[0].message.content;
+    console.log(`DEBUG: Received response (first 50 chars): ${responseContent.substring(0, 50)}...`);
+    
+    return responseContent;
   } catch (error) {
     console.error(`DEBUG: Error in getAIResponse: ${error.message}`);
     throw error;

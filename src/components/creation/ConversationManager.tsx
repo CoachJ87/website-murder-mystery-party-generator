@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
@@ -23,6 +22,7 @@ export const ConversationManager = ({
   const [messages, setMessages] = useState<Message[]>([]);
   const [initialDataLoaded, setInitialDataLoaded] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
+  const [systemInstruction, setSystemInstruction] = useState<string | null>(null);
 
   useEffect(() => {
     if (conversationId && !initialDataLoaded) {
@@ -37,10 +37,11 @@ export const ConversationManager = ({
       setIsLoadingHistory(true);
       
       const { data, error } = await supabase
-        .from("messages")
-        .select("*")
-        .eq("conversation_id", id)
-        .order("created_at", { ascending: true });
+        .from("conversations")
+        .select("*, messages(*), system_instruction")
+        .eq("id", id)
+        .order("created_at", { ascending: true })
+        .single();
 
       if (error) {
         console.error("Error loading messages:", error);
@@ -48,9 +49,16 @@ export const ConversationManager = ({
         return;
       }
 
-      if (data && data.length > 0) {
-        console.log("Loaded messages:", data.length);
-        const formattedMessages = data.map((msg: any) => ({
+      if (data) {
+        console.log("Loaded messages:", data.messages?.length || 0);
+        console.log("System instruction loaded:", !!data.system_instruction);
+        
+        // Store the system instruction if available
+        if (data.system_instruction) {
+          setSystemInstruction(data.system_instruction);
+        }
+        
+        const formattedMessages = (data.messages || []).map((msg: any) => ({
           id: msg.id || `msg-${Date.now()}-${Math.random()}`,
           content: msg.content,
           is_ai: msg.role === "assistant",
@@ -126,26 +134,33 @@ export const ConversationManager = ({
 
   // Create a special system message to help maintain context
   const createSystemMessage = (formData: FormValues | null) => {
-    if (!formData) return "";
+    if (!formData) return systemInstruction || "";
     
-    let systemMessage = "This is a murder mystery creation conversation. ";
-    systemMessage += "Here are the user's confirmed preferences that you should remember and not ask about again: ";
+    if (systemInstruction) {
+      console.log("Using stored system instruction from database");
+      return systemInstruction;
+    }
+    
+    let customSystemMessage = "This is a murder mystery creation conversation. ";
+    customSystemMessage += "Here are the user's confirmed preferences that you should remember and not ask about again: ";
     
     if (formData.theme) {
-      systemMessage += `Theme: ${formData.theme}. `;
+      customSystemMessage += `Theme: ${formData.theme}. `;
     }
     if (formData.playerCount) {
-      systemMessage += `Player count: ${formData.playerCount}. `;
+      customSystemMessage += `Player count: ${formData.playerCount}. `;
     }
     if (formData.hasAccomplice !== undefined) {
-      systemMessage += `Accomplice: ${formData.hasAccomplice ? "Yes" : "No"}. `;
+      customSystemMessage += `Accomplice: ${formData.hasAccomplice ? "Yes" : "No"}. `;
     }
     if (formData.scriptType) {
-      systemMessage += `Script type: ${formData.scriptType}. `;
+      customSystemMessage += `Script type: ${formData.scriptType}. `;
     }
     
-    systemMessage += "Please remember these details throughout our conversation and don't ask about them again.";
-    return systemMessage;
+    customSystemMessage += "Please remember these details throughout our conversation and don't ask about them again.";
+    customSystemMessage += "\n\nYou MUST follow the OUTPUT FORMAT specified in your instructions exactly for all responses.";
+    
+    return customSystemMessage;
   };
 
   return (
