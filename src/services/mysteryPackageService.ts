@@ -1,6 +1,5 @@
 
-// src/services/mysteryPackageService.ts
-import { getAIResponse } from '@/services/aiService';
+import { getAIResponse, saveGenerationState, getGenerationState, clearGenerationState } from '@/services/aiService';
 import { supabase } from '@/lib/supabase';
 import { MysteryData } from '@/interfaces/mystery';
 
@@ -22,18 +21,37 @@ export interface GenerationStatus {
     clues: boolean;
     solution?: boolean;  // Make solution optional
   };
+  lastUpdated?: string; // Timestamp of last update
+  resumable?: boolean; // Whether generation can be resumed
 }
 
 /**
  * Generates a complete murder mystery package based on an existing conversation
- * using a chunked approach to avoid timeouts
+ * using a chunked approach to avoid timeouts with improved resumability
  */
 export const generateCompletePackage = async (
   mysteryId: string, 
-  testMode: boolean = false
+  testMode: boolean = false,
+  resumeFrom?: string // Optional parameter to resume from a specific section
 ): Promise<string> => {
   try {
-    // 1. Fetch the original conversation
+    // 1. Check for existing generation state in local/session storage
+    const savedState = getGenerationState(mysteryId);
+    let fullPackage = "";
+    let lastCompletedSection = "";
+    
+    if (savedState && savedState.content) {
+      console.log("Resuming generation from saved state:", savedState.lastCompletedSection);
+      fullPackage = savedState.content;
+      lastCompletedSection = savedState.lastCompletedSection || "";
+      
+      // If explicitly provided resumeFrom parameter, use that instead
+      if (resumeFrom) {
+        lastCompletedSection = resumeFrom;
+      }
+    }
+    
+    // 2. Fetch the original conversation
     const { data: conversations, error: convError } = await supabase
       .from("conversations")
       .select("*, user_id")
@@ -45,7 +63,7 @@ export const generateCompletePackage = async (
       throw new Error("Could not find the original conversation");
     }
     
-    // 2. Fetch all messages from this conversation
+    // 3. Fetch all messages from this conversation
     const { data: messagesData, error: msgError } = await supabase
       .from("messages")
       .select("*")
@@ -57,43 +75,53 @@ export const generateCompletePackage = async (
       throw new Error("Could not retrieve conversation messages");
     }
     
-    // 3. Format messages for the AI service
+    // 4. Format messages for the AI service
     const messages: Message[] = messagesData.map(msg => ({
       is_ai: msg.is_ai,
       content: msg.content
     }));
     
-    // 4. Create an empty package record to track progress
+    // 5. Check for existing package record
     const { data: existingPackage } = await supabase
       .from("mystery_packages")
-      .select("id")
+      .select("id, content, generation_status")
       .eq("conversation_id", mysteryId)
       .maybeSingle();
       
     let packageId: string;
+    let existingContent: string = "";
     
+    // 6. If we have an existing package, use its content and update its status
     if (existingPackage) {
       packageId = existingPackage.id;
       
-      // Update the generation status
+      // If the package already has content and we're not explicitly resuming, use it
+      if (existingPackage.content && !resumeFrom) {
+        existingContent = existingPackage.content;
+        fullPackage = existingPackage.content;
+      }
+      
+      // Update the generation status to indicate we're resuming/restarting
       await supabase
         .from("mystery_packages")
         .update({
           generation_status: {
             status: 'in_progress',
-            progress: 0,
-            currentStep: 'Starting generation',
+            progress: fullPackage ? 25 : 0, // If we have content already, start at 25%
+            currentStep: fullPackage ? 'Resuming generation...' : 'Starting generation',
             sections: {
-              hostGuide: false,
+              hostGuide: !!fullPackage,
               characters: false,
               clues: false
-            }
+            },
+            resumable: true,
+            lastUpdated: new Date().toISOString()
           },
           updated_at: new Date().toISOString()
         })
         .eq("id", packageId);
     } else {
-      // Create a new package record
+      // 7. If no existing package, create a new package record
       const { data: packageRecord, error: packageError } = await supabase
         .from("mystery_packages")
         .insert({
@@ -107,7 +135,9 @@ export const generateCompletePackage = async (
               hostGuide: false,
               characters: false,
               clues: false
-            }
+            },
+            resumable: true,
+            lastUpdated: new Date().toISOString()
           },
           created_at: new Date().toISOString()
         })
@@ -122,7 +152,7 @@ export const generateCompletePackage = async (
       packageId = packageRecord.id;
     }
     
-    // 5. Update conversation status to indicate generation has started
+    // 8. Update conversation status to indicate generation has started
     await supabase
       .from("conversations")
       .update({ 
@@ -132,10 +162,17 @@ export const generateCompletePackage = async (
       })
       .eq("id", mysteryId);
     
-    // 6. Generate the package in smaller chunks with improved retry logic
-    const packageContent = await generatePackageInChunks(messages, mysteryId, packageId, testMode);
+    // 9. Generate the package in smaller chunks with improved retry and resume logic
+    const packageContent = await generatePackageInChunks(
+      messages, 
+      mysteryId, 
+      packageId, 
+      testMode,
+      lastCompletedSection,
+      fullPackage
+    );
     
-    // 7. Store the final result
+    // 10. Store the final result
     await supabase
       .from("conversations")
       .update({
@@ -157,11 +194,16 @@ export const generateCompletePackage = async (
             hostGuide: true,
             characters: true,
             clues: true
-          }
+          },
+          lastUpdated: new Date().toISOString(),
+          resumable: false
         },
         updated_at: new Date().toISOString()
       })
       .eq("id", packageId);
+    
+    // Clear saved state now that we're done
+    clearGenerationState(mysteryId);
     
     return packageContent;
     
@@ -184,15 +226,35 @@ export const generateCompletePackage = async (
 
 /**
  * Check the status of an ongoing package generation
+ * Now with enhanced resumability support
  */
 export const getPackageGenerationStatus = async (mysteryId: string): Promise<GenerationStatus> => {
   try {
+    // First check local storage for most recent generation state
+    const localState = getGenerationState(mysteryId);
+    
     // Check if there's an existing package for this mystery
     const { data: packageData, error: packageError } = await supabase
       .from("mystery_packages")
       .select("generation_status, content")
       .eq("conversation_id", mysteryId)
       .single();
+    
+    // If we have a more recent local state, prioritize that
+    if (localState && localState.lastUpdated) {
+      const localDate = new Date(localState.lastUpdated);
+      const serverDate = packageData?.generation_status?.lastUpdated ? 
+        new Date(packageData.generation_status.lastUpdated) : 
+        new Date(0);
+      
+      if (localDate > serverDate) {
+        console.log("Using more recent local generation state");
+        return {
+          ...localState,
+          resumable: true
+        };
+      }
+    }
       
     if (packageError) {
       return {
@@ -208,7 +270,11 @@ export const getPackageGenerationStatus = async (mysteryId: string): Promise<Gen
     }
     
     if (packageData.generation_status) {
-      return packageData.generation_status as GenerationStatus;
+      return {
+        ...packageData.generation_status as GenerationStatus,
+        resumable: packageData.generation_status.status === 'in_progress' || 
+                  packageData.generation_status.status === 'failed'
+      };
     }
     
     // Check conversation status
@@ -245,14 +311,15 @@ export const getPackageGenerationStatus = async (mysteryId: string): Promise<Gen
       return {
         status: 'in_progress',
         progress,
-        currentStep: progress < 30 ? 'Generating host guide' : 
-                     progress < 60 ? 'Generating character guides' : 
-                     'Finalizing materials',
+        currentStep: progress < 30 ? 'Generating host guide (5-10 minutes remaining)' : 
+                     progress < 60 ? 'Generating character guides (3-7 minutes remaining)' : 
+                     'Finalizing materials (1-3 minutes remaining)',
         sections: {
           hostGuide: progress >= 25,
           characters: progress >= 50,
           clues: progress >= 75
-        }
+        },
+        resumable: true
       };
     }
     
@@ -278,27 +345,57 @@ export const getPackageGenerationStatus = async (mysteryId: string): Promise<Gen
         hostGuide: false,
         characters: false,
         clues: false
-      }
+      },
+      resumable: true
     };
   }
 };
 
 /**
- * Generate the package in logical chunks to avoid timeouts
+ * Resume an interrupted package generation
+ */
+export const resumePackageGeneration = async (mysteryId: string, testMode: boolean = false): Promise<string> => {
+  try {
+    // Check for existing generation state
+    const savedState = getGenerationState(mysteryId);
+    
+    if (!savedState) {
+      // If no saved state, restart from scratch
+      return generateCompletePackage(mysteryId, testMode);
+    }
+    
+    // Resume from the last completed section
+    return generateCompletePackage(
+      mysteryId, 
+      testMode, 
+      savedState.lastCompletedSection
+    );
+  } catch (error) {
+    console.error("Error resuming package generation:", error);
+    throw error;
+  }
+};
+
+/**
+ * Generate the package in logical chunks to avoid timeouts with improved resumability
  */
 const generatePackageInChunks = async (
   messages: Message[], 
   mysteryId: string,
   packageId: string,
-  testMode: boolean = false
+  testMode: boolean = false,
+  lastCompletedSection: string = "",
+  existingContent: string = ""
 ): Promise<string> => {
-  let fullPackage = "";
+  let fullPackage = existingContent;
   const maxRetries = 4; // Increased for more reliability
   const backoffFactor = 1.5; // Exponential backoff factor
+  let sectionsToGenerate = [];
+  let startFromIndex = 0;
   
   try {
     // Use a reduced set of sections for test mode
-    const sections = testMode ? [
+    const allSections = testMode ? [
       {
         name: "Host Guide",
         prompt: "Based on our previous conversation, generate a concise host guide for this murder mystery package. Keep it very brief since this is for testing.",
@@ -366,18 +463,42 @@ const generatePackageInChunks = async (
       }
     ];
     
-    let currentContent = "";
+    // If we're resuming, determine where to start
+    if (lastCompletedSection) {
+      const lastCompletedIndex = allSections.findIndex(section => section.name === lastCompletedSection);
+      if (lastCompletedIndex >= 0) {
+        startFromIndex = lastCompletedIndex + 1;
+        console.log(`Resuming from section ${startFromIndex}: ${allSections[startFromIndex]?.name}`);
+      }
+    }
+    
+    // Select only the remaining sections to generate
+    sectionsToGenerate = allSections.slice(startFromIndex);
+    
+    let currentContent = fullPackage;
     let completedSections = {
-      hostGuide: false,
-      characters: false,
-      clues: false
+      hostGuide: allSections.slice(0, startFromIndex).some(s => s.sectionKey === "hostGuide" && !s.partial),
+      characters: allSections.slice(0, startFromIndex).some(s => s.sectionKey === "characters" && !s.partial),
+      clues: allSections.slice(0, startFromIndex).some(s => s.sectionKey === "clues" && !s.partial)
     };
     
-    // Process each section sequentially with retry logic
-    for (const section of sections) {
-      console.log(`Generating section: ${section.name}`);
+    // Process each remaining section sequentially with retry logic
+    for (let i = 0; i < sectionsToGenerate.length; i++) {
+      const section = sectionsToGenerate[i];
+      console.log(`Generating section ${i + startFromIndex}: ${section.name}`);
+      
       let sectionContent = "";
       let retries = 0;
+      let lastError = null;
+      
+      // Save the current state before starting this section
+      saveGenerationState(mysteryId, {
+        content: fullPackage,
+        lastCompletedSection: i > 0 ? sectionsToGenerate[i-1].name : lastCompletedSection,
+        progress: section.progress,
+        currentStep: `About to generate ${section.name}`,
+        sections: completedSections
+      });
       
       while (retries < maxRetries) {
         try {
@@ -385,7 +506,7 @@ const generatePackageInChunks = async (
             mysteryId, 
             packageId, 
             section.progress, 
-            `Generating ${section.name}`, 
+            `Generating ${section.name} (5-10 minutes total generation time)`, 
             {
               ...completedSections,
               [section.sectionKey]: section.partial ? false : true
@@ -400,7 +521,9 @@ const generatePackageInChunks = async (
           // Create context from previous content
           const contextMessages = [
             ...messages,
-            { is_ai: true, content: currentContent },
+            { is_ai: true, content: currentContent.length > 2000 ? 
+                            currentContent.substring(currentContent.length - 2000) : 
+                            currentContent },
             sectionPrompt
           ];
           
@@ -418,8 +541,18 @@ const generatePackageInChunks = async (
           fullPackage += sectionContent;
           currentContent += sectionContent;
           
-          // Store incremental results
+          // Store incremental results - both in database and local storage
           await updatePackageContent(packageId, fullPackage);
+          saveGenerationState(mysteryId, {
+            content: fullPackage,
+            lastCompletedSection: section.name,
+            progress: section.progress,
+            currentStep: `Completed ${section.name}`,
+            sections: {
+              ...completedSections,
+              [section.sectionKey]: !section.partial
+            }
+          });
           
           // Mark section as completed
           if (!section.partial) {
@@ -430,12 +563,24 @@ const generatePackageInChunks = async (
           break;
         } catch (error) {
           retries++;
+          lastError = error;
           console.error(`Error generating ${section.name}, attempt ${retries}:`, error);
+          
+          // Save state indicating the error so we can resume
+          saveGenerationState(mysteryId, {
+            content: fullPackage,
+            lastCompletedSection: i > 0 ? sectionsToGenerate[i-1].name : lastCompletedSection,
+            progress: section.progress,
+            currentStep: `Error in ${section.name}, attempt ${retries}`,
+            error: error.message,
+            sections: completedSections
+          });
           
           if (retries >= maxRetries) {
             console.warn(`Failed to generate ${section.name} after ${maxRetries} attempts`);
+            
             // Continue with next section even if this one failed
-            fullPackage += `\n\n## ${section.name}\n\n[Content generation failed for this section]\n\n`;
+            fullPackage += `\n\n## ${section.name}\n\n[Content generation failed for this section. You may want to regenerate this mystery.]\n\n`;
             await updatePackageContent(packageId, fullPackage);
             break;
           }
@@ -446,6 +591,12 @@ const generatePackageInChunks = async (
           await new Promise(resolve => setTimeout(resolve, delay));
         }
       }
+      
+      // If we failed to generate this section after all retries and it's a non-partial section,
+      // still mark it as done to allow progression to the next section
+      if (retries >= maxRetries && !section.partial) {
+        completedSections[section.sectionKey] = true;
+      }
     }
     
     // Ensure any partial sections are properly marked as complete at the end
@@ -455,6 +606,9 @@ const generatePackageInChunks = async (
       clues: true
     };
     
+    // Clear saved state since we're done
+    clearGenerationState(mysteryId);
+    
     return fullPackage;
     
   } catch (error) {
@@ -462,6 +616,22 @@ const generatePackageInChunks = async (
     
     // If we hit an error but have partial content, update status and return partial content
     if (fullPackage.length > 0) {
+      // Save the current state even though there was an error
+      saveGenerationState(mysteryId, {
+        content: fullPackage,
+        lastCompletedSection: sectionsToGenerate.length > 0 ? 
+                               (lastCompletedSection || "none") : 
+                               "none",
+        progress: -1,
+        currentStep: "Generation failed - partial content available",
+        error: error.message,
+        sections: {
+          hostGuide: fullPackage.includes("Host Guide"),
+          characters: fullPackage.includes("Character"),
+          clues: fullPackage.includes("Clues") || fullPackage.includes("Evidence")
+        }
+      });
+      
       await updateGenerationStatus(mysteryId, packageId, -1, "Generation failed - partial content available", {
         hostGuide: fullPackage.includes("Host Guide"),
         characters: fullPackage.includes("Character"),
@@ -469,7 +639,7 @@ const generatePackageInChunks = async (
       }, true);
       
       console.log("Returning partial content after error");
-      return fullPackage + "\n\n[Note: Generation was incomplete due to an error. You may want to regenerate this package.]";
+      return fullPackage + "\n\n[Note: Generation was incomplete due to an error. You can try resuming the generation.]\n\n";
     }
     
     throw error;
@@ -510,6 +680,7 @@ const updateGenerationStatus = async (
 ): Promise<void> => {
   try {
     const status = isFailed ? 'failed' : progress >= 100 ? 'completed' : 'in_progress';
+    const timestamp = new Date().toISOString();
     
     // Update the package status
     await supabase
@@ -519,7 +690,9 @@ const updateGenerationStatus = async (
           status,
           progress: progress < 0 ? 0 : progress,
           currentStep,
-          sections
+          sections,
+          lastUpdated: timestamp,
+          resumable: status !== 'completed'
         }
       })
       .eq("id", packageId);
@@ -537,7 +710,36 @@ const updateGenerationStatus = async (
         }
       })
       .eq("id", mysteryId);
+    
+    // Also save to local storage for resilience
+    saveGenerationState(mysteryId, {
+      progress: progress < 0 ? 0 : progress,
+      currentStep,
+      sections,
+      lastUpdated: timestamp,
+      status
+    });
   } catch (error) {
     console.error("Error updating generation progress:", error);
+  }
+};
+
+// New function to toggle test mode for generation
+export const toggleTestMode = (enabled: boolean): void => {
+  try {
+    localStorage.setItem('mystery_test_mode', JSON.stringify(enabled));
+  } catch (error) {
+    console.error("Failed to save test mode setting:", error);
+  }
+};
+
+// Get current test mode setting
+export const getTestModeEnabled = (): boolean => {
+  try {
+    const setting = localStorage.getItem('mystery_test_mode');
+    return setting ? JSON.parse(setting) : false;
+  } catch (error) {
+    console.error("Failed to get test mode setting:", error);
+    return false;
   }
 };

@@ -182,3 +182,56 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
     throw error;
   }
 };
+
+// New function to store generation state in local and session storage
+export const saveGenerationState = (mysteryId: string, progressData: any) => {
+  try {
+    // Save to both localStorage and sessionStorage for redundancy
+    localStorage.setItem(`mystery_generation_${mysteryId}`, JSON.stringify({
+      ...progressData,
+      lastUpdated: new Date().toISOString()
+    }));
+    
+    sessionStorage.setItem(`mystery_generation_${mysteryId}`, JSON.stringify({
+      ...progressData,
+      lastUpdated: new Date().toISOString()
+    }));
+    
+    return true;
+  } catch (error) {
+    console.error("Failed to save generation state:", error);
+    return false;
+  }
+};
+
+// New function to retrieve generation state from storage
+export const getGenerationState = (mysteryId: string) => {
+  try {
+    // Try sessionStorage first (more likely to have the most recent data)
+    const sessionData = sessionStorage.getItem(`mystery_generation_${mysteryId}`);
+    if (sessionData) {
+      return JSON.parse(sessionData);
+    }
+    
+    // Fall back to localStorage
+    const localData = localStorage.getItem(`mystery_generation_${mysteryId}`);
+    if (localData) {
+      return JSON.parse(localData);
+    }
+    
+    return null;
+  } catch (error) {
+    console.error("Failed to retrieve generation state:", error);
+    return null;
+  }
+};
+
+// New function to clear generation state
+export const clearGenerationState = (mysteryId: string) => {
+  try {
+    localStorage.removeItem(`mystery_generation_${mysteryId}`);
+    sessionStorage.removeItem(`mystery_generation_${mysteryId}`);
+  } catch (error) {
+    console.error("Failed to clear generation state:", error);
+  }
+};

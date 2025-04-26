@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -6,11 +7,17 @@ import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { supabase } from "@/lib/supabase";
-import { generateCompletePackage, getPackageGenerationStatus, GenerationStatus } from "@/services/mysteryPackageService";
+import { 
+  generateCompletePackage, 
+  resumePackageGeneration,
+  getPackageGenerationStatus, 
+  GenerationStatus 
+} from "@/services/mysteryPackageService";
 import { useAuth } from "@/context/AuthContext";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, AlertTriangle, Clock } from "lucide-react";
 import MysteryPackageTabView from "@/components/MysteryPackageTabView";
 import { Progress } from "@/components/ui/progress";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const MysteryView = () => {
   const [mystery, setMystery] = useState<any | null>(null);
@@ -19,9 +26,93 @@ const MysteryView = () => {
   const [generating, setGenerating] = useState(false);
   const [generationStatus, setGenerationStatus] = useState<GenerationStatus | null>(null);
   const [statusCheckInterval, setStatusCheckInterval] = useState<number | null>(null);
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+  const [hasUserInteracted, setHasUserInteracted] = useState(false);
   const { id } = useParams();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+
+  // Define a function to check if the page is visible
+  const isPageVisible = () => document.visibilityState === 'visible';
+
+  // Handle tab visibility changes 
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (isPageVisible()) {
+        console.log("Tab is now visible, refreshing status");
+        checkGenerationStatus();
+        startStatusPolling();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [id]);
+
+  // Function to check generation status
+  const checkGenerationStatus = useCallback(async () => {
+    if (!id) return;
+    
+    try {
+      const status = await getPackageGenerationStatus(id);
+      setGenerationStatus(status);
+      setLastUpdate(new Date());
+      
+      if (status.status === 'completed') {
+        // Package generation complete, fetch content
+        const { data: packageData } = await supabase
+          .from("mystery_packages")
+          .select("content")
+          .eq("conversation_id", id)
+          .single();
+          
+        if (packageData) {
+          setPackageContent(packageData.content);
+          clearStatusPolling();
+          toast.success("Your mystery package is ready!");
+        }
+      } else if (status.status === 'failed') {
+        clearStatusPolling();
+        
+        if (status.resumable) {
+          toast.error(
+            <div className="space-y-2">
+              <p>Generation encountered an error but can be resumed.</p>
+              <Button size="sm" variant="outline" onClick={handleResumeGeneration}>
+                Resume Generation
+              </Button>
+            </div>,
+            { duration: 10000 }
+          );
+        } else {
+          toast.error("There was an issue generating your package");
+        }
+      }
+    } catch (error) {
+      console.error("Error checking generation status:", error);
+    }
+  }, [id]);
+
+  const clearStatusPolling = () => {
+    if (statusCheckInterval) {
+      clearInterval(statusCheckInterval);
+      setStatusCheckInterval(null);
+    }
+  };
+
+  const startStatusPolling = useCallback(() => {
+    // Clear any existing interval
+    clearStatusPolling();
+    
+    // Check status every 5 seconds
+    const intervalId = window.setInterval(checkGenerationStatus, 5000);
+    
+    // Store the numeric ID of the interval in state
+    setStatusCheckInterval(intervalId);
+  }, [checkGenerationStatus]);
 
   useEffect(() => {
     const fetchMystery = async () => {
@@ -54,6 +145,7 @@ const MysteryView = () => {
         if (conversation.needs_package_generation) {
           const status = await getPackageGenerationStatus(id);
           setGenerationStatus(status);
+          setLastUpdate(new Date());
           
           // Start status polling
           if (status.status === 'in_progress') {
@@ -83,54 +175,63 @@ const MysteryView = () => {
 
     fetchMystery();
     
+    // Set up user interaction detection
+    const handleUserInteraction = () => {
+      setHasUserInteracted(true);
+    };
+    window.addEventListener('click', handleUserInteraction);
+    window.addEventListener('keydown', handleUserInteraction);
+    
     // Cleanup
     return () => {
       if (statusCheckInterval) {
         clearInterval(statusCheckInterval);
       }
+      window.removeEventListener('click', handleUserInteraction);
+      window.removeEventListener('keydown', handleUserInteraction);
     };
-  }, [id, navigate]);
+  }, [id, navigate, startStatusPolling]);
 
-  const startStatusPolling = () => {
-    // Clear any existing interval
-    if (statusCheckInterval) {
-      clearInterval(statusCheckInterval);
+  // Reset user interaction flag when checking status
+  useEffect(() => {
+    if (lastUpdate) {
+      setHasUserInteracted(false);
     }
-    
-    // Check status every 5 seconds
-    const intervalId = window.setInterval(async () => {
-      if (!id) return;
+  }, [lastUpdate]);
+
+  const handleResumeGeneration = async () => {
+    if (!id) {
+      toast.error("Mystery ID is missing");
+      return;
+    }
+
+    setGenerating(true);
+    try {
+      toast.info("Resuming your mystery generation. This may take 5-10 minutes...");
       
-      try {
-        const status = await getPackageGenerationStatus(id);
-        setGenerationStatus(status);
-        
-        if (status.status === 'completed') {
-          // Package generation complete, fetch content
-          const { data: packageData } = await supabase
-            .from("mystery_packages")
-            .select("content")
-            .eq("conversation_id", id)
-            .single();
-            
-          if (packageData) {
-            setPackageContent(packageData.content);
-            clearInterval(intervalId);
-            setStatusCheckInterval(null);
-            toast.success("Your mystery package is ready!");
-          }
-        } else if (status.status === 'failed') {
-          clearInterval(intervalId);
-          setStatusCheckInterval(null);
-          toast.error("There was an issue generating your package");
-        }
-      } catch (error) {
-        console.error("Error checking generation status:", error);
-      }
-    }, 5000);
-    
-    // Store the numeric ID of the interval in state
-    setStatusCheckInterval(intervalId);
+      // Start resuming from the last saved point
+      resumePackageGeneration(id)
+        .then(content => {
+          setPackageContent(content);
+          setGenerating(false);
+          toast.success("Your complete mystery package is ready!");
+        })
+        .catch(error => {
+          console.error("Error in package generation:", error);
+          setGenerating(false);
+          toast.error("There was an issue generating your package. Please try again.");
+        });
+      
+      // Start polling for status updates
+      const initialStatus = await getPackageGenerationStatus(id);
+      setGenerationStatus(initialStatus);
+      startStatusPolling();
+      
+    } catch (error: any) {
+      console.error("Error resuming package generation:", error);
+      setGenerating(false);
+      toast.error(error.message || "Failed to resume generation");
+    }
   };
 
   const handleGeneratePackage = async () => {
@@ -141,7 +242,12 @@ const MysteryView = () => {
 
     setGenerating(true);
     try {
-      toast.info("Generating your complete murder mystery package. This may take a few minutes...");
+      toast.info(
+        <div className="space-y-2">
+          <div className="font-semibold">Generating your mystery package</div>
+          <p className="text-sm">This will take about 5-10 minutes. Please keep this browser tab open.</p>
+        </div>
+      );
       
       // Start generation
       generateCompletePackage(id)
@@ -198,12 +304,26 @@ const MysteryView = () => {
   const renderGenerationProgress = () => {
     if (!generationStatus) return null;
     
+    const isIdle = !isPageVisible() && !hasUserInteracted && lastUpdate && 
+                  (new Date().getTime() - lastUpdate.getTime() > 30000);
+    
     return (
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Generating Your Mystery Package</CardTitle>
+          <CardTitle className="flex items-center justify-between">
+            <span>Generating Your Mystery Package</span>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={checkGenerationStatus} 
+              className="h-8 w-8 p-0"
+              title="Refresh status"
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          </CardTitle>
           <CardDescription>
-            This process may take a few minutes. You can leave this page and return later.
+            This process takes 5-10 minutes to complete. Please keep this browser tab open.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -215,10 +335,59 @@ const MysteryView = () => {
             <Progress value={generationStatus.progress} />
           </div>
           
+          {isIdle && (
+            <Alert className="bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800">
+              <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+              <AlertTitle>Update paused</AlertTitle>
+              <AlertDescription>
+                Status updates paused because the page is inactive. Click anywhere or switch back to this tab to resume updates.
+              </AlertDescription>
+            </Alert>
+          )}
+          
+          <div className="flex flex-col md:flex-row gap-4 text-sm">
+            <div className="flex-1 border rounded-md p-3">
+              <div className="font-medium mb-2 flex items-center">
+                <Clock className="h-4 w-4 mr-2" />
+                <span>Estimated Time</span>
+              </div>
+              <p className="text-muted-foreground">
+                Full generation takes 5-10 minutes to complete. Remaining: 
+                {generationStatus.progress < 30 ? " 7-10 minutes" : 
+                 generationStatus.progress < 60 ? " 4-7 minutes" : 
+                 generationStatus.progress < 90 ? " 1-3 minutes" : 
+                 " less than 1 minute"}
+              </p>
+            </div>
+            
+            <div className="flex-1 border rounded-md p-3">
+              <div className="font-medium mb-2">Status</div>
+              <div className="space-y-1">
+                <div className="flex items-center">
+                  <div className={`h-2 w-2 rounded-full mr-2 ${generationStatus.sections?.hostGuide ? "bg-green-500" : "bg-muted"}`}></div>
+                  <span className={generationStatus.sections?.hostGuide ? "" : "text-muted-foreground"}>Host Guide</span>
+                </div>
+                <div className="flex items-center">
+                  <div className={`h-2 w-2 rounded-full mr-2 ${generationStatus.sections?.characters ? "bg-green-500" : "bg-muted"}`}></div>
+                  <span className={generationStatus.sections?.characters ? "" : "text-muted-foreground"}>Character Guides</span>
+                </div>
+                <div className="flex items-center">
+                  <div className={`h-2 w-2 rounded-full mr-2 ${generationStatus.sections?.clues ? "bg-green-500" : "bg-muted"}`}></div>
+                  <span className={generationStatus.sections?.clues ? "" : "text-muted-foreground"}>Clues & Materials</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
           <p className="text-sm text-muted-foreground">
-            We're creating a custom murder mystery package based on your conversations. 
-            This includes host instructions, character guides, and all game materials.
+            <strong>Important:</strong> Keep this browser tab open. Closing it or putting your computer to sleep will pause generation, but you'll be able to resume later.
           </p>
+          
+          {generationStatus.status === 'failed' && generationStatus.resumable && (
+            <Button onClick={handleResumeGeneration} disabled={generating} className="mt-2">
+              Resume Generation
+            </Button>
+          )}
         </CardContent>
       </Card>
     );
@@ -227,76 +396,54 @@ const MysteryView = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-
       <main className="flex-1 py-12 px-4">
         <div className="container mx-auto max-w-4xl">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">{mystery?.title || "Your Murder Mystery"}</h1>
-            <p className="text-muted-foreground">
-              Your purchased murder mystery package.
-            </p>
+            <h1 className="text-3xl font-bold mb-2">{mystery?.title || "Mystery Package"}</h1>
+            <p className="text-muted-foreground">{extractSummary(mystery)}</p>
           </div>
 
-          {generationStatus && generationStatus.status === 'in_progress' && renderGenerationProgress()}
-
           {packageContent ? (
-            <MysteryPackageTabView 
-              packageContent={packageContent} 
-              mysteryTitle={mystery?.title || "Murder Mystery"}
-            />
+            <MysteryPackageTabView content={packageContent} />
+          ) : generationStatus ? (
+            renderGenerationProgress()
           ) : (
-            <Card>
+            <Card className="mb-6">
               <CardHeader>
-                <CardTitle>Generate Your Complete Murder Mystery Package</CardTitle>
+                <CardTitle>Generate Your Mystery Package</CardTitle>
                 <CardDescription>
-                  You've purchased this mystery! Generate your complete package now.
+                  Your mystery is ready to be generated. Click the button below to create your custom murder mystery package.
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="p-4 bg-muted/30 rounded-md">
-                  <h3 className="font-semibold mb-2">Mystery Summary</h3>
-                  <p>{extractSummary(mystery)}</p>
-                </div>
-                
-                <div className="space-y-2">
-                  <p>
-                    Click the button below to generate the complete murder
-                    mystery package with all materials you need to host your event:
-                  </p>
-                  <ul className="list-disc pl-5 space-y-1">
-                    <li>Detailed character guides for each player</li>
-                    <li>Comprehensive host instructions</li>
-                    <li>Evidence cards and game materials</li>
-                    <li>Complete gameplay script</li>
-                  </ul>
-                  
-                  <Button
-                    onClick={handleGeneratePackage}
-                    disabled={generating}
-                    className="w-full mt-4"
-                  >
-                    {generating ? (
-                      <>
-                        <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                        Starting Generation (This may take a few minutes)...
-                      </>
-                    ) : (
-                      "Generate Complete Mystery Package"
-                    )}
-                  </Button>
-                </div>
+              <CardContent>
+                <Button
+                  onClick={handleGeneratePackage}
+                  disabled={generating}
+                  className="w-full sm:w-auto"
+                >
+                  {generating ? (
+                    <>
+                      <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    "Generate Mystery Package"
+                  )}
+                </Button>
+                <p className="text-sm text-muted-foreground mt-3">
+                  Generation takes 5-10 minutes. Please keep this browser tab open during generation.
+                </p>
               </CardContent>
             </Card>
           )}
 
-          <div className="mt-8 text-center">
+          <div className="flex justify-center mt-8">
             <Button variant="outline" onClick={() => navigate("/dashboard")}>
               Back to Dashboard
             </Button>
           </div>
         </div>
       </main>
-
       <Footer />
     </div>
   );

@@ -1,305 +1,385 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
-import { supabase } from '@/lib/supabase';
-import { useUser } from '@/hooks/useUser';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import { CheckCircle, CreditCard } from 'lucide-react';
 
-interface MysteryPackage {
-  id: string;
-  name: string;
-  content: string;
-  theme?: string;
-  num_players?: number;
-  premise?: string;
-}
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { toast } from "sonner";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/context/AuthContext";
+import { Message } from "@/components/types";
+import ReactMarkdown from 'react-markdown';
+import { InfoIcon, AlertTriangleIcon, ClockIcon, LoaderIcon, PlayIcon } from "lucide-react";
+import { generateCompletePackage, resumePackageGeneration, getPackageGenerationStatus, toggleTestMode, getTestModeEnabled } from "@/services/mysteryPackageService";
+import { Separator } from "@/components/ui/separator";
 
-export default function MysteryPreview() {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const { isLoading: isUserLoading, isAuthenticated, user } = useUser();
-  const [mystery, setMystery] = useState<MysteryPackage | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [purchasing, setPurchasing] = useState(false);
-  const [polling, setPolling] = useState(false);
+const MysteryPreview = () => {
+    const [mystery, setMystery] = useState<any | null>(null);
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [title, setTitle] = useState("");
+    const [mysteryPreview, setMysteryPreview] = useState("");
+    const [isPremiumUser, setIsPremiumUser] = useState(false);
+    const [generating, setGenerating] = useState(false);
+    const navigate = useNavigate();
+    const { id } = useParams();
+    const { user, isAuthenticated } = useAuth();
+    const [testModeEnabled, setTestModeEnabled] = useState(false);
+    const [resumable, setResumable] = useState(false);
+    const [generationAbandoned, setGenerationAbandoned] = useState(false);
 
-  const extractPremiseFromMessages = (messages: any[]) => {
-    const aiMessages = messages.filter(msg => msg.is_ai === true || msg.role === 'assistant');
-    
-    for (const msg of aiMessages) {
-      const content = msg.content || '';
-      const premiseMatch = content.match(/## PREMISE\n([\s\S]*?)(?=\n##|\n$)/i);
-      if (premiseMatch && premiseMatch[1]) {
-        return premiseMatch[1].trim();
-      }
-    }
-
-    if (aiMessages.length > 0) {
-      const firstMsg = aiMessages[0].content || '';
-      const firstParagraph = firstMsg.split('\n\n')[0] || '';
-      return firstParagraph.length > 200 ? firstParagraph.substring(0, 200) + '...' : firstParagraph;
-    }
-    
-    return 'An intriguing murder mystery awaits...';
-  };
-
-  const loadMystery = useCallback(async () => {
-    if (!id) {
-      navigate('/dashboard');
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      if (user?.id) {
-        const { data, error } = await supabase
-          .from('conversations')
-          .select('is_paid')
-          .eq('id', id)
-          .single();
-
-        if (error) {
-          console.error('Error loading purchase status:', error);
-        } else if (data?.is_paid) {
-          toast.info("You've already purchased this mystery!");
-          navigate(`/mystery/${id}`);
-          return;
-        }
-      }
-
-      const { data, error } = await supabase
-        .from('conversations')
-        .select('*, mystery_data, messages(*)')
-        .eq('id', id)
-        .single();
-
-      if (error) {
-        console.error('Error loading mystery:', error);
-        toast.error('Failed to load mystery preview');
-        return;
-      }
-
-      const mysteryData = {
-        id: data.id,
-        name: data.title || 'Mystery Preview',
-        theme: data.mystery_data?.theme || 'Classic Mystery',
-        num_players: data.mystery_data?.playerCount || 6,
-        content: '',
-        premise: extractPremiseFromMessages(data.messages || [])
-      };
-
-      setMystery(mysteryData);
-    } catch (error) {
-      console.error('Error in loadMystery:', error);
-      toast.error('An error occurred while loading the mystery.');
-    } finally {
-      setLoading(false);
-    }
-  }, [id, navigate, user?.id]);
-
-  useEffect(() => {
-    loadMystery();
-  }, [loadMystery]);
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
-    if (polling && id) {
-      interval = setInterval(async () => {
-        try {
-          console.log("Polling for payment status...");
-          const { data, error } = await supabase
-            .from('conversations')
-            .select('is_paid')
-            .eq('id', id)
-            .single();
-  
-          console.log("Poll result:", data, error);
-          
-          if (!error && data?.is_paid) {
-            console.log("Payment confirmed! Redirecting...");
-            toast.success("Payment confirmed! Loading your package...");
-            setPolling(false);
-            navigate(`/mystery/${id}`);
-          }
-        } catch (e) {
-          console.error("Polling failed:", e);
-        }
-      }, 2000);
-    }
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [polling, id, navigate]);
-
-  const openStripeCheckoutAndPoll = (checkoutUrl: string) => {
-    if (!user?.id) {
-      toast.error("Please sign in to purchase this mystery");
-      navigate("/sign-in");
-      return;
-    }
-    setPolling(true);
-    window.open(checkoutUrl, "_blank");
-    toast.info("Please complete your purchase in the newly opened Stripe window. This page will unlock automatically when payment is complete.");
-  };
-
-  const handleRealPurchase = () => {
-    openStripeCheckoutAndPoll("https://buy.stripe.com/6oE6rm1fT4BRdyM3cd");
-  };
-
-  const handleSimulatePurchase = async () => {
-    if (!user?.id) {
-      toast.error("Please sign in to simulate a purchase");
-      navigate("/sign-in");
-      return;
-    }
-    setPurchasing(true);
-    try {
-      const { error } = await supabase
-        .from('conversations')
-        .update({ is_paid: true, purchase_date: new Date().toISOString() })
-        .eq('id', id);
-
-      if (error) {
-        toast.error("Simulate purchase failed.");
-        setPurchasing(false);
-      } else {
-        toast.success("Simulated purchase complete! Unlocking your package...");
-        navigate(`/mystery/${id}`);
-      }
-    } catch (err) {
-      toast.error("Unexpected error during simulated purchase.");
-      setPurchasing(false);
-    }
-  };
-
-  if (isUserLoading || loading) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <div className="container mx-auto py-10 flex-1">
-          <Skeleton className="h-10 w-80 mb-4" />
-          <Skeleton className="h-64 w-full rounded-md" />
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Skeleton className="h-48 rounded-md" />
-            <Skeleton className="h-48 rounded-md" />
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
-
-  if (!mystery) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <div className="container mx-auto py-10 flex-1 text-center">
-          <p className="text-lg text-muted-foreground">Mystery not found.</p>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      
-      <main className="container mx-auto py-10 flex-1">
-        <h1 className="text-3xl font-bold mb-6">{mystery?.name}</h1>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Mystery Preview</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <h3 className="font-bold text-lg mb-2">Theme</h3>
-                <p>{mystery?.theme || 'Classic Murder Mystery'}</p>
-              </div>
-              
-              <div>
-                <h3 className="font-bold text-lg mb-2">Number of Players</h3>
-                <p>{mystery?.num_players || 6} players</p>
-              </div>
-              
-              <div>
-                <h3 className="font-bold text-lg mb-2">Premise</h3>
-                <p className="whitespace-pre-line">{mystery?.premise}</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Purchase This Mystery</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-start gap-4 mb-4">
-                <div className="h-12 w-12 rounded bg-primary/10 flex items-center justify-center shrink-0">
-                  <CreditCard className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <div className="font-bold text-2xl mb-1">$4.99</div>
-                  <p className="text-muted-foreground">One-time purchase, instant access</p>
-                </div>
-              </div>
-              
-              <div className="space-y-3">
-                <h3 className="font-medium">What's included:</h3>
-                {[
-                  "Full character profiles for all suspects",
-                  "Host guide with step-by-step instructions",
-                  "Printable character sheets",
-                  "Evidence and clue cards",
-                  "Timeline of events",
-                  "Solution reveal script",
-                  "PDF downloads of all materials"
-                ].map((item, index) => (
-                  <div key={index} className="flex items-start gap-2">
-                    <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span>{item}</span>
-                  </div>
-                ))}
-              </div>
-
-              <Button
-                onClick={handleRealPurchase}
-                disabled={purchasing}
-                className="w-full mt-4"
-                aria-label="Buy with Stripe (Production)"
-              >
-                Purchase Now
-              </Button>
-
-              <Button
-                onClick={handleSimulatePurchase}
-                variant="outline"
-                disabled={purchasing}
-                className="w-full mt-2"
-                aria-label="Simulate Test Purchase"
-              >
-                Simulate Purchase (Dev Mode)
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
+    useEffect(() => {
+        if (!id) return;
         
-        <div className="mt-8 text-center">
-          <Button variant="outline" onClick={() => navigate("/dashboard")}>
-            Back to Dashboard
-          </Button>
+        // Load test mode setting from localStorage
+        setTestModeEnabled(getTestModeEnabled());
+        
+        // Check for abandoned generation
+        const checkForAbandonedGeneration = async () => {
+            try {
+                const status = await getPackageGenerationStatus(id);
+                if ((status.status === 'in_progress' || status.status === 'failed') && status.resumable) {
+                    setResumable(true);
+                    setGenerationAbandoned(true);
+                    toast.info("We found an incomplete mystery generation that can be resumed");
+                }
+            } catch (error) {
+                console.error("Error checking for abandoned generation:", error);
+            }
+        };
+        
+        const fetchMystery = async () => {
+            try {
+                setLoading(true);
+                
+                // Check subscription status
+                if (user) {
+                    const { data: profile } = await supabase
+                        .from("profiles")
+                        .select("is_subscribed, subscription_tier")
+                        .eq("id", user.id)
+                        .single();
+                        
+                    if (profile) {
+                        setIsPremiumUser(profile.is_subscribed || profile.subscription_tier === 'premium');
+                    }
+                }
+                
+                // Get mystery data 
+                const { data: mystery, error: mysteryError } = await supabase
+                    .from("conversations")
+                    .select("*, messages(*)")
+                    .eq("id", id)
+                    .order("created_at", { ascending: true })
+                    .single();
+                    
+                if (mysteryError) {
+                    toast.error("Failed to load mystery preview");
+                    console.error(mysteryError);
+                    return;
+                }
+
+                if (!mystery) {
+                    toast.error("Mystery not found");
+                    navigate("/dashboard");
+                    return;
+                }
+                
+                setMystery(mystery);
+                
+                // Extract messages, format, and sort by timestamp
+                if (mystery.messages && mystery.messages.length > 0) {
+                    const formattedMessages = mystery.messages.map((msg: any) => ({
+                        content: msg.content,
+                        is_ai: msg.role === "assistant",
+                        timestamp: new Date(msg.created_at || Date.now())
+                    }));
+                    
+                    formattedMessages.sort((a: any, b: any) => 
+                        a.timestamp.getTime() - b.timestamp.getTime()
+                    );
+                    
+                    setMessages(formattedMessages);
+                    
+                    // Look for the AI's response with the mystery
+                    const aiResponses = formattedMessages.filter((msg: Message) => msg.is_ai);
+                    if (aiResponses.length > 0) {
+                        // Find the first response with a proper mystery format
+                        const mysteryResponse = aiResponses.find(msg => 
+                            msg.content.includes("PREMISE") && 
+                            msg.content.includes("CHARACTER") && 
+                            msg.content.includes("#")
+                        ) || aiResponses[aiResponses.length - 1];
+                        
+                        if (mysteryResponse) {
+                            setMysteryPreview(mysteryResponse.content);
+                        }
+                    }
+                }
+                
+                // Extract title from mystery data or messages
+                let extractedTitle = "";
+                
+                if (mystery.title && mystery.title !== `${mystery.mystery_data?.theme} Mystery`) {
+                    // Use conversation title if it's been customized
+                    extractedTitle = mystery.title;
+                } else {
+                    // Try to extract from AI messages
+                    const aiMessages = (mystery.messages || []).filter((msg: any) => msg.role === "assistant");
+                    
+                    if (aiMessages.length > 0) {
+                        for (const msg of aiMessages) {
+                            // Look for text that appears to be a title - typically in quotes or after a # at the start
+                            const titlePattern = /^#+\s*["']([^"']+)["']|^#+\s*([A-Z][A-Z\s]+)|^["']([^"']+)["']\s*-/m;
+                            const match = msg.content.match(titlePattern);
+                            
+                            if (match) {
+                                extractedTitle = match[1] || match[2] || match[3] || "";
+                                break;
+                            }
+                        }
+                    }
+                    
+                    // Fallback to theme if we couldn't find a title
+                    if (!extractedTitle && mystery.mystery_data?.theme) {
+                        extractedTitle = `${mystery.mystery_data.theme} Mystery`;
+                    }
+                }
+                
+                setTitle(extractedTitle || "Murder Mystery");
+                
+                // Check for abandoned generation
+                await checkForAbandonedGeneration();
+                
+            } catch (error) {
+                console.error("Error fetching mystery:", error);
+                toast.error("Failed to load mystery data");
+            } finally {
+                setLoading(false);
+            }
+        };
+        
+        fetchMystery();
+    }, [id, user, navigate]);
+
+    const handleGenerateClick = async () => {
+        if (!isAuthenticated) {
+            toast.error("Please sign in to generate a complete mystery package");
+            navigate("/sign-in");
+            return;
+        }
+
+        if (!id) {
+            toast.error("Mystery ID is missing");
+            return;
+        }
+
+        // Warning message toast
+        toast.info(
+            <div className="space-y-2">
+                <div className="font-semibold flex items-center gap-2">
+                    <AlertTriangleIcon className="h-4 w-4" />
+                    <span>Please keep this tab open</span>
+                </div>
+                <p className="text-sm">Generation takes 5-10 minutes and requires this browser tab to remain open and active. Closing will interrupt the process.</p>
+            </div>,
+            { duration: 7000 }
+        );
+
+        try {
+            setGenerating(true);
+            
+            // Generate with or without test mode
+            if (!resumable) {
+                // Start new generation
+                await generateCompletePackage(id, testModeEnabled);
+                toast.success("Generation started successfully!");
+            } else {
+                // Resume previous generation
+                await resumePackageGeneration(id, testModeEnabled);
+                toast.success("Generation resumed successfully!");
+            }
+            
+            // Navigate to the view page to see results and progress
+            navigate(`/mystery/${id}`);
+        } catch (error) {
+            console.error("Error generating mystery:", error);
+            setGenerating(false);
+            toast.error("Failed to start generation. Please try again.");
+        }
+    };
+
+    const handleTestModeChange = (enabled: boolean) => {
+        setTestModeEnabled(enabled);
+        toggleTestMode(enabled);
+        
+        if (enabled) {
+            toast.info("Test mode enabled. This will generate shorter content for testing purposes.");
+        } else {
+            toast.info("Test mode disabled. Will generate full-length content.");
+        }
+    };
+
+    // Extract premise from mystery preview for display
+    const extractPremise = (content: string): string => {
+        if (!content) return "";
+        
+        const premisePattern = /##\s*PREMISE\s*\n([\s\S]*?)(?=##|$)/i;
+        const match = content.match(premisePattern);
+        
+        if (match && match[1]) {
+            // Return just the first paragraph of the premise
+            const paragraphs = match[1].split('\n\n');
+            return paragraphs[0].trim();
+        }
+        
+        return "";
+    };
+
+    // Simple function to sanitize and format the mystery title
+    const formatTitle = (title: string): string => {
+        return title.replace(/["']/g, '').trim();
+    };
+
+    const premise = extractPremise(mysteryPreview);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex flex-col">
+                <Header />
+                <main className="flex-1 py-12 px-4">
+                    <div className="container mx-auto max-w-4xl">
+                        <div className="flex justify-center">
+                            <LoaderIcon className="h-12 w-12 animate-spin text-primary" />
+                        </div>
+                    </div>
+                </main>
+                <Footer />
+            </div>
+        );
+    }
+
+    return (
+        <div className="min-h-screen flex flex-col">
+            <Header />
+            <main className="flex-1 py-12 px-4">
+                <div className="container mx-auto max-w-4xl">
+                    <div className="mb-8">
+                        <h1 className="text-3xl font-bold mb-2">{formatTitle(title)}</h1>
+                        <p className="text-muted-foreground">
+                            Preview your murder mystery and generate the complete package.
+                        </p>
+                    </div>
+                    
+                    {generationAbandoned && (
+                        <Alert variant="warning" className="mb-6">
+                            <AlertTriangleIcon className="h-4 w-4" />
+                            <AlertTitle>Incomplete Generation Found</AlertTitle>
+                            <AlertDescription>
+                                We found an incomplete mystery generation that was interrupted. You can resume it from where it left off.
+                            </AlertDescription>
+                        </Alert>
+                    )}
+
+                    <Card className="mb-6">
+                        <CardHeader>
+                            <CardTitle>Mystery Preview</CardTitle>
+                            <CardDescription>
+                                A preview of your murder mystery package
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="max-h-96 overflow-y-auto">
+                            {premise ? (
+                                <div className="space-y-4">
+                                    <div className="prose prose-stone dark:prose-invert">
+                                        <ReactMarkdown>
+                                            {premise}
+                                        </ReactMarkdown>
+                                        <div className="mt-2 italic text-muted-foreground">
+                                            [Preview only shows the introduction. The complete mystery includes character details, clues, host instructions, and all materials needed to run your event.]
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="text-center py-12">
+                                    <p className="text-muted-foreground">No preview available</p>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+
+                    <Card className="mb-6">
+                        <CardHeader>
+                            <CardTitle>Generate Full Mystery Package</CardTitle>
+                            <CardDescription>
+                                Get complete character guides, host instructions, and game materials
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <Alert className="mb-4">
+                                <InfoIcon className="h-4 w-4" />
+                                <AlertTitle>Important Information</AlertTitle>
+                                <AlertDescription className="space-y-2">
+                                    <p>Generating a complete mystery package takes 5-10 minutes. Your browser tab must remain open during generation.</p>
+                                    <p>Closing the browser or putting your computer to sleep will interrupt the process, but you can resume later.</p>
+                                </AlertDescription>
+                            </Alert>
+                            
+                            <div className="mt-4 flex items-center space-x-2">
+                                <Label htmlFor="test-mode">Test Mode (Shorter Content)</Label>
+                                <Switch 
+                                    id="test-mode" 
+                                    checked={testModeEnabled}
+                                    onCheckedChange={handleTestModeChange}
+                                />
+                            </div>
+                            
+                            <p className="text-xs text-muted-foreground mt-2">
+                                Test mode generates a shorter mystery package that uses less AI credits, perfect for testing.
+                            </p>
+                        </CardContent>
+                        <CardFooter className="flex justify-between flex-col sm:flex-row gap-4">
+                            <div>
+                                <Button 
+                                    onClick={handleGenerateClick} 
+                                    disabled={generating}
+                                    className="w-full sm:w-auto"
+                                    variant="default"
+                                >
+                                    {resumable ? (
+                                        <>
+                                            <PlayIcon className="mr-2 h-4 w-4" />
+                                            Resume Generation
+                                        </>
+                                    ) : (
+                                        <>
+                                            <ClockIcon className="mr-2 h-4 w-4" />
+                                            Generate Full Package
+                                        </>
+                                    )}
+                                </Button>
+                                <p className="text-xs text-muted-foreground mt-2">
+                                    {resumable ? "Continue from where you left off." : "Generate a complete package including all character guides, clues and printable materials."}
+                                </p>
+                            </div>
+                            <Button 
+                                variant="outline" 
+                                onClick={() => navigate(`/mystery/edit/${id}`)}
+                                className="w-full sm:w-auto"
+                            >
+                                Continue Editing
+                            </Button>
+                        </CardFooter>
+                    </Card>
+                </div>
+            </main>
+            <Footer />
         </div>
-      </main>
-      
-      <Footer />
-    </div>
-  );
-}
+    );
+};
+
+export default MysteryPreview;
