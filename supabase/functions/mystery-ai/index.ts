@@ -2,7 +2,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { Anthropic } from "https://esm.sh/@anthropic-ai/sdk@0.39.0";
 
-// More permissive CORS headers
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
@@ -21,8 +20,10 @@ serve(async (req) => {
   }
 
   try {
-    // Get API key from environment variables
+    // Get API key and prompts from environment variables
     const anthropicApiKey = Deno.env.get('ANTHROPIC_API_KEY');
+    const freeMysteryPrompt = Deno.env.get('MYSTERY_FREE_PROMPT');
+    const paidMysteryPrompt = Deno.env.get('MYSTERY_PAID_PROMPT');
     
     if (!anthropicApiKey) {
       console.error("Missing Anthropic API key in environment variables");
@@ -73,10 +74,11 @@ serve(async (req) => {
 
     console.log(`Processing request with ${messages.length} messages and prompt version: ${promptVersion}`);
 
-    // Get the appropriate system prompt based on promptVersion
-    const systemPrompt = system || (promptVersion === 'paid' 
-      ? "You are an AI assistant that helps create detailed murder mystery party games. Since the user has purchased, provide complete character details, clues, and all game materials."
-      : "You are an AI assistant that helps create murder mystery party games. Create an engaging storyline and suggest character ideas, but don't provide complete details as this is a preview.");
+    // Determine system prompt
+    const systemPrompt = system || 
+      (promptVersion === 'paid' 
+        ? (paidMysteryPrompt || "You are an AI assistant that helps create detailed murder mystery party games. Provide complete character details, clues, and all game materials.")
+        : (freeMysteryPrompt || "You are an AI assistant that helps create murder mystery party games. Create an engaging storyline and suggest character ideas, but don't provide complete details as this is a preview."));
 
     try {
       const response = await anthropic.messages.create({
@@ -117,3 +119,4 @@ serve(async (req) => {
     );
   }
 });
+
