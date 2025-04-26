@@ -28,19 +28,20 @@ serve(async (req) => {
 
     const anthropic = new Anthropic({ apiKey: anthropicApiKey });
     
-    const { messages, system, promptVersion, requireFormatValidation } = await req.json();
+    const { messages, system, promptVersion, requireFormatValidation, chunkSize } = await req.json();
     
     if (!messages || !Array.isArray(messages)) {
       throw new Error("Missing or invalid messages parameter");
     }
 
     console.log(`Processing request with ${messages.length} messages and prompt version: ${promptVersion}`);
+    console.log(`Chunk size requested: ${chunkSize || 'default'}`);
 
     // Combine system prompts to ensure format is preserved
     let finalSystemPrompt = "";
     const outputFormatSection = `
 ## OUTPUT FORMAT
-Present your mystery preview in an engaging, dramatic format that will excite the user. Include:
+Present your murder mystery preview in an engaging, dramatic format that will excite the user. Include:
 
 # "[CREATIVE TITLE]" - A [THEME] MURDER MYSTERY
 
@@ -83,16 +84,36 @@ Present your mystery preview in an engaging, dramatic format that will excite th
     console.log("System prompt length:", finalSystemPrompt.length);
     console.log("System prompt preview:", finalSystemPrompt.substring(0, 100) + "...");
     
+    // Determine model and parameters based on the request
+    let model = "claude-3-opus-20240229";
+    let maxTokens = promptVersion === 'paid' ? 12000 : 4000;
+    let temperature = promptVersion === 'paid' ? 0.7 : 0.3;
+    
+    // If we're requesting a larger chunk size, adjust parameters
+    if (chunkSize && chunkSize > 1000) {
+      maxTokens = Math.min(24000, chunkSize * 3); // Scale up tokens but cap at 24k
+      temperature = 0.5; // Middle ground temperature
+      console.log(`Adjusted max tokens to ${maxTokens} for large response`);
+    }
+    
     try {
+      // Set a longer timeout for large responses
+      const timeout = promptVersion === 'paid' ? 55000 : 25000; // 55s for paid, 25s for free
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeout);
+      
       const response = await anthropic.messages.create({
-        model: "claude-3-opus-20240229",
+        model,
         system: finalSystemPrompt,
-        messages: messages,
-        max_tokens: 4000,
-        temperature: 0.3, // Lower temperature for better format adherence
+        messages,
+        max_tokens: maxTokens,
+        temperature,
       });
       
+      clearTimeout(timeoutId);
+      
       console.log("Received response from Anthropic API");
+      console.log(`Response length: ${response.content[0].text.length} characters`);
       
       // Less strict validation - just check for basic elements
       const content = response.content[0].text;
@@ -120,6 +141,12 @@ Present your mystery preview in an engaging, dramatic format that will excite th
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     } catch (apiError) {
+      // Check if it was an abort error
+      if (apiError.name === 'AbortError') {
+        console.error("Request timed out");
+        throw new Error("Request timed out while waiting for Anthropic response");
+      }
+      
       console.error("Error calling Anthropic API:", apiError);
       throw apiError;
     }

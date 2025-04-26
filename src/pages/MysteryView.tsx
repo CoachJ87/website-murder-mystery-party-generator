@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -6,19 +7,19 @@ import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { supabase } from "@/lib/supabase";
-import { generateCompletePackage } from "@/services/mysteryPackageService";
+import { generateCompletePackage, getPackageGenerationStatus, GenerationStatus } from "@/services/mysteryPackageService";
 import { useAuth } from "@/context/AuthContext";
 import { RefreshCw } from "lucide-react";
 import MysteryPackageTabView from "@/components/MysteryPackageTabView";
-
-// This component needs to be created (see code below)
-// import MysteryPackageTabView from "@/components/MysteryPackageTabView";
+import { Progress } from "@/components/ui/progress";
 
 const MysteryView = () => {
   const [mystery, setMystery] = useState<any | null>(null);
   const [packageContent, setPackageContent] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
+  const [generationStatus, setGenerationStatus] = useState<GenerationStatus | null>(null);
+  const [statusCheckInterval, setStatusCheckInterval] = useState<number | null>(null);
   const { id } = useParams();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
@@ -32,7 +33,7 @@ const MysteryView = () => {
         // Get the conversation and check if it's paid
         const { data: conversation, error } = await supabase
           .from("conversations")
-          .select("*, mystery_data, is_paid, has_complete_package")
+          .select("*, mystery_data, is_paid, has_complete_package, needs_package_generation")
           .eq("id", id)
           .single();
 
@@ -49,6 +50,17 @@ const MysteryView = () => {
         }
 
         setMystery(conversation);
+
+        // Check if we need to show generation status
+        if (conversation.needs_package_generation) {
+          const status = await getPackageGenerationStatus(id);
+          setGenerationStatus(status);
+          
+          // Start status polling
+          if (status.status === 'in_progress') {
+            startStatusPolling();
+          }
+        }
 
         // Check if we already have generated package content
         if (conversation.has_complete_package) {
@@ -71,7 +83,55 @@ const MysteryView = () => {
     };
 
     fetchMystery();
+    
+    // Cleanup
+    return () => {
+      if (statusCheckInterval) {
+        clearInterval(statusCheckInterval);
+      }
+    };
   }, [id, navigate]);
+
+  const startStatusPolling = () => {
+    // Clear any existing interval
+    if (statusCheckInterval) {
+      clearInterval(statusCheckInterval);
+    }
+    
+    // Check status every 5 seconds
+    const interval = setInterval(async () => {
+      if (!id) return;
+      
+      try {
+        const status = await getPackageGenerationStatus(id);
+        setGenerationStatus(status);
+        
+        if (status.status === 'completed') {
+          // Package generation complete, fetch content
+          const { data: packageData } = await supabase
+            .from("mystery_packages")
+            .select("content")
+            .eq("conversation_id", id)
+            .single();
+            
+          if (packageData) {
+            setPackageContent(packageData.content);
+            clearInterval(interval);
+            setStatusCheckInterval(null);
+            toast.success("Your mystery package is ready!");
+          }
+        } else if (status.status === 'failed') {
+          clearInterval(interval);
+          setStatusCheckInterval(null);
+          toast.error("There was an issue generating your package");
+        }
+      } catch (error) {
+        console.error("Error checking generation status:", error);
+      }
+    }, 5000);
+    
+    setStatusCheckInterval(interval);
+  };
 
   const handleGeneratePackage = async () => {
     if (!id) {
@@ -83,33 +143,28 @@ const MysteryView = () => {
     try {
       toast.info("Generating your complete murder mystery package. This may take a few minutes...");
       
-      const content = await generateCompletePackage(id);
-      setPackageContent(content);
-      
-      // Save the generated package
-      await supabase
-        .from("conversations")
-        .update({ 
-          has_complete_package: true,
-          package_generated_at: new Date().toISOString()
+      // Start generation
+      generateCompletePackage(id)
+        .then(content => {
+          setPackageContent(content);
+          setGenerating(false);
+          toast.success("Your complete mystery package is ready!");
         })
-        .eq("id", id);
-        
-      // Also save in mystery_packages table
-      await supabase
-        .from("mystery_packages")
-        .upsert({ 
-          conversation_id: id,
-          content: content,
-          created_at: new Date().toISOString()
+        .catch(error => {
+          console.error("Error in package generation:", error);
+          setGenerating(false);
+          toast.error("There was an issue generating your package. Please try again.");
         });
-        
-      toast.success("Your complete mystery package is ready!");
+      
+      // Start polling for status updates
+      const initialStatus = await getPackageGenerationStatus(id);
+      setGenerationStatus(initialStatus);
+      startStatusPolling();
+      
     } catch (error: any) {
-      console.error("Error generating package:", error);
-      toast.error(error.message || "Failed to generate complete package");
-    } finally {
+      console.error("Error starting package generation:", error);
       setGenerating(false);
+      toast.error(error.message || "Failed to start package generation");
     }
   };
 
@@ -141,6 +196,36 @@ const MysteryView = () => {
     return summary;
   };
 
+  // Show in-progress generation UI
+  const renderGenerationProgress = () => {
+    if (!generationStatus) return null;
+    
+    return (
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Generating Your Mystery Package</CardTitle>
+          <CardDescription>
+            This process may take a few minutes. You can leave this page and return later.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span>{generationStatus.currentStep}</span>
+              <span>{generationStatus.progress}%</span>
+            </div>
+            <Progress value={generationStatus.progress} />
+          </div>
+          
+          <p className="text-sm text-muted-foreground">
+            We're creating a custom murder mystery package based on your conversations. 
+            This includes host instructions, character guides, and all game materials.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -153,6 +238,9 @@ const MysteryView = () => {
               Your purchased murder mystery package.
             </p>
           </div>
+
+          {/* Show generation progress if applicable */}
+          {generationStatus && generationStatus.status === 'in_progress' && renderGenerationProgress()}
 
           {packageContent ? (
             <MysteryPackageTabView 
@@ -193,7 +281,7 @@ const MysteryView = () => {
                     {generating ? (
                       <>
                         <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                        Generating Full Package (This may take a few minutes)...
+                        Starting Generation (This may take a few minutes)...
                       </>
                     ) : (
                       "Generate Complete Mystery Package"
