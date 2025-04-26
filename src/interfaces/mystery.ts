@@ -1,3 +1,4 @@
+
 export interface MysteryData {
   title?: string; // Making title optional to fix the type error
   theme?: string;
@@ -49,4 +50,5 @@ export interface Mystery {
       clues: boolean;
     };
   };
+  purchase_date?: string;
 }

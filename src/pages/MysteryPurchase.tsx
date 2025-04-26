@@ -30,31 +30,40 @@ const MysteryPurchase = () => {
       toast.loading("Processing payment...");
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // Update the conversation to mark it as purchased
+      const purchaseDate = new Date().toISOString();
+      
+      // Update the conversation to mark it as purchased with ALL purchase-related fields
       if (user && id) {
         const { error: conversationError } = await supabase
           .from("conversations")
           .update({ 
             is_purchased: true,
-            purchase_date: new Date().toISOString()
+            is_paid: true,
+            display_status: "purchased",
+            purchase_date: purchaseDate,
+            mystery_data: {
+              status: "purchased"
+            }
           })
           .eq("id", id);
           
         if (conversationError) {
           console.error("Error updating conversation:", conversationError);
+          throw new Error("Failed to update purchase status");
         }
         
-        // If user has profile table, you could update it too
+        // If user has profile table, update it too
         const { error: profileError } = await supabase
           .from("profiles")
           .upsert({ 
             id: user.id,
             has_purchased: true,
-            updated_at: new Date().toISOString()
+            updated_at: purchaseDate
           });
           
         if (profileError) {
           console.error("Error updating profile:", profileError);
+          // Don't throw here, as the purchase was successful even if profile update fails
         }
       }
       

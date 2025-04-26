@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -93,7 +94,7 @@ const MysteryDashboard = () => {
 
       const { data: conversationsData, error: conversationsError } = await supabase
         .from("conversations")
-        .select("id, title, created_at, updated_at, mystery_data")
+        .select("id, title, created_at, updated_at, mystery_data, display_status, is_paid, purchase_date")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
@@ -118,16 +119,29 @@ const MysteryDashboard = () => {
           
           const title = aiTitle || conversation.title || `${theme} Mystery`;
           
+          // Determine the true status - prioritize database fields over mystery_data
+          let status: "draft" | "purchased" | "archived";
+          
+          if (conversation.is_paid === true || conversation.display_status === "purchased") {
+            status = "purchased";
+          } else if (conversation.display_status === "archived") {
+            status = "archived";
+          } else {
+            // Fall back to mystery_data status if available, otherwise default to "draft"
+            status = mysteryData.status || "draft";
+          }
+          
           return {
             id: conversation.id,
             title: title,
             created_at: conversation.created_at,
             updated_at: conversation.updated_at || conversation.created_at,
-            status: mysteryData.status || "draft",
+            status: status,
             theme: theme,
             guests: mysteryData.playerCount || mysteryData.numberOfGuests,
-            is_purchased: false,
-            ai_title: aiTitle
+            is_purchased: conversation.is_paid === true || conversation.display_status === "purchased",
+            ai_title: aiTitle,
+            purchase_date: conversation.purchase_date
           };
         })
       );
@@ -199,6 +213,9 @@ const MysteryDashboard = () => {
         .update({
           display_status: newStatus,
           updated_at: new Date().toISOString(),
+          // Update both fields to ensure consistency
+          is_paid: newStatus === "purchased",
+          purchase_date: newStatus === "purchased" ? new Date().toISOString() : null,
           mystery_data: {
             ...mysteryToUpdate,
             status: newStatus
@@ -211,7 +228,13 @@ const MysteryDashboard = () => {
       setMysteries(
         mysteries.map((mystery) =>
           mystery.id === id
-            ? { ...mystery, status: newStatus, updated_at: new Date().toISOString() }
+            ? { 
+                ...mystery, 
+                status: newStatus, 
+                updated_at: new Date().toISOString(),
+                is_purchased: newStatus === "purchased",
+                purchase_date: newStatus === "purchased" ? new Date().toISOString() : undefined
+              }
             : mystery
         )
       );

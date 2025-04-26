@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,16 +14,18 @@ interface MysteryCardProps {
 }
 
 export const MysteryCard = ({ mystery, onStatusChange, onDelete, onEdit }: MysteryCardProps) => {
-  const isPurchased = mystery.status === "purchased" || mystery.is_purchased === true;
+  // Check multiple status indicators for purchase status
+  const isPurchased = mystery.status === "purchased" || 
+                      mystery.is_purchased === true;
 
   return (
-    <Card className={`${isPurchased ? "border-primary" : ""}`}>
+    <Card className={`${isPurchased ? "border-primary border-2" : ""}`}>
       <CardHeader>
         <CardTitle className="flex justify-between items-start gap-2">
           <span className="truncate">{mystery.title}</span>
           <div>
             {isPurchased ? (
-              <Badge variant="default" className="bg-primary">
+              <Badge variant="default" className="bg-primary font-semibold">
                 <CheckCircle2 className="h-3 w-3 mr-1" />
                 Purchased
               </Badge>
@@ -51,6 +54,12 @@ export const MysteryCard = ({ mystery, onStatusChange, onDelete, onEdit }: Myste
         {mystery.guests && (
           <p className="text-sm text-muted-foreground">
             Guests: {mystery.guests}
+          </p>
+        )}
+        {mystery.purchase_date && (
+          <p className="text-sm text-primary-foreground font-medium">
+            <CheckCircle2 className="inline-block h-4 w-4 mr-1 text-primary" />
+            Purchased: {new Date(mystery.purchase_date).toLocaleDateString()}
           </p>
         )}
         

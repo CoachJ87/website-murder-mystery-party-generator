@@ -68,14 +68,17 @@ const MysteryView = () => {
           setPackageContent(packageData.content);
           clearStatusPolling();
           toast.success("Your mystery package is ready!");
+          
           await supabase
             .from("conversations")
             .update({
               status: "purchased",
               is_paid: true,
+              is_purchased: true,
               display_status: "purchased"
             })
             .eq("id", id);
+          
           if (window.location.pathname.includes('/preview/')) {
             navigate(`/mystery/${id}`);
           }
@@ -142,6 +145,19 @@ const MysteryView = () => {
           
           if (status.status === 'in_progress') {
             startStatusPolling();
+          } else if (status.status === 'completed') {
+            await supabase
+              .from("conversations")
+              .update({
+                is_paid: true,
+                is_purchased: true,
+                display_status: "purchased",
+                mystery_data: {
+                  ...conversation.mystery_data,
+                  status: "purchased"
+                }
+              })
+              .eq("id", id);
           }
         }
 
