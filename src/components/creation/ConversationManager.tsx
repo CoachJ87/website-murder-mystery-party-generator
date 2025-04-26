@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
@@ -127,6 +128,7 @@ export const ConversationManager = ({
   };
 
   const createSystemMessage = (data: FormValues) => {
+    // Create the base system message
     let systemMsg = "This is a murder mystery creation conversation. ";
     systemMsg += "The user has ALREADY selected the following preferences, so DO NOT ask about these again: ";
     
@@ -146,6 +148,7 @@ export const ConversationManager = ({
       systemMsg += `Additional details: ${data.additionalDetails}. `;
     }
     
+    // Important change: Always include the full output format directly in the system message
     systemMsg += `\n\nYou MUST follow this exact output format for ALL your responses:
 
 ## OUTPUT FORMAT

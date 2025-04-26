@@ -38,9 +38,36 @@ serve(async (req) => {
 
     // Combine system prompts to ensure format is preserved
     let finalSystemPrompt = "";
+    const outputFormatSection = `
+## OUTPUT FORMAT
+Present your mystery preview in an engaging, dramatic format that will excite the user. Include:
+
+# "[CREATIVE TITLE]" - A [THEME] MURDER MYSTERY
+
+## PREMISE
+[2-3 paragraphs setting the scene, describing the event where the murder takes place, and creating dramatic tension]
+
+## VICTIM
+**[Victim Name]** - [Vivid description of the victim, their role in the story, personality traits, and why they might have made enemies]
+
+## CHARACTER LIST ([PLAYER COUNT] PLAYERS)
+1. **[Character 1 Name]** - [Engaging one-sentence description including profession and connection to victim]
+2. **[Character 2 Name]** - [Engaging one-sentence description including profession and connection to victim]
+[Continue for all characters]
+
+## MURDER METHOD
+[Paragraph describing how the murder was committed, interesting details about the method, and what clues might be found]
+
+[After presenting the mystery concept, ask if the concept works for them and explain that they can continue to make edits and that once they are done they can press the 'Generate Mystery' button to create a complete game package with detailed character guides, host instructions, and game materials if they choose to purchase.]
+`;
+
     if (system) {
+      // If a custom system prompt is provided, make sure it includes the output format
       finalSystemPrompt = system;
-      console.log("Using provided system instruction");
+      if (!system.includes("OUTPUT FORMAT") && !system.includes("# \"[CREATIVE TITLE]\"")) {
+        finalSystemPrompt += "\n\n" + outputFormatSection;
+      }
+      console.log("Using provided system instruction with OUTPUT FORMAT appended");
     } else {
       finalSystemPrompt = promptVersion === 'paid' ? 
         (paidMysteryPrompt || "Default paid prompt") : 
@@ -48,12 +75,13 @@ serve(async (req) => {
       console.log(`Using ${promptVersion} prompt from environment`);
     }
 
-    // Add format validation enforcement
+    // Add format validation enforcement but less strict
     if (requireFormatValidation) {
-      finalSystemPrompt += "\n\nIMPORTANT: You MUST strictly follow the OUTPUT FORMAT section above. Your response MUST include all required sections in the exact order specified.";
+      finalSystemPrompt += "\n\nIMPORTANT: Your response MUST follow the OUTPUT FORMAT specified above. Include all required sections in the order specified.";
     }
 
     console.log("System prompt length:", finalSystemPrompt.length);
+    console.log("System prompt preview:", finalSystemPrompt.substring(0, 100) + "...");
     
     try {
       const response = await anthropic.messages.create({
@@ -61,22 +89,25 @@ serve(async (req) => {
         system: finalSystemPrompt,
         messages: messages,
         max_tokens: 4000,
-        temperature: 0.2, // Lower temperature for better format adherence
+        temperature: 0.3, // Lower temperature for better format adherence
       });
       
       console.log("Received response from Anthropic API");
       
-      // Validate response format
+      // Less strict validation - just check for basic elements
       const content = response.content[0].text;
       const hasRequiredFormat = 
-        content.includes("# ") && 
-        content.includes("## PREMISE") &&
-        content.includes("## VICTIM") &&
-        content.includes("## CHARACTER LIST");
+        content.includes("#") && 
+        (content.includes("PREMISE") || content.includes("Premise")) && 
+        (content.includes("VICTIM") || content.includes("Victim")) && 
+        (content.includes("CHARACTER") || content.includes("Characters"));
       
       if (!hasRequiredFormat && requireFormatValidation) {
-        console.warn("Response does not follow required format!");
-        throw new Error("AI response did not follow the required format");
+        console.warn("Response does not follow required format! Response preview:", content.substring(0, 300));
+        
+        // We'll still return the response instead of throwing an error
+        // This is to prevent failures when the format is slightly different
+        console.log("Returning response anyway to avoid disrupting user experience");
       }
 
       return new Response(JSON.stringify({

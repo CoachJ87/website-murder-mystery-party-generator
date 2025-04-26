@@ -33,42 +33,64 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
     
     console.log("DEBUG: Calling mystery-ai Edge Function");
 
-    const { data: functionData, error: functionError } = await supabase.functions.invoke('mystery-ai', {
-      body: {
-        messages: standardMessages,
-        system: systemInstruction,
-        promptVersion,
-        requireFormatValidation: true // New flag to enforce format validation
+    let attempts = 0;
+    const maxAttempts = 2;
+    let responseContent = '';
+    
+    while (attempts < maxAttempts) {
+      attempts++;
+      console.log(`DEBUG: Attempt ${attempts} of ${maxAttempts}`);
+      
+      try {
+        const { data: functionData, error: functionError } = await supabase.functions.invoke('mystery-ai', {
+          body: {
+            messages: standardMessages,
+            system: systemInstruction,
+            promptVersion,
+            requireFormatValidation: true // Flag to enforce format validation
+          }
+        });
+
+        if (functionError) {
+          console.error("DEBUG: Edge Function error:", functionError);
+          throw new Error(`Edge Function error: ${functionError.message}`);
+        }
+
+        if (!functionData?.choices?.[0]?.message?.content) {
+          console.error("DEBUG: Invalid response format from Edge Function");
+          throw new Error("Invalid response format from Edge Function");
+        }
+
+        responseContent = functionData.choices[0].message.content;
+        console.log(`DEBUG: Received response (first 100 chars): ${responseContent.substring(0, 100)}...`);
+        
+        // Do a more relaxed validation - just check for some key sections
+        const hasRequiredSections = 
+          responseContent.includes("#") && 
+          (responseContent.includes("PREMISE") || responseContent.includes("Premise")) && 
+          (responseContent.includes("VICTIM") || responseContent.includes("Victim")) && 
+          (responseContent.includes("CHARACTER") || responseContent.includes("Characters"));
+        
+        if (hasRequiredSections || attempts === maxAttempts) {
+          // If format is valid or we've exhausted attempts, return the response
+          return responseContent;
+        } else {
+          console.log("DEBUG: Response does not follow required format, retrying...");
+          // If format is invalid and we haven't exhausted attempts, continue to next attempt
+        }
+      } catch (error) {
+        if (attempts >= maxAttempts) {
+          console.error(`DEBUG: Error in getAIResponse (attempt ${attempts}): ${error.message}`);
+          throw error;
+        }
+        console.warn(`DEBUG: Error in attempt ${attempts}, retrying: ${error.message}`);
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait a bit before retrying
       }
-    });
-
-    if (functionError) {
-      console.error("DEBUG: Edge Function error:", functionError);
-      throw new Error(`Edge Function error: ${functionError.message}`);
-    }
-
-    if (!functionData?.choices?.[0]?.message?.content) {
-      console.error("DEBUG: Invalid response format from Edge Function");
-      throw new Error("Invalid response format from Edge Function");
-    }
-
-    const responseContent = functionData.choices[0].message.content;
-    console.log(`DEBUG: Received response (first 100 chars): ${responseContent.substring(0, 100)}...`);
-    
-    // Validate response format
-    const hasRequiredSections = 
-      responseContent.includes("# ") && 
-      responseContent.includes("## PREMISE") &&
-      responseContent.includes("## VICTIM") &&
-      responseContent.includes("## CHARACTER LIST");
-    
-    if (!hasRequiredSections) {
-      console.error("DEBUG: Response does not follow required format, retrying...");
-      // You could implement a retry mechanism here if needed
-      throw new Error("AI response did not follow the required format");
     }
     
-    return responseContent;
+    // If we've made it here, we've exhausted attempts but didn't get a valid response
+    console.error("DEBUG: Failed to get a properly formatted response after multiple attempts");
+    return responseContent; // Return the last response we got, even if it doesn't match the format
   } catch (error) {
     console.error(`DEBUG: Error in getAIResponse: ${error.message}`);
     throw error;
