@@ -14,7 +14,7 @@ import {
   GenerationStatus 
 } from "@/services/mysteryPackageService";
 import { useAuth } from "@/context/AuthContext";
-import { RefreshCw, AlertTriangle, Clock } from "lucide-react";
+import { RefreshCw, AlertTriangle, Clock, CheckCircle2 } from "lucide-react";
 import MysteryPackageTabView from "@/components/MysteryPackageTabView";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -332,7 +332,7 @@ const MysteryView = () => {
               <span>{generationStatus.currentStep}</span>
               <span>{generationStatus.progress}%</span>
             </div>
-            <Progress value={generationStatus.progress} />
+            <Progress value={generationStatus.progress} className="h-2" />
           </div>
           
           {isIdle && (
@@ -361,7 +361,7 @@ const MysteryView = () => {
             </div>
             
             <div className="flex-1 border rounded-md p-3">
-              <div className="font-medium mb-2">Status</div>
+              <div className="font-medium mb-2">Generation Progress</div>
               <div className="space-y-1">
                 <div className="flex items-center">
                   <div className={`h-2 w-2 rounded-full mr-2 ${generationStatus.sections?.hostGuide ? "bg-green-500" : "bg-muted"}`}></div>

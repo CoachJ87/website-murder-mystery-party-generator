@@ -1,289 +1,105 @@
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Book, Users, FileText, Printer, Download } from "lucide-react";
+import ReactMarkdown from 'react-markdown';
 import { Button } from "@/components/ui/button";
-import { Download, Mail, FileText, Printer, AlertTriangle } from "lucide-react";
-import { toast } from "sonner";
-import SendToGuestsDialog from "@/components/SendToGuestsDialog";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Badge } from '@/components/ui/badge';
-import { GenerationStatus } from '@/services/mysteryPackageService';
+import { GenerationStatus } from "@/services/mysteryPackageService";
 
-interface MysteryPackageTabViewProps {
+export interface MysteryPackageTabViewProps {
   packageContent: string;
   mysteryTitle: string;
   generationStatus?: GenerationStatus;
 }
 
-const MysteryPackageTabView = ({ packageContent, mysteryTitle, generationStatus }: MysteryPackageTabViewProps) => {
-  const [activeTab, setActiveTab] = useState("overview");
-  const [sendToGuestsOpen, setSendToGuestsOpen] = useState(false);
-
-  // Parse the package content sections
-  const sections = parsePackageContent(packageContent);
+const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
+  packageContent,
+  mysteryTitle,
+  generationStatus
+}) => {
+  const [activeTab, setActiveTab] = useState("host-guide");
   
-  // Extract character list for SendToGuests dialog
-  const characters = extractCharacters(packageContent);
-
-  // Check if any sections are incomplete
-  const hasIncompleteContent = generationStatus?.status === 'failed' || 
-                              (!sections.overview || !sections.host || !sections.characters || 
-                               !sections.clues);
-
-  const handleDownloadText = () => {
-    const blob = new Blob([packageContent], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${mysteryTitle.replace(/\s+/g, '_')}_murder_mystery.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast.success("Text file downloaded successfully");
+  // Parse the different sections from the package content
+  const sections = {
+    hostGuide: extractSection(packageContent, "Host Guide"),
+    characters: extractSection(packageContent, "Character"),
+    clues: extractSection(packageContent, "Clue"),
+    materials: extractSection(packageContent, "Printable Material"),
   };
-
-  const handleDownloadPDF = () => {
-    toast.info("PDF generation will be implemented soon!");
-  };
-
-  const handlePrint = () => {
-    const printWindow = window.open('', '_blank');
-    if (printWindow) {
-      printWindow.document.write(`
-        <html>
-          <head>
-            <title>${mysteryTitle} - Murder Mystery</title>
-            <style>
-              body { font-family: Arial, sans-serif; margin: 20px; }
-              h1, h2, h3 { margin-top: 20px; }
-              pre { white-space: pre-wrap; }
-            </style>
-          </head>
-          <body>
-            <pre>${packageContent}</pre>
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
-      printWindow.focus();
-      printWindow.print();
-    } else {
-      toast.error("Unable to open print window. Please check your popup blocker.");
+  
+  function extractSection(content: string, sectionName: string): string {
+    // This is a simple extraction - could be improved with regex based on actual content structure
+    const sectionIndex = content.indexOf(`# ${sectionName}`);
+    if (sectionIndex === -1) return "";
+    
+    const nextSectionIndex = content.indexOf("# ", sectionIndex + 2);
+    if (nextSectionIndex === -1) {
+      return content.substring(sectionIndex);
     }
-  };
-
-  const getSectionStatus = (sectionType: string) => {
-    if (!generationStatus?.sections) return null;
     
-    const sectionMap = {
-      "overview": generationStatus.sections.hostGuide,
-      "host": generationStatus.sections.hostGuide,
-      "characters": generationStatus.sections.characters,
-      "clues": generationStatus.sections.clues
-    };
-    
-    const isComplete = sectionMap[sectionType];
-    
-    return isComplete ? (
-      <Badge variant="outline" className="ml-2 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
-        Complete
-      </Badge>
-    ) : (
-      <Badge variant="outline" className="ml-2 bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300">
-        Pending
-      </Badge>
-    );
-  };
-
+    return content.substring(sectionIndex, nextSectionIndex);
+  }
+  
   return (
-    <div className="space-y-4">
-      {hasIncompleteContent && (
-        <Alert variant="warning" className="mb-4">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Incomplete Package</AlertTitle>
-          <AlertDescription>
-            Some sections of your mystery package may be incomplete due to generation issues. 
-            You can still view the available content, but you may want to regenerate the package.
-          </AlertDescription>
-        </Alert>
-      )}
-      
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">{mysteryTitle}</h2>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={handleDownloadText}>
-            <FileText className="h-4 w-4 mr-2" />
-            Text
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleDownloadPDF}>
-            <Download className="h-4 w-4 mr-2" />
-            PDF
-          </Button>
-          <Button variant="outline" size="sm" onClick={handlePrint}>
-            <Printer className="h-4 w-4 mr-2" />
-            Print
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => setSendToGuestsOpen(true)}>
-            <Mail className="h-4 w-4 mr-2" />
-            Email to Guests
-          </Button>
-        </div>
-      </div>
-
-      <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-4 w-full">
-          <TabsTrigger value="overview">
-            Overview
-            {getSectionStatus("overview")}
-          </TabsTrigger>
-          <TabsTrigger value="host">
-            Host Guide
-            {getSectionStatus("host")}
-          </TabsTrigger>
-          <TabsTrigger value="characters">
-            Characters
-            {getSectionStatus("characters")}
-          </TabsTrigger>
-          <TabsTrigger value="clues">
-            Clues & Evidence
-            {getSectionStatus("clues")}
-          </TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="overview" className="p-4 border rounded-md mt-4">
-          <div className="prose max-w-none">
-            <h2>Murder Mystery Overview</h2>
-            {sections.overview ? (
-              <div dangerouslySetInnerHTML={{ __html: markdownToHtml(sections.overview) }} />
-            ) : (
-              <p className="text-muted-foreground">Overview content is still being generated or is unavailable.</p>
-            )}
+    <Card>
+      <CardContent className="pt-6">
+        <Tabs defaultValue="host-guide" value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <div className="flex items-center mb-4 justify-between">
+            <TabsList className="grid grid-cols-4 w-full max-w-xl">
+              <TabsTrigger value="host-guide" className="flex flex-col gap-1 sm:flex-row sm:gap-2 items-center">
+                <Book className="h-4 w-4" />
+                <span className="hidden sm:block">Host Guide</span>
+                <span className="block sm:hidden">Host</span>
+              </TabsTrigger>
+              <TabsTrigger value="characters" className="flex flex-col gap-1 sm:flex-row sm:gap-2 items-center">
+                <Users className="h-4 w-4" />
+                <span>Characters</span>
+              </TabsTrigger>
+              <TabsTrigger value="clues" className="flex flex-col gap-1 sm:flex-row sm:gap-2 items-center">
+                <FileText className="h-4 w-4" />
+                <span>Clues</span>
+              </TabsTrigger>
+              <TabsTrigger value="materials" className="flex flex-col gap-1 sm:flex-row sm:gap-2 items-center">
+                <Printer className="h-4 w-4" />
+                <span className="hidden sm:block">Materials</span>
+                <span className="block sm:hidden">Print</span>
+              </TabsTrigger>
+            </TabsList>
+            
+            <Button variant="outline" size="sm" className="hidden sm:flex items-center gap-2">
+              <Download className="h-4 w-4" />
+              <span>Download PDF</span>
+            </Button>
           </div>
-        </TabsContent>
-        
-        <TabsContent value="host" className="p-4 border rounded-md mt-4">
-          <div className="prose max-w-none">
-            <h2>Host Guide</h2>
-            {sections.host ? (
-              <div dangerouslySetInnerHTML={{ __html: markdownToHtml(sections.host) }} />
-            ) : (
-              <p className="text-muted-foreground">Host guide is still being generated or is unavailable.</p>
-            )}
+          
+          <div className="sm:hidden flex justify-end mb-4">
+            <Button variant="outline" size="sm" className="flex items-center gap-2">
+              <Download className="h-4 w-4" />
+              <span>Download PDF</span>
+            </Button>
           </div>
-        </TabsContent>
-        
-        <TabsContent value="characters" className="p-4 border rounded-md mt-4">
-          <div className="prose max-w-none">
-            <h2>Character Guides</h2>
-            {sections.characters ? (
-              <div dangerouslySetInnerHTML={{ __html: markdownToHtml(sections.characters) }} />
-            ) : (
-              <p className="text-muted-foreground">Character guides are still being generated or are unavailable.</p>
-            )}
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="clues" className="p-4 border rounded-md mt-4">
-          <div className="prose max-w-none">
-            <h2>Clues & Evidence</h2>
-            {sections.clues ? (
-              <div dangerouslySetInnerHTML={{ __html: markdownToHtml(sections.clues) }} />
-            ) : (
-              <p className="text-muted-foreground">Clues and evidence are still being generated or are unavailable.</p>
-            )}
-          </div>
-        </TabsContent>
-      </Tabs>
-
-      <SendToGuestsDialog 
-        open={sendToGuestsOpen} 
-        onOpenChange={setSendToGuestsOpen} 
-        characters={characters}
-      />
-    </div>
+          
+          <TabsContent value="host-guide" className="prose prose-gray dark:prose-invert max-w-none">
+            <ReactMarkdown>{sections.hostGuide || "Host guide content will appear here."}</ReactMarkdown>
+          </TabsContent>
+          
+          <TabsContent value="characters" className="prose prose-gray dark:prose-invert max-w-none">
+            <ReactMarkdown>{sections.characters || "Character information will appear here."}</ReactMarkdown>
+          </TabsContent>
+          
+          <TabsContent value="clues" className="prose prose-gray dark:prose-invert max-w-none">
+            <ReactMarkdown>{sections.clues || "Clues and evidence information will appear here."}</ReactMarkdown>
+          </TabsContent>
+          
+          <TabsContent value="materials" className="prose prose-gray dark:prose-invert max-w-none">
+            <ReactMarkdown>{sections.materials || "Printable materials will appear here."}</ReactMarkdown>
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+    </Card>
   );
 };
-
-// Helper function to parse the package content into sections
-function parsePackageContent(content: string) {
-  const sections = {
-    overview: '',
-    host: '',
-    characters: '',
-    clues: '',
-  };
-  
-  // Extract overview section
-  const overviewMatch = content.match(/# .+?\n\n([\s\S]*?)(?=\n## Host Guide|\n## Character|$)/i);
-  if (overviewMatch) {
-    sections.overview = overviewMatch[1].trim();
-  }
-  
-  // Extract host guide section
-  const hostMatch = content.match(/## Host Guide\n\n([\s\S]*?)(?=\n## Character|$)/i);
-  if (hostMatch) {
-    sections.host = hostMatch[1].trim();
-  }
-  
-  // Extract characters section
-  const charactersMatch = content.match(/## Character.*?\n\n([\s\S]*?)(?=\n## (?!Character)|$)/i);
-  if (charactersMatch) {
-    sections.characters = charactersMatch[1].trim();
-  }
-  
-  // Extract clues section
-  const cluesMatch = content.match(/## (?:Clues|Evidence|Props).*?\n\n([\s\S]*?)(?=\n## (?!Clue|Evidence|Prop)|$)/i);
-  if (cluesMatch) {
-    sections.clues = cluesMatch[1].trim();
-  }
-  
-  return sections;
-}
-
-// Helper function to extract character list
-function extractCharacters(content: string) {
-  const characters: {name: string, role: string, description: string}[] = [];
-  
-  // Look for character sections in the content
-  const characterBlocks = content.match(/\*\*([^*]+)\*\*\s*(?:-\s*)?([^\n]+)?/g) || [];
-  
-  characterBlocks.forEach(block => {
-    const match = block.match(/\*\*([^*]+)\*\*\s*(?:-\s*)?([^\n]+)?/);
-    if (match) {
-      const name = match[1].trim();
-      const role = match[2]?.trim() || 'Character';
-      const description = 'A character in the murder mystery.';
-      
-      // Only include if it looks like a character name (not a section header)
-      if (name.length < 50 && !name.includes('Host Guide') && !name.includes('Evidence')) {
-        characters.push({
-          name,
-          role,
-          description
-        });
-      }
-    }
-  });
-  
-  return characters;
-}
-
-// Simple markdown to HTML converter
-function markdownToHtml(markdown: string) {
-  return markdown
-    .replace(/## ([^\n]+)/g, '<h2>$1</h2>')
-    .replace(/### ([^\n]+)/g, '<h3>$1</h3>')
-    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-    .replace(/^- (.+)$/gm, '<li>$1</li>')
-    .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
-    .replace(/<li>(.+)<\/li>/g, function(match) {
-      return match.replace(/\n/g, ' ');
-    })
-    .replace(/(<li>.*?<\/li>)\n(<li>)/g, '$1$2')
-    .replace(/\n\n/g, '<br/><br/>')
-    .replace(/\n/g, '<br/>');
-}
 
 export default MysteryPackageTabView;

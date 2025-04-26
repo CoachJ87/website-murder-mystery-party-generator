@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Calendar, Clock, Edit, Archive, Trash, Eye } from "lucide-react";
+import { Calendar, Clock, Edit, Archive, Trash, Eye, CheckCircle2 } from "lucide-react";
 import { Mystery } from "@/interfaces/mystery";
 
 interface MysteryCardProps {
@@ -14,16 +14,21 @@ interface MysteryCardProps {
 }
 
 export const MysteryCard = ({ mystery, onStatusChange, onDelete, onEdit }: MysteryCardProps) => {
-  const isPurchased = mystery.status === "purchased" || mystery.is_purchased;
+  const isPurchased = mystery.status === "purchased" || mystery.is_purchased || mystery.is_paid;
 
   return (
-    <Card className="bg-card">
+    <Card className={`${isPurchased ? "border-primary/30" : "bg-card"}`}>
       <CardHeader>
         <CardTitle className="flex justify-between items-start gap-2">
           <span className="truncate">{mystery.title}</span>
           <div>
-            {mystery.status === "draft" && <Badge variant="secondary">Draft</Badge>}
-            {mystery.status === "purchased" && <Badge>Purchased</Badge>}
+            {isPurchased && (
+              <Badge variant="default" className="bg-primary">
+                <CheckCircle2 className="h-3 w-3 mr-1" />
+                Purchased
+              </Badge>
+            )}
+            {mystery.status === "draft" && !isPurchased && <Badge variant="secondary">Draft</Badge>}
             {mystery.status === "archived" && <Badge variant="outline">Archived</Badge>}
           </div>
         </CardTitle>
@@ -51,14 +56,14 @@ export const MysteryCard = ({ mystery, onStatusChange, onDelete, onEdit }: Myste
         <div className="flex flex-wrap justify-end gap-2 pt-2">
           <Button
             size="sm"
-            variant="secondary"
-            onClick={() => isPurchased ? window.location.href = `/mystery/view/${mystery.id}` : onEdit(mystery.id)}
+            variant={isPurchased ? "default" : "secondary"}
+            onClick={() => isPurchased ? window.location.href = `/mystery/${mystery.id}` : onEdit(mystery.id)}
             className="flex-1 min-w-[80px]"
           >
             {isPurchased ? (
               <>
                 <Eye className="h-4 w-4 mr-2" />
-                View
+                View Mystery
               </>
             ) : (
               <>
@@ -67,53 +72,59 @@ export const MysteryCard = ({ mystery, onStatusChange, onDelete, onEdit }: Myste
               </>
             )}
           </Button>
-          {mystery.status !== "archived" ? (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => onStatusChange(mystery.id, "archived")}
-              className="flex-1 min-w-[80px]"
-            >
-              <Archive className="h-4 w-4 mr-2" />
-              Archive
-            </Button>
-          ) : (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => onStatusChange(mystery.id, "draft")}
-              className="flex-1 min-w-[80px]"
-            >
-              <Edit className="h-4 w-4 mr-2" />
-              Unarchive
-            </Button>
+          
+          {!isPurchased && (
+            <>
+              {mystery.status !== "archived" ? (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => onStatusChange(mystery.id, "archived")}
+                  className="flex-1 min-w-[80px]"
+                >
+                  <Archive className="h-4 w-4 mr-2" />
+                  Archive
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => onStatusChange(mystery.id, "draft")}
+                  className="flex-1 min-w-[80px]"
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  Unarchive
+                </Button>
+              )}
+              
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button 
+                    size="sm" 
+                    variant="destructive"
+                    className="flex-1 min-w-[80px]"
+                  >
+                    <Trash className="h-4 w-4 mr-2" />
+                    Delete
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete your mystery from our servers.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => onDelete(mystery.id)}>
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </>
           )}
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button 
-                size="sm" 
-                variant="destructive"
-                className="flex-1 min-w-[80px]"
-              >
-                <Trash className="h-4 w-4 mr-2" />
-                Delete
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete your mystery from our servers.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={() => onDelete(mystery.id)}>
-                  Delete
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
         </div>
       </CardContent>
     </Card>

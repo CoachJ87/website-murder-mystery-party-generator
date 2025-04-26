@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -358,12 +357,12 @@ const MysteryPreview = () => {
                                     ) : (
                                         <>
                                             <ClockIcon className="mr-2 h-4 w-4" />
-                                            Generate Full Package
+                                            Generate Package
                                         </>
                                     )}
                                 </Button>
                                 <p className="text-xs text-muted-foreground mt-2">
-                                    {resumable ? "Continue from where you left off." : "Generate a complete package including all character guides, clues and printable materials."}
+                                    {resumable ? "Continue from where you left off." : "Takes 5-10 minutes with this browser tab open."}
                                 </p>
                             </div>
                             <Button 
@@ -371,7 +370,7 @@ const MysteryPreview = () => {
                                 onClick={() => navigate(`/mystery/edit/${id}`)}
                                 className="w-full sm:w-auto"
                             >
-                                Continue Editing
+                                Back to Editing
                             </Button>
                         </CardFooter>
                     </Card>
