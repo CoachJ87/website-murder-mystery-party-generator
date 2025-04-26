@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Book, Users, FileText, Printer, Download } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 import { Button } from "@/components/ui/button";
@@ -12,12 +11,14 @@ export interface MysteryPackageTabViewProps {
   packageContent: string;
   mysteryTitle: string;
   generationStatus?: GenerationStatus;
+  isGenerating?: boolean;
 }
 
 const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
   packageContent,
   mysteryTitle,
-  generationStatus
+  generationStatus,
+  isGenerating
 }) => {
   const [activeTab, setActiveTab] = useState("host-guide");
   
@@ -41,6 +42,23 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
     
     return content.substring(sectionIndex, nextSectionIndex);
   }
+  
+  const getTabContent = (section: string, sectionKey: keyof typeof sections) => {
+    if (!sections[sectionKey] && isGenerating) {
+      const isInProgress = generationStatus?.sections?.[sectionKey] === false;
+      const isComplete = generationStatus?.sections?.[sectionKey] === true;
+      
+      if (isComplete) {
+        return "Processing completed content...";
+      } else if (isInProgress) {
+        return `Generating ${section}...`;
+      } else {
+        return `Waiting to generate ${section}...`;
+      }
+    }
+    
+    return sections[sectionKey] || `${section} content will appear here.`;
+  };
   
   return (
     <Card>
@@ -82,19 +100,19 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
           </div>
           
           <TabsContent value="host-guide" className="prose prose-gray dark:prose-invert max-w-none">
-            <ReactMarkdown>{sections.hostGuide || "Host guide content will appear here."}</ReactMarkdown>
+            <ReactMarkdown>{getTabContent("Host Guide", "hostGuide")}</ReactMarkdown>
           </TabsContent>
           
           <TabsContent value="characters" className="prose prose-gray dark:prose-invert max-w-none">
-            <ReactMarkdown>{sections.characters || "Character information will appear here."}</ReactMarkdown>
+            <ReactMarkdown>{getTabContent("Character Information", "characters")}</ReactMarkdown>
           </TabsContent>
           
           <TabsContent value="clues" className="prose prose-gray dark:prose-invert max-w-none">
-            <ReactMarkdown>{sections.clues || "Clues and evidence information will appear here."}</ReactMarkdown>
+            <ReactMarkdown>{getTabContent("Clues and Evidence", "clues")}</ReactMarkdown>
           </TabsContent>
           
           <TabsContent value="materials" className="prose prose-gray dark:prose-invert max-w-none">
-            <ReactMarkdown>{sections.materials || "Printable materials will appear here."}</ReactMarkdown>
+            <ReactMarkdown>{getTabContent("Printable Materials", "materials")}</ReactMarkdown>
           </TabsContent>
         </Tabs>
       </CardContent>

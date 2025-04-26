@@ -3,7 +3,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import Header from "@/components/Header";
@@ -12,8 +11,11 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
 import { Message } from "@/components/types";
 import ReactMarkdown from 'react-markdown';
-import { AlertTriangleIcon, LoaderIcon, RefreshCw } from "lucide-react";
+import { AlertTriangle, Loader2, RefreshCw } from "lucide-react";
 import { generateCompletePackage, resumePackageGeneration, getPackageGenerationStatus, toggleTestMode, getTestModeEnabled } from "@/services/mysteryPackageService";
+import MysteryPackageTabView from "@/components/MysteryPackageTabView";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 const MysteryPreview = () => {
     const [mystery, setMystery] = useState<any | null>(null);
@@ -30,14 +32,14 @@ const MysteryPreview = () => {
     const [resumable, setResumable] = useState(false);
     const [generationAbandoned, setGenerationAbandoned] = useState(false);
     const [generationStatus, setGenerationStatus] = useState<any | null>(null);
+    const [currentContent, setCurrentContent] = useState("");
+    const [activeTab, setActiveTab] = useState("host-guide");
 
     useEffect(() => {
         if (!id) return;
         
-        // Load test mode setting from localStorage
         setTestModeEnabled(getTestModeEnabled());
         
-        // Check for abandoned generation
         const checkForAbandonedGeneration = async () => {
             try {
                 const status = await getPackageGenerationStatus(id);
@@ -50,12 +52,11 @@ const MysteryPreview = () => {
                 console.error("Error checking for abandoned generation:", error);
             }
         };
-        
+
         const fetchMystery = async () => {
             try {
                 setLoading(true);
                 
-                // Check subscription status
                 if (user) {
                     const { data: profile } = await supabase
                         .from("profiles")
@@ -68,7 +69,6 @@ const MysteryPreview = () => {
                     }
                 }
                 
-                // Get mystery data 
                 const { data: mystery, error: mysteryError } = await supabase
                     .from("conversations")
                     .select("*, messages(*)")
@@ -90,7 +90,6 @@ const MysteryPreview = () => {
                 
                 setMystery(mystery);
                 
-                // Extract messages, format, and sort by timestamp
                 if (mystery.messages && mystery.messages.length > 0) {
                     const formattedMessages = mystery.messages.map((msg: any) => ({
                         content: msg.content,
@@ -104,10 +103,8 @@ const MysteryPreview = () => {
                     
                     setMessages(formattedMessages);
                     
-                    // Look for the AI's response with the mystery
                     const aiResponses = formattedMessages.filter((msg: Message) => msg.is_ai);
                     if (aiResponses.length > 0) {
-                        // Find the first response with a proper mystery format
                         const mysteryResponse = aiResponses.find(msg => 
                             msg.content.includes("PREMISE") && 
                             msg.content.includes("CHARACTER") && 
@@ -120,19 +117,15 @@ const MysteryPreview = () => {
                     }
                 }
                 
-                // Extract title from mystery data or messages
                 let extractedTitle = "";
                 
                 if (mystery.title && mystery.title !== `${mystery.mystery_data?.theme} Mystery`) {
-                    // Use conversation title if it's been customized
                     extractedTitle = mystery.title;
                 } else {
-                    // Try to extract from AI messages
                     const aiMessages = (mystery.messages || []).filter((msg: any) => msg.role === "assistant");
                     
                     if (aiMessages.length > 0) {
                         for (const msg of aiMessages) {
-                            // Look for text that appears to be a title - typically in quotes or after a # at the start
                             const titlePattern = /^#+\s*["']([^"']+)["']|^#+\s*([A-Z][A-Z\s]+)|^["']([^"']+)["']\s*-/m;
                             const match = msg.content.match(titlePattern);
                             
@@ -143,7 +136,6 @@ const MysteryPreview = () => {
                         }
                     }
                     
-                    // Fallback to theme if we couldn't find a title
                     if (!extractedTitle && mystery.mystery_data?.theme) {
                         extractedTitle = `${mystery.mystery_data.theme} Mystery`;
                     }
@@ -151,7 +143,6 @@ const MysteryPreview = () => {
                 
                 setTitle(extractedTitle || "Murder Mystery");
                 
-                // Check for abandoned generation
                 await checkForAbandonedGeneration();
                 
             } catch (error) {
@@ -166,103 +157,111 @@ const MysteryPreview = () => {
     }, [id, user, navigate]);
 
     const checkGenerationStatus = async () => {
-      if (!id) return;
-      try {
-        const status = await getPackageGenerationStatus(id);
-        setGenerationStatus(status);
-        
-        if (status.status === 'completed') {
-          navigate(`/mystery/${id}`);
+        if (!id) return;
+        try {
+            const status = await getPackageGenerationStatus(id);
+            setGenerationStatus(status);
+            
+            const { data: packageData } = await supabase
+                .from("mystery_packages")
+                .select("content")
+                .eq("conversation_id", id)
+                .single();
+                
+            if (packageData?.content) {
+                setCurrentContent(packageData.content);
+            }
+            
+            if (status.status === 'completed') {
+                navigate(`/mystery/${id}`);
+            }
+        } catch (error) {
+            console.error("Error checking generation status:", error);
         }
-      } catch (error) {
-        console.error("Error checking generation status:", error);
-      }
     };
-    
+
     useEffect(() => {
-      checkGenerationStatus();
-      const interval = setInterval(checkGenerationStatus, 5000);
-      return () => clearInterval(interval);
+        checkGenerationStatus();
+        const interval = setInterval(checkGenerationStatus, 5000);
+        return () => clearInterval(interval);
     }, [id, navigate]);
 
     const renderGenerationProgress = () => {
-      if (!generationStatus) return null;
+        if (!generationStatus) return null;
 
-      return (
-        <div className="space-y-4 mb-6">
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>{generationStatus.currentStep}</span>
-              <span>{generationStatus.progress}%</span>
+        return (
+            <div className="space-y-4 mb-6">
+                <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                        <span>{generationStatus.currentStep}</span>
+                        <span>{generationStatus.progress}%</span>
+                    </div>
+                    <Progress value={generationStatus.progress} className="h-2" />
+                </div>
+                <div className="flex gap-2 flex-wrap">
+                    {Object.entries(generationStatus.sections || {}).map(([key, isComplete]) => (
+                        <Badge 
+                            key={key}
+                            variant={isComplete ? "default" : "outline"}
+                            className={isComplete ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300" : ""}
+                        >
+                            {key.charAt(0).toUpperCase() + key.slice(1)} {isComplete ? "✓" : "..."}
+                        </Badge>
+                    ))}
+                </div>
             </div>
-            <Progress value={generationStatus.progress} className="h-2" />
-          </div>
-          <div className="flex gap-2 flex-wrap">
-            {Object.entries(generationStatus.sections || {}).map(([key, isComplete]) => (
-              <Badge 
-                key={key}
-                variant={isComplete ? "default" : "outline"}
-                className={isComplete ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300" : ""}
-              >
-                {key.charAt(0).toUpperCase() + key.slice(1)} {isComplete ? "✓" : "..."}
-              </Badge>
-            ))}
-          </div>
-        </div>
-      );
+        );
     };
 
     const handleGenerateClick = async () => {
-      if (!isAuthenticated) {
-        toast.error("Please sign in to generate a complete mystery package");
-        navigate("/sign-in");
-        return;
-      }
-
-      if (!id) {
-        toast.error("Mystery ID is missing");
-        return;
-      }
-
-      // Warning message toast
-      toast.info(
-        <div className="space-y-2">
-          <div className="font-semibold flex items-center gap-2">
-            <AlertTriangleIcon className="h-4 w-4" />
-            <span>Please keep this tab open</span>
-          </div>
-          <p className="text-sm">Generation takes 5-10 minutes and requires this browser tab to remain open and active. Closing will interrupt the process.</p>
-        </div>,
-        { duration: 7000 }
-      );
-
-      try {
-        setGenerating(true);
-        
-        const status = await getPackageGenerationStatus(id);
-        const isResuming = status.status === 'in_progress' || status.status === 'failed';
-        
-        toast.info(
-          <div className="space-y-2">
-            <div className="font-semibold">
-              {isResuming ? "Resuming generation..." : "Starting generation..."}
-            </div>
-            <p className="text-sm">This will take about 5-10 minutes. Please keep this browser tab open.</p>
-          </div>
-        );
-        
-        if (isResuming) {
-          await resumePackageGeneration(id);
-        } else {
-          await generateCompletePackage(id);
+        if (!isAuthenticated) {
+            toast.error("Please sign in to generate a complete mystery package");
+            navigate("/sign-in");
+            return;
         }
-        
-        // Success will be handled by the status polling
-      } catch (error) {
-        console.error("Error generating package:", error);
-        setGenerating(false);
-        toast.error("Failed to generate package. Please try again.");
-      }
+
+        if (!id) {
+            toast.error("Mystery ID is missing");
+            return;
+        }
+
+        toast.info(
+            <div className="space-y-2">
+                <div className="font-semibold flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4" />
+                    <span>Please keep this tab open</span>
+                </div>
+                <p className="text-sm">Generation takes 5-10 minutes and requires this browser tab to remain open and active. Closing will interrupt the process.</p>
+            </div>,
+            { duration: 7000 }
+        );
+
+        try {
+            setGenerating(true);
+            
+            const status = await getPackageGenerationStatus(id);
+            const isResuming = status.status === 'in_progress' || status.status === 'failed';
+            
+            toast.info(
+                <div className="space-y-2">
+                    <div className="font-semibold">
+                        {isResuming ? "Resuming generation..." : "Starting generation..."}
+                    </div>
+                    <p className="text-sm">This will take about 5-10 minutes. Please keep this browser tab open.</p>
+                </div>
+            );
+            
+            if (isResuming) {
+                await resumePackageGeneration(id);
+            } else {
+                await generateCompletePackage(id);
+            }
+            
+        } catch (error) {
+            console.error("Error generating package:", error);
+            setGenerating(false);
+            toast.error("Failed to generate package. Please try again.");
+        }
     };
 
     const handleTestModeChange = (enabled: boolean) => {
@@ -283,7 +282,6 @@ const MysteryPreview = () => {
         const match = content.match(premisePattern);
         
         if (match && match[1]) {
-            // Return just the first paragraph of the premise
             const paragraphs = match[1].split('\n\n');
             return paragraphs[0].trim();
         }
@@ -304,7 +302,7 @@ const MysteryPreview = () => {
                 <main className="flex-1 py-12 px-4">
                     <div className="container mx-auto max-w-4xl">
                         <div className="flex justify-center">
-                            <LoaderIcon className="h-12 w-12 animate-spin text-primary" />
+                            <Loader2 className="h-12 w-12 animate-spin text-primary" />
                         </div>
                     </div>
                 </main>
@@ -327,7 +325,7 @@ const MysteryPreview = () => {
                     
                     {generationAbandoned && (
                         <Alert variant="warning" className="mb-6">
-                            <AlertTriangleIcon className="h-4 w-4" />
+                            <AlertTriangle className="h-4 w-4" />
                             <AlertTitle>Incomplete Generation Found</AlertTitle>
                             <AlertDescription>
                                 We found an incomplete mystery generation that was interrupted. You can resume it from where it left off.
@@ -335,36 +333,50 @@ const MysteryPreview = () => {
                         </Alert>
                     )}
 
-                    <Card className="mb-6">
-                        <CardHeader>
-                            <CardTitle>Mystery Preview</CardTitle>
-                            <CardDescription>
-                                A preview of your murder mystery package
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="max-h-96 overflow-y-auto">
-                            {premise ? (
-                                <div className="space-y-4">
-                                    <div className="prose prose-stone dark:prose-invert">
-                                        <ReactMarkdown>
-                                            {premise}
-                                        </ReactMarkdown>
-                                        <div className="mt-2 italic text-muted-foreground">
-                                            [Preview only shows the introduction. The complete mystery includes character details, clues, host instructions, and all materials needed to run your event.]
+                    {generating ? (
+                        <>
+                            {renderGenerationProgress()}
+                            <Card>
+                                <CardContent className="pt-6">
+                                    <MysteryPackageTabView 
+                                        packageContent={currentContent || "Generation in progress..."}
+                                        mysteryTitle={title}
+                                        generationStatus={generationStatus}
+                                        isGenerating={true}
+                                    />
+                                </CardContent>
+                            </Card>
+                        </>
+                    ) : (
+                        <Card className="mb-6">
+                            <CardHeader>
+                                <CardTitle>Mystery Preview</CardTitle>
+                                <CardDescription>
+                                    A preview of your murder mystery package
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent className="max-h-96 overflow-y-auto">
+                                {premise ? (
+                                    <div className="space-y-4">
+                                        <div className="prose prose-stone dark:prose-invert">
+                                            <ReactMarkdown>
+                                                {premise}
+                                            </ReactMarkdown>
+                                            <div className="mt-2 italic text-muted-foreground">
+                                                [Preview only shows the introduction. The complete mystery includes character details, clues, host instructions, and all materials needed to run your event.]
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ) : (
-                                <div className="text-center py-12">
-                                    <p className="text-muted-foreground">No preview available</p>
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
-
-                    {generationStatus?.status === 'in_progress' && renderGenerationProgress()}
+                                ) : (
+                                    <div className="text-center py-12">
+                                        <p className="text-muted-foreground">No preview available</p>
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
+                    )}
                     
-                    <Card className="mb-6">
+                    <Card>
                         <CardHeader>
                             <CardTitle>
                                 {generationStatus?.status === 'in_progress' ? 'Generating Your Mystery Package' : 'Generate Your Mystery Package'}
@@ -375,19 +387,32 @@ const MysteryPreview = () => {
                                     : 'Start generating your custom murder mystery package with all materials included.'}
                             </CardDescription>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className="flex flex-col sm:flex-row items-center gap-4">
+                            <div className="flex items-center space-x-2 mb-4 sm:mb-0">
+                                <Switch 
+                                    id="test-mode" 
+                                    checked={testModeEnabled} 
+                                    onCheckedChange={setTestModeEnabled}
+                                />
+                                <Label htmlFor="test-mode">Test Mode (Faster, Less Content)</Label>
+                            </div>
                             <Button
                                 onClick={handleGenerateClick}
                                 disabled={generating}
-                                className="w-full sm:w-auto"
+                                className="w-full sm:w-auto ml-auto"
                             >
                                 {generating ? (
                                     <>
-                                        <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                                        {generationStatus?.status === 'in_progress' ? "Resuming..." : "Generating..."}
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        {generationStatus?.status === 'in_progress' ? "Generating..." : "Starting..."}
+                                    </>
+                                ) : generationAbandoned ? (
+                                    <>
+                                        <RefreshCw className="mr-2 h-4 w-4" />
+                                        Resume Generation
                                     </>
                                 ) : (
-                                    generationStatus?.status === 'in_progress' ? "Resume Generation" : "Generate Package"
+                                    "Generate Package"
                                 )}
                             </Button>
                         </CardContent>
