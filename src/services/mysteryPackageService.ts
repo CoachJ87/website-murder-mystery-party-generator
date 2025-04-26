@@ -16,6 +16,12 @@ export interface GenerationStatus {
   progress: number; // 0-100 percentage
   currentStep: string;
   error?: string;
+  sections?: {
+    hostGuide: boolean;
+    characters: boolean;
+    clues: boolean;
+    solution: boolean;
+  };
 }
 
 /**
@@ -55,19 +61,64 @@ export const generateCompletePackage = async (mysteryId: string): Promise<string
     }));
     
     // 4. Create an empty package record to track progress
-    const { data: packageRecord, error: packageError } = await supabase
+    const { data: existingPackage } = await supabase
       .from("mystery_packages")
-      .insert({
-        conversation_id: mysteryId,
-        content: "",
-        created_at: new Date().toISOString()
-      })
-      .select()
-      .single();
+      .select("id")
+      .eq("conversation_id", mysteryId)
+      .maybeSingle();
       
-    if (packageError) {
-      console.error("Error creating package record:", packageError);
-      throw new Error("Could not create package record");
+    let packageId: string;
+    
+    if (existingPackage) {
+      packageId = existingPackage.id;
+      
+      // Update the generation status
+      await supabase
+        .from("mystery_packages")
+        .update({
+          generation_status: {
+            status: 'in_progress',
+            progress: 0,
+            currentStep: 'Starting generation',
+            sections: {
+              hostGuide: false,
+              characters: false,
+              clues: false,
+              solution: false
+            }
+          },
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", packageId);
+    } else {
+      // Create a new package record
+      const { data: packageRecord, error: packageError } = await supabase
+        .from("mystery_packages")
+        .insert({
+          conversation_id: mysteryId,
+          content: "",
+          generation_status: {
+            status: 'in_progress',
+            progress: 0,
+            currentStep: 'Starting generation',
+            sections: {
+              hostGuide: false,
+              characters: false,
+              clues: false,
+              solution: false
+            }
+          },
+          created_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+        
+      if (packageError) {
+        console.error("Error creating package record:", packageError);
+        throw new Error("Could not create package record");
+      }
+      
+      packageId = packageRecord.id;
     }
     
     // 5. Update conversation status to indicate generation has started
@@ -75,12 +126,13 @@ export const generateCompletePackage = async (mysteryId: string): Promise<string
       .from("conversations")
       .update({ 
         has_complete_package: false,
-        needs_package_generation: true
+        needs_package_generation: true,
+        display_status: "purchased"
       })
       .eq("id", mysteryId);
     
-    // 6. Generate the package in chunks
-    const packageContent = await generatePackageInChunks(messages, mysteryId, packageRecord.id);
+    // 6. Generate the package in chunks with retry logic
+    const packageContent = await generatePackageInChunks(messages, mysteryId, packageId);
     
     // 7. Store the final result
     await supabase
@@ -96,9 +148,20 @@ export const generateCompletePackage = async (mysteryId: string): Promise<string
       .from("mystery_packages")
       .update({
         content: packageContent,
+        generation_status: {
+          status: 'completed',
+          progress: 100,
+          currentStep: 'Generation complete',
+          sections: {
+            hostGuide: true,
+            characters: true,
+            clues: true,
+            solution: true
+          }
+        },
         updated_at: new Date().toISOString()
       })
-      .eq("id", packageRecord.id);
+      .eq("id", packageId);
     
     return packageContent;
     
@@ -127,7 +190,7 @@ export const getPackageGenerationStatus = async (mysteryId: string): Promise<Gen
     // Check if there's an existing package for this mystery
     const { data: packageData, error: packageError } = await supabase
       .from("mystery_packages")
-      .select("*")
+      .select("generation_status, content")
       .eq("conversation_id", mysteryId)
       .single();
       
@@ -135,8 +198,18 @@ export const getPackageGenerationStatus = async (mysteryId: string): Promise<Gen
       return {
         status: 'pending',
         progress: 0,
-        currentStep: 'Not started'
+        currentStep: 'Not started',
+        sections: {
+          hostGuide: false,
+          characters: false,
+          clues: false,
+          solution: false
+        }
       };
+    }
+    
+    if (packageData.generation_status) {
+      return packageData.generation_status as GenerationStatus;
     }
     
     // Check conversation status
@@ -155,7 +228,13 @@ export const getPackageGenerationStatus = async (mysteryId: string): Promise<Gen
       return {
         status: 'completed',
         progress: 100,
-        currentStep: 'Generation complete'
+        currentStep: 'Generation complete',
+        sections: {
+          hostGuide: true,
+          characters: true,
+          clues: true,
+          solution: true
+        }
       };
     }
     
@@ -170,14 +249,26 @@ export const getPackageGenerationStatus = async (mysteryId: string): Promise<Gen
         progress,
         currentStep: progress < 30 ? 'Generating host guide' : 
                      progress < 60 ? 'Generating character guides' : 
-                     'Finalizing materials'
+                     'Finalizing materials',
+        sections: {
+          hostGuide: progress >= 25,
+          characters: progress >= 50,
+          clues: progress >= 75,
+          solution: progress >= 90
+        }
       };
     }
     
     return {
       status: 'pending',
       progress: 0,
-      currentStep: 'Waiting to start'
+      currentStep: 'Waiting to start',
+      sections: {
+        hostGuide: false,
+        characters: false,
+        clues: false,
+        solution: false
+      }
     };
     
   } catch (error) {
@@ -186,7 +277,13 @@ export const getPackageGenerationStatus = async (mysteryId: string): Promise<Gen
       status: 'failed',
       progress: 0,
       currentStep: 'Error checking status',
-      error: error.message
+      error: error.message,
+      sections: {
+        hostGuide: false,
+        characters: false,
+        clues: false,
+        solution: false
+      }
     };
   }
 };
@@ -199,6 +296,9 @@ const generatePackageInChunks = async (
   mysteryId: string,
   packageId: string
 ): Promise<string> => {
+  let fullPackage = "";
+  const maxRetries = 3;
+  
   try {
     // 1. First chunk: Get the basic structure and host guide
     const hostGuidePrompt: Message = {
@@ -207,11 +307,37 @@ const generatePackageInChunks = async (
     };
     
     console.log("Generating host guide...");
-    let hostGuide = await getAIResponse([...messages, hostGuidePrompt], "paid");
+    let hostGuide = "";
+    let hostGuideRetries = 0;
     
-    // Save progress
-    await updatePackageContent(packageId, hostGuide);
-    await updateGenerationProgress(mysteryId, 30, "Generating character guides");
+    while (hostGuideRetries < maxRetries) {
+      try {
+        hostGuide = await getAIResponse([...messages, hostGuidePrompt], "paid");
+        
+        // Update progress and partial content
+        fullPackage += hostGuide;
+        await updatePackageContent(packageId, fullPackage);
+        await updateGenerationStatus(mysteryId, packageId, 25, "Generating character guides", {
+          hostGuide: true,
+          characters: false,
+          clues: false,
+          solution: false
+        });
+        
+        break;
+      } catch (error) {
+        hostGuideRetries++;
+        console.error(`Host guide generation attempt ${hostGuideRetries} failed:`, error);
+        
+        if (hostGuideRetries >= maxRetries) {
+          console.error("Failed to generate host guide after multiple attempts");
+          throw error;
+        }
+        
+        // Wait before retrying
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
+    }
     
     // 2. Second chunk: Character guides
     const characterGuidesPrompt: Message = {
@@ -220,53 +346,148 @@ const generatePackageInChunks = async (
     };
     
     console.log("Generating character guides...");
-    let characterGuides = await getAIResponse([...messages, { is_ai: true, content: hostGuide }, characterGuidesPrompt], "paid");
+    let characterGuides = "";
+    let characterGuideRetries = 0;
     
-    // Save progress
-    await updatePackageContent(packageId, hostGuide + "\n\n" + characterGuides);
-    await updateGenerationProgress(mysteryId, 60, "Generating game materials");
+    while (characterGuideRetries < maxRetries) {
+      try {
+        characterGuides = await getAIResponse(
+          [...messages, { is_ai: true, content: hostGuide }, characterGuidesPrompt], 
+          "paid"
+        );
+        
+        // Update progress and partial content
+        fullPackage += "\n\n" + characterGuides;
+        await updatePackageContent(packageId, fullPackage);
+        await updateGenerationStatus(mysteryId, packageId, 50, "Generating clues and evidence", {
+          hostGuide: true,
+          characters: true,
+          clues: false,
+          solution: false
+        });
+        
+        break;
+      } catch (error) {
+        characterGuideRetries++;
+        console.error(`Character guides generation attempt ${characterGuideRetries} failed:`, error);
+        
+        if (characterGuideRetries >= maxRetries) {
+          console.error("Failed to generate character guides after multiple attempts");
+          throw error;
+        }
+        
+        // Wait before retrying
+        await new Promise(resolve => setTimeout(resolve, 3000));
+      }
+    }
     
-    // 3. Final chunk: Game materials and evidence
-    const materialsPrompt: Message = {
+    // 3. Third chunk: Clues and evidence
+    const cluesPrompt: Message = {
       is_ai: false,
-      content: `Based on our previous conversation and the content you've created, now generate game materials including evidence cards, clue distribution, and any printable materials needed to host this murder mystery.`
+      content: `Based on our previous conversation and the content you've created, now generate clues, evidence, and props for this murder mystery. Include details about how and when each clue is discovered.`
     };
     
-    console.log("Generating game materials...");
-    let gameMaterials = await getAIResponse(
-      [...messages, { is_ai: true, content: hostGuide + "\n\n" + characterGuides }, materialsPrompt], 
-      "paid"
-    );
+    console.log("Generating clues and evidence...");
+    let cluesAndEvidence = "";
+    let cluesRetries = 0;
     
-    // Combine all sections
-    const fullPackage = 
-      hostGuide + "\n\n" +
-      characterGuides + "\n\n" + 
-      gameMaterials;
-      
-    // Save the complete package
-    await updatePackageContent(packageId, fullPackage);
-    await updateGenerationProgress(mysteryId, 100, "Generation complete");
+    while (cluesRetries < maxRetries) {
+      try {
+        cluesAndEvidence = await getAIResponse(
+          [...messages, 
+           { is_ai: true, content: hostGuide }, 
+           { is_ai: true, content: characterGuides },
+           cluesPrompt], 
+          "paid"
+        );
+        
+        // Update progress and partial content
+        fullPackage += "\n\n" + cluesAndEvidence;
+        await updatePackageContent(packageId, fullPackage);
+        await updateGenerationStatus(mysteryId, packageId, 75, "Generating solution", {
+          hostGuide: true,
+          characters: true,
+          clues: true,
+          solution: false
+        });
+        
+        break;
+      } catch (error) {
+        cluesRetries++;
+        console.error(`Clues and evidence generation attempt ${cluesRetries} failed:`, error);
+        
+        if (cluesRetries >= maxRetries) {
+          console.error("Failed to generate clues and evidence after multiple attempts");
+          throw error;
+        }
+        
+        // Wait before retrying
+        await new Promise(resolve => setTimeout(resolve, 3000));
+      }
+    }
+    
+    // 4. Final chunk: Solution and printable materials
+    const solutionPrompt: Message = {
+      is_ai: false,
+      content: `Based on our previous conversation and the content you've created, now generate the solution section that explains how the murder was committed, with all key evidence pointing to the killer. Also include any final printable materials needed.`
+    };
+    
+    console.log("Generating solution...");
+    let solution = "";
+    let solutionRetries = 0;
+    
+    while (solutionRetries < maxRetries) {
+      try {
+        solution = await getAIResponse(
+          [...messages, 
+           { is_ai: true, content: hostGuide }, 
+           { is_ai: true, content: characterGuides },
+           { is_ai: true, content: cluesAndEvidence },
+           solutionPrompt], 
+          "paid"
+        );
+        
+        // Update final package
+        fullPackage += "\n\n" + solution;
+        await updatePackageContent(packageId, fullPackage);
+        await updateGenerationStatus(mysteryId, packageId, 100, "Generation complete", {
+          hostGuide: true,
+          characters: true,
+          clues: true,
+          solution: true
+        });
+        
+        break;
+      } catch (error) {
+        solutionRetries++;
+        console.error(`Solution generation attempt ${solutionRetries} failed:`, error);
+        
+        if (solutionRetries >= maxRetries) {
+          console.error("Failed to generate solution after multiple attempts");
+          throw error;
+        }
+        
+        // Wait before retrying
+        await new Promise(resolve => setTimeout(resolve, 3000));
+      }
+    }
     
     return fullPackage;
     
   } catch (error) {
     console.error("Error in chunked generation:", error);
     
-    // If we hit an error but have partial content, try to get the partial content
-    try {
-      const { data: packageData } = await supabase
-        .from("mystery_packages")
-        .select("content")
-        .eq("id", packageId)
-        .single();
-        
-      if (packageData && packageData.content && packageData.content.length > 0) {
-        console.log("Returning partial content after error");
-        return packageData.content + "\n\n[Note: Generation was incomplete due to an error. You may want to regenerate this package.]";
-      }
-    } catch (partialError) {
-      console.error("Error retrieving partial content:", partialError);
+    // If we hit an error but have partial content, update status and return partial content
+    if (fullPackage.length > 0) {
+      await updateGenerationStatus(mysteryId, packageId, -1, "Generation failed - partial content available", {
+        hostGuide: fullPackage.includes("Host Guide"),
+        characters: fullPackage.includes("Character"),
+        clues: fullPackage.includes("Clues") || fullPackage.includes("Evidence"),
+        solution: fullPackage.includes("Solution")
+      }, true);
+      
+      console.log("Returning partial content after error");
+      return fullPackage + "\n\n[Note: Generation was incomplete due to an error. You may want to regenerate this package.]";
     }
     
     throw error;
@@ -293,18 +514,42 @@ const updatePackageContent = async (packageId: string, content: string): Promise
 /**
  * Update the generation progress
  */
-const updateGenerationProgress = async (
+const updateGenerationStatus = async (
   mysteryId: string, 
+  packageId: string,
   progress: number, 
-  currentStep: string
+  currentStep: string,
+  sections = {
+    hostGuide: false,
+    characters: false,
+    clues: false,
+    solution: false
+  },
+  isFailed = false
 ): Promise<void> => {
   try {
+    const status = isFailed ? 'failed' : progress >= 100 ? 'completed' : 'in_progress';
+    
+    // Update the package status
+    await supabase
+      .from("mystery_packages")
+      .update({ 
+        generation_status: {
+          status,
+          progress: progress < 0 ? 0 : progress,
+          currentStep,
+          sections
+        }
+      })
+      .eq("id", packageId);
+      
+    // Also update the conversation mystery_data to include progress info
     await supabase
       .from("conversations")
       .update({ 
         mystery_data: {
           ...supabase.rpc('get_mystery_data', { conversation_id: mysteryId }),
-          generationProgress: progress,
+          generationProgress: progress < 0 ? 0 : progress,
           generationStep: currentStep
         }
       })

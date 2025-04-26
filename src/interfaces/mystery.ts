@@ -1,3 +1,4 @@
+
 export interface MysteryData {
   title?: string; // Making title optional to fix the type error
   theme?: string;
@@ -5,7 +6,7 @@ export interface MysteryData {
   hasAccomplice?: boolean;
   scriptType?: 'full' | 'summary';
   additionalDetails?: string;
-  status?: "draft" | "published" | "archived";
+  status?: "draft" | "purchased" | "archived";
   [key: string]: any;  // Allow for additional properties
 }
 
@@ -25,6 +26,7 @@ export interface Conversation {
   premise?: string;
   purchase_date?: string;
   is_purchased?: boolean;
+  display_status?: "draft" | "purchased" | "archived";
 }
 
 export interface Mystery {

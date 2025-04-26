@@ -1,16 +1,21 @@
+
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Download, Mail, FileText, Printer } from "lucide-react";
+import { Download, Mail, FileText, Printer, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import SendToGuestsDialog from "@/components/SendToGuestsDialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from '@/components/ui/badge';
+import { GenerationStatus } from '@/services/mysteryPackageService';
 
 interface MysteryPackageTabViewProps {
   packageContent: string;
   mysteryTitle: string;
+  generationStatus?: GenerationStatus;
 }
 
-const MysteryPackageTabView = ({ packageContent, mysteryTitle }: MysteryPackageTabViewProps) => {
+const MysteryPackageTabView = ({ packageContent, mysteryTitle, generationStatus }: MysteryPackageTabViewProps) => {
   const [activeTab, setActiveTab] = useState("overview");
   const [sendToGuestsOpen, setSendToGuestsOpen] = useState(false);
 
@@ -19,6 +24,11 @@ const MysteryPackageTabView = ({ packageContent, mysteryTitle }: MysteryPackageT
   
   // Extract character list for SendToGuests dialog
   const characters = extractCharacters(packageContent);
+
+  // Check if any sections are incomplete
+  const hasIncompleteContent = generationStatus?.status === 'failed' || 
+                              (!sections.overview || !sections.host || !sections.characters || 
+                               !sections.clues || !sections.solution);
 
   const handleDownloadText = () => {
     const blob = new Blob([packageContent], { type: 'text/plain' });
@@ -63,8 +73,43 @@ const MysteryPackageTabView = ({ packageContent, mysteryTitle }: MysteryPackageT
     }
   };
 
+  const getSectionStatus = (sectionType: string) => {
+    if (!generationStatus?.sections) return null;
+    
+    const sectionMap = {
+      "overview": generationStatus.sections.hostGuide,
+      "host": generationStatus.sections.hostGuide,
+      "characters": generationStatus.sections.characters,
+      "clues": generationStatus.sections.clues,
+      "solution": generationStatus.sections.solution
+    };
+    
+    const isComplete = sectionMap[sectionType];
+    
+    return isComplete ? (
+      <Badge variant="outline" className="ml-2 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+        Complete
+      </Badge>
+    ) : (
+      <Badge variant="outline" className="ml-2 bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300">
+        Pending
+      </Badge>
+    );
+  };
+
   return (
     <div className="space-y-4">
+      {hasIncompleteContent && (
+        <Alert variant="warning" className="mb-4">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Incomplete Package</AlertTitle>
+          <AlertDescription>
+            Some sections of your mystery package may be incomplete due to generation issues. 
+            You can still view the available content, but you may want to regenerate the package.
+          </AlertDescription>
+        </Alert>
+      )}
+      
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">{mysteryTitle}</h2>
         <div className="flex gap-2">
@@ -89,11 +134,26 @@ const MysteryPackageTabView = ({ packageContent, mysteryTitle }: MysteryPackageT
 
       <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid grid-cols-5 w-full">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="host">Host Guide</TabsTrigger>
-          <TabsTrigger value="characters">Characters</TabsTrigger>
-          <TabsTrigger value="clues">Clues & Evidence</TabsTrigger>
-          <TabsTrigger value="solution">Solution</TabsTrigger>
+          <TabsTrigger value="overview">
+            Overview
+            {getSectionStatus("overview")}
+          </TabsTrigger>
+          <TabsTrigger value="host">
+            Host Guide
+            {getSectionStatus("host")}
+          </TabsTrigger>
+          <TabsTrigger value="characters">
+            Characters
+            {getSectionStatus("characters")}
+          </TabsTrigger>
+          <TabsTrigger value="clues">
+            Clues & Evidence
+            {getSectionStatus("clues")}
+          </TabsTrigger>
+          <TabsTrigger value="solution">
+            Solution
+            {getSectionStatus("solution")}
+          </TabsTrigger>
         </TabsList>
         
         <TabsContent value="overview" className="p-4 border rounded-md mt-4">
@@ -102,7 +162,7 @@ const MysteryPackageTabView = ({ packageContent, mysteryTitle }: MysteryPackageT
             {sections.overview ? (
               <div dangerouslySetInnerHTML={{ __html: markdownToHtml(sections.overview) }} />
             ) : (
-              <p>No overview available.</p>
+              <p className="text-muted-foreground">Overview content is still being generated or is unavailable.</p>
             )}
           </div>
         </TabsContent>
@@ -113,7 +173,7 @@ const MysteryPackageTabView = ({ packageContent, mysteryTitle }: MysteryPackageT
             {sections.host ? (
               <div dangerouslySetInnerHTML={{ __html: markdownToHtml(sections.host) }} />
             ) : (
-              <p>No host guide available.</p>
+              <p className="text-muted-foreground">Host guide is still being generated or is unavailable.</p>
             )}
           </div>
         </TabsContent>
@@ -124,7 +184,7 @@ const MysteryPackageTabView = ({ packageContent, mysteryTitle }: MysteryPackageT
             {sections.characters ? (
               <div dangerouslySetInnerHTML={{ __html: markdownToHtml(sections.characters) }} />
             ) : (
-              <p>No character guides available.</p>
+              <p className="text-muted-foreground">Character guides are still being generated or are unavailable.</p>
             )}
           </div>
         </TabsContent>
@@ -135,7 +195,7 @@ const MysteryPackageTabView = ({ packageContent, mysteryTitle }: MysteryPackageT
             {sections.clues ? (
               <div dangerouslySetInnerHTML={{ __html: markdownToHtml(sections.clues) }} />
             ) : (
-              <p>No clues and evidence available.</p>
+              <p className="text-muted-foreground">Clues and evidence are still being generated or are unavailable.</p>
             )}
           </div>
         </TabsContent>
@@ -146,7 +206,7 @@ const MysteryPackageTabView = ({ packageContent, mysteryTitle }: MysteryPackageT
             {sections.solution ? (
               <div dangerouslySetInnerHTML={{ __html: markdownToHtml(sections.solution) }} />
             ) : (
-              <p>No solution available.</p>
+              <p className="text-muted-foreground">Solution is still being generated or is unavailable.</p>
             )}
           </div>
         </TabsContent>

@@ -37,6 +37,18 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
     const maxAttempts = 3; // Increased from 2 to 3
     let responseContent = '';
     
+    // Estimate if this is likely a large request
+    const isLargeRequest = promptVersion === 'paid' && standardMessages.some(msg => 
+      msg.content.length > 5000 || 
+      msg.content.includes("Host Guide") ||
+      msg.content.includes("character guides") || 
+      msg.content.includes("clues and evidence")
+    );
+    
+    // For large requests, we'll use chunk sizes
+    let chunkSize = isLargeRequest ? 2500 : undefined;
+    console.log(`DEBUG: Request classified as ${isLargeRequest ? 'large' : 'standard'}`);
+    
     while (attempts < maxAttempts) {
       attempts++;
       console.log(`DEBUG: Attempt ${attempts} of ${maxAttempts}`);
@@ -44,7 +56,13 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
       try {
         // Set a longer timeout for the function call
         const abortController = new AbortController();
-        const timeoutId = setTimeout(() => abortController.abort(), 60000); // 60 seconds timeout
+        const timeoutId = setTimeout(() => abortController.abort(), 120000); // 2 minute timeout
+        
+        // If we're on a retry attempt and it might be due to size, increase the chunk size
+        if (attempts > 1 && isLargeRequest) {
+          chunkSize = 2000 * attempts; // Get more aggressive with chunk size on retries
+          console.log(`DEBUG: Retry with increased chunk size: ${chunkSize}`);
+        }
         
         // Remove the signal from options - it's not supported in the Supabase FunctionInvokeOptions type
         const { data: functionData, error: functionError } = await supabase.functions.invoke('mystery-ai', {
@@ -53,7 +71,7 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
             system: systemInstruction,
             promptVersion,
             requireFormatValidation: promptVersion === 'free', // Only enforce strict validation for free prompts
-            chunkSize: 2000 // Send a hint that we want to generate a lot of content
+            chunkSize: chunkSize // Send a hint about how much content we expect to generate
           }
           // Removed signal property as it's not supported in the type definition
         });

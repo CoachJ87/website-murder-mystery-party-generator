@@ -86,19 +86,19 @@ Present your murder mystery preview in an engaging, dramatic format that will ex
     
     // Determine model and parameters based on the request
     let model = "claude-3-opus-20240229";
-    let maxTokens = promptVersion === 'paid' ? 12000 : 4000;
+    let maxTokens = promptVersion === 'paid' ? 15000 : 4000;
     let temperature = promptVersion === 'paid' ? 0.7 : 0.3;
     
-    // If we're requesting a larger chunk size, adjust parameters
+    // If we're requesting a larger chunk size, adjust parameters for generating package parts
     if (chunkSize && chunkSize > 1000) {
-      maxTokens = Math.min(24000, chunkSize * 3); // Scale up tokens but cap at 24k
-      temperature = 0.5; // Middle ground temperature
-      console.log(`Adjusted max tokens to ${maxTokens} for large response`);
+      maxTokens = Math.min(30000, chunkSize * 4); // Scale up tokens for larger chunks with a cap
+      temperature = 0.6; // Middle ground temperature for consistency in package generation
+      console.log(`Adjusted max tokens to ${maxTokens} for large chunk generation`);
     }
     
     try {
       // Set a longer timeout for large responses
-      const timeout = promptVersion === 'paid' ? 55000 : 25000; // 55s for paid, 25s for free
+      const timeout = promptVersion === 'paid' ? 90000 : 25000; // 90s for paid, 25s for free
       
       const response = await anthropic.messages.create({
         model,
@@ -111,7 +111,7 @@ Present your murder mystery preview in an engaging, dramatic format that will ex
       console.log("Received response from Anthropic API");
       console.log(`Response length: ${response.content[0].text.length} characters`);
       
-      // Less strict validation - just check for basic elements
+      // Less strict validation - just check for basic elements when needed
       const content = response.content[0].text;
       const hasRequiredFormat = 
         content.includes("#") && 
