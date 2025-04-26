@@ -58,7 +58,7 @@ serve(async (req) => {
       );
     }
     
-    const { messages, promptVersion } = requestBody;
+    const { messages, system, promptVersion } = requestBody;
     
     // Validate request data
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
@@ -74,22 +74,15 @@ serve(async (req) => {
     console.log(`Processing request with ${messages.length} messages and prompt version: ${promptVersion}`);
 
     // Get the appropriate system prompt based on promptVersion
-    const systemPrompt = promptVersion === 'paid' 
+    const systemPrompt = system || (promptVersion === 'paid' 
       ? "You are an AI assistant that helps create detailed murder mystery party games. Since the user has purchased, provide complete character details, clues, and all game materials."
-      : "You are an AI assistant that helps create murder mystery party games. Create an engaging storyline and suggest character ideas, but don't provide complete details as this is a preview.";
+      : "You are an AI assistant that helps create murder mystery party games. Create an engaging storyline and suggest character ideas, but don't provide complete details as this is a preview.");
 
-    // Format messages for Anthropic API
-    const formattedMessages = messages.map((msg) => ({
-      role: msg.is_ai ? "assistant" : "user",
-      content: msg.content
-    }));
-    
-    // Call Anthropic API
     try {
       const response = await anthropic.messages.create({
         model: "claude-3-opus-20240229",
         system: systemPrompt,
-        messages: formattedMessages,
+        messages: messages,
         max_tokens: 4000,
         temperature: 0.7,
       });

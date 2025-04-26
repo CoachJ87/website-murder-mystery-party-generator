@@ -27,19 +27,12 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
       return msg;
     });
     
-    // Filter out any system messages
-    const userAndAssistantMessages = standardMessages.filter(msg => msg.role !== 'system');
-    
-    // Create an enhanced system instruction that emphasizes not to ask about already provided information
-    const baseSystemInstruction = systemInstruction || "Please format your response using Markdown syntax.";
-    const enhancedSystemInstruction = `IMPORTANT: If the user has already specified preferences such as theme, player count, whether they want an accomplice, or script type, DO NOT ask about these again. Instead, create content based on these stated preferences. ${baseSystemInstruction}`;
-    
     console.log("DEBUG: Calling mystery-ai Edge Function");
 
     const { data: functionData, error: functionError } = await supabase.functions.invoke('mystery-ai', {
       body: {
-        messages: userAndAssistantMessages,
-        system: enhancedSystemInstruction,
+        messages: standardMessages,
+        system: systemInstruction,
         promptVersion
       }
     });
