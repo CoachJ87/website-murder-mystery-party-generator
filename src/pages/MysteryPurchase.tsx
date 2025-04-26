@@ -59,7 +59,7 @@ const MysteryPurchase = () => {
       <Header />
       
       <main className="flex-1 py-12 px-4">
-        <div className="container mx-auto max-w-3xl">
+        <div className="container mx-auto max-w-7xl">
           <div className="mb-8 text-center">
             <h1 className="text-3xl font-bold mb-2">Complete Your Purchase</h1>
             <p className="text-muted-foreground">
@@ -67,67 +67,99 @@ const MysteryPurchase = () => {
             </p>
           </div>
           
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle>Murder Mystery Package</CardTitle>
-              <CardDescription>One-time purchase, instant access</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-start gap-4 mb-6">
-                <div className="h-16 w-16 rounded bg-primary/10 flex items-center justify-center shrink-0">
-                  <CreditCard className="h-8 w-8 text-primary" />
-                </div>
-                <div>
-                  <div className="font-bold text-2xl mb-1">$4.99</div>
-                  <p className="text-muted-foreground">
-                    Complete murder mystery package with all character materials, clues, and hosting instructions.
-                  </p>
-                </div>
-              </div>
-              
-              <div className="space-y-3 mb-6">
-                <h3 className="font-medium">What's included:</h3>
-                {[
-                  "Full character profiles for all suspects",
-                  "Host guide with step-by-step instructions",
-                  "Printable character sheets",
-                  "Evidence and clue cards",
-                  "Timeline of events",
-                  "Solution reveal script",
-                  "PDF downloads of all materials"
-                ].map((item, index) => (
-                  <div key={index} className="flex items-start gap-2">
-                    <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                    <span>{item}</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Preview Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Mystery Preview</CardTitle>
+                <CardDescription>A sneak peek of your mystery</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
+                    <p className="text-muted-foreground">Mystery preview image</p>
                   </div>
-                ))}
+                  <div>
+                    <h3 className="font-semibold mb-2">Your Custom Murder Mystery</h3>
+                    <p className="text-muted-foreground">
+                      An engaging mystery crafted based on your preferences and requirements.
+                      Perfect for your next gathering or event.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Purchase Info Card */}
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Murder Mystery Package</CardTitle>
+                  <CardDescription>One-time purchase, instant access</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-start gap-4 mb-6">
+                    <div className="h-16 w-16 rounded bg-primary/10 flex items-center justify-center shrink-0">
+                      <CreditCard className="h-8 w-8 text-primary" />
+                    </div>
+                    <div>
+                      <div className="font-bold text-2xl mb-1">$4.99</div>
+                      <p className="text-muted-foreground">
+                        Complete murder mystery package with all character materials, clues, and hosting instructions.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-3 mb-6">
+                    <h3 className="font-medium">What's included:</h3>
+                    {[
+                      "Full character profiles for all suspects",
+                      "Host guide with step-by-step instructions",
+                      "Printable character sheets",
+                      "Evidence and clue cards",
+                      "Timeline of events",
+                      "Solution reveal script",
+                      "PDF downloads of all materials"
+                    ].map((item, index) => (
+                      <div key={index} className="flex items-start gap-2">
+                        <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
+                        <span>{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button 
+                    className="w-full" 
+                    size="lg" 
+                    onClick={handlePurchase} 
+                    disabled={processing}
+                  >
+                    {processing ? (
+                      <>
+                        <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        Complete Purchase
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </>
+                    )}
+                  </Button>
+                </CardFooter>
+              </Card>
+
+              <div className="bg-muted rounded-lg p-6">
+                <h3 className="font-medium mb-2">Important Notes</h3>
+                <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
+                  <li>This is a one-time purchase for this specific mystery package</li>
+                  <li>You'll have permanent access to download all materials</li>
+                  <li>Content is for personal use only, not for commercial redistribution</li>
+                  <li>Need help? Contact our support at support@mysterygenerator.com</li>
+                </ul>
               </div>
-            </CardContent>
-            <CardFooter>
-              <Button className="w-full" size="lg" onClick={handlePurchase} disabled={processing}>
-                {processing ? (
-                  <>
-                    <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
-                    Processing...
-                  </>
-                ) : (
-                  <>
-                    Complete Purchase
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </>
-                )}
-              </Button>
-            </CardFooter>
-          </Card>
-          
-          <div className="bg-muted rounded-lg p-6">
-            <h3 className="font-medium mb-2">Important Notes</h3>
-            <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
-              <li>This is a one-time purchase for this specific mystery package</li>
-              <li>You'll have permanent access to download all materials</li>
-              <li>Content is for personal use only, not for commercial redistribution</li>
-              <li>Need help? Contact our support at support@mysterygenerator.com</li>
-            </ul>
+            </div>
           </div>
           
           <div className="mt-8 text-center">
