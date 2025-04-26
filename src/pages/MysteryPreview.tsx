@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -12,9 +12,8 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
 import { Message } from "@/components/types";
 import ReactMarkdown from 'react-markdown';
-import { InfoIcon, AlertTriangleIcon, ClockIcon, LoaderIcon, PlayIcon, RefreshCw } from "lucide-react";
+import { AlertTriangleIcon, LoaderIcon, RefreshCw } from "lucide-react";
 import { generateCompletePackage, resumePackageGeneration, getPackageGenerationStatus, toggleTestMode, getTestModeEnabled } from "@/services/mysteryPackageService";
-import { Separator } from "@/components/ui/separator";
 
 const MysteryPreview = () => {
     const [mystery, setMystery] = useState<any | null>(null);
