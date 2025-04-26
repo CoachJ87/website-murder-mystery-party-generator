@@ -100,7 +100,7 @@ const MysteryPackageTabView = ({ packageContent, mysteryTitle, generationStatus 
   return (
     <div className="space-y-4">
       {hasIncompleteContent && (
-        <Alert variant="warning" className="mb-4">
+        <Alert variant="destructive" className="mb-4">
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>Incomplete Package</AlertTitle>
           <AlertDescription>

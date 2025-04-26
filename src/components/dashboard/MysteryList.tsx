@@ -4,7 +4,7 @@ import { MysteryCard } from "./MysteryCard";
 
 interface MysteryListProps {
   mysteries: Mystery[];
-  onStatusChange: (id: string, status: "draft" | "published" | "archived") => void;
+  onStatusChange: (id: string, status: "draft" | "purchased" | "archived") => void;
   onDelete: (id: string) => void;
   onEdit: (id: string) => void;
   loading: boolean;
