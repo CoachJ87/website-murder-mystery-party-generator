@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
@@ -8,12 +8,41 @@ import { toast } from "sonner";
 import { CheckCircle, CreditCard, ArrowRight } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
+import type { Mystery } from "@/interfaces/mystery";
+import { Badge } from "@/components/ui/badge";
 
 const MysteryPurchase = () => {
   const { id } = useParams();
   const [processing, setProcessing] = useState(false);
+  const [mystery, setMystery] = useState<Mystery | null>(null);
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
+
+  useEffect(() => {
+    const fetchMystery = async () => {
+      const { data, error } = await supabase
+        .from('mysteries')
+        .select('*')
+        .eq('id', id)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error fetching mystery:", error);
+        toast.error("Failed to load mystery details");
+        return;
+      }
+
+      if (!data) {
+        toast.error("Mystery not found");
+        navigate('/dashboard');
+        return;
+      }
+
+      setMystery(data);
+    };
+
+    fetchMystery();
+  }, [id, navigate]);
 
   const handlePurchase = async () => {
     if (!isAuthenticated) {
@@ -54,6 +83,22 @@ const MysteryPurchase = () => {
     }
   };
 
+  if (!mystery) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-1 py-12 px-4">
+          <div className="container mx-auto max-w-7xl">
+            <div className="flex items-center justify-center h-64">
+              <div className="h-8 w-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -68,29 +113,38 @@ const MysteryPurchase = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Preview Card */}
+            {/* Mystery Preview Card */}
             <Card>
               <CardHeader>
-                <CardTitle>Mystery Preview</CardTitle>
-                <CardDescription>A sneak peek of your mystery</CardDescription>
+                <div className="flex items-center justify-between">
+                  <CardTitle>{mystery.title || mystery.ai_title}</CardTitle>
+                  {mystery.theme && (
+                    <Badge variant="secondary">{mystery.theme}</Badge>
+                  )}
+                </div>
+                <CardDescription>
+                  {mystery.guests ? `Perfect for ${mystery.guests} players` : 'Custom murder mystery'}
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
-                    <p className="text-muted-foreground">Mystery preview image</p>
-                  </div>
                   <div>
-                    <h3 className="font-semibold mb-2">Your Custom Murder Mystery</h3>
+                    <h3 className="font-semibold mb-2">Mystery Premise</h3>
                     <p className="text-muted-foreground">
-                      An engaging mystery crafted based on your preferences and requirements.
-                      Perfect for your next gathering or event.
+                      {mystery.premise || 'A captivating murder mystery that will keep your guests guessing until the very end.'}
                     </p>
                   </div>
+                  {mystery.theme && (
+                    <div>
+                      <h3 className="font-semibold mb-2">Theme</h3>
+                      <p className="text-muted-foreground">{mystery.theme}</p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
 
-            {/* Purchase Info Card */}
+            {/* Purchase Info Section */}
             <div className="space-y-6">
               <Card>
                 <CardHeader>
@@ -132,7 +186,7 @@ const MysteryPurchase = () => {
                   <Button 
                     className="w-full" 
                     size="lg" 
-                    onClick={handlePurchase} 
+                    onClick={handlePurchase}
                     disabled={processing}
                   >
                     {processing ? (
