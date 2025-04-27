@@ -406,7 +406,7 @@ const MysteryPurchase = () => {
             <MysteryPreviewCard 
               mystery={mystery} 
               parsedDetails={parsedDetails} 
-              showPurchaseButton={isDevMode}
+              showPurchaseButton={false}
               onSimulatePurchase={handleSimulatePurchase}
               isDevMode={isDevMode}
             />
@@ -468,6 +468,17 @@ const MysteryPurchase = () => {
                     )}
                   </Button>
                 </CardFooter>
+                {isDevMode && (
+                  <div className="px-6 pb-6 -mt-3">
+                    <Button 
+                      variant="outline" 
+                      className="w-full" 
+                      onClick={handleSimulatePurchase}
+                    >
+                      Simulate Purchase (Dev Mode)
+                    </Button>
+                  </div>
+                )}
               </Card>
 
               <div className="bg-muted rounded-lg p-6">
