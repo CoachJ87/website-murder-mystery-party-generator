@@ -1,184 +1,102 @@
-
+import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Clock, User, Brush, FileText } from "lucide-react";
-import type { Mystery } from "@/interfaces/mystery";
-
-interface Character {
-  name: string;
-  description: string;
-}
-
-interface Evidence {
-  title: string;
-  description: string;
-}
-
-interface ParsedMysteryDetails {
-  premise: string;
-  overview?: string;
-  gameDetails?: string;
-  characters: Character[];
-  evidence?: Evidence[];
-}
-
-interface MysteryPreviewCardProps {
-  mystery: Mystery;
-  parsedDetails: ParsedMysteryDetails | null;
-  showPurchaseButton?: boolean;
-  onSimulatePurchase?: () => void;
-  isDevMode?: boolean;
-}
+import { CalendarDays, Clock, Users, Tag } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
 
 const MysteryPreviewCard = ({ 
   mystery, 
   parsedDetails, 
-  showPurchaseButton,
-  onSimulatePurchase,
-  isDevMode 
-}: MysteryPreviewCardProps) => {
-  // Function to truncate text if it's too long
-  const truncateText = (text: string, maxLength: number = 100) => {
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + '...';
-  };
+  showPurchaseButton = false, 
+  onSimulatePurchase, 
+  isDevMode = false 
+}) => {
+  // Format the creation date
+  const formattedDate = mystery?.created_at
+    ? formatDistanceToNow(new Date(mystery.created_at), { addSuffix: true })
+    : "Recently";
+    
+  // Take only the first 2 sentences of the premise
+  const shortenedPremise = parsedDetails?.premise 
+    ? parsedDetails.premise.split('.').slice(0, 2).join('.') + '.'
+    : '';
 
   return (
-    <Card className="h-full">
+    <Card className="h-full flex flex-col">
       <CardHeader>
         <CardTitle>{mystery.title}</CardTitle>
-        <CardDescription>
-          Murder mystery for {mystery.guests} players
-        </CardDescription>
+        <CardDescription>Mystery preview</CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-6">
-          {/* Details Section */}
-          <div>
-            <h3 className="font-semibold mb-3">Details</h3>
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <User className="h-4 w-4 text-muted-foreground" />
-                <div className="flex flex-1 justify-between">
-                  <span className="text-muted-foreground">Players:</span>
-                  <span className="font-medium">{mystery.guests} players</span>
-                </div>
-              </div>
-              {mystery.theme && (
-                <div className="flex items-center gap-3">
-                  <Brush className="h-4 w-4 text-muted-foreground" />
-                  <div className="flex flex-1 justify-between">
-                    <span className="text-muted-foreground">Theme:</span>
-                    <span className="font-medium">{mystery.theme}</span>
-                  </div>
-                </div>
-              )}
-              {mystery.status === "purchased" && mystery.purchase_date && (
-                <div className="flex items-center gap-3">
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                  <div className="flex flex-1 justify-between">
-                    <span className="text-muted-foreground">Purchased:</span>
-                    <span className="font-medium">
-                      {new Date(mystery.purchase_date).toLocaleDateString()}
-                    </span>
-                  </div>
-                </div>
-              )}
+      
+      <CardContent className="flex-grow space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center text-sm">
+              <Users className="h-4 w-4 mr-2 text-muted-foreground" />
+              <span>Players:</span>
             </div>
+            <p className="font-medium">{mystery.guests || parsedDetails?.characters?.length || "Multiple"} Players</p>
           </div>
           
-          <Separator />
-
-          {/* Game Overview Section */}
-          {parsedDetails?.overview && (
-            <>
-              <div>
-                <h3 className="font-semibold mb-2">Game Overview</h3>
-                <p className="text-muted-foreground">
-                  {parsedDetails.overview}
-                </p>
-              </div>
-              <Separator />
-            </>
-          )}
-
-          {/* Premise Section */}
-          {parsedDetails?.premise && (
-            <>
-              <div>
-                <h3 className="font-semibold mb-2">Premise</h3>
-                <p className="text-muted-foreground">
-                  {parsedDetails.premise}
-                </p>
-              </div>
-              <Separator />
-            </>
-          )}
-
-          {/* Characters Preview Section */}
-          {parsedDetails?.characters && parsedDetails.characters.length > 0 && (
-            <div>
-              <h3 className="font-semibold mb-3">Characters</h3>
-              <div className="space-y-4">
-                {parsedDetails.characters.slice(0, 3).map((character, index) => (
-                  <div key={index} className="space-y-1">
-                    <h4 className="text-sm font-medium">{character.name}</h4>
-                    <p className="text-sm text-muted-foreground">{truncateText(character.description, 120)}</p>
-                  </div>
-                ))}
-                {parsedDetails.characters.length > 3 && (
-                  <p className="text-sm text-muted-foreground italic">
-                    +{parsedDetails.characters.length - 3} more characters in the full package
-                  </p>
-                )}
-              </div>
+          <div className="space-y-1">
+            <div className="flex items-center text-sm">
+              <Tag className="h-4 w-4 mr-2 text-muted-foreground" />
+              <span>Theme:</span>
             </div>
-          )}
-
-          {/* Evidence Preview Section */}
-          {parsedDetails?.evidence && parsedDetails.evidence.length > 0 && (
-            <>
-              <Separator />
-              <div>
-                <h3 className="font-semibold mb-3">Evidence</h3>
-                <div className="space-y-4">
-                  {parsedDetails.evidence.slice(0, 2).map((item, index) => (
-                    <div key={index} className="space-y-1">
-                      <div className="flex items-start gap-2">
-                        <FileText className="h-4 w-4 text-muted-foreground mt-0.5" />
-                        <h4 className="text-sm font-medium">{item.title}</h4>
-                      </div>
-                      <p className="text-sm text-muted-foreground ml-6">{truncateText(item.description, 100)}</p>
-                    </div>
-                  ))}
-                  {parsedDetails.evidence.length > 2 && (
-                    <p className="text-sm text-muted-foreground italic">
-                      +{parsedDetails.evidence.length - 2} more evidence items in the full package
-                    </p>
-                  )}
-                </div>
-              </div>
-            </>
-          )}
-
-          {(!parsedDetails?.premise && (!parsedDetails?.characters || parsedDetails.characters.length === 0)) && (
-            <div className="text-center py-4">
-              <p className="text-muted-foreground">
-                Purchase the full package to reveal all mystery details, character descriptions, and game materials.
-              </p>
+            <p className="font-medium">{mystery.theme || "Classic"}</p>
+          </div>
+          
+          <div className="space-y-1">
+            <div className="flex items-center text-sm">
+              <CalendarDays className="h-4 w-4 mr-2 text-muted-foreground" />
+              <span>Created:</span>
             </div>
-          )}
+            <p className="font-medium">{formattedDate}</p>
+          </div>
+          
+          <div className="space-y-1">
+            <div className="flex items-center text-sm">
+              <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
+              <span>Duration:</span>
+            </div>
+            <p className="font-medium">2-3 hours</p>
+          </div>
+        </div>
+        
+        {shortenedPremise && (
+          <div className="mt-4">
+            <h3 className="text-sm font-medium mb-1">Premise:</h3>
+            <p className="text-sm text-muted-foreground">{shortenedPremise}</p>
+          </div>
+        )}
+        
+        {parsedDetails?.characters && parsedDetails.characters.length > 0 && (
+          <div className="mt-4">
+            <h3 className="text-sm font-medium mb-1">Characters:</h3>
+            <ul className="text-sm text-muted-foreground list-disc pl-5">
+              {parsedDetails.characters.slice(0, 4).map((character, index) => (
+                <li key={index}>{character.name}</li>
+              ))}
+              {parsedDetails.characters.length > 4 && (
+                <li>...and {parsedDetails.characters.length - 4} more</li>
+              )}
+            </ul>
+          </div>
+        )}
+        
+        <div className="p-4 bg-muted rounded-lg text-sm text-muted-foreground mt-4">
+          <p>
+            <strong>Note:</strong> This is a preview of your mystery. Purchase the full package to get detailed character guides, host instructions, and all game materials.
+          </p>
         </div>
       </CardContent>
-
+      
       {showPurchaseButton && isDevMode && (
         <CardFooter>
           <Button 
             variant="outline" 
-            size="sm" 
+            onClick={onSimulatePurchase} 
             className="w-full"
-            onClick={onSimulatePurchase}
           >
             Simulate Purchase (Dev Mode)
           </Button>
