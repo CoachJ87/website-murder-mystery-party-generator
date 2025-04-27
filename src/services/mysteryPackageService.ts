@@ -1,4 +1,3 @@
-
 import { getAIResponse, saveGenerationState, getGenerationState, clearGenerationState } from '@/services/aiService';
 import { supabase } from '@/lib/supabase';
 import { MysteryData } from '@/interfaces/mystery';
@@ -377,6 +376,125 @@ export const resumePackageGeneration = async (mysteryId: string, testMode: boole
 };
 
 /**
+ * Extracts sections from the AI-generated content using regex patterns
+ */
+const extractSections = (content: string) => {
+  const sections = {
+    hostGuide: '',
+    detectiveScript: '',
+    evidenceCards: [] as any[],
+    relationshipMatrix: {} as any,
+    characters: [] as any[]
+  };
+
+  // Extract host guide section
+  const hostGuideMatch = content.match(/# .+ - HOST GUIDE\n([\s\S]*?)(?=# |$)/);
+  if (hostGuideMatch) {
+    sections.hostGuide = hostGuideMatch[1].trim();
+  }
+
+  // Extract detective script
+  const detectiveMatch = content.match(/# INSPECTOR SCRIPT\n([\s\S]*?)(?=# |$)/);
+  if (detectiveMatch) {
+    sections.detectiveScript = detectiveMatch[1].trim();
+  }
+
+  // Extract evidence cards
+  const evidencePattern = /# EVIDENCE: .*?\n([\s\S]*?)(?=# EVIDENCE:|# |$)/g;
+  let evidenceMatch;
+  while ((evidenceMatch = evidencePattern.exec(content)) !== null) {
+    const cardContent = evidenceMatch[1].trim();
+    sections.evidenceCards.push({
+      content: cardContent,
+      created_at: new Date().toISOString()
+    });
+  }
+
+  // Extract character information
+  const characterPattern = /# ([^-\n]+) - CHARACTER GUIDE\n([\s\S]*?)(?=# \w+ - CHARACTER GUIDE|# |$)/g;
+  let characterMatch;
+  while ((characterMatch = characterPattern.exec(content)) !== null) {
+    const characterName = characterMatch[1].trim();
+    const characterContent = characterMatch[2].trim();
+    
+    // Extract character details
+    const description = characterContent.match(/## CHARACTER DESCRIPTION\n([\s\S]*?)(?=##|$)/)?.[1]?.trim();
+    const background = characterContent.match(/## YOUR BACKGROUND\n([\s\S]*?)(?=##|$)/)?.[1]?.trim();
+    const relationshipsSection = characterContent.match(/## YOUR RELATIONSHIPS\n([\s\S]*?)(?=##|$)/)?.[1]?.trim();
+    const secretsSection = characterContent.match(/## YOUR SECRET\n([\s\S]*?)(?=##|$)/)?.[1]?.trim();
+    
+    // Extract round scripts
+    const roundScripts = {
+      introduction: characterContent.match(/### SAY HELLO\n"([^"]+)"/)?.[1],
+      round2: {
+        innocent: characterContent.match(/\*\*IF YOU ARE INNOCENT:\*\*\n"([^"]+)"/)?.[1],
+        guilty: characterContent.match(/\*\*IF YOU ARE GUILTY:\*\*\n"([^"]+)"/)?.[1],
+        accomplice: characterContent.match(/\*\*IF YOU ARE THE ACCOMPLICE:\*\*\n"([^"]+)"/)?.[1]
+      },
+      // ... similar pattern for rounds 3 and 4
+      final: {
+        innocent: characterContent.match(/\*\*IF YOU ARE INNOCENT:\*\*\n"([^"]+)"/)?.[1],
+        guilty: characterContent.match(/\*\*IF YOU ARE GUILTY:\*\*\n"([^"]+)"/)?.[1],
+        accomplice: characterContent.match(/\*\*IF YOU ARE THE ACCOMPLICE:\*\*\n"([^"]+)"/)?.[1]
+      }
+    };
+
+    sections.characters.push({
+      character_name: characterName,
+      description,
+      background,
+      relationships: parseRelationships(relationshipsSection),
+      secrets: secretsSection ? [secretsSection] : [],
+      round_scripts: roundScripts
+    });
+  }
+
+  // Extract relationship matrix
+  const matrixMatch = content.match(/# CHARACTER RELATIONSHIP MATRIX\n([\s\S]*?)(?=# |$)/);
+  if (matrixMatch) {
+    sections.relationshipMatrix = parseRelationshipMatrix(matrixMatch[1].trim());
+  }
+
+  return sections;
+};
+
+const parseRelationships = (relationshipsText: string | undefined): any[] => {
+  if (!relationshipsText) return [];
+  
+  const relationships = [];
+  const relationshipPattern = /\*\*([^*]+)\*\*:\s*([^\n]+)/g;
+  let match;
+  
+  while ((match = relationshipPattern.exec(relationshipsText)) !== null) {
+    relationships.push({
+      character: match[1].trim(),
+      description: match[2].trim()
+    });
+  }
+  
+  return relationships;
+};
+
+const parseRelationshipMatrix = (matrixText: string): any => {
+  const matrix: Record<string, any> = {};
+  const lines = matrixText.split('\n').filter(line => line.trim());
+  
+  // Skip header row
+  for (let i = 2; i < lines.length; i++) {
+    const [name, primary, secondary, secret] = lines[i].split('|').map(cell => cell.trim());
+    if (name && name !== '---') {
+      matrix[name] = {
+        primary_connection: primary,
+        secondary_connections: secondary.split(',').map(s => s.trim()),
+        secret_connections: secret.split(',').map(s => s.trim())
+      };
+    }
+  }
+  
+  return matrix;
+};
+
+/**
  * Generate the package in logical chunks to avoid timeouts with improved resumability
  */
 const generatePackageInChunks = async (
@@ -608,6 +726,32 @@ const generatePackageInChunks = async (
     
     // Clear saved state since we're done
     clearGenerationState(mysteryId);
+    
+    // Extract sections from the generated content
+    const sections = extractSections(fullPackage);
+    
+    // Store the sections in the database
+    await supabase
+      .from('mystery_packages')
+      .update({
+        content: fullPackage, // Keep the full content for reference
+        host_guide: sections.hostGuide,
+        detective_script: sections.detectiveScript,
+        evidence_cards: sections.evidenceCards,
+        relationship_matrix: sections.relationshipMatrix,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', packageId);
+      
+    // Store character information
+    for (const character of sections.characters) {
+      await supabase
+        .from('mystery_characters')
+        .insert({
+          package_id: packageId,
+          ...character
+        });
+    }
     
     return fullPackage;
     

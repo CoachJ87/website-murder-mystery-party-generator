@@ -116,32 +116,91 @@ export type Database = {
           },
         ]
       }
+      mystery_characters: {
+        Row: {
+          background: string | null
+          character_name: string
+          created_at: string | null
+          description: string | null
+          id: string
+          package_id: string | null
+          relationships: Json | null
+          round_scripts: Json | null
+          secrets: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          background?: string | null
+          character_name: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          package_id?: string | null
+          relationships?: Json | null
+          round_scripts?: Json | null
+          secrets?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          background?: string | null
+          character_name?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          package_id?: string | null
+          relationships?: Json | null
+          round_scripts?: Json | null
+          secrets?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mystery_characters_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "mystery_packages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mystery_packages: {
         Row: {
           content: string
           conversation_id: string | null
           created_at: string | null
+          detective_script: string | null
+          evidence_cards: Json | null
           generation_status: Json | null
+          host_guide: string | null
           id: string
           partial_content: Json | null
+          relationship_matrix: Json | null
           updated_at: string | null
         }
         Insert: {
           content: string
           conversation_id?: string | null
           created_at?: string | null
+          detective_script?: string | null
+          evidence_cards?: Json | null
           generation_status?: Json | null
+          host_guide?: string | null
           id?: string
           partial_content?: Json | null
+          relationship_matrix?: Json | null
           updated_at?: string | null
         }
         Update: {
           content?: string
           conversation_id?: string | null
           created_at?: string | null
+          detective_script?: string | null
+          evidence_cards?: Json | null
           generation_status?: Json | null
+          host_guide?: string | null
           id?: string
           partial_content?: Json | null
+          relationship_matrix?: Json | null
           updated_at?: string | null
         }
         Relationships: [
