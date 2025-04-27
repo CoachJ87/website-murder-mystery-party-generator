@@ -1,21 +1,8 @@
 import React from "react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { CalendarDays, Clock, Users, Tag } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Users, Tag } from "lucide-react";
 
-const MysteryPreviewCard = ({ 
-  mystery, 
-  parsedDetails, 
-  showPurchaseButton = false, 
-  onSimulatePurchase, 
-  isDevMode = false 
-}) => {
-  // Format the creation date
-  const formattedDate = mystery?.created_at
-    ? formatDistanceToNow(new Date(mystery.created_at), { addSuffix: true })
-    : "Recently";
-    
+const MysteryPreviewCard = ({ mystery, parsedDetails }) => {
   // Take only the first 2 sentences of the premise
   const shortenedPremise = parsedDetails?.premise 
     ? parsedDetails.premise.split('.').slice(0, 2).join('.') + '.'
@@ -35,7 +22,7 @@ const MysteryPreviewCard = ({
               <Users className="h-4 w-4 mr-2 text-muted-foreground" />
               <span>Players:</span>
             </div>
-            <p className="font-medium">{mystery.guests || parsedDetails?.characters?.length || "Multiple"} Players</p>
+            <p className="font-medium">{mystery.guests || parsedDetails?.characters?.length || "3"} Players</p>
           </div>
           
           <div className="space-y-1">
@@ -45,24 +32,9 @@ const MysteryPreviewCard = ({
             </div>
             <p className="font-medium">{mystery.theme || "Classic"}</p>
           </div>
-          
-          <div className="space-y-1">
-            <div className="flex items-center text-sm">
-              <CalendarDays className="h-4 w-4 mr-2 text-muted-foreground" />
-              <span>Created:</span>
-            </div>
-            <p className="font-medium">{formattedDate}</p>
-          </div>
-          
-          <div className="space-y-1">
-            <div className="flex items-center text-sm">
-              <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
-              <span>Duration:</span>
-            </div>
-            <p className="font-medium">2-3 hours</p>
-          </div>
         </div>
         
+        {/* Premise Section */}
         {shortenedPremise && (
           <div className="mt-4">
             <h3 className="text-sm font-medium mb-1">Premise:</h3>
@@ -70,16 +42,14 @@ const MysteryPreviewCard = ({
           </div>
         )}
         
+        {/* Characters Section */}
         {parsedDetails?.characters && parsedDetails.characters.length > 0 && (
           <div className="mt-4">
             <h3 className="text-sm font-medium mb-1">Characters:</h3>
             <ul className="text-sm text-muted-foreground list-disc pl-5">
-              {parsedDetails.characters.slice(0, 4).map((character, index) => (
+              {parsedDetails.characters.map((character, index) => (
                 <li key={index}>{character.name}</li>
               ))}
-              {parsedDetails.characters.length > 4 && (
-                <li>...and {parsedDetails.characters.length - 4} more</li>
-              )}
             </ul>
           </div>
         )}
@@ -90,18 +60,6 @@ const MysteryPreviewCard = ({
           </p>
         </div>
       </CardContent>
-      
-      {showPurchaseButton && isDevMode && (
-        <CardFooter>
-          <Button 
-            variant="outline" 
-            onClick={onSimulatePurchase} 
-            className="w-full"
-          >
-            Simulate Purchase (Dev Mode)
-          </Button>
-        </CardFooter>
-      )}
     </Card>
   );
 };
