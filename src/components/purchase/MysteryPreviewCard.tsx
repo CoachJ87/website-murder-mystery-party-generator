@@ -1,7 +1,8 @@
 
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Clock, User, Brush } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Clock, User, Brush, FileText } from "lucide-react";
 import type { Mystery } from "@/interfaces/mystery";
 
 interface Character {
@@ -9,17 +10,40 @@ interface Character {
   description: string;
 }
 
+interface Evidence {
+  title: string;
+  description: string;
+}
+
 interface ParsedMysteryDetails {
   premise: string;
+  overview?: string;
+  gameDetails?: string;
   characters: Character[];
+  evidence?: Evidence[];
 }
 
 interface MysteryPreviewCardProps {
   mystery: Mystery;
   parsedDetails: ParsedMysteryDetails | null;
+  showPurchaseButton?: boolean;
+  onSimulatePurchase?: () => void;
+  isDevMode?: boolean;
 }
 
-const MysteryPreviewCard = ({ mystery, parsedDetails }: MysteryPreviewCardProps) => {
+const MysteryPreviewCard = ({ 
+  mystery, 
+  parsedDetails, 
+  showPurchaseButton,
+  onSimulatePurchase,
+  isDevMode 
+}: MysteryPreviewCardProps) => {
+  // Function to truncate text if it's too long
+  const truncateText = (text: string, maxLength: number = 100) => {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+  };
+
   return (
     <Card className="h-full">
       <CardHeader>
@@ -66,6 +90,19 @@ const MysteryPreviewCard = ({ mystery, parsedDetails }: MysteryPreviewCardProps)
           
           <Separator />
 
+          {/* Game Overview Section */}
+          {parsedDetails?.overview && (
+            <>
+              <div>
+                <h3 className="font-semibold mb-2">Game Overview</h3>
+                <p className="text-muted-foreground">
+                  {parsedDetails.overview}
+                </p>
+              </div>
+              <Separator />
+            </>
+          )}
+
           {/* Premise Section */}
           {parsedDetails?.premise && (
             <>
@@ -84,19 +121,45 @@ const MysteryPreviewCard = ({ mystery, parsedDetails }: MysteryPreviewCardProps)
             <div>
               <h3 className="font-semibold mb-3">Characters</h3>
               <div className="space-y-4">
-                {parsedDetails.characters.map((character, index) => (
+                {parsedDetails.characters.slice(0, 3).map((character, index) => (
                   <div key={index} className="space-y-1">
                     <h4 className="text-sm font-medium">{character.name}</h4>
-                    <p className="text-sm text-muted-foreground">{character.description}</p>
+                    <p className="text-sm text-muted-foreground">{truncateText(character.description, 120)}</p>
                   </div>
                 ))}
-                {parsedDetails.characters.length < mystery.guests && (
+                {parsedDetails.characters.length > 3 && (
                   <p className="text-sm text-muted-foreground italic">
-                    +{mystery.guests - parsedDetails.characters.length} more characters in the full package
+                    +{parsedDetails.characters.length - 3} more characters in the full package
                   </p>
                 )}
               </div>
             </div>
+          )}
+
+          {/* Evidence Preview Section */}
+          {parsedDetails?.evidence && parsedDetails.evidence.length > 0 && (
+            <>
+              <Separator />
+              <div>
+                <h3 className="font-semibold mb-3">Evidence</h3>
+                <div className="space-y-4">
+                  {parsedDetails.evidence.slice(0, 2).map((item, index) => (
+                    <div key={index} className="space-y-1">
+                      <div className="flex items-start gap-2">
+                        <FileText className="h-4 w-4 text-muted-foreground mt-0.5" />
+                        <h4 className="text-sm font-medium">{item.title}</h4>
+                      </div>
+                      <p className="text-sm text-muted-foreground ml-6">{truncateText(item.description, 100)}</p>
+                    </div>
+                  ))}
+                  {parsedDetails.evidence.length > 2 && (
+                    <p className="text-sm text-muted-foreground italic">
+                      +{parsedDetails.evidence.length - 2} more evidence items in the full package
+                    </p>
+                  )}
+                </div>
+              </div>
+            </>
           )}
 
           {(!parsedDetails?.premise && (!parsedDetails?.characters || parsedDetails.characters.length === 0)) && (
@@ -108,6 +171,19 @@ const MysteryPreviewCard = ({ mystery, parsedDetails }: MysteryPreviewCardProps)
           )}
         </div>
       </CardContent>
+
+      {showPurchaseButton && isDevMode && (
+        <CardFooter>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full"
+            onClick={onSimulatePurchase}
+          >
+            Simulate Purchase (Dev Mode)
+          </Button>
+        </CardFooter>
+      )}
     </Card>
   );
 };

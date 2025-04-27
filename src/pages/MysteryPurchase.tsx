@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -16,9 +17,17 @@ interface Character {
   description: string;
 }
 
+interface Evidence {
+  title: string;
+  description: string;
+}
+
 interface ParsedMysteryDetails {
   premise: string;
+  overview?: string;
+  gameDetails?: string;
   characters: Character[];
+  evidence?: Evidence[];
 }
 
 const MysteryPurchase = () => {
@@ -28,37 +37,94 @@ const MysteryPurchase = () => {
   const [parsedDetails, setParsedDetails] = useState<ParsedMysteryDetails | null>(null);
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
+  const isDevMode = import.meta.env.DEV || (window.location.hostname === 'localhost');
 
-  const extractFirstTwoSentences = (text: string) => {
-    const cleanText = text.trim().replace(/^\s*[-*]\s*/, '');
-    const sentences = cleanText.match(/[^.!?]+[.!?]+/g) || [];
-    return sentences.slice(0, 2).join(' ').trim();
+  // Enhanced extraction functions with better pattern matching
+  const extractGameOverview = (content: string): string => {
+    // Look for game overview section which might be marked with different headers
+    const overviewPatterns = [
+      /(?:##?\s*(?:GAME OVERVIEW|OVERVIEW|GAME INTRODUCTION|INTRODUCTION))([\s\S]*?)(?=##|$)/i,
+      /(?:".*?")\s+is\s+a\s+([\s\S]*?)(?=\.\s)/i
+    ];
+    
+    for (const pattern of overviewPatterns) {
+      const match = content.match(pattern);
+      if (match?.[1]) {
+        return match[1].trim().replace(/^\s*[-*]\s*/, '');
+      }
+    }
+    
+    return '';
+  };
+
+  const extractPremise = (content: string): string => {
+    // Look for premise or similar sections with case-insensitive matching
+    const premisePatterns = [
+      /(?:##?\s*(?:PREMISE|Background|Setting|SETTING|SCENARIO|Scenario|THE STORY|Story))([\s\S]*?)(?=##|$)/i,
+      /(?:GAME OVERVIEW)([\s\S]*?)(?=##|MATERIALS NEEDED|BEFORE THE PARTY|$)/i
+    ];
+    
+    for (const pattern of premisePatterns) {
+      const match = content.match(pattern);
+      if (match?.[1] && match[1].trim().length > 20) {
+        return match[1].trim().replace(/^\s*[-*]\s*/, '');
+      }
+    }
+    
+    // Fallback: try to find the first substantial paragraph if no premise section exists
+    const fallbackMatch = content.match(/^([^#]+)/);
+    if (fallbackMatch?.[1] && fallbackMatch[1].trim().length > 50) {
+      return fallbackMatch[1].trim().replace(/^\s*[-*]\s*/, '');
+    }
+    
+    return '';
   };
 
   const parseCharacters = (content: string): Character[] => {
     const characters: Character[] = [];
     
-    const characterSections = content.match(/(?:##\s*(?:CHARACTER LIST|Characters|CHARACTERS|CHARACTER|SUSPECTS))([\s\S]*?)(?=##|$)/i);
+    // Try to find character sections with case-insensitive matching
+    const characterSectionsPatterns = [
+      /(?:##?\s*(?:CHARACTER LIST|Characters|CHARACTERS|CHARACTER|SUSPECTS))([\s\S]*?)(?=##|$)/i,
+      /(?:##?\s*(?:[A-Z\s]+ - CHARACTER GUIDE))([\s\S]*?)(?=##|$)/i
+    ];
     
-    if (!characterSections?.[1]) return characters;
+    let characterSection = '';
+    for (const pattern of characterSectionsPatterns) {
+      const match = content.match(pattern);
+      if (match?.[1]) {
+        characterSection = match[1];
+        break;
+      }
+    }
     
-    const characterSection = characterSections[1];
+    if (!characterSection) return characters;
     
+    // Pattern 1: Character with description after colon/dash
     const formatOneMatches = Array.from(characterSection.matchAll(/(?:\d+\.|\*|\-)\s*\*\*([^*]+)\*\*\s*[-–:]\s*([^#\n]+)/g));
     
+    // Pattern 2: Character name in bold followed by description
     const formatTwoMatches = Array.from(characterSection.matchAll(/\*\*([^*]+)\*\*\s*[-–:]\s*([^#\n]+)/g));
     
-    const allMatches = formatOneMatches.length > 0 ? formatOneMatches : formatTwoMatches;
+    // Pattern 3: Character name as header followed by description
+    const formatThreeMatches = Array.from(content.matchAll(/##?\s*([A-Z\s]+)\s*-\s*CHARACTER GUIDE\s*\n+(?:CHARACTER DESCRIPTION\s*\n+)?([\s\S]*?)(?=YOUR BACKGROUND|YOUR RELATIONSHIPS|##|$)/ig));
+
+    // Use the most populated set of matches
+    let allMatches = [];
+    if (formatOneMatches.length >= formatTwoMatches.length && formatOneMatches.length >= formatThreeMatches.length) {
+      allMatches = formatOneMatches;
+    } else if (formatTwoMatches.length >= formatOneMatches.length && formatTwoMatches.length >= formatThreeMatches.length) {
+      allMatches = formatTwoMatches;
+    } else {
+      allMatches = formatThreeMatches;
+    }
     
     for (const match of allMatches) {
       const [_, name, description] = match;
       if (name && description) {
-        const cleanName = name.trim();
+        const cleanName = name.trim().replace(/^\d+\.\s*/, '');
         let cleanDescription = description.trim();
-        if (cleanDescription.length > 150) {
-          const firstSentence = description.split(/[.!?]/)[0].trim() + '.';
-          cleanDescription = firstSentence;
-        }
+        
         characters.push({
           name: cleanName,
           description: cleanDescription
@@ -66,6 +132,7 @@ const MysteryPurchase = () => {
       }
     }
 
+    // If we still don't have characters, try another approach for character names only
     if (characters.length === 0) {
       const nameOnlyMatches = characterSection.match(/\*\*([^*]+)\*\*/g);
       if (nameOnlyMatches) {
@@ -79,32 +146,74 @@ const MysteryPurchase = () => {
           }
         });
       }
+      
+      // Last resort: look for character names as headers
+      if (characters.length === 0) {
+        const headerMatches = Array.from(content.matchAll(/##\s*([A-Z][A-Z\s]+[A-Z])\s*(?:-|–)/g));
+        headerMatches.forEach(match => {
+          const name = match[1].trim();
+          if (name && name.length > 2 && !name.match(/EVIDENCE CARD|HOST GUIDE/i)) {
+            characters.push({
+              name,
+              description: "Full character description available in the purchased package."
+            });
+          }
+        });
+      }
     }
 
     return characters;
   };
-
-  const parsePremise = (content: string): string => {
-    const premiseMatch = content.match(/(?:##\s*(?:PREMISE|Background|Setting|SETTING|SCENARIO|Scenario|THE STORY|Story))([\s\S]*?)(?=##|$)/i);
+  
+  const parseEvidence = (content: string): Evidence[] => {
+    const evidence: Evidence[] = [];
     
-    if (!premiseMatch?.[1]) {
-      const fallbackMatch = content.match(/^([^#]+)/);
-      if (fallbackMatch?.[1] && fallbackMatch[1].trim().length > 20) {
-        return extractFirstTwoSentences(fallbackMatch[1]);
+    // Try to find evidence sections
+    const evidenceSectionsPattern = /(?:##?\s*(?:EVIDENCE CARDS|CLUES|EVIDENCE|CLUE CARDS))([\s\S]*?)(?=##|$)/i;
+    
+    const evidenceItemPattern = /(?:##?\s*EVIDENCE CARD #?\d+:?\s*([^\n]+)|"?EVIDENCE CARD #?\d+:?\s*([^\n]+)"?)([\s\S]*?)(?=(?:##?\s*EVIDENCE CARD)|##|$)/gi;
+    
+    const match = content.match(evidenceSectionsPattern);
+    const evidenceSection = match?.[1] || content;
+    
+    const evidenceMatches = Array.from(evidenceSection.matchAll(evidenceItemPattern));
+    
+    for (const match of evidenceMatches) {
+      const title = (match[1] || match[2]).trim();
+      const description = match[3].trim().split('\n')[0]; // Get just the first line
+      
+      if (title) {
+        evidence.push({
+          title,
+          description: description || "Evidence details available in the full package."
+        });
       }
-      return '';
     }
     
-    const premiseText = premiseMatch[1].trim()
-      .replace(/^\s*[-*]\s*/, '')
-      .replace(/\n+/g, ' ');
-
-    return extractFirstTwoSentences(premiseText);
+    return evidence;
   };
 
   useEffect(() => {
     const fetchMysteryAndMessages = async () => {
       try {
+        // Check if this is a redirect from Stripe with a success parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const purchaseStatus = urlParams.get('purchase');
+        
+        if (purchaseStatus === 'success') {
+          toast.success("Purchase successful! You now have full access to this mystery package.");
+          
+          // Need to update the local state to reflect the purchase
+          await supabase
+            .from('conversations')
+            .update({ is_paid: true, purchase_date: new Date().toISOString() })
+            .eq('id', id);
+        }
+        
+        if (purchaseStatus === 'cancel') {
+          toast.error("Purchase cancelled. You can try again when you're ready.");
+        }
+        
         const { data: conversation, error: convError } = await supabase
           .from('conversations')
           .select('*, messages(*)')
@@ -123,14 +232,12 @@ const MysteryPurchase = () => {
           return;
         }
 
-        console.log("Conversation data:", conversation);
-
         const mysteryData: Mystery = {
           id: conversation.id,
           title: conversation.title || "Custom Murder Mystery",
           created_at: conversation.created_at,
           updated_at: conversation.updated_at,
-          status: conversation.display_status || "draft",
+          status: conversation.is_paid ? "purchased" : (conversation.display_status || "draft"),
           guests: conversation.mystery_data?.playerCount || 0,
           theme: conversation.mystery_data?.theme || "",
           premise: "",
@@ -144,50 +251,45 @@ const MysteryPurchase = () => {
           const aiMessages = conversation.messages
             .filter(m => m.is_ai)
             .sort((a, b) => new Date(b.created_at || b.timestamp).getTime() - new Date(a.created_at || a.timestamp).getTime());
-
-          console.log("AI messages found:", aiMessages.length);
           
           let detailedMessage = null;
           
+          // First, look for a message with both premise and characters
           for (const msg of aiMessages) {
-            const hasPremise = /(?:##\s*(?:PREMISE|Background|Setting|SETTING|SCENARIO|Scenario|THE STORY|Story))/i.test(msg.content);
+            const hasPremise = /(?:##\s*(?:PREMISE|GAME OVERVIEW|Background|Setting|SETTING|SCENARIO|Scenario|THE STORY|Story))/i.test(msg.content);
             const hasCharacters = /(?:##\s*(?:CHARACTER LIST|Characters|CHARACTERS|CHARACTER|SUSPECTS))/i.test(msg.content);
             
             if (hasPremise && hasCharacters) {
               detailedMessage = msg;
-              console.log("Found complete message with premise and characters");
               break;
             }
           }
           
+          // If no complete message found, look for one with any detailed content
           if (!detailedMessage) {
             for (const msg of aiMessages) {
-              const hasSomeDetails = /(?:##\s*(?:PREMISE|Background|Setting|CHARACTER LIST|Characters|CHARACTERS|VICTIM|MURDER|SCENARIO))/i.test(msg.content);
+              const hasSomeDetails = /(?:##\s*(?:PREMISE|GAME OVERVIEW|Background|Setting|CHARACTER LIST|Characters|CHARACTERS|VICTIM|MURDER|SCENARIO|EVIDENCE))/i.test(msg.content);
               if (hasSomeDetails) {
                 detailedMessage = msg;
-                console.log("Using message with partial details");
                 break;
               }
             }
           }
-
+          
+          // Last resort: use the most recent message
           if (!detailedMessage && aiMessages.length > 0) {
             detailedMessage = aiMessages[0];
-            console.log("Falling back to most recent AI message");
           }
 
           if (detailedMessage) {
-            console.log("Processing detailed message:", detailedMessage.content.substring(0, 100) + "...");
-            
-            const details = {
-              premise: parsePremise(detailedMessage.content),
-              characters: parseCharacters(detailedMessage.content)
+            const details: ParsedMysteryDetails = {
+              premise: extractPremise(detailedMessage.content),
+              overview: extractGameOverview(detailedMessage.content),
+              characters: parseCharacters(detailedMessage.content),
+              evidence: parseEvidence(detailedMessage.content)
             };
             
-            console.log("Parsed details:", details);
             setParsedDetails(details);
-          } else {
-            console.log("No suitable AI message found");
           }
         }
       } catch (error) {
@@ -199,6 +301,34 @@ const MysteryPurchase = () => {
     fetchMysteryAndMessages();
   }, [id, navigate]);
 
+  const handleSimulatePurchase = async () => {
+    if (!isDevMode) return;
+    
+    try {
+      toast.info("Simulating purchase in dev mode...");
+      
+      // Update conversation to mark as purchased
+      await supabase
+        .from('conversations')
+        .update({ 
+          is_paid: true,
+          purchase_date: new Date().toISOString()
+        })
+        .eq('id', id);
+        
+      toast.success("Purchase simulated! Redirecting to mystery page...");
+      
+      // Redirect to the full mystery page
+      setTimeout(() => {
+        navigate(`/mystery/${id}`);
+      }, 1500);
+      
+    } catch (error) {
+      console.error("Error simulating purchase:", error);
+      toast.error("Failed to simulate purchase");
+    }
+  };
+
   const handlePurchase = async () => {
     if (!isAuthenticated) {
       toast.error("Please sign in to purchase this mystery");
@@ -208,7 +338,9 @@ const MysteryPurchase = () => {
     
     try {
       setProcessing(true);
+      toast.info("Preparing your checkout...");
       
+      // Call our API endpoint to create a checkout session
       const response = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: {
@@ -220,17 +352,22 @@ const MysteryPurchase = () => {
         }),
       });
 
-      const { url, error } = await response.json();
+      const data = await response.json();
       
-      if (error) {
-        throw new Error(error);
+      if (data.error) {
+        throw new Error(data.error);
       }
 
-      window.location.href = url;
+      if (data.url) {
+        // Redirect to Stripe checkout
+        window.location.href = data.url;
+      } else {
+        throw new Error("No checkout URL returned from the server");
+      }
       
     } catch (error) {
       console.error("Error processing payment:", error);
-      toast.error("Payment failed. Please try again.");
+      toast.error("Payment preparation failed. Please try again.");
     } finally {
       setProcessing(false);
     }
@@ -266,7 +403,13 @@ const MysteryPurchase = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <MysteryPreviewCard mystery={mystery} parsedDetails={parsedDetails} />
+            <MysteryPreviewCard 
+              mystery={mystery} 
+              parsedDetails={parsedDetails} 
+              showPurchaseButton={isDevMode}
+              onSimulatePurchase={handleSimulatePurchase}
+              isDevMode={isDevMode}
+            />
 
             <div className="space-y-6">
               <Card>
