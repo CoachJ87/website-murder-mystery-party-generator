@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -290,6 +289,7 @@ const MysteryPurchase = () => {
             };
             
             setParsedDetails(details);
+            console.log("Extracted details:", details); // Debug log
           }
         }
       } catch (error) {
@@ -406,9 +406,6 @@ const MysteryPurchase = () => {
             <MysteryPreviewCard 
               mystery={mystery} 
               parsedDetails={parsedDetails} 
-              showPurchaseButton={false}
-              onSimulatePurchase={handleSimulatePurchase}
-              isDevMode={isDevMode}
             />
 
             <div className="space-y-6">
@@ -448,7 +445,7 @@ const MysteryPurchase = () => {
                     ))}
                   </div>
                 </CardContent>
-                <CardFooter>
+                <CardFooter className="flex-col gap-4">
                   <Button 
                     className="w-full" 
                     size="lg" 
@@ -467,9 +464,8 @@ const MysteryPurchase = () => {
                       </>
                     )}
                   </Button>
-                </CardFooter>
-                {isDevMode && (
-                  <div className="px-6 pb-6 -mt-3">
+                  
+                  {isDevMode && (
                     <Button 
                       variant="outline" 
                       className="w-full" 
@@ -477,8 +473,8 @@ const MysteryPurchase = () => {
                     >
                       Simulate Purchase (Dev Mode)
                     </Button>
-                  </div>
-                )}
+                  )}
+                </CardFooter>
               </Card>
 
               <div className="bg-muted rounded-lg p-6">
