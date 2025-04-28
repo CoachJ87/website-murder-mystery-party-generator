@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Users, Tag, Clock } from "lucide-react";
+import { Users, Tag } from "lucide-react";
 
 interface MysteryPreviewCardProps {
   mystery: {
@@ -12,7 +12,6 @@ interface MysteryPreviewCardProps {
   parsedDetails?: {
     premise?: string;
     characters?: Array<{ name: string }>;
-    playtime?: string;
   };
 }
 
@@ -29,7 +28,7 @@ const MysteryPreviewCard = ({ mystery, parsedDetails }: MysteryPreviewCardProps)
       
       <CardContent className="flex-grow space-y-6">
         {/* Core Details Grid */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
             <div className="flex items-center text-sm">
               <Users className="h-4 w-4 mr-2 text-muted-foreground" />
@@ -46,14 +45,6 @@ const MysteryPreviewCard = ({ mystery, parsedDetails }: MysteryPreviewCardProps)
               <span>Theme</span>
             </div>
             <p className="font-medium">{mystery.theme || "Classic"}</p>
-          </div>
-
-          <div className="space-y-1">
-            <div className="flex items-center text-sm">
-              <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
-              <span>Duration</span>
-            </div>
-            <p className="font-medium">2-3 hours</p>
           </div>
         </div>
         
