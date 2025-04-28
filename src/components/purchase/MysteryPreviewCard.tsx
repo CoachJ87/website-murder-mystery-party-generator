@@ -17,10 +17,8 @@ interface MysteryPreviewCardProps {
 }
 
 const MysteryPreviewCard = ({ mystery, parsedDetails }: MysteryPreviewCardProps) => {
-  // Take only the first 2 sentences of the premise if it exists
-  const shortenedPremise = parsedDetails?.premise 
-    ? parsedDetails.premise.split('.').slice(0, 2).join('.') + '.'
-    : '';
+  // Extract first paragraph from premise as teaser
+  const teaser = parsedDetails?.premise?.split('\n\n')[0] || '';
 
   return (
     <Card className="h-full flex flex-col">
@@ -30,6 +28,7 @@ const MysteryPreviewCard = ({ mystery, parsedDetails }: MysteryPreviewCardProps)
       </CardHeader>
       
       <CardContent className="flex-grow space-y-6">
+        {/* Core Details Grid */}
         <div className="grid grid-cols-3 gap-4">
           <div className="space-y-1">
             <div className="flex items-center text-sm">
@@ -37,7 +36,7 @@ const MysteryPreviewCard = ({ mystery, parsedDetails }: MysteryPreviewCardProps)
               <span>Players</span>
             </div>
             <p className="font-medium">
-              {mystery.guests || parsedDetails?.characters?.length || "4-8"} Players
+              {mystery.guests || "4-8"} Players
             </p>
           </div>
           
@@ -58,30 +57,18 @@ const MysteryPreviewCard = ({ mystery, parsedDetails }: MysteryPreviewCardProps)
           </div>
         </div>
         
-        {/* Preview Content */}
-        <div className="prose prose-sm max-w-none space-y-4">
-          {shortenedPremise && (
-            <div>
-              <h3 className="text-sm font-medium">Story Preview</h3>
-              <p className="text-sm text-muted-foreground">{shortenedPremise}</p>
-            </div>
-          )}
-          
-          {parsedDetails?.characters && parsedDetails.characters.length > 0 && (
-            <div>
-              <h3 className="text-sm font-medium">Featured Characters</h3>
-              <ul className="text-sm text-muted-foreground list-disc pl-5">
-                {parsedDetails.characters.slice(0, 3).map((character, index) => (
-                  <li key={index}>{character.name}</li>
-                ))}
-                {parsedDetails.characters.length > 3 && (
-                  <li>And {parsedDetails.characters.length - 3} more characters...</li>
-                )}
-              </ul>
-            </div>
-          )}
-        </div>
+        {/* Story Teaser */}
+        {teaser && (
+          <div className="prose prose-sm max-w-none">
+            <h3 className="text-sm font-medium">Story Preview</h3>
+            <p className="text-sm text-muted-foreground">{teaser}</p>
+            <p className="text-xs italic text-muted-foreground mt-2">
+              Purchase to unlock the complete mystery package with all character details, clues, and materials.
+            </p>
+          </div>
+        )}
         
+        {/* Package Contents Preview */}
         <div className="p-4 bg-muted rounded-lg text-sm text-muted-foreground">
           <p className="font-medium mb-2">What's included in the full package:</p>
           <ul className="list-disc pl-4 space-y-1">
