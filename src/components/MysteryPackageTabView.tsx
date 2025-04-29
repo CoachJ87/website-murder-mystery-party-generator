@@ -26,7 +26,7 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
   const [activeTab, setActiveTab] = useState("host-guide");
   const [completeContent, setCompleteContent] = useState(packageContent);
   const [title, setTitle] = useState(mysteryTitle);
-  const [debugMode] = useState(true); // Enable debug mode to see what's happening
+  const [debugMode] = useState(true); // Keep debug mode enabled for troubleshooting
   const [sectionContent, setSectionContent] = useState({
     hostGuide: '',
     characters: '',
@@ -92,10 +92,10 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
               }
                 
               if (charactersData && charactersData.length > 0) {
-                charactersContent += `# CHARACTERS\n\n`;
+                charactersContent = `# CHARACTERS\n\n`;
                 if (debugMode) console.log(`Found ${charactersData.length} characters`);
                 
-                charactersData.forEach(char => {
+                for (const char of charactersData) {
                   charactersContent += `## ${char.character_name}\n\n`;
                   
                   if (char.description) {
@@ -106,19 +106,57 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
                     charactersContent += `### BACKGROUND\n${char.background}\n\n`;
                   }
                   
-                  if (char.relationships && char.relationships.length > 0) {
+                  // Format relationships properly
+                  if (Array.isArray(char.relationships) && char.relationships.length > 0) {
                     charactersContent += `### RELATIONSHIPS\n`;
-                    char.relationships.forEach((rel: any) => {
-                      if (rel.character && rel.description) {
+                    
+                    for (const rel of char.relationships) {
+                      if (typeof rel === 'object' && rel.character && rel.description) {
                         charactersContent += `**${rel.character}**: ${rel.description}\n\n`;
                       }
-                    });
+                    }
                   }
                   
-                  if (char.secrets && char.secrets.length > 0) {
-                    charactersContent += `### SECRETS\n${char.secrets.join('\n\n')}\n\n`;
+                  // Format secrets properly
+                  if (Array.isArray(char.secrets) && char.secrets.length > 0) {
+                    charactersContent += `### SECRETS\n`;
+                    
+                    for (const secret of char.secrets) {
+                      if (typeof secret === 'string' && secret.trim()) {
+                        charactersContent += `${secret}\n\n`;
+                      }
+                    }
                   }
-                });
+                  
+                  // Add any round scripts if available
+                  if (char.round_scripts && typeof char.round_scripts === 'object') {
+                    charactersContent += `### SCRIPT NOTES\n`;
+                    
+                    // Format introduction scripts
+                    if (char.round_scripts.introduction) {
+                      charactersContent += `**Introduction**: "${char.round_scripts.introduction}"\n\n`;
+                    }
+                    
+                    // Format final statements
+                    if (char.round_scripts.final) {
+                      if (char.round_scripts.final.innocent) {
+                        charactersContent += `**If innocent**: "${char.round_scripts.final.innocent}"\n\n`;
+                      }
+                      if (char.round_scripts.final.guilty) {
+                        charactersContent += `**If guilty**: "${char.round_scripts.final.guilty}"\n\n`;
+                      }
+                      if (char.round_scripts.final.accomplice) {
+                        charactersContent += `**If accomplice**: "${char.round_scripts.final.accomplice}"\n\n`;
+                      }
+                    }
+                  }
+                  
+                  // Add a separator between characters
+                  charactersContent += `\n---\n\n`;
+                }
+                
+                // Remove the last separator
+                charactersContent = charactersContent.replace(/\n---\n\n$/, '\n\n');
                 
                 constructedContent += charactersContent;
                 if (debugMode) console.log("Added characters content, length:", charactersContent.length);
@@ -126,13 +164,14 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
             }
             
             // 3. Add clues/evidence if available
-            if (data.evidence_cards && data.evidence_cards.length > 0) {
-              cluesContent += `# CLUES AND EVIDENCE\n\n`;
+            if (Array.isArray(data.evidence_cards) && data.evidence_cards.length > 0) {
+              cluesContent = `# CLUES AND EVIDENCE\n\n`;
               if (debugMode) console.log(`Found ${data.evidence_cards.length} evidence cards`);
               
-              data.evidence_cards.forEach((card: any, index: number) => {
-                if (card.content) {
-                  cluesContent += `## EVIDENCE ${index + 1}: ${card.title || 'Item'}\n\n${card.content}\n\n`;
+              data.evidence_cards.forEach((card, index) => {
+                if (card && typeof card === 'object' && card.content) {
+                  const title = card.title || `Item ${index + 1}`;
+                  cluesContent += `## EVIDENCE ${index + 1}: ${title}\n\n${card.content}\n\n`;
                 }
               });
               
@@ -140,13 +179,13 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
               if (debugMode) console.log("Added clues content, length:", cluesContent.length);
             } else if (data.detective_script && data.detective_script.length > 10) {
               // Add detective script as an alternative source of clues
-              cluesContent += `# CLUES AND EVIDENCE\n\n${data.detective_script}\n\n`;
+              cluesContent = `# CLUES AND EVIDENCE\n\n${data.detective_script}\n\n`;
               constructedContent += cluesContent;
               if (debugMode) console.log("Added detective script as clues, length:", cluesContent.length);
             }
             
             // 4. Add printable materials section
-            materialsContent += `# PRINTABLE MATERIALS\n\n`;
+            materialsContent = `# PRINTABLE MATERIALS\n\n`;
             materialsContent += `## Name Tags\n\nPrint name tags for each character using card stock or sticker paper.\n\n`;
             materialsContent += `## Evidence Cards\n\nPrint the evidence cards on card stock and cut them out.\n\n`;
             

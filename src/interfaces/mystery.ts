@@ -27,6 +27,9 @@ export interface Conversation {
   purchase_date?: string;
   is_purchased?: boolean;
   display_status?: "draft" | "purchased" | "archived";
+  has_complete_package?: boolean;
+  needs_package_generation?: boolean;
+  package_generated_at?: string;
 }
 
 export interface Mystery {
@@ -51,4 +54,34 @@ export interface Mystery {
     };
   };
   purchase_date?: string;
+}
+
+export interface MysteryCharacter {
+  id: string;
+  package_id: string;
+  character_name: string;
+  description?: string;
+  background?: string;
+  relationships: RelationshipInfo[];
+  secrets: string[];
+  round_scripts?: {
+    introduction?: string;
+    round2?: ScriptOptions;
+    round3?: ScriptOptions;
+    round4?: ScriptOptions;
+    final?: ScriptOptions;
+  };
+  created_at: string;
+  updated_at: string;
+}
+
+interface RelationshipInfo {
+  character: string;
+  description: string;
+}
+
+interface ScriptOptions {
+  innocent?: string;
+  guilty?: string;
+  accomplice?: string;
 }
