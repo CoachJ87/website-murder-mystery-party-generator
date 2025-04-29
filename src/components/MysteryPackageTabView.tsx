@@ -26,13 +26,23 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
   const [activeTab, setActiveTab] = useState("host-guide");
   const [completeContent, setCompleteContent] = useState(packageContent);
   const [title, setTitle] = useState(mysteryTitle);
-  const [debugMode] = useState(false); // Set to true for debugging content issues
+  const [debugMode] = useState(true); // Enable debug mode to see what's happening
+  const [sectionContent, setSectionContent] = useState({
+    hostGuide: '',
+    characters: '',
+    clues: '',
+    materials: ''
+  });
+  const [loading, setLoading] = useState(true);
   
   useEffect(() => {
     if (conversationId) {
       // If we have a conversation ID but empty content, fetch from the database
       const fetchFullContent = async () => {
         try {
+          setLoading(true);
+          if (debugMode) console.log("Fetching content for conversation ID:", conversationId);
+          
           // Fetch the main package data
           const { data, error } = await supabase
             .from("mystery_packages")
@@ -46,13 +56,28 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
           }
             
           if (data) {
-            // Initialize our constructed content
+            if (debugMode) {
+              console.log("Fetched data:", {
+                contentLength: data.content?.length || 0,
+                hostGuideLength: data.host_guide?.length || 0,
+                evidenceCards: data.evidence_cards?.length || 0,
+                detectiveScriptLength: data.detective_script?.length || 0,
+                hasId: !!data.id
+              });
+            }
+            
+            // Initialize our constructed content with proper markdown sections
             let constructedContent = "";
+            let hostGuideContent = "";
+            let charactersContent = "";
+            let cluesContent = "";
+            let materialsContent = "";
             
             // 1. Add Host Guide if available
             if (data.host_guide && data.host_guide.length > 10) {
-              constructedContent += `# HOST GUIDE\n\n${data.host_guide}\n\n`;
-              if (debugMode) console.log("Added host guide to content");
+              hostGuideContent = `# HOST GUIDE\n\n${data.host_guide}\n\n`;
+              constructedContent += hostGuideContent;
+              if (debugMode) console.log("Added host guide to content, length:", hostGuideContent.length);
             }
             
             // 2. Fetch and add characters data if available
@@ -67,75 +92,111 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
               }
                 
               if (charactersData && charactersData.length > 0) {
-                constructedContent += `# CHARACTERS\n\n`;
+                charactersContent += `# CHARACTERS\n\n`;
                 if (debugMode) console.log(`Found ${charactersData.length} characters`);
                 
                 charactersData.forEach(char => {
-                  constructedContent += `## ${char.character_name}\n\n`;
+                  charactersContent += `## ${char.character_name}\n\n`;
                   
                   if (char.description) {
-                    constructedContent += `### CHARACTER DESCRIPTION\n${char.description}\n\n`;
+                    charactersContent += `### CHARACTER DESCRIPTION\n${char.description}\n\n`;
                   }
                   
                   if (char.background) {
-                    constructedContent += `### BACKGROUND\n${char.background}\n\n`;
+                    charactersContent += `### BACKGROUND\n${char.background}\n\n`;
                   }
                   
                   if (char.relationships && char.relationships.length > 0) {
-                    constructedContent += `### RELATIONSHIPS\n`;
+                    charactersContent += `### RELATIONSHIPS\n`;
                     char.relationships.forEach((rel: any) => {
                       if (rel.character && rel.description) {
-                        constructedContent += `**${rel.character}**: ${rel.description}\n\n`;
+                        charactersContent += `**${rel.character}**: ${rel.description}\n\n`;
                       }
                     });
                   }
                   
                   if (char.secrets && char.secrets.length > 0) {
-                    constructedContent += `### SECRETS\n${char.secrets.join('\n\n')}\n\n`;
+                    charactersContent += `### SECRETS\n${char.secrets.join('\n\n')}\n\n`;
                   }
                 });
+                
+                constructedContent += charactersContent;
+                if (debugMode) console.log("Added characters content, length:", charactersContent.length);
               }
             }
             
             // 3. Add clues/evidence if available
             if (data.evidence_cards && data.evidence_cards.length > 0) {
-              constructedContent += `# CLUES AND EVIDENCE\n\n`;
+              cluesContent += `# CLUES AND EVIDENCE\n\n`;
               if (debugMode) console.log(`Found ${data.evidence_cards.length} evidence cards`);
               
               data.evidence_cards.forEach((card: any, index: number) => {
                 if (card.content) {
-                  constructedContent += `## EVIDENCE ${index + 1}: ${card.title || 'Item'}\n\n${card.content}\n\n`;
+                  cluesContent += `## EVIDENCE ${index + 1}: ${card.title || 'Item'}\n\n${card.content}\n\n`;
                 }
               });
+              
+              constructedContent += cluesContent;
+              if (debugMode) console.log("Added clues content, length:", cluesContent.length);
             } else if (data.detective_script && data.detective_script.length > 10) {
               // Add detective script as an alternative source of clues
-              constructedContent += `# CLUES AND EVIDENCE\n\n${data.detective_script}\n\n`;
-              if (debugMode) console.log("Added detective script as clues");
+              cluesContent += `# CLUES AND EVIDENCE\n\n${data.detective_script}\n\n`;
+              constructedContent += cluesContent;
+              if (debugMode) console.log("Added detective script as clues, length:", cluesContent.length);
             }
             
             // 4. Add printable materials section
-            constructedContent += `# PRINTABLE MATERIALS\n\n`;
-            constructedContent += `## Name Tags\n\nPrint name tags for each character using card stock or sticker paper.\n\n`;
-            constructedContent += `## Evidence Cards\n\nPrint the evidence cards on card stock and cut them out.\n\n`;
+            materialsContent += `# PRINTABLE MATERIALS\n\n`;
+            materialsContent += `## Name Tags\n\nPrint name tags for each character using card stock or sticker paper.\n\n`;
+            materialsContent += `## Evidence Cards\n\nPrint the evidence cards on card stock and cut them out.\n\n`;
+            
+            constructedContent += materialsContent;
+            if (debugMode) console.log("Added materials content, length:", materialsContent.length);
             
             // Use this constructed content if it's substantial, otherwise fall back to existing content
             if (constructedContent.length > 100) {
               if (debugMode) console.log("Using constructed content, length:", constructedContent.length);
               setCompleteContent(constructedContent);
+              
+              // Set each section directly without extraction
+              setSectionContent({
+                hostGuide: hostGuideContent,
+                characters: charactersContent,
+                clues: cluesContent,
+                materials: materialsContent
+              });
             } else if (data.content && data.content.length > 100) {
-              if (debugMode) console.log("Using original content from database");
+              if (debugMode) console.log("Using original content from database, length:", data.content.length);
               setCompleteContent(data.content);
+              
+              // Extract sections from the original content
+              const extractedSections = {
+                hostGuide: extractSection(data.content, "Host Guide"),
+                characters: extractSection(data.content, "Character"),
+                clues: extractSection(data.content, "Clue"),
+                materials: extractSection(data.content, "Printable Material")
+              };
+              
+              setSectionContent(extractedSections);
+              
+              if (debugMode) {
+                console.log("Extracted section lengths:", {
+                  hostGuide: extractedSections.hostGuide.length,
+                  characters: extractedSections.characters.length,
+                  clues: extractedSections.clues.length,
+                  materials: extractedSections.materials.length
+                });
+              }
             }
             
             // For debugging
             if (debugMode) {
               console.log("Content construction results:");
-              console.log("- Host guide length:", data.host_guide?.length || 0);
-              console.log("- Evidence cards:", data.evidence_cards?.length || 0);
-              console.log("- Constructed content length:", constructedContent.length);
-              console.log("- Original content length:", data.content?.length || 0);
-              console.log("- Final content used length:", 
-                constructedContent.length > 100 ? constructedContent.length : data.content?.length || 0);
+              console.log("- Host guide length:", hostGuideContent.length);
+              console.log("- Characters length:", charactersContent.length);
+              console.log("- Clues length:", cluesContent.length);
+              console.log("- Materials length:", materialsContent.length);
+              console.log("- Total constructed content length:", constructedContent.length);
             }
           }
           
@@ -151,37 +212,47 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
           }
         } catch (err) {
           console.error("Error fetching mystery content:", err);
+        } finally {
+          setLoading(false);
         }
       };
       
       fetchFullContent();
     } else {
+      // No conversation ID, use provided package content and extract sections
       setCompleteContent(packageContent);
+      
+      const extractedSections = {
+        hostGuide: extractSection(packageContent, "Host Guide"),
+        characters: extractSection(packageContent, "Character"),
+        clues: extractSection(packageContent, "Clue"),
+        materials: extractSection(packageContent, "Printable Material")
+      };
+      
+      setSectionContent(extractedSections);
+      setLoading(false);
+      
+      if (debugMode) {
+        console.log("Using provided package content, length:", packageContent.length);
+        console.log("Extracted section lengths:", {
+          hostGuide: extractedSections.hostGuide.length,
+          characters: extractedSections.characters.length,
+          clues: extractedSections.clues.length,
+          materials: extractedSections.materials.length
+        });
+      }
     }
   }, [conversationId, packageContent, debugMode]);
   
-  // Parse the different sections from the package content
-  const sections = {
-    hostGuide: extractSection(completeContent, "Host Guide"),
-    characters: extractSection(completeContent, "Character"),
-    clues: extractSection(completeContent, "Clue"),
-    materials: extractSection(completeContent, "Printable Material"),
-  };
-  
-  // If debug mode is enabled, log the extracted sections
-  useEffect(() => {
-    if (debugMode) {
-      console.log("Extracted sections:");
-      console.log("- Host Guide length:", sections.hostGuide?.length || 0);
-      console.log("- Characters length:", sections.characters?.length || 0);
-      console.log("- Clues length:", sections.clues?.length || 0);
-      console.log("- Materials length:", sections.materials?.length || 0);
-      console.log("Total content length:", completeContent?.length || 0);
-    }
-  }, [sections, completeContent, debugMode]);
-  
+  // Enhanced section extraction with multiple fallback patterns
   function extractSection(content: string, sectionName: string): string {
     if (!content) return "";
+    
+    if (debugMode) {
+      console.log(`Extracting section: ${sectionName}`);
+      console.log(`Content length: ${content.length}`);
+      console.log(`First 100 chars: ${content.substring(0, 100)}`);
+    }
     
     // Enhanced section extraction with fallback patterns
     const patterns = [
@@ -195,9 +266,12 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
     for (const pattern of patterns) {
       const match = content.match(pattern);
       if (match && match[0]) {
+        if (debugMode) console.log(`Found match with pattern: ${pattern}`);
         return match[0].trim();
       }
     }
+    
+    // Additional fallbacks for specific section types
     
     // Additional fallback for character sections
     if (sectionName === "Character") {
@@ -210,12 +284,14 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
       }
       
       if (characterSections.length > 0) {
+        if (debugMode) console.log(`Found ${characterSections.length} character sections with special pattern`);
         return characterSections.join('\n\n');
       }
       
       // Try for just CHARACTERS section
       const charactersSection = content.match(/# CHARACTERS\s*\n([\s\S]*?)(?=# |$)/i);
       if (charactersSection && charactersSection[0]) {
+        if (debugMode) console.log("Found CHARACTERS section with direct pattern");
         return charactersSection[0];
       }
       
@@ -225,12 +301,17 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
       let charMatch;
       
       while ((charMatch = charHeaderPattern.exec(content)) !== null) {
-        if (charMatch[1].includes("CHARACTER") || !charMatch[1].includes(":")) {
+        if (
+          charMatch[1].includes("CHARACTER") || 
+          !charMatch[1].includes(":") || 
+          !/EVIDENCE|CLUE|PRINTABLE|HOST|GUIDE/i.test(charMatch[1])
+        ) {
           charSections.push(`## ${charMatch[1]}\n${charMatch[2]}`);
         }
       }
       
       if (charSections.length > 0) {
+        if (debugMode) console.log(`Found ${charSections.length} character sections with ## pattern`);
         return `# CHARACTERS\n\n${charSections.join('\n\n')}`;
       }
     }
@@ -244,10 +325,12 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
       const cluesMatch = content.match(cluesPattern);
       
       if (evidenceMatch && evidenceMatch[0]) {
+        if (debugMode) console.log("Found EVIDENCE section with pattern");
         return evidenceMatch[0].trim();
       }
       
       if (cluesMatch && cluesMatch[0]) {
+        if (debugMode) console.log("Found CLUES section with pattern");
         return cluesMatch[0].trim();
       }
       
@@ -261,6 +344,7 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
       }
       
       if (evidenceItems.length > 0) {
+        if (debugMode) console.log(`Found ${evidenceItems.length} evidence items with ## pattern`);
         return `# CLUES AND EVIDENCE\n\n${evidenceItems.join('\n\n')}`;
       }
     }
@@ -274,6 +358,7 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
       for (const pattern of [hostPattern, setupPattern, guidePattern]) {
         const match = content.match(pattern);
         if (match && match[0]) {
+          if (debugMode) console.log(`Found host guide with pattern: ${pattern}`);
           return match[0].trim();
         }
       }
@@ -287,16 +372,24 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
       for (const pattern of [materialsPattern, printablesPattern]) {
         const match = content.match(pattern);
         if (match && match[0]) {
+          if (debugMode) console.log(`Found materials with pattern: ${pattern}`);
           return match[0].trim();
         }
       }
     }
     
+    if (debugMode) console.log(`No matching section found for ${sectionName}`);
     return "";
   }
   
-  const getTabContent = (section: string, sectionKey: keyof typeof sections) => {
-    if (!sections[sectionKey] && isGenerating) {
+  const getTabContent = (section: string, sectionKey: keyof typeof sectionContent) => {
+    // First check if we've already extracted this section
+    if (sectionContent[sectionKey] && sectionContent[sectionKey].length > 0) {
+      return sectionContent[sectionKey];
+    }
+    
+    // If not extracted but generation is in progress
+    if (isGenerating) {
       const isInProgress = generationStatus?.sections?.[sectionKey] === false;
       const isComplete = generationStatus?.sections?.[sectionKey] === true;
       
@@ -309,13 +402,24 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
       }
     }
     
-    // If no specific section content is found but we have packageContent, 
-    // show the full content in the first tab as a fallback
-    if (!sections[sectionKey] && completeContent && sectionKey === "hostGuide") {
-      return completeContent;
+    // If we have complete content but no extracted section, try to extract it again
+    if (completeContent && completeContent.length > 0) {
+      const extractedContent = extractSection(completeContent, section);
+      if (extractedContent && extractedContent.length > 0) {
+        return extractedContent;
+      }
+      
+      // If this is the first tab and we have content but no extracted host guide,
+      // just show the complete content
+      if (sectionKey === "hostGuide") {
+        return completeContent;
+      }
     }
     
-    return sections[sectionKey] || `${section} content will appear here.`;
+    // Default fallback message
+    return loading 
+      ? `Loading ${section.toLowerCase()} content...` 
+      : `${section} content will appear here.`;
   };
   
   const handleDownloadPDF = () => {
@@ -383,15 +487,15 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
           </TabsContent>
           
           <TabsContent value="characters" className="prose prose-gray dark:prose-invert max-w-none">
-            <ReactMarkdown>{getTabContent("Character Information", "characters")}</ReactMarkdown>
+            <ReactMarkdown>{getTabContent("Character", "characters")}</ReactMarkdown>
           </TabsContent>
           
           <TabsContent value="clues" className="prose prose-gray dark:prose-invert max-w-none">
-            <ReactMarkdown>{getTabContent("Clues and Evidence", "clues")}</ReactMarkdown>
+            <ReactMarkdown>{getTabContent("Clue", "clues")}</ReactMarkdown>
           </TabsContent>
           
           <TabsContent value="materials" className="prose prose-gray dark:prose-invert max-w-none">
-            <ReactMarkdown>{getTabContent("Printable Materials", "materials")}</ReactMarkdown>
+            <ReactMarkdown>{getTabContent("Printable Material", "materials")}</ReactMarkdown>
           </TabsContent>
         </Tabs>
       </CardContent>
