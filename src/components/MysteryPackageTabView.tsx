@@ -1,4 +1,4 @@
-
+// src/components/MysteryPackageTabView.tsx
 import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,13 +7,21 @@ import ReactMarkdown from 'react-markdown';
 import { Button } from "@/components/ui/button";
 import { GenerationStatus } from "@/services/mysteryPackageService";
 import { supabase } from "@/lib/supabase";
+import { MysteryCharacter } from "@/interfaces/mystery";
 
 export interface MysteryPackageTabViewProps {
-  packageContent: string;
+  packageContent?: string;
   mysteryTitle: string;
   generationStatus?: GenerationStatus;
   isGenerating?: boolean;
   conversationId?: string;
+}
+
+interface TabData {
+  hostGuide: string;
+  characters: MysteryCharacter[];
+  clues: any[];
+  materials: string;
 }
 
 const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
@@ -24,455 +32,265 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
   conversationId
 }) => {
   const [activeTab, setActiveTab] = useState("host-guide");
-  const [completeContent, setCompleteContent] = useState(packageContent);
-  const [title, setTitle] = useState(mysteryTitle);
-  const [debugMode] = useState(true); // Keep debug mode enabled for troubleshooting
-  const [sectionContent, setSectionContent] = useState({
+  const [loading, setLoading] = useState(true);
+  const [tabData, setTabData] = useState<TabData>({
     hostGuide: '',
-    characters: '',
-    clues: '',
+    characters: [],
+    clues: [],
     materials: ''
   });
-  const [loading, setLoading] = useState(true);
   
   useEffect(() => {
     if (conversationId) {
-      // If we have a conversation ID but empty content, fetch from the database
-      const fetchFullContent = async () => {
-        try {
-          setLoading(true);
-          if (debugMode) console.log("Fetching content for conversation ID:", conversationId);
+      fetchFullContent(conversationId);
+    } else if (packageContent) {
+      extractContentFromMarkdown(packageContent);
+    }
+  }, [conversationId, packageContent]);
+
+  const fetchFullContent = async (conversationId: string) => {
+    try {
+      setLoading(true);
+      console.log("Fetching content for conversation ID:", conversationId);
+      
+      // Fetch package data with all needed fields
+      const { data: packageData, error: packageError } = await supabase
+        .from("mystery_packages")
+        .select("id, content, host_guide, evidence_cards, detective_script, relationship_matrix")
+        .eq("conversation_id", conversationId)
+        .single();
+        
+      if (packageError) {
+        console.error("Error fetching mystery package:", packageError);
+        setLoading(false);
+        return;
+      }
+      
+      console.log("Package data fetched:", {
+        id: packageData.id,
+        hostGuideLength: packageData.host_guide?.length || 0,
+        evidenceCardsCount: packageData.evidence_cards?.length || 0,
+        hasContent: !!packageData.content,
+      });
+      
+      // Fetch characters if we have a package ID
+      let charactersData: MysteryCharacter[] = [];
+      if (packageData.id) {
+        const { data: chars, error: charsError } = await supabase
+          .from("mystery_characters")
+          .select("*")
+          .eq("package_id", packageData.id);
           
-          // Fetch the main package data
-          const { data, error } = await supabase
-            .from("mystery_packages")
-            .select("id, content, host_guide, evidence_cards, conversation_id, detective_script")
-            .eq("conversation_id", conversationId)
-            .single();
-            
-          if (error) {
-            console.error("Error fetching mystery package:", error);
-            return;
-          }
-            
-          if (data) {
-            if (debugMode) {
-              console.log("Fetched data:", {
-                contentLength: data.content?.length || 0,
-                hostGuideLength: data.host_guide?.length || 0,
-                evidenceCards: data.evidence_cards?.length || 0,
-                detectiveScriptLength: data.detective_script?.length || 0,
-                hasId: !!data.id
-              });
-            }
-            
-            // Initialize our constructed content with proper markdown sections
-            let constructedContent = "";
-            let hostGuideContent = "";
-            let charactersContent = "";
-            let cluesContent = "";
-            let materialsContent = "";
-            
-            // 1. Add Host Guide if available
-            if (data.host_guide && data.host_guide.length > 10) {
-              hostGuideContent = `# HOST GUIDE\n\n${data.host_guide}\n\n`;
-              constructedContent += hostGuideContent;
-              if (debugMode) console.log("Added host guide to content, length:", hostGuideContent.length);
-            }
-            
-            // 2. Fetch and add characters data if available
-            if (data.id) {
-              const { data: charactersData, error: charError } = await supabase
-                .from("mystery_characters")
-                .select("*")
-                .eq("package_id", data.id);
-                
-              if (charError) {
-                console.error("Error fetching characters:", charError);
-              }
-                
-              if (charactersData && charactersData.length > 0) {
-                charactersContent = `# CHARACTERS\n\n`;
-                if (debugMode) console.log(`Found ${charactersData.length} characters`);
-                
-                for (const char of charactersData) {
-                  charactersContent += `## ${char.character_name}\n\n`;
-                  
-                  if (char.description) {
-                    charactersContent += `### CHARACTER DESCRIPTION\n${char.description}\n\n`;
-                  }
-                  
-                  if (char.background) {
-                    charactersContent += `### BACKGROUND\n${char.background}\n\n`;
-                  }
-                  
-                  // Format relationships properly
-                  if (Array.isArray(char.relationships) && char.relationships.length > 0) {
-                    charactersContent += `### RELATIONSHIPS\n`;
-                    
-                    for (const rel of char.relationships) {
-                      if (typeof rel === 'object' && rel.character && rel.description) {
-                        charactersContent += `**${rel.character}**: ${rel.description}\n\n`;
-                      }
-                    }
-                  }
-                  
-                  // Format secrets properly
-                  if (Array.isArray(char.secrets) && char.secrets.length > 0) {
-                    charactersContent += `### SECRETS\n`;
-                    
-                    for (const secret of char.secrets) {
-                      if (typeof secret === 'string' && secret.trim()) {
-                        charactersContent += `${secret}\n\n`;
-                      }
-                    }
-                  }
-                  
-                  // Add any round scripts if available
-                  if (char.round_scripts && typeof char.round_scripts === 'object') {
-                    charactersContent += `### SCRIPT NOTES\n`;
-                    
-                    // Format introduction scripts
-                    if (char.round_scripts.introduction) {
-                      charactersContent += `**Introduction**: "${char.round_scripts.introduction}"\n\n`;
-                    }
-                    
-                    // Format final statements
-                    if (char.round_scripts.final) {
-                      if (char.round_scripts.final.innocent) {
-                        charactersContent += `**If innocent**: "${char.round_scripts.final.innocent}"\n\n`;
-                      }
-                      if (char.round_scripts.final.guilty) {
-                        charactersContent += `**If guilty**: "${char.round_scripts.final.guilty}"\n\n`;
-                      }
-                      if (char.round_scripts.final.accomplice) {
-                        charactersContent += `**If accomplice**: "${char.round_scripts.final.accomplice}"\n\n`;
-                      }
-                    }
-                  }
-                  
-                  // Add a separator between characters
-                  charactersContent += `\n---\n\n`;
-                }
-                
-                // Remove the last separator
-                charactersContent = charactersContent.replace(/\n---\n\n$/, '\n\n');
-                
-                constructedContent += charactersContent;
-                if (debugMode) console.log("Added characters content, length:", charactersContent.length);
-              }
-            }
-            
-            // 3. Add clues/evidence if available
-            if (Array.isArray(data.evidence_cards) && data.evidence_cards.length > 0) {
-              cluesContent = `# CLUES AND EVIDENCE\n\n`;
-              if (debugMode) console.log(`Found ${data.evidence_cards.length} evidence cards`);
-              
-              data.evidence_cards.forEach((card, index) => {
-                if (card && typeof card === 'object' && card.content) {
-                  const title = card.title || `Item ${index + 1}`;
-                  cluesContent += `## EVIDENCE ${index + 1}: ${title}\n\n${card.content}\n\n`;
-                }
-              });
-              
-              constructedContent += cluesContent;
-              if (debugMode) console.log("Added clues content, length:", cluesContent.length);
-            } else if (data.detective_script && data.detective_script.length > 10) {
-              // Add detective script as an alternative source of clues
-              cluesContent = `# CLUES AND EVIDENCE\n\n${data.detective_script}\n\n`;
-              constructedContent += cluesContent;
-              if (debugMode) console.log("Added detective script as clues, length:", cluesContent.length);
-            }
-            
-            // 4. Add printable materials section
-            materialsContent = `# PRINTABLE MATERIALS\n\n`;
-            materialsContent += `## Name Tags\n\nPrint name tags for each character using card stock or sticker paper.\n\n`;
-            materialsContent += `## Evidence Cards\n\nPrint the evidence cards on card stock and cut them out.\n\n`;
-            
-            constructedContent += materialsContent;
-            if (debugMode) console.log("Added materials content, length:", materialsContent.length);
-            
-            // Use this constructed content if it's substantial, otherwise fall back to existing content
-            if (constructedContent.length > 100) {
-              if (debugMode) console.log("Using constructed content, length:", constructedContent.length);
-              setCompleteContent(constructedContent);
-              
-              // Set each section directly without extraction
-              setSectionContent({
-                hostGuide: hostGuideContent,
-                characters: charactersContent,
-                clues: cluesContent,
-                materials: materialsContent
-              });
-            } else if (data.content && data.content.length > 100) {
-              if (debugMode) console.log("Using original content from database, length:", data.content.length);
-              setCompleteContent(data.content);
-              
-              // Extract sections from the original content
-              const extractedSections = {
-                hostGuide: extractSection(data.content, "Host Guide"),
-                characters: extractSection(data.content, "Character"),
-                clues: extractSection(data.content, "Clue"),
-                materials: extractSection(data.content, "Printable Material")
-              };
-              
-              setSectionContent(extractedSections);
-              
-              if (debugMode) {
-                console.log("Extracted section lengths:", {
-                  hostGuide: extractedSections.hostGuide.length,
-                  characters: extractedSections.characters.length,
-                  clues: extractedSections.clues.length,
-                  materials: extractedSections.materials.length
-                });
-              }
-            }
-            
-            // For debugging
-            if (debugMode) {
-              console.log("Content construction results:");
-              console.log("- Host guide length:", hostGuideContent.length);
-              console.log("- Characters length:", charactersContent.length);
-              console.log("- Clues length:", cluesContent.length);
-              console.log("- Materials length:", materialsContent.length);
-              console.log("- Total constructed content length:", constructedContent.length);
-            }
-          }
-          
-          // Also fetch the conversation title
-          const { data: convData } = await supabase
-            .from("conversations")
-            .select("title")
-            .eq("id", conversationId)
-            .single();
-            
-          if (convData && convData.title) {
-            setTitle(convData.title);
-          }
-        } catch (err) {
-          console.error("Error fetching mystery content:", err);
-        } finally {
-          setLoading(false);
+        if (charsError) {
+          console.error("Error fetching characters:", charsError);
+        } else if (chars) {
+          charactersData = chars;
+          console.log(`Found ${chars.length} characters`);
         }
+      }
+
+      // Fetch conversation title as fallback
+      let title = mysteryTitle;
+      if (!title && conversationId) {
+        const { data: convData } = await supabase
+          .from("conversations")
+          .select("title")
+          .eq("id", conversationId)
+          .single();
+          
+        if (convData?.title) {
+          title = convData.title;
+        }
+      }
+      
+      // Build tab data from fetched content
+      const newTabData: TabData = {
+        hostGuide: packageData.host_guide || '',
+        characters: charactersData,
+        clues: packageData.evidence_cards || [],
+        materials: generateMaterialsContent(packageData, charactersData)
       };
       
-      fetchFullContent();
-    } else {
-      // No conversation ID, use provided package content and extract sections
-      setCompleteContent(packageContent);
-      
-      const extractedSections = {
-        hostGuide: extractSection(packageContent, "Host Guide"),
-        characters: extractSection(packageContent, "Character"),
-        clues: extractSection(packageContent, "Clue"),
-        materials: extractSection(packageContent, "Printable Material")
-      };
-      
-      setSectionContent(extractedSections);
+      setTabData(newTabData);
       setLoading(false);
-      
-      if (debugMode) {
-        console.log("Using provided package content, length:", packageContent.length);
-        console.log("Extracted section lengths:", {
-          hostGuide: extractedSections.hostGuide.length,
-          characters: extractedSections.characters.length,
-          clues: extractedSections.clues.length,
-          materials: extractedSections.materials.length
-        });
-      }
+    } catch (error) {
+      console.error("Error fetching mystery content:", error);
+      setLoading(false);
     }
-  }, [conversationId, packageContent, debugMode]);
-  
-  // Enhanced section extraction with multiple fallback patterns
-  function extractSection(content: string, sectionName: string): string {
-    if (!content) return "";
-    
-    if (debugMode) {
-      console.log(`Extracting section: ${sectionName}`);
-      console.log(`Content length: ${content.length}`);
-      console.log(`First 100 chars: ${content.substring(0, 100)}`);
-    }
-    
-    // Enhanced section extraction with fallback patterns
-    const patterns = [
-      new RegExp(`# ${sectionName.toUpperCase()}S?[^#]*(?=# |$)`, 'is'),
-      new RegExp(`# ${sectionName}S?[^#]*(?=# |$)`, 'is'),
-      new RegExp(`# .* ${sectionName}[^#]*(?=# |$)`, 'is'),
-      new RegExp(`## ${sectionName}[^#]*(?=##|# |$)`, 'is'),
-      new RegExp(`${sectionName}[^#]*(?=# |$)`, 'is')
-    ];
-    
-    for (const pattern of patterns) {
-      const match = content.match(pattern);
-      if (match && match[0]) {
-        if (debugMode) console.log(`Found match with pattern: ${pattern}`);
-        return match[0].trim();
-      }
-    }
-    
-    // Additional fallbacks for specific section types
-    
-    // Additional fallback for character sections
-    if (sectionName === "Character") {
-      const characterSections = [];
-      let characterPattern = /# ([^-\n]+) - CHARACTER GUIDE\n([\s\S]*?)(?=# \w+ - CHARACTER GUIDE|# |$)/g;
-      let match;
-      
-      while ((match = characterPattern.exec(content)) !== null) {
-        characterSections.push(`# ${match[1]} - CHARACTER GUIDE\n${match[2]}`);
-      }
-      
-      if (characterSections.length > 0) {
-        if (debugMode) console.log(`Found ${characterSections.length} character sections with special pattern`);
-        return characterSections.join('\n\n');
-      }
-      
-      // Try for just CHARACTERS section
-      const charactersSection = content.match(/# CHARACTERS\s*\n([\s\S]*?)(?=# |$)/i);
-      if (charactersSection && charactersSection[0]) {
-        if (debugMode) console.log("Found CHARACTERS section with direct pattern");
-        return charactersSection[0];
-      }
-      
-      // Try for character sections with ## headers
-      const charSections = [];
-      const charHeaderPattern = /## ([^\n]+)\n([\s\S]*?)(?=## |# |$)/g;
-      let charMatch;
-      
-      while ((charMatch = charHeaderPattern.exec(content)) !== null) {
-        if (
-          charMatch[1].includes("CHARACTER") || 
-          !charMatch[1].includes(":") || 
-          !/EVIDENCE|CLUE|PRINTABLE|HOST|GUIDE/i.test(charMatch[1])
-        ) {
-          charSections.push(`## ${charMatch[1]}\n${charMatch[2]}`);
-        }
-      }
-      
-      if (charSections.length > 0) {
-        if (debugMode) console.log(`Found ${charSections.length} character sections with ## pattern`);
-        return `# CHARACTERS\n\n${charSections.join('\n\n')}`;
-      }
-    }
-    
-    // Additional fallback for clues/evidence sections
-    if (sectionName === "Clue") {
-      const evidencePattern = /# (EVIDENCE|CLUES AND EVIDENCE)[^#]*(?=# |$)/is;
-      const cluesPattern = /# CLUES[^#]*(?=# |$)/is;
-      
-      const evidenceMatch = content.match(evidencePattern);
-      const cluesMatch = content.match(cluesPattern);
-      
-      if (evidenceMatch && evidenceMatch[0]) {
-        if (debugMode) console.log("Found EVIDENCE section with pattern");
-        return evidenceMatch[0].trim();
-      }
-      
-      if (cluesMatch && cluesMatch[0]) {
-        if (debugMode) console.log("Found CLUES section with pattern");
-        return cluesMatch[0].trim();
-      }
-      
-      // Look for evidence items with ## headers
-      const evidenceItems = [];
-      const evidenceItemPattern = /## (EVIDENCE \d+|CLUE \d+)[^\n]*\n([\s\S]*?)(?=## |# |$)/gi;
-      let evidenceItemMatch;
-      
-      while ((evidenceItemMatch = evidenceItemPattern.exec(content)) !== null) {
-        evidenceItems.push(`## ${evidenceItemMatch[1]}\n${evidenceItemMatch[2]}`);
-      }
-      
-      if (evidenceItems.length > 0) {
-        if (debugMode) console.log(`Found ${evidenceItems.length} evidence items with ## pattern`);
-        return `# CLUES AND EVIDENCE\n\n${evidenceItems.join('\n\n')}`;
-      }
-    }
-    
-    // Host Guide fallbacks
-    if (sectionName === "Host Guide") {
-      const hostPattern = /# HOST GUIDE\s*\n([\s\S]*?)(?=# |$)/i;
-      const setupPattern = /# SETUP\s*\n([\s\S]*?)(?=# |$)/i;
-      const guidePattern = /# GUIDE\s*\n([\s\S]*?)(?=# |$)/i;
-      
-      for (const pattern of [hostPattern, setupPattern, guidePattern]) {
-        const match = content.match(pattern);
-        if (match && match[0]) {
-          if (debugMode) console.log(`Found host guide with pattern: ${pattern}`);
-          return match[0].trim();
-        }
-      }
-    }
-    
-    // Materials fallbacks
-    if (sectionName === "Printable Material") {
-      const materialsPattern = /# (PRINTABLE )?MATERIALS\s*\n([\s\S]*?)(?=# |$)/i;
-      const printablesPattern = /# PRINTABLES\s*\n([\s\S]*?)(?=# |$)/i;
-      
-      for (const pattern of [materialsPattern, printablesPattern]) {
-        const match = content.match(pattern);
-        if (match && match[0]) {
-          if (debugMode) console.log(`Found materials with pattern: ${pattern}`);
-          return match[0].trim();
-        }
-      }
-    }
-    
-    if (debugMode) console.log(`No matching section found for ${sectionName}`);
-    return "";
-  }
-  
-  const getTabContent = (section: string, sectionKey: keyof typeof sectionContent) => {
-    // First check if we've already extracted this section
-    if (sectionContent[sectionKey] && sectionContent[sectionKey].length > 0) {
-      return sectionContent[sectionKey];
-    }
-    
-    // If not extracted but generation is in progress
-    if (isGenerating) {
-      const isInProgress = generationStatus?.sections?.[sectionKey] === false;
-      const isComplete = generationStatus?.sections?.[sectionKey] === true;
-      
-      if (isComplete) {
-        return "Processing completed content...";
-      } else if (isInProgress) {
-        return `Generating ${section}...`;
-      } else {
-        return `Waiting to generate ${section}...`;
-      }
-    }
-    
-    // If we have complete content but no extracted section, try to extract it again
-    if (completeContent && completeContent.length > 0) {
-      const extractedContent = extractSection(completeContent, section);
-      if (extractedContent && extractedContent.length > 0) {
-        return extractedContent;
-      }
-      
-      // If this is the first tab and we have content but no extracted host guide,
-      // just show the complete content
-      if (sectionKey === "hostGuide") {
-        return completeContent;
-      }
-    }
-    
-    // Default fallback message
-    return loading 
-      ? `Loading ${section.toLowerCase()} content...` 
-      : `${section} content will appear here.`;
   };
-  
+
+  const extractContentFromMarkdown = (content: string) => {
+    // This is a fallback for when we only have the packageContent string
+    // and not direct database access
+    try {
+      const hostGuideMatch = content.match(/# (?:HOST GUIDE|.*HOST GUIDE).*?\n([\s\S]*?)(?=# |$)/i);
+      const charactersMatch = content.match(/# (?:CHARACTERS|.*CHARACTER).*?\n([\s\S]*?)(?=# |$)/i);
+      const cluesMatch = content.match(/# (?:CLUES|EVIDENCE|.*CLUES|.*EVIDENCE).*?\n([\s\S]*?)(?=# |$)/i);
+      const materialsMatch = content.match(/# (?:MATERIALS|PRINTABLE|.*MATERIALS|.*PRINTABLE).*?\n([\s\S]*?)(?=# |$)/i);
+      
+      setTabData({
+        hostGuide: hostGuideMatch?.[1]?.trim() || '',
+        characters: [], // We can't extract structured character data from markdown
+        clues: [], // We can't extract structured clue data from markdown
+        materials: materialsMatch?.[1]?.trim() || ''
+      });
+      
+      setLoading(false);
+    } catch (error) {
+      console.error("Error extracting content from markdown:", error);
+      setLoading(false);
+    }
+  };
+
+  const generateMaterialsContent = (packageData: any, characters: MysteryCharacter[]): string => {
+    let content = "# PRINTABLE MATERIALS\n\n";
+    
+    // Add name tags section
+    content += "## Name Tags\n\n";
+    content += "Print name tags for each character using card stock or sticker paper:\n\n";
+    characters.forEach(char => {
+      content += `- ${char.character_name}\n`;
+    });
+    
+    // Add evidence cards section
+    content += "\n## Evidence Cards\n\n";
+    content += "Print the following evidence cards on card stock and cut them out:\n\n";
+    
+    if (packageData.evidence_cards && packageData.evidence_cards.length > 0) {
+      packageData.evidence_cards.forEach((card: any, index: number) => {
+        const title = card.title || `Evidence ${index + 1}`;
+        content += `### ${title}\n\n`;
+        if (card.content) {
+          content += `${card.content}\n\n`;
+        }
+      });
+    } else {
+      content += "No evidence cards available.\n\n";
+    }
+    
+    return content;
+  };
+
+  const renderCharacters = () => {
+    if (tabData.characters.length === 0) {
+      return <p>No character information available.</p>;
+    }
+
+    return (
+      <div className="space-y-6">
+        {tabData.characters.map((character, index) => (
+          <div key={index} className="border rounded-lg p-4 mb-4">
+            <h2 className="text-xl font-bold mb-2">{character.character_name}</h2>
+            
+            {character.description && (
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold mb-1">Description</h3>
+                <p>{character.description}</p>
+              </div>
+            )}
+            
+            {character.background && (
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold mb-1">Background</h3>
+                <p>{character.background}</p>
+              </div>
+            )}
+            
+            {character.relationships && character.relationships.length > 0 && (
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold mb-1">Relationships</h3>
+                <ul className="list-disc pl-5">
+                  {character.relationships.map((rel: any, idx: number) => (
+                    <li key={idx}>
+                      <strong>{rel.character}:</strong> {rel.description}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            
+            {character.secrets && character.secrets.length > 0 && (
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold mb-1">Secrets</h3>
+                <ul className="list-disc pl-5">
+                  {character.secrets.map((secret: string, idx: number) => (
+                    <li key={idx}>{secret}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            
+            {character.round_scripts && (
+              <div>
+                <h3 className="text-lg font-semibold mb-1">Script Notes</h3>
+                
+                {character.round_scripts.introduction && (
+                  <div className="mb-2">
+                    <p><strong>Introduction:</strong> "{character.round_scripts.introduction}"</p>
+                  </div>
+                )}
+                
+                {character.round_scripts.final && (
+                  <div>
+                    <p className="font-medium">Final Statements:</p>
+                    {character.round_scripts.final.innocent && (
+                      <p><strong>If innocent:</strong> "{character.round_scripts.final.innocent}"</p>
+                    )}
+                    {character.round_scripts.final.guilty && (
+                      <p><strong>If guilty:</strong> "{character.round_scripts.final.guilty}"</p>
+                    )}
+                    {character.round_scripts.final.accomplice && (
+                      <p><strong>If accomplice:</strong> "{character.round_scripts.final.accomplice}"</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const renderClues = () => {
+    if (tabData.clues.length === 0) {
+      return <ReactMarkdown>{`# CLUES AND EVIDENCE\n\nNo clue information available.`}</ReactMarkdown>;
+    }
+
+    let cluesContent = `# CLUES AND EVIDENCE\n\n`;
+    
+    tabData.clues.forEach((clue, index) => {
+      const title = clue.title || `Evidence ${index + 1}`;
+      cluesContent += `## ${title}\n\n`;
+      if (clue.content) {
+        cluesContent += `${clue.content}\n\n`;
+      }
+    });
+    
+    return <ReactMarkdown>{cluesContent}</ReactMarkdown>;
+  };
+
   const handleDownloadPDF = () => {
     // PDF download functionality would be implemented here
     console.log("Download PDF requested");
   };
   
+  if (loading) {
+    return (
+      <Card>
+        <CardContent className="p-6 flex justify-center items-center h-64">
+          <div className="h-8 w-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          <span className="ml-2">Loading mystery content...</span>
+        </CardContent>
+      </Card>
+    );
+  }
+  
   return (
     <Card>
-      {title && (
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">{title}</CardTitle>
-        </CardHeader>
-      )}
+      <CardHeader>
+        <CardTitle className="text-2xl font-bold">{mysteryTitle}</CardTitle>
+      </CardHeader>
       
       <CardContent className="pt-6">
         <Tabs defaultValue="host-guide" value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -522,19 +340,19 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
           </div>
           
           <TabsContent value="host-guide" className="prose prose-gray dark:prose-invert max-w-none">
-            <ReactMarkdown>{getTabContent("Host Guide", "hostGuide")}</ReactMarkdown>
+            <ReactMarkdown>{tabData.hostGuide}</ReactMarkdown>
           </TabsContent>
           
           <TabsContent value="characters" className="prose prose-gray dark:prose-invert max-w-none">
-            <ReactMarkdown>{getTabContent("Character", "characters")}</ReactMarkdown>
+            {renderCharacters()}
           </TabsContent>
           
           <TabsContent value="clues" className="prose prose-gray dark:prose-invert max-w-none">
-            <ReactMarkdown>{getTabContent("Clue", "clues")}</ReactMarkdown>
+            {renderClues()}
           </TabsContent>
           
           <TabsContent value="materials" className="prose prose-gray dark:prose-invert max-w-none">
-            <ReactMarkdown>{getTabContent("Printable Material", "materials")}</ReactMarkdown>
+            <ReactMarkdown>{tabData.materials}</ReactMarkdown>
           </TabsContent>
         </Tabs>
       </CardContent>
