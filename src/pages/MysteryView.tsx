@@ -1,3 +1,4 @@
+// src/pages/MysteryView.tsx
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -398,7 +399,7 @@ const MysteryView = () => {
       <Header />
       <main className="flex-1 py-12 px-4">
         <div className="container mx-auto max-w-4xl">
-          {!window.location.pathname.includes('/preview/') && packageContent ? (
+          {!window.location.pathname.includes('/preview/') && (generationStatus?.status === 'completed' || packageContent) ? (
             <MysteryPackageTabView 
               packageContent={packageContent} 
               mysteryTitle={mystery?.title || "Mystery Package"} 
@@ -406,33 +407,35 @@ const MysteryView = () => {
               conversationId={id}
             />
           ) : (
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle>Generate Your Mystery Package</CardTitle>
-                <CardDescription>
-                  Your mystery is ready to be generated. Click the button below to create your custom murder mystery package.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button
-                  onClick={handleGeneratePackage}
-                  disabled={generating}
-                  className="w-full sm:w-auto"
-                >
-                  {generating ? (
-                    <>
-                      <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                      Generating...
-                    </>
-                  ) : (
-                    "Generate Mystery Package"
-                  )}
-                </Button>
-                <p className="text-sm text-muted-foreground mt-3">
-                  Generation takes 5-10 minutes. Please keep this browser tab open during generation.
-                </p>
-              </CardContent>
-            </Card>
+            generationStatus?.status === 'in_progress' ? renderGenerationProgress() : (
+              <Card className="mb-6">
+                <CardHeader>
+                  <CardTitle>Generate Your Mystery Package</CardTitle>
+                  <CardDescription>
+                    Your mystery is ready to be generated. Click the button below to create your custom murder mystery package.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button
+                    onClick={handleGeneratePackage}
+                    disabled={generating}
+                    className="w-full sm:w-auto"
+                  >
+                    {generating ? (
+                      <>
+                        <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      "Generate Mystery Package"
+                    )}
+                  </Button>
+                  <p className="text-sm text-muted-foreground mt-3">
+                    Generation takes 5-10 minutes. Please keep this browser tab open during generation.
+                  </p>
+                </CardContent>
+              </Card>
+            )
           )}
           
           <div className="flex justify-center mt-8">
