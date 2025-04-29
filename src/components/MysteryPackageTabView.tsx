@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,7 +33,7 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
         try {
           const { data, error } = await supabase
             .from("mystery_packages")
-            .select("content, host_guide, conversation_id")
+            .select("id, content, host_guide, conversation_id") // Added 'id' to the select list
             .eq("conversation_id", conversationId)
             .single();
             
