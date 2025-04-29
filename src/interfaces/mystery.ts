@@ -1,13 +1,15 @@
+// src/interfaces/mystery.ts
+// Add these interfaces if they don't already exist
 
 export interface MysteryData {
-  title?: string; // Making title optional to fix the type error
+  title?: string;
   theme?: string;
   playerCount?: number;
   hasAccomplice?: boolean;
   scriptType?: 'full' | 'summary';
   additionalDetails?: string;
   status?: "draft" | "purchased" | "archived";
-  [key: string]: any;  // Allow for additional properties
+  [key: string]: any;
 }
 
 export interface Conversation {
