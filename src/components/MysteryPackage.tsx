@@ -238,6 +238,7 @@ const MysteryPackage = ({ mysteryId, title }: MysteryPackageProps) => {
               packageContent={packageContent} 
               mysteryTitle={title}
               generationStatus={generationStatus || undefined}
+              conversationId={mysteryId}
             />
             
             {generationStatus?.status === 'failed' && (

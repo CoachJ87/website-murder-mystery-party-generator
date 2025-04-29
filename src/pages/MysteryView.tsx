@@ -403,6 +403,7 @@ const MysteryView = () => {
               packageContent={packageContent} 
               mysteryTitle={mystery?.title || "Mystery Package"} 
               generationStatus={generationStatus || undefined}
+              conversationId={id}
             />
           ) : (
             <Card className="mb-6">

@@ -1,33 +1,94 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Book, Users, FileText, Printer, Download } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 import { Button } from "@/components/ui/button";
 import { GenerationStatus } from "@/services/mysteryPackageService";
+import { supabase } from "@/lib/supabase";
 
 export interface MysteryPackageTabViewProps {
   packageContent: string;
   mysteryTitle: string;
   generationStatus?: GenerationStatus;
   isGenerating?: boolean;
+  conversationId?: string;
 }
 
 const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
   packageContent,
   mysteryTitle,
   generationStatus,
-  isGenerating
+  isGenerating,
+  conversationId
 }) => {
   const [activeTab, setActiveTab] = useState("host-guide");
+  const [completeContent, setCompleteContent] = useState(packageContent);
+  const [title, setTitle] = useState(mysteryTitle);
+  
+  useEffect(() => {
+    if (conversationId) {
+      // If we have a conversation ID but empty content, fetch from the database
+      const fetchFullContent = async () => {
+        try {
+          const { data, error } = await supabase
+            .from("mystery_packages")
+            .select("content, host_guide, conversation_id")
+            .eq("conversation_id", conversationId)
+            .single();
+            
+          if (data) {
+            if (data.content && data.content.length > 100) {
+              setCompleteContent(data.content);
+            } else if (data.host_guide) {
+              // If content is empty but we have host_guide, construct content
+              let constructedContent = `# HOST GUIDE\n\n${data.host_guide}\n\n`;
+              
+              // Fetch characters data if available
+              const { data: charactersData } = await supabase
+                .from("mystery_characters")
+                .select("*")
+                .eq("package_id", data.id);
+                
+              if (charactersData && charactersData.length > 0) {
+                constructedContent += `# CHARACTERS\n\n`;
+                charactersData.forEach(char => {
+                  constructedContent += `## ${char.character_name}\n\n${char.description || ''}\n\n${char.background || ''}\n\n`;
+                });
+              }
+              
+              setCompleteContent(constructedContent);
+            }
+          }
+          
+          // Also fetch the conversation title
+          const { data: convData } = await supabase
+            .from("conversations")
+            .select("title")
+            .eq("id", conversationId)
+            .single();
+            
+          if (convData && convData.title) {
+            setTitle(convData.title);
+          }
+        } catch (err) {
+          console.error("Error fetching mystery content:", err);
+        }
+      };
+      
+      fetchFullContent();
+    } else {
+      setCompleteContent(packageContent);
+    }
+  }, [conversationId, packageContent]);
   
   // Parse the different sections from the package content
   const sections = {
-    hostGuide: extractSection(packageContent, "Host Guide"),
-    characters: extractSection(packageContent, "Character"),
-    clues: extractSection(packageContent, "Clue"),
-    materials: extractSection(packageContent, "Printable Material"),
+    hostGuide: extractSection(completeContent, "Host Guide"),
+    characters: extractSection(completeContent, "Character"),
+    clues: extractSection(completeContent, "Clue"),
+    materials: extractSection(completeContent, "Printable Material"),
   };
   
   function extractSection(content: string, sectionName: string): string {
@@ -61,6 +122,12 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
       if (characterSections.length > 0) {
         return characterSections.join('\n\n');
       }
+      
+      // Try for just CHARACTERS section
+      const charactersSection = content.match(/# CHARACTERS\s*\n([\s\S]*?)(?=# |$)/i);
+      if (charactersSection && charactersSection[1]) {
+        return `# CHARACTERS\n${charactersSection[1]}`;
+      }
     }
     
     // Additional fallback for clues/evidence sections
@@ -77,6 +144,33 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
       
       if (cluesMatch && cluesMatch[0]) {
         return cluesMatch[0].trim();
+      }
+    }
+    
+    // Host Guide fallbacks
+    if (sectionName === "Host Guide") {
+      const hostPattern = /# HOST GUIDE\s*\n([\s\S]*?)(?=# |$)/i;
+      const setupPattern = /# SETUP\s*\n([\s\S]*?)(?=# |$)/i;
+      const guidePattern = /# GUIDE\s*\n([\s\S]*?)(?=# |$)/i;
+      
+      for (const pattern of [hostPattern, setupPattern, guidePattern]) {
+        const match = content.match(pattern);
+        if (match && match[0]) {
+          return match[0].trim();
+        }
+      }
+    }
+    
+    // Materials fallbacks
+    if (sectionName === "Printable Material") {
+      const materialsPattern = /# MATERIALS\s*\n([\s\S]*?)(?=# |$)/i;
+      const printablesPattern = /# PRINTABLES\s*\n([\s\S]*?)(?=# |$)/i;
+      
+      for (const pattern of [materialsPattern, printablesPattern]) {
+        const match = content.match(pattern);
+        if (match && match[0]) {
+          return match[0].trim();
+        }
       }
     }
     
@@ -99,15 +193,26 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
     
     // If no specific section content is found but we have packageContent, 
     // show the full content in the first tab as a fallback
-    if (!sections[sectionKey] && packageContent && sectionKey === "hostGuide") {
-      return packageContent;
+    if (!sections[sectionKey] && completeContent && sectionKey === "hostGuide") {
+      return completeContent;
     }
     
     return sections[sectionKey] || `${section} content will appear here.`;
   };
   
+  const handleDownloadPDF = () => {
+    // PDF download functionality would be implemented here
+    console.log("Download PDF requested");
+  };
+  
   return (
     <Card>
+      {title && (
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold">{title}</CardTitle>
+        </CardHeader>
+      )}
+      
       <CardContent className="pt-6">
         <Tabs defaultValue="host-guide" value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="flex items-center mb-4 justify-between">
@@ -132,14 +237,24 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
               </TabsTrigger>
             </TabsList>
             
-            <Button variant="outline" size="sm" className="hidden sm:flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="hidden sm:flex items-center gap-2"
+              onClick={handleDownloadPDF}
+            >
               <Download className="h-4 w-4" />
               <span>Download PDF</span>
             </Button>
           </div>
           
           <div className="sm:hidden flex justify-end mb-4">
-            <Button variant="outline" size="sm" className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="flex items-center gap-2"
+              onClick={handleDownloadPDF}
+            >
               <Download className="h-4 w-4" />
               <span>Download PDF</span>
             </Button>

@@ -371,6 +371,7 @@ const MysteryPreview = () => {
                                         mysteryTitle={title}
                                         generationStatus={generationStatus}
                                         isGenerating={true}
+                                        conversationId={id}
                                     />
                                 </CardContent>
                             </Card>
