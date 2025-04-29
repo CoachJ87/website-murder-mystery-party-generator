@@ -31,16 +31,56 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
   };
   
   function extractSection(content: string, sectionName: string): string {
-    // This is a simple extraction - could be improved with regex based on actual content structure
-    const sectionIndex = content.indexOf(`# ${sectionName}`);
-    if (sectionIndex === -1) return "";
+    if (!content) return "";
     
-    const nextSectionIndex = content.indexOf("# ", sectionIndex + 2);
-    if (nextSectionIndex === -1) {
-      return content.substring(sectionIndex);
+    // Enhanced section extraction with fallback patterns
+    const patterns = [
+      new RegExp(`# .* ${sectionName}[^#]*(?=# |$)`, 'is'),
+      new RegExp(`# ${sectionName}[^#]*(?=# |$)`, 'is'),
+      new RegExp(`## ${sectionName}[^#]*(?=## |# |$)`, 'is'),
+      new RegExp(`${sectionName}[^#]*(?=# |$)`, 'is')
+    ];
+    
+    for (const pattern of patterns) {
+      const match = content.match(pattern);
+      if (match && match[0]) {
+        return match[0].trim();
+      }
     }
     
-    return content.substring(sectionIndex, nextSectionIndex);
+    // Additional fallback for character sections
+    if (sectionName === "Character") {
+      const characterSections = [];
+      let characterPattern = /# ([^-\n]+) - CHARACTER GUIDE\n([\s\S]*?)(?=# \w+ - CHARACTER GUIDE|# |$)/g;
+      let match;
+      
+      while ((match = characterPattern.exec(content)) !== null) {
+        characterSections.push(`# ${match[1]} - CHARACTER GUIDE\n${match[2]}`);
+      }
+      
+      if (characterSections.length > 0) {
+        return characterSections.join('\n\n');
+      }
+    }
+    
+    // Additional fallback for clues/evidence sections
+    if (sectionName === "Clue") {
+      const evidencePattern = /# EVIDENCE[^#]*(?=# |$)/is;
+      const cluesPattern = /# CLUES[^#]*(?=# |$)/is;
+      
+      const evidenceMatch = content.match(evidencePattern);
+      const cluesMatch = content.match(cluesPattern);
+      
+      if (evidenceMatch && evidenceMatch[0]) {
+        return evidenceMatch[0].trim();
+      }
+      
+      if (cluesMatch && cluesMatch[0]) {
+        return cluesMatch[0].trim();
+      }
+    }
+    
+    return "";
   }
   
   const getTabContent = (section: string, sectionKey: keyof typeof sections) => {
@@ -55,6 +95,12 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
       } else {
         return `Waiting to generate ${section}...`;
       }
+    }
+    
+    // If no specific section content is found but we have packageContent, 
+    // show the full content in the first tab as a fallback
+    if (!sections[sectionKey] && packageContent && sectionKey === "hostGuide") {
+      return packageContent;
     }
     
     return sections[sectionKey] || `${section} content will appear here.`;
