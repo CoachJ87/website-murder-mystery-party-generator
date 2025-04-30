@@ -1,5 +1,6 @@
+
 // src/components/MysteryPackage.tsx
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Download, FileText, Loader2, RefreshCw } from "lucide-react";
@@ -24,11 +25,17 @@ const MysteryPackage = ({ mysteryId, title }: MysteryPackageProps) => {
   const [generationStatus, setGenerationStatus] = useState<GenerationStatus | null>(null);
   const [statusCheckInterval, setStatusCheckInterval] = useState<number | null>(null);
   const [testMode, setTestMode] = useState<boolean>(false);
+  
+  // Add ref to track toast notifications
+  const packageReadyNotified = useRef<boolean>(false);
 
   useEffect(() => {
     const checkForExistingPackage = async () => {
       try {
         setLoading(true);
+        
+        // Reset notification state on component mount
+        packageReadyNotified.current = false;
         
         // Get existing status
         const status = await getPackageGenerationStatus(mysteryId);
@@ -95,7 +102,12 @@ const MysteryPackage = ({ mysteryId, title }: MysteryPackageProps) => {
             clearInterval(intervalId);
             setStatusCheckInterval(null);
             setGenerating(false);
-            toast.success("Your mystery package is ready!");
+            
+            // Only show notification once
+            if (!packageReadyNotified.current) {
+              toast.success("Your mystery package is ready!");
+              packageReadyNotified.current = true;
+            }
           }
         } else if (status.status === 'failed') {
           clearInterval(intervalId);
@@ -127,6 +139,9 @@ const MysteryPackage = ({ mysteryId, title }: MysteryPackageProps) => {
     try {
       setGenerating(true);
       
+      // Reset notification flag when starting a new generation
+      packageReadyNotified.current = false;
+      
       const toastMessage = testMode 
         ? "Generating test version of your murder mystery package..."
         : "Generating your complete murder mystery package. This may take a few minutes...";
@@ -138,9 +153,13 @@ const MysteryPackage = ({ mysteryId, title }: MysteryPackageProps) => {
         .then(content => {
           setPackageContent(content);
           setGenerating(false);
-          toast.success(testMode 
+          
+          const successMessage = testMode
             ? "Your test mystery package is ready!"
-            : "Your complete mystery package is ready!");
+            : "Your complete mystery package is ready!";
+            
+          toast.success(successMessage);
+          packageReadyNotified.current = true;
         })
         .catch(error => {
           console.error("Error in package generation:", error);

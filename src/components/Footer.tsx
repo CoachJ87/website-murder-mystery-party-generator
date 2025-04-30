@@ -30,11 +30,7 @@ const Footer = () => {
                   Support
                 </Link>
               </li>
-              <li>
-                <Link to="/showcase" className="text-muted-foreground hover:text-foreground transition-colors no-underline">
-                  Showcase
-                </Link>
-              </li>
+              {/* Showcase link removed as requested */}
             </ul>
           </div>
           

@@ -1,5 +1,5 @@
 // src/pages/MysteryView.tsx
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -31,6 +31,9 @@ const MysteryView = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  
+  // Add refs to track notification states
+  const packageReadyNotified = useRef<boolean>(false);
 
   const isPageVisible = () => document.visibilityState === 'visible';
 
@@ -68,7 +71,12 @@ const MysteryView = () => {
         if (packageData) {
           setPackageContent(packageData.content);
           clearStatusPolling();
-          toast.success("Your mystery package is ready!");
+          
+          // Only show the notification if we haven't shown it before
+          if (!packageReadyNotified.current) {
+            toast.success("Your mystery package is ready!");
+            packageReadyNotified.current = true;
+          }
           
           await supabase
             .from("conversations")
@@ -147,6 +155,8 @@ const MysteryView = () => {
           if (status.status === 'in_progress') {
             startStatusPolling();
           } else if (status.status === 'completed') {
+            // Reset notification state on new page load if package is complete
+            packageReadyNotified.current = false;
             await supabase
               .from("conversations")
               .update({
@@ -214,11 +224,15 @@ const MysteryView = () => {
     try {
       toast.info("Resuming your mystery generation. This may take 5-10 minutes...");
       
+      // Reset notification state on new generation start
+      packageReadyNotified.current = false;
+      
       resumePackageGeneration(id)
         .then(content => {
           setPackageContent(content);
           setGenerating(false);
           toast.success("Your complete mystery package is ready!");
+          packageReadyNotified.current = true;
         })
         .catch(error => {
           console.error("Error in package generation:", error);
@@ -252,11 +266,15 @@ const MysteryView = () => {
         </div>
       );
       
+      // Reset notification state on new generation start
+      packageReadyNotified.current = false;
+      
       generateCompletePackage(id)
         .then(content => {
           setPackageContent(content);
           setGenerating(false);
           toast.success("Your complete mystery package is ready!");
+          packageReadyNotified.current = true;
         })
         .catch(error => {
           console.error("Error in package generation:", error);

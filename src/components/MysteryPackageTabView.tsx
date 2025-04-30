@@ -1,8 +1,9 @@
+
 // src/components/MysteryPackageTabView.tsx
 import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Book, Users, FileText, Table, FileCode, Download } from "lucide-react";
+import { Book, Users, FileText, Grid2x2, FileCode, Download } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 import { Button } from "@/components/ui/button";
 import { GenerationStatus } from "@/services/mysteryPackageService";
@@ -27,12 +28,22 @@ interface MysteryCharacter {
   secrets?: string[];
   round_scripts?: {
     introduction?: string;
-    final?: {
-      innocent?: string;
-      guilty?: string;
-      accomplice?: string;
-    };
+    round2?: ScriptOptions;
+    round3?: ScriptOptions;
+    round4?: ScriptOptions;
+    final?: ScriptOptions;
   };
+}
+
+interface RelationshipInfo {
+  character: string;
+  description: string;
+}
+
+interface ScriptOptions {
+  innocent?: string;
+  guilty?: string;
+  accomplice?: string;
 }
 
 interface EvidenceCard {
@@ -177,7 +188,7 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
       const headerCells = lines[0].split('|').map(cell => cell.trim());
       tableHtml += '  <thead>\n    <tr>\n';
       headerCells.forEach(cell => {
-        tableHtml += `      <th class="border border-gray-300 px-4 py-2 bg-gray-100">${cell}</th>\n`;
+        tableHtml += `      <th class="border border-gray-300 px-4 py-2 bg-muted">${cell}</th>\n`;
       });
       tableHtml += '    </tr>\n  </thead>\n';
     }
@@ -192,9 +203,9 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
         tableHtml += '    <tr>\n';
         cells.forEach((cell, index) => {
           if (index === 0) {
-            tableHtml += `      <td class="border border-gray-300 px-4 py-2 font-semibold bg-gray-50">${cell}</td>\n`;
+            tableHtml += `      <td class="border border-gray-300 px-4 py-2 font-semibold bg-muted/50">${cell}</td>\n`;
           } else {
-            tableHtml += `      <td class="border border-gray-300 px-4 py-2">${cell}</td>\n`;
+            tableHtml += `      <td class="border border-gray-300 px-4 py-2 bg-card">${cell}</td>\n`;
           }
         });
         tableHtml += '    </tr>\n';
@@ -216,10 +227,10 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
     
     // Header row
     tableHtml += '  <thead>\n    <tr>\n';
-    tableHtml += '      <th class="border border-gray-300 px-4 py-2 bg-gray-100">Character</th>\n';
-    tableHtml += '      <th class="border border-gray-300 px-4 py-2 bg-gray-100">Primary Connection</th>\n';
-    tableHtml += '      <th class="border border-gray-300 px-4 py-2 bg-gray-100">Secondary Connections</th>\n';
-    tableHtml += '      <th class="border border-gray-300 px-4 py-2 bg-gray-100">Secret Connections</th>\n';
+    tableHtml += '      <th class="border border-gray-300 px-4 py-2 bg-muted">Character</th>\n';
+    tableHtml += '      <th class="border border-gray-300 px-4 py-2 bg-muted">Primary Connection</th>\n';
+    tableHtml += '      <th class="border border-gray-300 px-4 py-2 bg-muted">Secondary Connections</th>\n';
+    tableHtml += '      <th class="border border-gray-300 px-4 py-2 bg-muted">Secret Connections</th>\n';
     tableHtml += '    </tr>\n  </thead>\n';
     
     // Body rows
@@ -227,8 +238,8 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
     characters.forEach(character => {
       const charData = matrixObj[character];
       tableHtml += '    <tr>\n';
-      tableHtml += `      <td class="border border-gray-300 px-4 py-2 font-semibold bg-gray-50">${character}</td>\n`;
-      tableHtml += `      <td class="border border-gray-300 px-4 py-2">${charData.primary_connection || ''}</td>\n`;
+      tableHtml += `      <td class="border border-gray-300 px-4 py-2 font-semibold bg-muted/50">${character}</td>\n`;
+      tableHtml += `      <td class="border border-gray-300 px-4 py-2 bg-card">${charData.primary_connection || ''}</td>\n`;
       
       let secondaryConn = '';
       if (Array.isArray(charData.secondary_connections)) {
@@ -236,7 +247,7 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
       } else if (typeof charData.secondary_connections === 'string') {
         secondaryConn = charData.secondary_connections;
       }
-      tableHtml += `      <td class="border border-gray-300 px-4 py-2">${secondaryConn}</td>\n`;
+      tableHtml += `      <td class="border border-gray-300 px-4 py-2 bg-card">${secondaryConn}</td>\n`;
       
       let secretConn = '';
       if (Array.isArray(charData.secret_connections)) {
@@ -244,7 +255,7 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
       } else if (typeof charData.secret_connections === 'string') {
         secretConn = charData.secret_connections;
       }
-      tableHtml += `      <td class="border border-gray-300 px-4 py-2">${secretConn}</td>\n`;
+      tableHtml += `      <td class="border border-gray-300 px-4 py-2 bg-card">${secretConn}</td>\n`;
       
       tableHtml += '    </tr>\n';
     });
@@ -401,7 +412,9 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
                   {character.background && (
                     <div>
                       <h3 className="text-md font-semibold mb-1">Background</h3>
-                      <p>{character.background}</p>
+                      <div className="prose prose-sm max-w-none">
+                        <ReactMarkdown>{character.background}</ReactMarkdown>
+                      </div>
                     </div>
                   )}
                   
@@ -493,7 +506,9 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
             )}
             {clue.content && (
               <div className="mb-2">
-                <ReactMarkdown>{clue.content}</ReactMarkdown>
+                <div className="prose prose-sm max-w-none">
+                  <ReactMarkdown>{clue.content}</ReactMarkdown>
+                </div>
               </div>
             )}
             {clue.implication && (
@@ -530,86 +545,94 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
         <CardTitle className="text-2xl font-bold">{mysteryTitle}</CardTitle>
       </CardHeader>
       
-      <CardContent className="pt-6">
+      <CardContent>
         <Tabs defaultValue="host-guide" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <div className="flex items-center mb-4 justify-between">
-            <TabsList className="grid grid-cols-5 w-full max-w-2xl">
-              <TabsTrigger value="host-guide" className="flex flex-col gap-1 sm:flex-row sm:gap-2 items-center">
-                <Book className="h-4 w-4" />
-                <span className="hidden sm:block">Host Guide</span>
-                <span className="block sm:hidden">Host</span>
-              </TabsTrigger>
-              <TabsTrigger value="characters" className="flex flex-col gap-1 sm:flex-row sm:gap-2 items-center">
-                <Users className="h-4 w-4" />
-                <span>Characters</span>
-              </TabsTrigger>
-              <TabsTrigger value="clues" className="flex flex-col gap-1 sm:flex-row sm:gap-2 items-center">
-                <FileText className="h-4 w-4" />
-                <span>Clues</span>
-              </TabsTrigger>
-              <TabsTrigger value="inspector-script" className="flex flex-col gap-1 sm:flex-row sm:gap-2 items-center">
-                <FileCode className="h-4 w-4" />
-                <span className="hidden sm:block">Inspector Script</span>
-                <span className="block sm:hidden">Script</span>
-              </TabsTrigger>
-              <TabsTrigger value="character-matrix" className="flex flex-col gap-1 sm:flex-row sm:gap-2 items-center">
-                <Table className="h-4 w-4" />
-                <span className="hidden sm:block">Character Matrix</span>
-                <span className="block sm:hidden">Matrix</span>
-              </TabsTrigger>
-            </TabsList>
-            
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="hidden sm:flex items-center gap-2"
-              onClick={handleDownloadPDF}
-            >
-              <Download className="h-4 w-4" />
-              <span>Download PDF</span>
-            </Button>
+          <div className="border-b pb-2 mb-4">
+            <div className="flex items-center justify-between">
+              <TabsList className="h-9 p-0 bg-transparent space-x-2">
+                <TabsTrigger 
+                  value="host-guide" 
+                  className="data-[state=active]:bg-primary/20 data-[state=active]:text-foreground px-3 py-1.5 h-9"
+                >
+                  <div className="flex items-center gap-2">
+                    <Book className="h-4 w-4" />
+                    <span>Host Guide</span>
+                  </div>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="characters" 
+                  className="data-[state=active]:bg-primary/20 data-[state=active]:text-foreground px-3 py-1.5 h-9"
+                >
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4" />
+                    <span>Characters</span>
+                  </div>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="clues" 
+                  className="data-[state=active]:bg-primary/20 data-[state=active]:text-foreground px-3 py-1.5 h-9"
+                >
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-4 w-4" />
+                    <span>Clues</span>
+                  </div>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="inspector-script" 
+                  className="data-[state=active]:bg-primary/20 data-[state=active]:text-foreground px-3 py-1.5 h-9"
+                >
+                  <div className="flex items-center gap-2">
+                    <FileCode className="h-4 w-4" />
+                    <span>Inspector Script</span>
+                  </div>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="character-matrix" 
+                  className="data-[state=active]:bg-primary/20 data-[state=active]:text-foreground px-3 py-1.5 h-9"
+                >
+                  <div className="flex items-center gap-2">
+                    <Grid2x2 className="h-4 w-4" />
+                    <span>Character Matrix</span>
+                  </div>
+                </TabsTrigger>
+              </TabsList>
+              
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleDownloadPDF}
+                className="flex items-center gap-2"
+              >
+                <Download className="h-4 w-4" />
+                <span>Download PDF</span>
+              </Button>
+            </div>
           </div>
           
-          <div className="sm:hidden flex justify-end mb-4">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="flex items-center gap-2"
-              onClick={handleDownloadPDF}
-            >
-              <Download className="h-4 w-4" />
-              <span>Download PDF</span>
-            </Button>
-          </div>
-          
-          <TabsContent value="host-guide" className="prose prose-gray dark:prose-invert max-w-none">
-            {tabData.hostGuide ? (
+          <TabsContent value="host-guide" className="mt-4">
+            <div className="prose prose-stone dark:prose-invert max-w-none">
               <ReactMarkdown>{tabData.hostGuide}</ReactMarkdown>
-            ) : (
-              <p className="text-center py-8">Host guide content is not available.</p>
-            )}
+            </div>
           </TabsContent>
           
-          <TabsContent value="characters">
+          <TabsContent value="characters" className="mt-4">
             {renderCharacters()}
           </TabsContent>
           
-          <TabsContent value="clues">
+          <TabsContent value="clues" className="mt-4">
             {renderClues()}
           </TabsContent>
           
-          <TabsContent value="inspector-script" className="prose prose-gray dark:prose-invert max-w-none">
-            {tabData.inspectorScript ? (
+          <TabsContent value="inspector-script" className="mt-4">
+            <div className="prose prose-stone dark:prose-invert max-w-none">
               <ReactMarkdown>{tabData.inspectorScript}</ReactMarkdown>
-            ) : (
-              <p className="text-center py-8">Inspector script is not available.</p>
-            )}
+            </div>
           </TabsContent>
           
-          <TabsContent value="character-matrix">
+          <TabsContent value="character-matrix" className="mt-4">
             {tabData.characterMatrix ? (
               <div 
-                className="prose prose-gray dark:prose-invert max-w-none"
+                className="prose prose-stone dark:prose-invert max-w-none"
                 dangerouslySetInnerHTML={{ __html: tabData.characterMatrix }}
               />
             ) : (

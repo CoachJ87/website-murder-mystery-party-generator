@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -35,6 +35,9 @@ const MysteryPreview = () => {
     const [generationStatus, setGenerationStatus] = useState<any | null>(null);
     const [currentContent, setCurrentContent] = useState("");
     const [activeTab, setActiveTab] = useState("host-guide");
+    
+    // Add ref to track toast notifications
+    const packageReadyNotified = useRef<boolean>(false);
 
     useEffect(() => {
         const checkPurchaseStatus = async () => {
@@ -201,6 +204,11 @@ const MysteryPreview = () => {
             }
             
             if (status.status === 'completed') {
+                // Only show notification once
+                if (!packageReadyNotified.current) {
+                    toast.success("Your mystery package is ready!");
+                    packageReadyNotified.current = true;
+                }
                 navigate(`/mystery/${id}`);
             }
         } catch (error) {
@@ -279,6 +287,9 @@ const MysteryPreview = () => {
                 </div>
             );
             
+            // Reset notification state
+            packageReadyNotified.current = false;
+            
             if (isResuming) {
                 await resumePackageGeneration(id);
             } else {
@@ -345,7 +356,7 @@ const MysteryPreview = () => {
             <main className="flex-1 py-12 px-4">
                 <div className="container mx-auto max-w-4xl">
                     <div className="mb-8">
-                        <h1 className="text-3xl font-bold mb-2">{formatTitle(title)}</h1>
+                        <h1 className="text-3xl font-bold mb-2">{title}</h1>
                         <p className="text-muted-foreground">
                             Preview your murder mystery and generate the complete package.
                         </p>
@@ -363,7 +374,7 @@ const MysteryPreview = () => {
 
                     {generating ? (
                         <>
-                            {renderGenerationProgress()}
+                            {renderGenerationProgress && renderGenerationProgress()}
                             <Card>
                                 <CardContent className="pt-6">
                                     <MysteryPackageTabView 
@@ -421,7 +432,7 @@ const MysteryPreview = () => {
                                 <Switch 
                                     id="test-mode" 
                                     checked={testModeEnabled} 
-                                    onCheckedChange={setTestModeEnabled}
+                                    onCheckedChange={handleTestModeChange}
                                 />
                                 <Label htmlFor="test-mode">Test Mode (Faster, Less Content)</Label>
                             </div>
