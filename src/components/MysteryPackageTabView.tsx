@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { GenerationStatus } from "@/services/mysteryPackageService";
 import { supabase } from "@/lib/supabase";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { toast } from "sonner";
 
 export interface MysteryPackageTabViewProps {
   packageContent?: string;
@@ -123,8 +124,58 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
         if (charsError) {
           console.error("Error fetching characters:", charsError);
         } else if (chars && chars.length > 0) {
-          charactersData = chars;
-          console.log(`Found ${chars.length} characters`);
+          // Transform character data to ensure consistent structure
+          charactersData = chars.map(character => {
+            // Normalize relationships to expected format
+            let relationships = [];
+            
+            // Handle database format with name/relation pairs
+            if (Array.isArray(character.relationships)) {
+              relationships = character.relationships.map((rel: any) => {
+                // Support both name/relation and character/description formats
+                if (rel.name && rel.relation) {
+                  return {
+                    character: rel.name,
+                    description: rel.relation
+                  };
+                } else if (rel.character && rel.description) {
+                  return rel; // Already in correct format
+                } else {
+                  // Try to extract from simple object
+                  const characterName = Object.keys(rel)[0];
+                  return {
+                    character: characterName,
+                    description: rel[characterName] || ''
+                  };
+                }
+              });
+            }
+            
+            // Normalize secrets to array format
+            let secrets: string[] = [];
+            if (typeof character.secrets === 'string') {
+              // If it's a single string, convert to array
+              secrets = [character.secrets];
+            } else if (Array.isArray(character.secrets)) {
+              // If array, ensure all items are strings
+              secrets = character.secrets.map(secret => 
+                typeof secret === 'string' ? secret : JSON.stringify(secret)
+              );
+            } else if (character.secrets && typeof character.secrets === 'object') {
+              // If it's an object, convert to array of strings
+              secrets = Object.entries(character.secrets).map(
+                ([key, value]) => `${key}: ${value}`
+              );
+            }
+            
+            return {
+              ...character,
+              relationships,
+              secrets: secrets.filter(s => s && s.trim().length > 0)
+            };
+          });
+          
+          console.log(`Found and processed ${charactersData.length} characters`);
         }
       }
 
@@ -158,7 +209,14 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
         const extractedCharacters = extractCharactersFromContent(packageData.content);
         if (extractedCharacters.length > 0) {
           charactersData = extractedCharacters;
+          console.log(`Extracted ${extractedCharacters.length} characters from content`);
         }
+      }
+      
+      // If character data is still empty but we have a content string that likely contains characters
+      if (charactersData.length === 0 && packageData?.content && 
+          packageData.content.includes("CHARACTER GUIDE")) {
+        toast.info("Extracting character information from raw content");
       }
       
       // Store all the data
@@ -173,6 +231,7 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
       setLoading(false);
     } catch (error) {
       console.error("Error fetching mystery content:", error);
+      toast.error("Failed to load mystery content");
       setLoading(false);
     }
   };
@@ -284,27 +343,105 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
       
       // Process relationships
       const relationships: {character: string; description: string}[] = [];
-      const relationshipPattern = /\*\*([^*]+)\*\*:\s*([^\n]+)/g;
-      let relMatch;
-      while ((relMatch = relationshipPattern.exec(relationshipsText)) !== null) {
-        relationships.push({
-          character: relMatch[1].trim(),
-          description: relMatch[2].trim()
+      
+      // Try different formatting patterns
+      const relationshipPatterns = [
+        /\*\*([^*]+)\*\*:\s*([^\n]+)/g, // Bold format: **Name**: Description
+        /\*([^*]+)\*:\s*([^\n]+)/g,     // Italic format: *Name*: Description
+        /^([^:]+):\s*(.+)$/gm           // Simple format: Name: Description
+      ];
+      
+      for (const pattern of relationshipPatterns) {
+        let relMatch;
+        while ((relMatch = pattern.exec(relationshipsText)) !== null) {
+          relationships.push({
+            character: relMatch[1].trim(),
+            description: relMatch[2].trim()
+          });
+        }
+      }
+      
+      // If no relationships were found using patterns, try paragraph-based extraction
+      if (relationships.length === 0 && relationshipsText) {
+        const paragraphs = relationshipsText.split('\n\n');
+        paragraphs.forEach(para => {
+          const parts = para.split(' - ');
+          if (parts.length >= 2) {
+            relationships.push({
+              character: parts[0].trim(),
+              description: parts.slice(1).join(' - ').trim()
+            });
+          }
         });
       }
       
       // Process secrets
-      const secrets: string[] = [];
+      let secrets: string[] = [];
       if (secretsText) {
-        const secretsLines = secretsText.split('\n').filter(line => line.trim());
-        secrets.push(...secretsLines);
+        // Try numbered list pattern (1. Secret)
+        const numberedSecretPattern = /\d+\.\s*([^\n]+)/g;
+        let secretMatch;
+        while ((secretMatch = numberedSecretPattern.exec(secretsText)) !== null) {
+          secrets.push(secretMatch[1].trim());
+        }
+        
+        // Try bulleted list pattern (- Secret or * Secret)
+        if (secrets.length === 0) {
+          const bulletedSecretPattern = /[-*]\s*([^\n]+)/g;
+          while ((secretMatch = bulletedSecretPattern.exec(secretsText)) !== null) {
+            secrets.push(secretMatch[1].trim());
+          }
+        }
+        
+        // If no structured secrets found, use paragraphs
+        if (secrets.length === 0) {
+          secrets = secretsText.split('\n\n')
+            .map(s => s.trim())
+            .filter(s => s.length > 0);
+        }
+        
+        // If still empty but we have text, use the whole thing as one secret
+        if (secrets.length === 0 && secretsText.trim()) {
+          secrets = [secretsText.trim()];
+        }
       }
       
       // Extract round scripts
-      const introduction = extractQuoted(characterContent, "SAY HELLO");
-      const innocentScript = extractQuoted(characterContent, "IF YOU ARE INNOCENT");
-      const guiltyScript = extractQuoted(characterContent, "IF YOU ARE GUILTY");
-      const accompliceScript = extractQuoted(characterContent, "IF YOU ARE THE ACCOMPLICE");
+      const introPatterns = [
+        /"([^"]+)"/,                           // Simple quoted
+        /SAY HELLO[^"]*"([^"]+)"/i,           // SAY HELLO followed by quote
+        /INTRODUCTION[^"]*"([^"]+)"/i         // INTRODUCTION followed by quote
+      ];
+      
+      const innocentPatterns = [
+        /IF YOU ARE INNOCENT[^"]*"([^"]+)"/i,
+        /INNOCENT[^"]*"([^"]+)"/i
+      ];
+      
+      const guiltyPatterns = [
+        /IF YOU ARE GUILTY[^"]*"([^"]+)"/i,
+        /GUILTY[^"]*"([^"]+)"/i,
+        /IF YOU ARE THE MURDERER[^"]*"([^"]+)"/i
+      ];
+      
+      const accomplicePatterns = [
+        /IF YOU ARE THE ACCOMPLICE[^"]*"([^"]+)"/i,
+        /ACCOMPLICE[^"]*"([^"]+)"/i
+      ];
+      
+      // Try multiple patterns for each script type
+      const getFirstMatch = (patterns: RegExp[]) => {
+        for (const pattern of patterns) {
+          const match = characterContent.match(pattern);
+          if (match && match[1]) return match[1];
+        }
+        return undefined;
+      };
+      
+      const introduction = getFirstMatch(introPatterns);
+      const innocentScript = getFirstMatch(innocentPatterns);
+      const guiltyScript = getFirstMatch(guiltyPatterns);
+      const accompliceScript = getFirstMatch(accomplicePatterns);
       
       const characterObj: MysteryCharacter = {
         character_name: characterName,
@@ -332,12 +469,6 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
     const pattern = new RegExp(`##\\s*(?:${sectionName})\\s*\\n([\\s\\S]*?)(?=##|$)`, 'i');
     const match = content.match(pattern);
     return match ? match[1].trim() : '';
-  };
-
-  const extractQuoted = (content: string, context: string): string | undefined => {
-    const pattern = new RegExp(`${context}[\\s\\S]*?"([^"]+)"`, 'i');
-    const match = content.match(pattern);
-    return match ? match[1] : undefined;
   };
 
   const extractContentFromMarkdown = (content: string) => {
@@ -384,12 +515,13 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
     } catch (error) {
       console.error("Error extracting content from markdown:", error);
       setLoading(false);
+      toast.error("Failed to extract mystery content");
     }
   };
 
   const renderCharacters = () => {
     if (tabData.characters.length === 0) {
-      return <p>No character information available.</p>;
+      return <p className="text-center py-8">No character information available.</p>;
     }
 
     return (
@@ -526,6 +658,7 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
   const handleDownloadPDF = () => {
     // PDF download functionality would be implemented here
     console.log("Download PDF requested");
+    toast.info("PDF download functionality is coming soon");
   };
   
   if (loading) {
