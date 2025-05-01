@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -189,7 +188,7 @@ const MysteryForm = ({ onSave, isSaving, initialData }: MysteryFormProps) => {
                                             <RadioGroupItem value="summary" />
                                         </FormControl>
                                         <FormLabel className="font-normal">
-                                            Point Form Summaries (Bullet points
+                                            Summary Points (Bullet points
                                             with key information)
                                         </FormLabel>
                                     </FormItem>
@@ -238,4 +237,3 @@ const MysteryForm = ({ onSave, isSaving, initialData }: MysteryFormProps) => {
 };
 
 export default MysteryForm;
-

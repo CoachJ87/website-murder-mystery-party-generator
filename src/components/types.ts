@@ -61,4 +61,3 @@ export interface CharacterRelationship {
 export interface CharacterSecret {
   content: string;
 }
-
