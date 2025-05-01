@@ -187,7 +187,7 @@ Present your mystery preview in an engaging, dramatic format that will excite th
         onSave={handleSaveMessage}
         initialMessages={messages}
         isLoadingHistory={isLoadingHistory}
-        systemInstruction={createSystemMessage(formData)}
+        systemInstruction={createSystemMessage(formData || {})}
       />
     </div>
   );

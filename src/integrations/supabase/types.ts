@@ -123,11 +123,17 @@ export type Database = {
           created_at: string | null
           description: string | null
           id: string
+          introduction: string | null
           package_id: string | null
+          questioning_options: Json | null
           relationships: Json | null
           round_scripts: Json | null
+          round1_statement: string | null
+          round2_statement: string | null
+          round3_statement: string | null
           secrets: Json | null
           updated_at: string | null
+          whereabouts: string | null
         }
         Insert: {
           background?: string | null
@@ -135,11 +141,17 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           id?: string
+          introduction?: string | null
           package_id?: string | null
+          questioning_options?: Json | null
           relationships?: Json | null
           round_scripts?: Json | null
+          round1_statement?: string | null
+          round2_statement?: string | null
+          round3_statement?: string | null
           secrets?: Json | null
           updated_at?: string | null
+          whereabouts?: string | null
         }
         Update: {
           background?: string | null
@@ -147,11 +159,17 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           id?: string
+          introduction?: string | null
           package_id?: string | null
+          questioning_options?: Json | null
           relationships?: Json | null
           round_scripts?: Json | null
+          round1_statement?: string | null
+          round2_statement?: string | null
+          round3_statement?: string | null
           secrets?: Json | null
           updated_at?: string | null
+          whereabouts?: string | null
         }
         Relationships: [
           {

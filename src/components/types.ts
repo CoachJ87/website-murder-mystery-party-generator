@@ -7,7 +7,7 @@ export interface Message {
   role?: string; // Add optional role property
 }
 
-// Add FormValues interface for MysteryForm component
+// Update FormValues interface to use 'summary' instead of 'pointForm'
 export interface FormValues {
   title?: string;
   theme?: string;
@@ -44,3 +44,21 @@ export interface CharacterScript {
     accomplice?: string;
   };
 }
+
+// Add more detailed interfaces for character details
+export interface CharacterWhereabouts {
+  location: string;
+  details: string;
+  witnesses?: string;
+  timeGap?: string;
+}
+
+export interface CharacterRelationship {
+  character: string;
+  description: string;
+}
+
+export interface CharacterSecret {
+  content: string;
+}
+

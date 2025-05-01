@@ -1,4 +1,4 @@
-import { useState } from "react"; // Likely not needed
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,7 +27,7 @@ const formSchema = z.object({
         .min(2, { message: "Minimum 2 players required" })
         .max(40, { message: "Maximum 40 players allowed" }),
     hasAccomplice: z.boolean().default(false),
-    scriptType: z.enum(["full", "pointForm"], {
+    scriptType: z.enum(["full", "summary"], {
         required_error: "Please select a script type",
     }),
     additionalDetails: z.string().optional(),
@@ -166,8 +166,8 @@ const MysteryForm = ({ onSave, isSaving, initialData }: MysteryFormProps) => {
                     render={({ field }) => (
                         <FormItem className="space-y-3">
                             <FormLabel>
-                                Would you prefer full scripts or point form
-                                summaries for character guidance?
+                                Would you prefer full scripts or summary
+                                points for character guidance?
                             </FormLabel>
                             <FormControl>
                                 <RadioGroup
@@ -186,7 +186,7 @@ const MysteryForm = ({ onSave, isSaving, initialData }: MysteryFormProps) => {
                                     </FormItem>
                                     <FormItem className="flex items-center space-x-3 space-y-0">
                                         <FormControl>
-                                            <RadioGroupItem value="pointForm" />
+                                            <RadioGroupItem value="summary" />
                                         </FormControl>
                                         <FormLabel className="font-normal">
                                             Point Form Summaries (Bullet points
@@ -238,3 +238,4 @@ const MysteryForm = ({ onSave, isSaving, initialData }: MysteryFormProps) => {
 };
 
 export default MysteryForm;
+

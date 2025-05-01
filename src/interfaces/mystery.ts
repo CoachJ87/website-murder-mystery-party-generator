@@ -1,6 +1,5 @@
 
 // src/interfaces/mystery.ts
-// Add these interfaces if they don't already exist
 
 export interface MysteryData {
   title?: string;
@@ -99,3 +98,52 @@ interface QuestionOption {
   target: string;
   question: string;
 }
+
+// Add helper function to normalize character data
+export function normalizeCharacterRelationships(relationships: any[]): RelationshipInfo[] {
+  if (!relationships || !Array.isArray(relationships)) {
+    return [];
+  }
+  
+  return relationships.map(rel => {
+    if (typeof rel === 'string') {
+      const parts = rel.split(':').map(p => p.trim());
+      return {
+        character: parts[0] || '',
+        description: parts.slice(1).join(':') || ''
+      };
+    }
+    
+    // Handle object with potentially different property names
+    if (typeof rel === 'object') {
+      return {
+        character: rel.character || rel.name || '',
+        description: rel.description || rel.relation || ''
+      };
+    }
+    
+    return { character: '', description: '' };
+  }).filter(r => r.character || r.description);
+}
+
+// Helper to normalize secrets
+export function normalizeCharacterSecrets(secrets: any): string[] {
+  if (!secrets) {
+    return [];
+  }
+  
+  if (typeof secrets === 'string') {
+    return [secrets];
+  }
+  
+  if (Array.isArray(secrets)) {
+    return secrets.map(s => typeof s === 'object' ? JSON.stringify(s) : String(s));
+  }
+  
+  if (typeof secrets === 'object') {
+    return Object.entries(secrets).map(([key, value]) => `${key}: ${value}`);
+  }
+  
+  return [];
+}
+
