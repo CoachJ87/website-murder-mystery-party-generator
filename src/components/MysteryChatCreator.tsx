@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -214,8 +213,8 @@ const MysteryChatCreator = () => {
                                         initialAdditionalDetails={formData?.additionalDetails}
                                         savedMysteryId={id}
                                         onSave={handleSaveChatMessage}
-                                        onGenerateFinal={handleGenerateMystery} // Pass the generate function
-                                        initialMessages={chatMessages} // Pass loaded messages
+                                        onGenerateFinal={handleGenerateMystery}
+                                        initialMessages={chatMessages}
                                     />
                                 </div>
                             ) : (
