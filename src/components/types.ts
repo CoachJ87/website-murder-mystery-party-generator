@@ -1,4 +1,3 @@
-
 export interface Message {
   id: string;
   content: string;
@@ -15,7 +14,7 @@ export interface FormValues {
   playerCount?: number;
   timeFrame?: string;
   hasAccomplice?: boolean;
-  scriptType?: 'full' | 'summary';
+  scriptType?: 'full' | 'summary'; // Changed from 'full' | 'pointForm' to 'full' | 'summary'
   additionalDetails?: string;
   [key: string]: any;
 }
