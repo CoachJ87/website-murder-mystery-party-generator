@@ -1,3 +1,4 @@
+
 // src/interfaces/mystery.ts
 // Add these interfaces if they don't already exist
 
@@ -68,11 +69,17 @@ export interface MysteryCharacter {
   secrets: string[];
   round_scripts?: {
     introduction?: string;
+    round1?: string;
     round2?: ScriptOptions;
     round3?: ScriptOptions;
-    round4?: ScriptOptions;
     final?: ScriptOptions;
   };
+  introduction?: string;
+  whereabouts?: string;
+  round1_statement?: string;
+  round2_statement?: string;
+  round3_statement?: string;
+  questioning_options?: QuestionOption[];
   created_at: string;
   updated_at: string;
 }
@@ -86,4 +93,9 @@ interface ScriptOptions {
   innocent?: string;
   guilty?: string;
   accomplice?: string;
+}
+
+interface QuestionOption {
+  target: string;
+  question: string;
 }

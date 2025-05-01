@@ -10,6 +10,7 @@ import { GenerationStatus } from "@/services/mysteryPackageService";
 import { supabase } from "@/lib/supabase";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { toast } from "sonner";
+import { MysteryCharacter } from "@/interfaces/mystery";
 
 export interface MysteryPackageTabViewProps {
   packageContent?: string;
@@ -17,34 +18,6 @@ export interface MysteryPackageTabViewProps {
   generationStatus?: GenerationStatus;
   isGenerating?: boolean;
   conversationId?: string;
-}
-
-interface MysteryCharacter {
-  id?: string;
-  package_id?: string;
-  character_name: string;
-  description?: string;
-  background?: string;
-  relationships?: Array<{character: string; description: string}>;
-  secrets?: string[];
-  round_scripts?: {
-    introduction?: string;
-    round2?: ScriptOptions;
-    round3?: ScriptOptions;
-    round4?: ScriptOptions;
-    final?: ScriptOptions;
-  };
-}
-
-interface RelationshipInfo {
-  character: string;
-  description: string;
-}
-
-interface ScriptOptions {
-  innocent?: string;
-  guilty?: string;
-  accomplice?: string;
 }
 
 interface EvidenceCard {
@@ -97,7 +70,7 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
         .from("mystery_packages")
         .select("id, content, host_guide, evidence_cards, detective_script, relationship_matrix")
         .eq("conversation_id", conversationId)
-        .single();
+        .maybeSingle();
         
       if (packageError) {
         console.error("Error fetching mystery package:", packageError);
@@ -168,10 +141,36 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
               );
             }
             
+            // Normalize round scripts
+            let round_scripts = character.round_scripts || {};
+            if (typeof round_scripts !== 'object') {
+              round_scripts = {};
+            }
+            
+            // Ensure the character data conforms to our interface
             return {
-              ...character,
-              relationships,
-              secrets: secrets.filter(s => s && s.trim().length > 0)
+              id: character.id || '',
+              package_id: character.package_id || '',
+              character_name: character.character_name || 'Unknown Character',
+              description: character.description || '',
+              background: character.background || '',
+              relationships: relationships.filter(r => r.character && r.character.trim().length > 0),
+              secrets: secrets.filter(s => s && s.trim().length > 0),
+              round_scripts: {
+                introduction: character.round_scripts?.introduction || character.introduction || '',
+                round1: character.round1_statement || '',
+                round2: character.round_scripts?.round2 || {},
+                round3: character.round_scripts?.round3 || {},
+                final: character.round_scripts?.final || {}
+              },
+              introduction: character.introduction || '',
+              whereabouts: character.whereabouts || '',
+              round1_statement: character.round1_statement || '',
+              round2_statement: character.round2_statement || '',
+              round3_statement: character.round3_statement || '',
+              questioning_options: character.questioning_options || [],
+              created_at: character.created_at || new Date().toISOString(),
+              updated_at: character.updated_at || new Date().toISOString()
             };
           });
           
@@ -210,6 +209,32 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
         if (extractedCharacters.length > 0) {
           charactersData = extractedCharacters;
           console.log(`Extracted ${extractedCharacters.length} characters from content`);
+          
+          // If we have a package_id, save these characters to the database
+          if (packageData?.id) {
+            try {
+              for (const character of extractedCharacters) {
+                await supabase.from("mystery_characters").insert({
+                  package_id: packageData.id,
+                  character_name: character.character_name,
+                  description: character.description,
+                  background: character.background,
+                  relationships: character.relationships,
+                  secrets: character.secrets,
+                  round_scripts: character.round_scripts,
+                  introduction: character.introduction || character.round_scripts?.introduction,
+                  whereabouts: character.whereabouts,
+                  round1_statement: character.round1_statement || (character.round_scripts?.round2 as any)?.innocent,
+                  round2_statement: character.round2_statement || (character.round_scripts?.round3 as any)?.innocent,
+                  round3_statement: character.round3_statement || (character.round_scripts?.final as any)?.innocent,
+                  questioning_options: character.questioning_options
+                });
+              }
+              toast.success("Character data saved to database");
+            } catch (error) {
+              console.error("Error saving extracted characters to database:", error);
+            }
+          }
         }
       }
       
@@ -340,6 +365,30 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
       const background = extractSection(characterContent, "(?:YOUR )?BACKGROUND");
       const relationshipsText = extractSection(characterContent, "(?:YOUR )?RELATIONSHIPS");
       const secretsText = extractSection(characterContent, "(?:YOUR )?SECRETS?");
+      const whereaboutsText = extractSection(characterContent, "(?:YOUR )?WHEREABOUTS");
+      const round1Text = extractSection(characterContent, "ROUND 1: INITIAL INVESTIGATION");
+      const round2Text = extractSection(characterContent, "ROUND 2: DEEPER REVELATIONS");
+      const round3Text = extractSection(characterContent, "ROUND 3: FINAL CLUES");
+      const finalStatementText = extractSection(characterContent, "FINAL STATEMENT");
+      
+      // Extract introductory statement
+      const introPattern = /YOUR INTRODUCTION\s*\n([^#]+?)(?=CHOOSE|$)/is;
+      const introMatch = round1Text.match(introPattern);
+      const introduction = introMatch ? introMatch[1].trim().replace(/"([^"]+)"/, '$1') : '';
+      
+      // Extract questioning options
+      const questioningOptions: { target: string, question: string }[] = [];
+      const questioningPattern = /Ask ([^:]+):\s*"([^"]+)"/g;
+      let questionMatch;
+      const questioningSection = characterContent.includes("CHOOSE SOMEONE TO QUESTION") ? 
+                               extractSection(characterContent, "CHOOSE SOMEONE TO QUESTION") : '';
+                               
+      while ((questionMatch = questioningPattern.exec(questioningSection)) !== null) {
+        questioningOptions.push({
+          target: questionMatch[1].trim(),
+          question: questionMatch[2].trim()
+        });
+      }
       
       // Process relationships
       const relationships: {character: string; description: string}[] = [];
@@ -406,57 +455,74 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
         }
       }
       
-      // Extract round scripts
-      const introPatterns = [
-        /"([^"]+)"/,                           // Simple quoted
-        /SAY HELLO[^"]*"([^"]+)"/i,           // SAY HELLO followed by quote
-        /INTRODUCTION[^"]*"([^"]+)"/i         // INTRODUCTION followed by quote
-      ];
+      // Extract round statements
+      const round1StatementPattern = /IF YOU ARE INNOCENT:\s*"([^"]+)"/i;
+      const round1Match = round1Text.match(round1StatementPattern);
+      const round1Statement = round1Match ? round1Match[1].trim() : '';
       
-      const innocentPatterns = [
-        /IF YOU ARE INNOCENT[^"]*"([^"]+)"/i,
-        /INNOCENT[^"]*"([^"]+)"/i
-      ];
+      const round2StatementPattern = /IF YOU ARE INNOCENT:\s*"([^"]+)"/i;
+      const round2Match = round2Text.match(round2StatementPattern);
+      const round2Statement = round2Match ? round2Match[1].trim() : '';
       
-      const guiltyPatterns = [
-        /IF YOU ARE GUILTY[^"]*"([^"]+)"/i,
-        /GUILTY[^"]*"([^"]+)"/i,
-        /IF YOU ARE THE MURDERER[^"]*"([^"]+)"/i
-      ];
-      
-      const accomplicePatterns = [
-        /IF YOU ARE THE ACCOMPLICE[^"]*"([^"]+)"/i,
-        /ACCOMPLICE[^"]*"([^"]+)"/i
-      ];
-      
-      // Try multiple patterns for each script type
-      const getFirstMatch = (patterns: RegExp[]) => {
-        for (const pattern of patterns) {
-          const match = characterContent.match(pattern);
-          if (match && match[1]) return match[1];
-        }
-        return undefined;
+      const round3StatementPattern = /IF YOU ARE INNOCENT:\s*"([^"]+)"/i;
+      const round3Match = round3Text.match(round3StatementPattern);
+      const round3Statement = round3Match ? round3Match[1].trim() : '';
+
+      // Extract scripts for different roles
+      // Find innocent, guilty and accomplice statements
+      const extractRoleScript = (text: string, role: string): string => {
+        const pattern = new RegExp(`IF YOU ARE ${role}:\\s*"([^"]+)"`, 'i');
+        const match = text.match(pattern);
+        return match ? match[1].trim() : '';
       };
       
-      const introduction = getFirstMatch(introPatterns);
-      const innocentScript = getFirstMatch(innocentPatterns);
-      const guiltyScript = getFirstMatch(guiltyPatterns);
-      const accompliceScript = getFirstMatch(accomplicePatterns);
+      const finalInnocent = extractRoleScript(finalStatementText, 'INNOCENT');
+      const finalGuilty = extractRoleScript(finalStatementText, 'GUILTY');
+      const finalAccomplice = extractRoleScript(finalStatementText, 'ACCOMPLICE');
+      
+      const round2Innocent = extractRoleScript(round2Text, 'INNOCENT');
+      const round2Guilty = extractRoleScript(round2Text, 'GUILTY');
+      const round2Accomplice = extractRoleScript(round2Text, 'ACCOMPLICE');
+      
+      const round3Innocent = extractRoleScript(round3Text, 'INNOCENT');
+      const round3Guilty = extractRoleScript(round3Text, 'GUILTY');
+      const round3Accomplice = extractRoleScript(round3Text, 'ACCOMPLICE');
       
       const characterObj: MysteryCharacter = {
+        id: '',  // Will be assigned when saved to DB
+        package_id: '', // Will be assigned when saved to DB
         character_name: characterName,
         description,
         background,
         relationships,
-        secrets: secrets.length > 0 ? secrets : undefined,
+        secrets,
+        introduction,
+        whereabouts: whereaboutsText,
+        round1_statement: round1Statement,
+        round2_statement: round2Statement,
+        round3_statement: round3Statement,
+        questioning_options: questioningOptions,
         round_scripts: {
           introduction,
+          round1: round1Statement,
+          round2: {
+            innocent: round2Innocent,
+            guilty: round2Guilty,
+            accomplice: round2Accomplice
+          },
+          round3: {
+            innocent: round3Innocent,
+            guilty: round3Guilty,
+            accomplice: round3Accomplice
+          },
           final: {
-            innocent: innocentScript,
-            guilty: guiltyScript,
-            accomplice: accompliceScript
+            innocent: finalInnocent,
+            guilty: finalGuilty,
+            accomplice: finalAccomplice
           }
-        }
+        },
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       };
       
       characters.push(characterObj);
@@ -468,7 +534,12 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
   const extractSection = (content: string, sectionName: string): string => {
     const pattern = new RegExp(`##\\s*(?:${sectionName})\\s*\\n([\\s\\S]*?)(?=##|$)`, 'i');
     const match = content.match(pattern);
-    return match ? match[1].trim() : '';
+    if (match) return match[1].trim();
+    
+    // Try alternative pattern with no ## markers
+    const altPattern = new RegExp(`${sectionName}\\s*\\n([\\s\\S]*?)(?=(?:ROUND|YOUR|FINAL|CHOOSE|$))`, 'i');
+    const altMatch = content.match(altPattern);
+    return altMatch ? altMatch[1].trim() : '';
   };
 
   const extractContentFromMarkdown = (content: string) => {
@@ -533,27 +604,27 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
                 {character.character_name}
               </AccordionTrigger>
               <AccordionContent>
-                <div className="space-y-4 p-4 rounded-md bg-muted/20">
+                <div className="space-y-6 p-4 rounded-md bg-muted/20">
                   {character.description && (
                     <div>
-                      <h3 className="text-md font-semibold mb-1">Description</h3>
-                      <p>{character.description}</p>
+                      <h3 className="text-md font-semibold mb-2">Character Description</h3>
+                      <p className="text-base">{character.description}</p>
                     </div>
                   )}
                   
                   {character.background && (
                     <div>
-                      <h3 className="text-md font-semibold mb-1">Background</h3>
+                      <h3 className="text-md font-semibold mb-2">Background</h3>
                       <div className="prose prose-sm max-w-none">
                         <ReactMarkdown>{character.background}</ReactMarkdown>
                       </div>
                     </div>
                   )}
                   
-                  {character.relationships && character.relationships.length > 0 && (
+                  {character.relationships?.length > 0 && (
                     <div>
-                      <h3 className="text-md font-semibold mb-1">Relationships</h3>
-                      <ul className="list-disc pl-5 space-y-1">
+                      <h3 className="text-md font-semibold mb-2">Relationships</h3>
+                      <ul className="list-disc pl-5 space-y-2">
                         {character.relationships.map((rel, idx) => (
                           <li key={idx} className="mb-1">
                             <strong>{rel.character}:</strong> {rel.description}
@@ -563,10 +634,10 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
                     </div>
                   )}
                   
-                  {character.secrets && character.secrets.length > 0 && (
+                  {character.secrets?.length > 0 && (
                     <div>
-                      <h3 className="text-md font-semibold mb-1">Secrets</h3>
-                      <ul className="list-disc pl-5 space-y-1">
+                      <h3 className="text-md font-semibold mb-2">Secrets</h3>
+                      <ul className="list-disc pl-5 space-y-2">
                         {character.secrets.map((secret, idx) => (
                           <li key={idx}>{secret}</li>
                         ))}
@@ -574,37 +645,111 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
                     </div>
                   )}
                   
-                  {character.round_scripts && (
+                  {character.whereabouts && (
                     <div>
-                      <h3 className="text-md font-semibold mb-1">Script Notes</h3>
+                      <h3 className="text-md font-semibold mb-2">Whereabouts During the Murder</h3>
+                      <p className="text-base">{character.whereabouts}</p>
+                    </div>
+                  )}
+                  
+                  {character.introduction && (
+                    <div>
+                      <h3 className="text-md font-semibold mb-2">Introduction</h3>
+                      <div className="p-3 bg-background rounded-md italic">
+                        "{character.introduction}"
+                      </div>
+                    </div>
+                  )}
+                  
+                  {character.questioning_options && character.questioning_options.length > 0 && (
+                    <div>
+                      <h3 className="text-md font-semibold mb-2">Questioning Options</h3>
+                      <ul className="list-disc pl-5 space-y-2">
+                        {character.questioning_options.map((option, idx) => (
+                          <li key={idx}>
+                            Ask <strong>{option.target}</strong>: "{option.question}"
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  
+                  {(character.round1_statement || character.round_scripts?.round1) && (
+                    <div>
+                      <h3 className="text-md font-semibold mb-2">Round 1 Response</h3>
+                      <div className="p-3 bg-background rounded-md italic">
+                        "{character.round1_statement || character.round_scripts?.round1}"
+                      </div>
+                    </div>
+                  )}
+                  
+                  {(character.round2_statement || 
+                    character.round_scripts?.round2?.innocent || 
+                    character.round_scripts?.round2?.guilty) && (
+                    <div>
+                      <h3 className="text-md font-semibold mb-2">Round 2 Response</h3>
+                      {character.round2_statement && (
+                        <div className="p-3 bg-background rounded-md italic mb-2">
+                          "{character.round2_statement}"
+                        </div>
+                      )}
+                      {character.round_scripts?.round2?.innocent && (
+                        <div className="p-3 bg-background rounded-md italic mb-2">
+                          <strong>If Innocent:</strong> "{character.round_scripts.round2.innocent}"
+                        </div>
+                      )}
+                      {character.round_scripts?.round2?.guilty && (
+                        <div className="p-3 bg-background rounded-md italic mb-2">
+                          <strong>If Guilty:</strong> "{character.round_scripts.round2.guilty}"
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  
+                  {(character.round3_statement || 
+                    character.round_scripts?.round3?.innocent || 
+                    character.round_scripts?.round3?.guilty) && (
+                    <div>
+                      <h3 className="text-md font-semibold mb-2">Round 3 Response</h3>
+                      {character.round3_statement && (
+                        <div className="p-3 bg-background rounded-md italic mb-2">
+                          "{character.round3_statement}"
+                        </div>
+                      )}
+                      {character.round_scripts?.round3?.innocent && (
+                        <div className="p-3 bg-background rounded-md italic mb-2">
+                          <strong>If Innocent:</strong> "{character.round_scripts.round3.innocent}"
+                        </div>
+                      )}
+                      {character.round_scripts?.round3?.guilty && (
+                        <div className="p-3 bg-background rounded-md italic mb-2">
+                          <strong>If Guilty:</strong> "{character.round_scripts.round3.guilty}"
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  
+                  {(character.round_scripts?.final?.innocent || 
+                    character.round_scripts?.final?.guilty || 
+                    character.round_scripts?.final?.accomplice) && (
+                    <div>
+                      <h3 className="text-md font-semibold mb-2">Final Statement</h3>
                       
-                      {character.round_scripts.introduction && (
-                        <div className="mb-2 p-2 bg-background rounded-md">
-                          <p><strong>Introduction:</strong> "{character.round_scripts.introduction}"</p>
+                      {character.round_scripts.final.innocent && (
+                        <div className="p-3 bg-background rounded-md italic mb-2">
+                          <strong>If innocent:</strong> "{character.round_scripts.final.innocent}"
                         </div>
                       )}
                       
-                      {character.round_scripts.final && (
-                        <div className="space-y-2">
-                          <p className="font-medium">Final Statements:</p>
-                          
-                          {character.round_scripts.final.innocent && (
-                            <div className="p-2 bg-background rounded-md">
-                              <p><strong>If innocent:</strong> "{character.round_scripts.final.innocent}"</p>
-                            </div>
-                          )}
-                          
-                          {character.round_scripts.final.guilty && (
-                            <div className="p-2 bg-background rounded-md">
-                              <p><strong>If guilty:</strong> "{character.round_scripts.final.guilty}"</p>
-                            </div>
-                          )}
-                          
-                          {character.round_scripts.final.accomplice && (
-                            <div className="p-2 bg-background rounded-md">
-                              <p><strong>If accomplice:</strong> "{character.round_scripts.final.accomplice}"</p>
-                            </div>
-                          )}
+                      {character.round_scripts.final.guilty && (
+                        <div className="p-3 bg-background rounded-md italic mb-2">
+                          <strong>If guilty:</strong> "{character.round_scripts.final.guilty}"
+                        </div>
+                      )}
+                      
+                      {character.round_scripts.final.accomplice && (
+                        <div className="p-3 bg-background rounded-md italic mb-2">
+                          <strong>If accomplice:</strong> "{character.round_scripts.final.accomplice}"
                         </div>
                       )}
                     </div>
