@@ -181,7 +181,7 @@ Present your mystery preview in an engaging, dramatic format that will excite th
         initialTheme={formData?.theme || ""}
         initialPlayerCount={formData?.playerCount}
         initialHasAccomplice={formData?.hasAccomplice}
-        initialScriptType={formData?.scriptType}
+        initialScriptType={formData?.scriptType as 'full' | 'pointForm'}
         initialAdditionalDetails={formData?.additionalDetails}
         savedMysteryId={conversationId || undefined}
         onSave={handleSaveMessage}

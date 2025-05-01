@@ -1,4 +1,5 @@
 
+
 export interface Message {
   id: string;
   content: string;
@@ -14,7 +15,7 @@ export interface FormValues {
   playerCount?: number;
   timeFrame?: string;
   hasAccomplice?: boolean;
-  scriptType?: 'full' | 'summary'; // Changed from 'full' | 'pointForm' to 'full' | 'summary'
+  scriptType?: 'full' | 'pointForm'; // Changed back to match the expected type
   additionalDetails?: string;
   [key: string]: any;
 }
@@ -60,3 +61,4 @@ export interface CharacterRelationship {
 export interface CharacterSecret {
   content: string;
 }
+

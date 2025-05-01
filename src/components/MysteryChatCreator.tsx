@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -209,7 +210,7 @@ const MysteryChatCreator = () => {
                                         initialTheme={formData?.theme || ""}
                                         initialPlayerCount={formData?.playerCount}
                                         initialHasAccomplice={formData?.hasAccomplice}
-                                        initialScriptType={formData?.scriptType}
+                                        initialScriptType={formData?.scriptType as 'full' | 'pointForm'}
                                         initialAdditionalDetails={formData?.additionalDetails}
                                         savedMysteryId={id}
                                         onSave={handleSaveChatMessage}

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -303,7 +304,7 @@ const MysteryCreation = () => {
                                     onGenerateFinal={handleGenerateMystery}
                                     initialPlayerCount={formData?.playerCount}
                                     initialHasAccomplice={formData?.hasAccomplice}
-                                    initialScriptType={formData?.scriptType}
+                                    initialScriptType={formData?.scriptType as 'full' | 'pointForm'}
                                     initialAdditionalDetails={formData?.additionalDetails}
                                     initialMessages={messages}
                                     isLoadingHistory={isLoadingHistory}
