@@ -1,3 +1,4 @@
+
 export interface Message {
   id: string;
   content: string;
@@ -6,7 +7,6 @@ export interface Message {
   role?: string; // Add optional role property
 }
 
-// Update FormValues interface to use 'summary' instead of 'pointForm'
 export interface FormValues {
   title?: string;
   theme?: string;

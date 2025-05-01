@@ -181,7 +181,7 @@ Present your mystery preview in an engaging, dramatic format that will excite th
         initialTheme={formData?.theme || ""}
         initialPlayerCount={formData?.playerCount}
         initialHasAccomplice={formData?.hasAccomplice}
-        initialScriptType={formData?.scriptType} // This was causing the type error - now using correct type
+        initialScriptType={formData?.scriptType}
         initialAdditionalDetails={formData?.additionalDetails}
         savedMysteryId={conversationId || undefined}
         onSave={handleSaveMessage}
