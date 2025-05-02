@@ -679,14 +679,26 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
                     <div>
                       <h3 className="text-md font-semibold mb-2">Round 1 Response</h3>
                       <div className="p-3 bg-background rounded-md italic">
-                        "{character.round1_statement || character.round_scripts?.round1}"
+                        {typeof character.round_scripts?.round1 === 'string' ? (
+                          `"${character.round1_statement || character.round_scripts.round1}"`
+                        ) : character.round_scripts?.round1 ? (
+                          <>
+                            <div className="mb-2">
+                              <strong>If innocent:</strong> "{character.round_scripts.round1.innocent}"
+                            </div>
+                            <div>
+                              <strong>If guilty:</strong> "{character.round_scripts.round1.guilty}"
+                            </div>
+                          </>
+                        ) : (
+                          `"${character.round1_statement || ''}"`
+                        )}
                       </div>
                     </div>
                   )}
                   
                   {(character.round2_statement || 
-                    character.round_scripts?.round2?.innocent || 
-                    character.round_scripts?.round2?.guilty) && (
+                    character.round_scripts?.round2) && (
                     <div>
                       <h3 className="text-md font-semibold mb-2">Round 2 Response</h3>
                       {character.round2_statement && (
@@ -694,12 +706,12 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
                           "{character.round2_statement}"
                         </div>
                       )}
-                      {character.round_scripts?.round2?.innocent && (
+                      {typeof character.round_scripts?.round2 !== 'string' && character.round_scripts?.round2?.innocent && (
                         <div className="p-3 bg-background rounded-md italic mb-2">
                           <strong>If Innocent:</strong> "{character.round_scripts.round2.innocent}"
                         </div>
                       )}
-                      {character.round_scripts?.round2?.guilty && (
+                      {typeof character.round_scripts?.round2 !== 'string' && character.round_scripts?.round2?.guilty && (
                         <div className="p-3 bg-background rounded-md italic mb-2">
                           <strong>If Guilty:</strong> "{character.round_scripts.round2.guilty}"
                         </div>
@@ -708,8 +720,7 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
                   )}
                   
                   {(character.round3_statement || 
-                    character.round_scripts?.round3?.innocent || 
-                    character.round_scripts?.round3?.guilty) && (
+                    character.round_scripts?.round3) && (
                     <div>
                       <h3 className="text-md font-semibold mb-2">Round 3 Response</h3>
                       {character.round3_statement && (
@@ -717,12 +728,12 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
                           "{character.round3_statement}"
                         </div>
                       )}
-                      {character.round_scripts?.round3?.innocent && (
+                      {typeof character.round_scripts?.round3 !== 'string' && character.round_scripts?.round3?.innocent && (
                         <div className="p-3 bg-background rounded-md italic mb-2">
                           <strong>If Innocent:</strong> "{character.round_scripts.round3.innocent}"
                         </div>
                       )}
-                      {character.round_scripts?.round3?.guilty && (
+                      {typeof character.round_scripts?.round3 !== 'string' && character.round_scripts?.round3?.guilty && (
                         <div className="p-3 bg-background rounded-md italic mb-2">
                           <strong>If Guilty:</strong> "{character.round_scripts.round3.guilty}"
                         </div>
