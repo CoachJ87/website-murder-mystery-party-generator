@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Book, Users, FileText, Grid2x2, FileCode, Download } from "lucide-react";
+import { Book, Users, FileText, FileCode, Grid2x2, Download } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 import { Button } from "@/components/ui/button";
 import { GenerationStatus } from "@/services/mysteryPackageService";
@@ -604,7 +604,7 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
                 {character.character_name}
               </AccordionTrigger>
               <AccordionContent>
-                <div className="space-y-6 p-4 rounded-md bg-muted/20">
+                <div className="space-y-6 p-4 rounded-md bg-card/50">
                   {character.description && (
                     <div>
                       <h3 className="text-md font-semibold mb-2">Character Description</h3>
@@ -770,32 +770,34 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
 
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold mb-4">CLUES AND EVIDENCE</h1>
+        <h1 className="text-2xl font-bold mb-6">Clues and Evidence</h1>
         
-        {tabData.clues.map((clue, index) => (
-          <div key={index} className="border rounded-lg p-4 mb-4">
-            <h2 className="text-xl font-semibold mb-2">{clue.title}</h2>
-            {clue.description && (
-              <div className="mb-2">
-                <h3 className="text-md font-medium">Description</h3>
-                <p>{clue.description}</p>
-              </div>
-            )}
-            {clue.content && (
-              <div className="mb-2">
-                <div className="prose prose-sm max-w-none">
-                  <ReactMarkdown>{clue.content}</ReactMarkdown>
+        <div className="grid gap-6 md:grid-cols-2">
+          {tabData.clues.map((clue, index) => (
+            <div key={index} className="border rounded-lg p-4 bg-card/50">
+              <h2 className="text-xl font-semibold mb-2">{clue.title}</h2>
+              {clue.description && (
+                <div className="mb-4">
+                  <h3 className="text-md font-medium mb-1">Description</h3>
+                  <p className="text-base">{clue.description}</p>
                 </div>
-              </div>
-            )}
-            {clue.implication && (
-              <div>
-                <h3 className="text-md font-medium">Implications</h3>
-                <p>{clue.implication}</p>
-              </div>
-            )}
-          </div>
-        ))}
+              )}
+              {clue.content && (
+                <div className="mb-4">
+                  <div className="prose prose-sm max-w-none">
+                    <ReactMarkdown>{clue.content}</ReactMarkdown>
+                  </div>
+                </div>
+              )}
+              {clue.implication && (
+                <div>
+                  <h3 className="text-md font-medium mb-1">Implications</h3>
+                  <p className="text-base">{clue.implication}</p>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
     );
   };
@@ -819,95 +821,95 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
   
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-2xl font-bold">{mysteryTitle}</CardTitle>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={handleDownloadPDF}
+          className="flex items-center gap-2"
+        >
+          <Download className="h-4 w-4" />
+          <span>Download PDF</span>
+        </Button>
       </CardHeader>
       
       <CardContent>
         <Tabs defaultValue="host-guide" value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="border-b pb-2 mb-4">
-            <div className="flex items-center justify-between">
-              <TabsList className="h-9 p-0 bg-transparent space-x-2">
-                <TabsTrigger 
-                  value="host-guide" 
-                  className="data-[state=active]:bg-primary/20 data-[state=active]:text-foreground px-3 py-1.5 h-9"
-                >
-                  <div className="flex items-center gap-2">
-                    <Book className="h-4 w-4" />
-                    <span>Host Guide</span>
-                  </div>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="characters" 
-                  className="data-[state=active]:bg-primary/20 data-[state=active]:text-foreground px-3 py-1.5 h-9"
-                >
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4" />
-                    <span>Characters</span>
-                  </div>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="clues" 
-                  className="data-[state=active]:bg-primary/20 data-[state=active]:text-foreground px-3 py-1.5 h-9"
-                >
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-4 w-4" />
-                    <span>Clues</span>
-                  </div>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="inspector-script" 
-                  className="data-[state=active]:bg-primary/20 data-[state=active]:text-foreground px-3 py-1.5 h-9"
-                >
-                  <div className="flex items-center gap-2">
-                    <FileCode className="h-4 w-4" />
-                    <span>Inspector Script</span>
-                  </div>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="character-matrix" 
-                  className="data-[state=active]:bg-primary/20 data-[state=active]:text-foreground px-3 py-1.5 h-9"
-                >
-                  <div className="flex items-center gap-2">
-                    <Grid2x2 className="h-4 w-4" />
-                    <span>Character Matrix</span>
-                  </div>
-                </TabsTrigger>
-              </TabsList>
-              
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleDownloadPDF}
-                className="flex items-center gap-2"
+            <TabsList className="h-10 p-0 bg-transparent space-x-2 w-full overflow-x-auto flex-nowrap">
+              <TabsTrigger 
+                value="host-guide" 
+                className="data-[state=active]:bg-primary/20 data-[state=active]:text-foreground px-3 py-1.5 h-10 whitespace-nowrap"
               >
-                <Download className="h-4 w-4" />
-                <span>Download PDF</span>
-              </Button>
-            </div>
+                <div className="flex items-center gap-2">
+                  <Book className="h-4 w-4" />
+                  <span>Host Guide</span>
+                </div>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="characters" 
+                className="data-[state=active]:bg-primary/20 data-[state=active]:text-foreground px-3 py-1.5 h-10 whitespace-nowrap"
+              >
+                <div className="flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  <span>Characters</span>
+                </div>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="clues" 
+                className="data-[state=active]:bg-primary/20 data-[state=active]:text-foreground px-3 py-1.5 h-10 whitespace-nowrap"
+              >
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  <span>Clues</span>
+                </div>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="inspector-script" 
+                className="data-[state=active]:bg-primary/20 data-[state=active]:text-foreground px-3 py-1.5 h-10 whitespace-nowrap"
+              >
+                <div className="flex items-center gap-2">
+                  <FileCode className="h-4 w-4" />
+                  <span>Detective Script</span>
+                </div>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="character-matrix" 
+                className="data-[state=active]:bg-primary/20 data-[state=active]:text-foreground px-3 py-1.5 h-10 whitespace-nowrap"
+              >
+                <div className="flex items-center gap-2">
+                  <Grid2x2 className="h-4 w-4" />
+                  <span>Character Matrix</span>
+                </div>
+              </TabsTrigger>
+            </TabsList>
           </div>
           
-          <TabsContent value="host-guide" className="mt-4">
+          <TabsContent value="host-guide" className="mt-6">
             <div className="prose prose-stone dark:prose-invert max-w-none">
+              <h1 className="text-2xl font-bold mb-6">Host Guide</h1>
               <ReactMarkdown>{tabData.hostGuide}</ReactMarkdown>
             </div>
           </TabsContent>
           
-          <TabsContent value="characters" className="mt-4">
+          <TabsContent value="characters" className="mt-6">
             {renderCharacters()}
           </TabsContent>
           
-          <TabsContent value="clues" className="mt-4">
+          <TabsContent value="clues" className="mt-6">
             {renderClues()}
           </TabsContent>
           
-          <TabsContent value="inspector-script" className="mt-4">
+          <TabsContent value="inspector-script" className="mt-6">
             <div className="prose prose-stone dark:prose-invert max-w-none">
+              <h1 className="text-2xl font-bold mb-6">Detective Script</h1>
               <ReactMarkdown>{tabData.inspectorScript}</ReactMarkdown>
             </div>
           </TabsContent>
           
-          <TabsContent value="character-matrix" className="mt-4">
+          <TabsContent value="character-matrix" className="mt-6">
+            <h1 className="text-2xl font-bold mb-6">Character Matrix</h1>
             {tabData.characterMatrix ? (
               <div 
                 className="prose prose-stone dark:prose-invert max-w-none"
