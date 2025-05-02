@@ -68,10 +68,10 @@ export interface MysteryCharacter {
   secrets: string[];
   round_scripts?: {
     introduction?: string;
-    round1?: string;
-    round2?: ScriptOptions;
-    round3?: ScriptOptions;
-    final?: ScriptOptions;
+    round1?: string | RoundScriptOptions;
+    round2?: RoundScriptOptions;
+    round3?: RoundScriptOptions;
+    final?: RoundScriptOptions;
   };
   introduction?: string;
   whereabouts?: string;
@@ -81,6 +81,7 @@ export interface MysteryCharacter {
   questioning_options?: QuestionOption[];
   created_at: string;
   updated_at: string;
+  [key: string]: any; // To allow for additional properties
 }
 
 interface RelationshipInfo {
@@ -88,7 +89,7 @@ interface RelationshipInfo {
   description: string;
 }
 
-interface ScriptOptions {
+interface RoundScriptOptions {
   innocent?: string;
   guilty?: string;
   accomplice?: string;

@@ -1,4 +1,3 @@
-
 // src/components/MysteryPackageTabView.tsx
 import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -11,6 +10,8 @@ import { supabase } from "@/lib/supabase";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { toast } from "sonner";
 import { MysteryCharacter } from "@/interfaces/mystery";
+import CharacterDetailView from "./CharacterDetailView";
+import CharacterRoleAssignment from "./CharacterRoleAssignment";
 
 export interface MysteryPackageTabViewProps {
   packageContent?: string;

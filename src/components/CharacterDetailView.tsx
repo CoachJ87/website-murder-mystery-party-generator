@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -35,6 +34,31 @@ export function CharacterDetailView({
       return content.split('\n').map(line => line.trim()).join('\n\n');
     }
     return content;
+  };
+
+  // Helper function to get the appropriate script for a round based on role
+  const getRoundScript = (roundKey: string) => {
+    if (!character.round_scripts) return null;
+    
+    // Direct statement takes precedence if available
+    const directStatement = character[`${roundKey}_statement` as keyof MysteryCharacter];
+    if (directStatement) return directStatement as string;
+    
+    // Otherwise look in round_scripts
+    const roundScripts = character.round_scripts[roundKey as keyof typeof character.round_scripts];
+    if (!roundScripts) return null;
+    
+    // If roundScripts is an object with role-specific responses
+    if (typeof roundScripts === 'object' && roundScripts !== null) {
+      return (roundScripts as any)[role] || null;
+    }
+    
+    // If roundScripts is a string
+    if (typeof roundScripts === 'string') {
+      return roundScripts;
+    }
+    
+    return null;
   };
 
   return (
@@ -118,7 +142,7 @@ export function CharacterDetailView({
       )}
 
       {/* Introduction */}
-      {(character.introduction || character.round_scripts?.introduction) && (
+      {(character.introduction || (character.round_scripts?.introduction)) && (
         <Card>
           <CardHeader>
             <CardTitle>Introduction</CardTitle>
@@ -126,7 +150,7 @@ export function CharacterDetailView({
           <CardContent>
             <div className="prose dark:prose-invert max-w-none">
               <ReactMarkdown rehypePlugins={[rehypeRaw]}>
-                {formatForMarkdown(character.introduction || character.round_scripts?.introduction || '')}
+                {formatForMarkdown(character.introduction || (character.round_scripts?.introduction as string) || '')}
               </ReactMarkdown>
             </div>
           </CardContent>
@@ -134,91 +158,78 @@ export function CharacterDetailView({
       )}
 
       {/* Round 1 */}
-      {(character.round1_statement || character.round_scripts?.round1) && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Round 1: Initial Investigation</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="prose dark:prose-invert max-w-none">
-              <ReactMarkdown rehypePlugins={[rehypeRaw]}>
-                {formatForMarkdown(character.round1_statement || character.round_scripts?.round1 || '')}
-              </ReactMarkdown>
-            </div>
-            
-            {/* Questions */}
-            {character.questioning_options && character.questioning_options.length > 0 && (
-              <div className="mt-4">
-                <h3 className="text-lg font-semibold mb-2">Questioning Options</h3>
-                <ul className="list-disc pl-5 space-y-2">
-                  {character.questioning_options.map((q, idx) => (
-                    <li key={idx}>
-                      <strong>Ask {q.target}:</strong> "{q.question}"
-                    </li>
-                  ))}
-                </ul>
+      {(() => {
+        const round1Content = getRoundScript('round1');
+        return round1Content ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>Round 1: Initial Investigation</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="prose dark:prose-invert max-w-none">
+                <ReactMarkdown rehypePlugins={[rehypeRaw]}>
+                  {formatForMarkdown(round1Content)}
+                </ReactMarkdown>
               </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
+              
+              {/* Questions */}
+              {character.questioning_options && character.questioning_options.length > 0 && (
+                <div className="mt-4">
+                  <h3 className="text-lg font-semibold mb-2">Questioning Options</h3>
+                  <ul className="list-disc pl-5 space-y-2">
+                    {character.questioning_options.map((q, idx) => (
+                      <li key={idx}>
+                        <strong>Ask {q.target}:</strong> "{q.question}"
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        ) : null;
+      })()}
 
       {/* Round 2 */}
-      {showFullScript && (character.round2_statement || 
-        (character.round_scripts?.round2 && (
-          character.round_scripts.round2.innocent || 
-          character.round_scripts.round2.guilty || 
-          character.round_scripts.round2.accomplice
-        ))) && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Round 2: Deeper Revelations</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="prose dark:prose-invert max-w-none">
-              <ReactMarkdown rehypePlugins={[rehypeRaw]}>
-                {formatForMarkdown(
-                  character.round2_statement || 
-                  (character.round_scripts?.round2 && character.round_scripts.round2[role as keyof ScriptOptions]) || 
-                  ''
-                )}
-              </ReactMarkdown>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {showFullScript && (() => {
+        const round2Content = getRoundScript('round2');
+        return round2Content ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>Round 2: Deeper Revelations</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="prose dark:prose-invert max-w-none">
+                <ReactMarkdown rehypePlugins={[rehypeRaw]}>
+                  {formatForMarkdown(round2Content)}
+                </ReactMarkdown>
+              </div>
+            </CardContent>
+          </Card>
+        ) : null;
+      })()}
 
       {/* Round 3 */}
-      {showFullScript && (character.round3_statement || 
-        (character.round_scripts?.round3 && (
-          character.round_scripts.round3.innocent || 
-          character.round_scripts.round3.guilty || 
-          character.round_scripts.round3.accomplice
-        ))) && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Round 3: Final Clues</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="prose dark:prose-invert max-w-none">
-              <ReactMarkdown rehypePlugins={[rehypeRaw]}>
-                {formatForMarkdown(
-                  character.round3_statement || 
-                  (character.round_scripts?.round3 && character.round_scripts.round3[role as keyof ScriptOptions]) || 
-                  ''
-                )}
-              </ReactMarkdown>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {showFullScript && (() => {
+        const round3Content = getRoundScript('round3');
+        return round3Content ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>Round 3: Final Clues</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="prose dark:prose-invert max-w-none">
+                <ReactMarkdown rehypePlugins={[rehypeRaw]}>
+                  {formatForMarkdown(round3Content)}
+                </ReactMarkdown>
+              </div>
+            </CardContent>
+          </Card>
+        ) : null;
+      })()}
 
       {/* Final Statement */}
       {showFullScript && character.round_scripts?.final && (
-        character.round_scripts.final.innocent || 
-        character.round_scripts.final.guilty || 
-        character.round_scripts.final.accomplice
-      ) && (
         <Card>
           <CardHeader>
             <CardTitle>Final Statement</CardTitle>
@@ -227,8 +238,7 @@ export function CharacterDetailView({
             <div className="prose dark:prose-invert max-w-none">
               <ReactMarkdown rehypePlugins={[rehypeRaw]}>
                 {formatForMarkdown(
-                  (character.round_scripts?.final && character.round_scripts.final[role as keyof ScriptOptions]) || 
-                  ''
+                  ((character.round_scripts.final as any)[role]) || ''
                 )}
               </ReactMarkdown>
             </div>
@@ -237,12 +247,6 @@ export function CharacterDetailView({
       )}
     </div>
   );
-}
-
-interface ScriptOptions {
-  innocent?: string;
-  guilty?: string;
-  accomplice?: string;
 }
 
 export default CharacterDetailView;

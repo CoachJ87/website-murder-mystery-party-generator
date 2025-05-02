@@ -1,5 +1,3 @@
-
-
 export interface Message {
   id: string;
   content: string;
@@ -27,7 +25,11 @@ export interface QuestionOption {
 
 export interface CharacterScript {
   introduction?: string;
-  round1?: string;
+  round1?: {
+    innocent?: string;
+    guilty?: string;
+    accomplice?: string;
+  };
   round2?: {
     innocent?: string;
     guilty?: string;
@@ -62,3 +64,17 @@ export interface CharacterSecret {
   content: string;
 }
 
+// Add the more detailed script structure
+export interface RoundScript {
+  innocent: string;
+  guilty: string;
+  accomplice?: string;
+}
+
+export interface CharacterRoundScripts {
+  introduction?: string;
+  round1?: string | RoundScript;
+  round2?: string | RoundScript;
+  round3?: string | RoundScript;
+  final?: RoundScript;
+}
