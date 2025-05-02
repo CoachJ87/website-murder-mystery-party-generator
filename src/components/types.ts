@@ -1,4 +1,5 @@
 
+
 export interface Message {
   id: string;
   content: string;
@@ -61,14 +62,3 @@ export interface CharacterSecret {
   content: string;
 }
 
-// Add a specific interface for the tab settings
-export interface TabSettings {
-  defaultActiveTab: string;
-  tabLabels: {
-    hostGuide: string;
-    characters: string;
-    clues: string;
-    inspectorScript: string;  // Using inspectorScript in code but will display as "Detective Script"
-    characterMatrix: string;
-  };
-}
