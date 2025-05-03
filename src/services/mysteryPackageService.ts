@@ -20,7 +20,6 @@ export interface GenerationStatus {
     clues: boolean;
     solution?: boolean;  // Make solution optional
   };
-  content?: string; // Add content field to track the current generation content
   lastUpdated?: string; // Timestamp of last update
   resumable?: boolean; // Whether generation can be resumed
 }
@@ -109,7 +108,6 @@ export const generateCompletePackage = async (
             status: 'in_progress',
             progress: fullPackage ? 25 : 0, // If we have content already, start at 25%
             currentStep: fullPackage ? 'Resuming generation...' : 'Starting generation',
-            content: fullPackage, // Store current content in status
             sections: {
               hostGuide: !!fullPackage,
               characters: false,
@@ -132,7 +130,6 @@ export const generateCompletePackage = async (
             status: 'in_progress',
             progress: 0,
             currentStep: 'Starting generation',
-            content: "", // Initialize empty content
             sections: {
               hostGuide: false,
               characters: false,
@@ -192,7 +189,6 @@ export const generateCompletePackage = async (
           status: 'completed',
           progress: 100,
           currentStep: 'Generation complete',
-          content: packageContent, // Store the full content
           sections: {
             hostGuide: true,
             characters: true,
@@ -229,7 +225,7 @@ export const generateCompletePackage = async (
 
 /**
  * Check the status of an ongoing package generation
- * Now with enhanced resumability support and content tracking
+ * Now with enhanced resumability support
  */
 export const getPackageGenerationStatus = async (mysteryId: string): Promise<GenerationStatus> => {
   try {
@@ -254,7 +250,6 @@ export const getPackageGenerationStatus = async (mysteryId: string): Promise<Gen
         console.log("Using more recent local generation state");
         return {
           ...localState,
-          content: localState.content || packageData?.content || "",
           resumable: true
         };
       }
@@ -276,7 +271,6 @@ export const getPackageGenerationStatus = async (mysteryId: string): Promise<Gen
     if (packageData.generation_status) {
       return {
         ...packageData.generation_status as GenerationStatus,
-        content: packageData.content || packageData.generation_status.content || "",
         resumable: packageData.generation_status.status === 'in_progress' || 
                   packageData.generation_status.status === 'failed'
       };
@@ -299,7 +293,6 @@ export const getPackageGenerationStatus = async (mysteryId: string): Promise<Gen
         status: 'completed',
         progress: 100,
         currentStep: 'Generation complete',
-        content: packageData?.content || "",
         sections: {
           hostGuide: true,
           characters: true,
@@ -320,7 +313,6 @@ export const getPackageGenerationStatus = async (mysteryId: string): Promise<Gen
         currentStep: progress < 30 ? 'Generating host guide (5-10 minutes remaining)' : 
                      progress < 60 ? 'Generating character guides (3-7 minutes remaining)' : 
                      'Finalizing materials (1-3 minutes remaining)',
-        content: packageData?.content || "",
         sections: {
           hostGuide: progress >= 25,
           characters: progress >= 50,
@@ -504,7 +496,6 @@ const parseRelationshipMatrix = (matrixText: string): any => {
 
 /**
  * Generate the package in logical chunks to avoid timeouts with improved resumability
- * Now with streaming content updates during generation
  */
 const generatePackageInChunks = async (
   messages: Message[], 
@@ -637,8 +628,7 @@ const generatePackageInChunks = async (
             {
               ...completedSections,
               [section.sectionKey]: section.partial ? false : true
-            },
-            fullPackage
+            }
           );
           
           const sectionPrompt: Message = {
@@ -670,7 +660,6 @@ const generatePackageInChunks = async (
           currentContent += sectionContent;
           
           // Store incremental results - both in database and local storage
-          // This is critical for showing the content being generated in real-time
           await updatePackageContent(packageId, fullPackage);
           saveGenerationState(mysteryId, {
             content: fullPackage,
@@ -791,7 +780,7 @@ const generatePackageInChunks = async (
         hostGuide: fullPackage.includes("Host Guide"),
         characters: fullPackage.includes("Character"),
         clues: fullPackage.includes("Clues") || fullPackage.includes("Evidence")
-      }, fullPackage, true);
+      }, true);
       
       console.log("Returning partial content after error");
       return fullPackage + "\n\n[Note: Generation was incomplete due to an error. You can try resuming the generation.]\n\n";
@@ -831,7 +820,6 @@ const updateGenerationStatus = async (
     characters: false,
     clues: false
   },
-  content: string = "",
   isFailed = false
 ): Promise<void> => {
   try {
@@ -847,7 +835,6 @@ const updateGenerationStatus = async (
           progress: progress < 0 ? 0 : progress,
           currentStep,
           sections,
-          content, // Include the current content in the status update
           lastUpdated: timestamp,
           resumable: status !== 'completed'
         }
@@ -870,7 +857,6 @@ const updateGenerationStatus = async (
     
     // Also save to local storage for resilience
     saveGenerationState(mysteryId, {
-      content,
       progress: progress < 0 ? 0 : progress,
       currentStep,
       sections,
