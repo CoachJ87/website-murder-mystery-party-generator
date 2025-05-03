@@ -102,26 +102,53 @@ export default {
                             fontWeight: '500',
                         },
                         p: {
-                            marginTop: '0.5em',
-                            marginBottom: '0.5em',
+                            marginTop: '0.75em',
+                            marginBottom: '0.75em',
+                            lineHeight: '1.6',
                         },
                         'h1, h2, h3, h4': {
                             color: 'inherit',
-                            marginTop: '1em',
-                            marginBottom: '0.5em',
+                            marginTop: '1.25em',
+                            marginBottom: '0.75em',
+                            lineHeight: '1.3',
+                            fontWeight: '600',
+                        },
+                        h1: {
+                            fontSize: '1.875rem',
+                        },
+                        h2: {
+                            fontSize: '1.5rem',
+                        },
+                        h3: {
+                            fontSize: '1.25rem',
+                        },
+                        h4: {
+                            fontSize: '1.125rem',
                         },
                         ul: {
                             paddingLeft: '1.5em',
                             listStyleType: 'disc',
+                            marginTop: '0.75em',
+                            marginBottom: '0.75em',
                         },
                         ol: {
                             paddingLeft: '1.5em',
                             listStyleType: 'decimal',
+                            marginTop: '0.75em',
+                            marginBottom: '0.75em',
                         },
                         li: {
-                            marginTop: '0.25em',
-                            marginBottom: '0.25em',
+                            marginTop: '0.375em',
+                            marginBottom: '0.375em',
                             display: 'list-item',
+                        },
+                        blockquote: {
+                            fontStyle: 'italic',
+                            borderLeftWidth: '4px',
+                            borderLeftColor: 'hsl(var(--muted))',
+                            paddingLeft: '1em',
+                            marginLeft: '0',
+                            marginRight: '0',
                         },
                         code: {
                             color: 'inherit',
@@ -136,6 +163,19 @@ export default {
                         em: {
                             fontStyle: 'italic',
                         },
+                        table: {
+                          fontSize: '0.875rem',
+                          lineHeight: '1.5',
+                        },
+                        'thead th': {
+                          fontWeight: '600',
+                          borderBottomWidth: '1px',
+                        },
+                        'tbody td, tfoot td': {
+                          padding: '0.75em',
+                          borderBottomWidth: '1px',
+                          borderBottomColor: 'hsl(var(--border))',
+                        }
                     },
                 },
             },

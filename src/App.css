@@ -83,3 +83,80 @@ body {
   background-color: #1D2B35;
   margin: 2rem 0;
 }
+
+/* Mystery content styles */
+.mystery-prose h1 {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  font-weight: 700;
+  margin-top: 1.5em;
+  margin-bottom: 0.75em;
+}
+
+.mystery-prose h2 {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 600;
+  margin-top: 1.25em;
+  margin-bottom: 0.6em;
+}
+
+.mystery-prose h3 {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: 600;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+
+.mystery-prose p {
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+  line-height: 1.6;
+}
+
+.mystery-prose ul,
+.mystery-prose ol {
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+  padding-left: 1.5em;
+}
+
+.mystery-prose ul {
+  list-style-type: disc;
+}
+
+.mystery-prose ol {
+  list-style-type: decimal;
+}
+
+.mystery-prose li {
+  margin-top: 0.375em;
+  margin-bottom: 0.375em;
+}
+
+.mystery-prose table {
+  width: 100%;
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+  border-collapse: collapse;
+}
+
+.mystery-prose th {
+  font-weight: 600;
+  padding: 0.75em;
+  text-align: left;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.mystery-prose td {
+  padding: 0.75em;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.mystery-prose blockquote {
+  margin: 1em 0;
+  padding-left: 1em;
+  border-left: 4px solid rgba(0, 0, 0, 0.1);
+  font-style: italic;
+}

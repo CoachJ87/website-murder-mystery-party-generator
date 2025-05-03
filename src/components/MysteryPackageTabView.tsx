@@ -1,3 +1,4 @@
+
 // src/components/MysteryPackageTabView.tsx
 import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -593,11 +594,11 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
 
   const renderCharacters = () => {
     if (tabData.characters.length === 0) {
-      return <p className="text-center py-8">No character information available.</p>;
+      return <p className="text-center py-8 text-muted-foreground">No character information available.</p>;
     }
 
     return (
-      <div className="space-y-4">
+      <div className="space-y-6">
         <Accordion type="single" collapsible className="w-full">
           {tabData.characters.map((character, index) => (
             <AccordionItem key={index} value={`character-${index}`}>
@@ -605,30 +606,30 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
                 {character.character_name}
               </AccordionTrigger>
               <AccordionContent>
-                <div className="space-y-6 p-4 rounded-md bg-muted/20">
+                <div className="space-y-6 p-6 rounded-md bg-card shadow-sm">
                   {character.description && (
-                    <div>
-                      <h3 className="text-md font-semibold mb-2">Character Description</h3>
-                      <p className="text-base">{character.description}</p>
+                    <div className="space-y-2">
+                      <h3 className="text-base font-semibold text-primary">Character Description</h3>
+                      <p className="text-foreground">{character.description}</p>
                     </div>
                   )}
                   
                   {character.background && (
-                    <div>
-                      <h3 className="text-md font-semibold mb-2">Background</h3>
-                      <div className="prose prose-sm max-w-none">
+                    <div className="space-y-2">
+                      <h3 className="text-base font-semibold text-primary">Background</h3>
+                      <div className="prose prose-sm max-w-none text-foreground">
                         <ReactMarkdown>{character.background}</ReactMarkdown>
                       </div>
                     </div>
                   )}
                   
                   {character.relationships?.length > 0 && (
-                    <div>
-                      <h3 className="text-md font-semibold mb-2">Relationships</h3>
+                    <div className="space-y-2">
+                      <h3 className="text-base font-semibold text-primary">Relationships</h3>
                       <ul className="list-disc pl-5 space-y-2">
                         {character.relationships.map((rel, idx) => (
-                          <li key={idx} className="mb-1">
-                            <strong>{rel.character}:</strong> {rel.description}
+                          <li key={idx} className="text-foreground">
+                            <span className="font-medium">{rel.character}:</span> {rel.description}
                           </li>
                         ))}
                       </ul>
@@ -636,39 +637,39 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
                   )}
                   
                   {character.secrets?.length > 0 && (
-                    <div>
-                      <h3 className="text-md font-semibold mb-2">Secrets</h3>
+                    <div className="space-y-2">
+                      <h3 className="text-base font-semibold text-primary">Secrets</h3>
                       <ul className="list-disc pl-5 space-y-2">
                         {character.secrets.map((secret, idx) => (
-                          <li key={idx}>{secret}</li>
+                          <li key={idx} className="text-foreground">{secret}</li>
                         ))}
                       </ul>
                     </div>
                   )}
                   
                   {character.whereabouts && (
-                    <div>
-                      <h3 className="text-md font-semibold mb-2">Whereabouts During the Murder</h3>
-                      <p className="text-base">{character.whereabouts}</p>
+                    <div className="space-y-2">
+                      <h3 className="text-base font-semibold text-primary">Whereabouts During the Murder</h3>
+                      <p className="text-foreground">{character.whereabouts}</p>
                     </div>
                   )}
                   
                   {character.introduction && (
-                    <div>
-                      <h3 className="text-md font-semibold mb-2">Introduction</h3>
-                      <div className="p-3 bg-background rounded-md italic">
+                    <div className="space-y-2">
+                      <h3 className="text-base font-semibold text-primary">Introduction</h3>
+                      <div className="p-4 bg-muted/30 rounded-md italic text-foreground border border-muted">
                         "{character.introduction}"
                       </div>
                     </div>
                   )}
                   
                   {character.questioning_options && character.questioning_options.length > 0 && (
-                    <div>
-                      <h3 className="text-md font-semibold mb-2">Questioning Options</h3>
+                    <div className="space-y-2">
+                      <h3 className="text-base font-semibold text-primary">Questioning Options</h3>
                       <ul className="list-disc pl-5 space-y-2">
                         {character.questioning_options.map((option, idx) => (
-                          <li key={idx}>
-                            Ask <strong>{option.target}</strong>: "{option.question}"
+                          <li key={idx} className="text-foreground">
+                            Ask <span className="font-medium">{option.target}</span>: "{option.question}"
                           </li>
                         ))}
                       </ul>
@@ -676,18 +677,18 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
                   )}
                   
                   {(character.round1_statement || character.round_scripts?.round1) && (
-                    <div>
-                      <h3 className="text-md font-semibold mb-2">Round 1 Response</h3>
-                      <div className="p-3 bg-background rounded-md italic">
+                    <div className="space-y-2">
+                      <h3 className="text-base font-semibold text-primary">Round 1 Response</h3>
+                      <div className="p-4 bg-muted/30 rounded-md italic text-foreground border border-muted">
                         {typeof character.round_scripts?.round1 === 'string' ? (
                           `"${character.round1_statement || character.round_scripts.round1}"`
                         ) : character.round_scripts?.round1 ? (
                           <>
                             <div className="mb-2">
-                              <strong>If innocent:</strong> "{character.round_scripts.round1.innocent}"
+                              <span className="font-medium text-foreground not-italic">If innocent:</span> "{character.round_scripts.round1.innocent}"
                             </div>
                             <div>
-                              <strong>If guilty:</strong> "{character.round_scripts.round1.guilty}"
+                              <span className="font-medium text-foreground not-italic">If guilty:</span> "{character.round_scripts.round1.guilty}"
                             </div>
                           </>
                         ) : (
@@ -699,21 +700,21 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
                   
                   {(character.round2_statement || 
                     character.round_scripts?.round2) && (
-                    <div>
-                      <h3 className="text-md font-semibold mb-2">Round 2 Response</h3>
+                    <div className="space-y-2">
+                      <h3 className="text-base font-semibold text-primary">Round 2 Response</h3>
                       {character.round2_statement && (
-                        <div className="p-3 bg-background rounded-md italic mb-2">
+                        <div className="p-4 bg-muted/30 rounded-md italic text-foreground border border-muted mb-2">
                           "{character.round2_statement}"
                         </div>
                       )}
                       {typeof character.round_scripts?.round2 !== 'string' && character.round_scripts?.round2?.innocent && (
-                        <div className="p-3 bg-background rounded-md italic mb-2">
-                          <strong>If Innocent:</strong> "{character.round_scripts.round2.innocent}"
+                        <div className="p-4 bg-muted/30 rounded-md italic text-foreground border border-muted mb-2">
+                          <span className="font-medium text-foreground not-italic">If Innocent:</span> "{character.round_scripts.round2.innocent}"
                         </div>
                       )}
                       {typeof character.round_scripts?.round2 !== 'string' && character.round_scripts?.round2?.guilty && (
-                        <div className="p-3 bg-background rounded-md italic mb-2">
-                          <strong>If Guilty:</strong> "{character.round_scripts.round2.guilty}"
+                        <div className="p-4 bg-muted/30 rounded-md italic text-foreground border border-muted mb-2">
+                          <span className="font-medium text-foreground not-italic">If Guilty:</span> "{character.round_scripts.round2.guilty}"
                         </div>
                       )}
                     </div>
@@ -721,21 +722,21 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
                   
                   {(character.round3_statement || 
                     character.round_scripts?.round3) && (
-                    <div>
-                      <h3 className="text-md font-semibold mb-2">Round 3 Response</h3>
+                    <div className="space-y-2">
+                      <h3 className="text-base font-semibold text-primary">Round 3 Response</h3>
                       {character.round3_statement && (
-                        <div className="p-3 bg-background rounded-md italic mb-2">
+                        <div className="p-4 bg-muted/30 rounded-md italic text-foreground border border-muted mb-2">
                           "{character.round3_statement}"
                         </div>
                       )}
                       {typeof character.round_scripts?.round3 !== 'string' && character.round_scripts?.round3?.innocent && (
-                        <div className="p-3 bg-background rounded-md italic mb-2">
-                          <strong>If Innocent:</strong> "{character.round_scripts.round3.innocent}"
+                        <div className="p-4 bg-muted/30 rounded-md italic text-foreground border border-muted mb-2">
+                          <span className="font-medium text-foreground not-italic">If Innocent:</span> "{character.round_scripts.round3.innocent}"
                         </div>
                       )}
                       {typeof character.round_scripts?.round3 !== 'string' && character.round_scripts?.round3?.guilty && (
-                        <div className="p-3 bg-background rounded-md italic mb-2">
-                          <strong>If Guilty:</strong> "{character.round_scripts.round3.guilty}"
+                        <div className="p-4 bg-muted/30 rounded-md italic text-foreground border border-muted mb-2">
+                          <span className="font-medium text-foreground not-italic">If Guilty:</span> "{character.round_scripts.round3.guilty}"
                         </div>
                       )}
                     </div>
@@ -744,24 +745,24 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
                   {(character.round_scripts?.final?.innocent || 
                     character.round_scripts?.final?.guilty || 
                     character.round_scripts?.final?.accomplice) && (
-                    <div>
-                      <h3 className="text-md font-semibold mb-2">Final Statement</h3>
+                    <div className="space-y-2">
+                      <h3 className="text-base font-semibold text-primary">Final Statement</h3>
                       
                       {character.round_scripts.final.innocent && (
-                        <div className="p-3 bg-background rounded-md italic mb-2">
-                          <strong>If innocent:</strong> "{character.round_scripts.final.innocent}"
+                        <div className="p-4 bg-muted/30 rounded-md italic text-foreground border border-muted mb-2">
+                          <span className="font-medium text-foreground not-italic">If innocent:</span> "{character.round_scripts.final.innocent}"
                         </div>
                       )}
                       
                       {character.round_scripts.final.guilty && (
-                        <div className="p-3 bg-background rounded-md italic mb-2">
-                          <strong>If guilty:</strong> "{character.round_scripts.final.guilty}"
+                        <div className="p-4 bg-muted/30 rounded-md italic text-foreground border border-muted mb-2">
+                          <span className="font-medium text-foreground not-italic">If guilty:</span> "{character.round_scripts.final.guilty}"
                         </div>
                       )}
                       
                       {character.round_scripts.final.accomplice && (
-                        <div className="p-3 bg-background rounded-md italic mb-2">
-                          <strong>If accomplice:</strong> "{character.round_scripts.final.accomplice}"
+                        <div className="p-4 bg-muted/30 rounded-md italic text-foreground border border-muted mb-2">
+                          <span className="font-medium text-foreground not-italic">If accomplice:</span> "{character.round_scripts.final.accomplice}"
                         </div>
                       )}
                     </div>
@@ -777,37 +778,39 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
 
   const renderClues = () => {
     if (tabData.clues.length === 0) {
-      return <p className="text-center py-8">No clue information available.</p>;
+      return <p className="text-center py-8 text-muted-foreground">No clue information available.</p>;
     }
 
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold mb-4">CLUES AND EVIDENCE</h1>
+        <h2 className="text-2xl font-semibold text-foreground mb-6">CLUES AND EVIDENCE</h2>
         
-        {tabData.clues.map((clue, index) => (
-          <div key={index} className="border rounded-lg p-4 mb-4">
-            <h2 className="text-xl font-semibold mb-2">{clue.title}</h2>
-            {clue.description && (
-              <div className="mb-2">
-                <h3 className="text-md font-medium">Description</h3>
-                <p>{clue.description}</p>
-              </div>
-            )}
-            {clue.content && (
-              <div className="mb-2">
-                <div className="prose prose-sm max-w-none">
-                  <ReactMarkdown>{clue.content}</ReactMarkdown>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {tabData.clues.map((clue, index) => (
+            <div key={index} className="border rounded-lg p-6 bg-card shadow-sm">
+              <h3 className="text-lg font-semibold text-primary mb-3">{clue.title}</h3>
+              {clue.description && (
+                <div className="mb-3">
+                  <h4 className="text-base font-medium mb-1">Description</h4>
+                  <p className="text-foreground">{clue.description}</p>
                 </div>
-              </div>
-            )}
-            {clue.implication && (
-              <div>
-                <h3 className="text-md font-medium">Implications</h3>
-                <p>{clue.implication}</p>
-              </div>
-            )}
-          </div>
-        ))}
+              )}
+              {clue.content && (
+                <div className="mb-3">
+                  <div className="prose prose-sm max-w-none text-foreground">
+                    <ReactMarkdown>{clue.content}</ReactMarkdown>
+                  </div>
+                </div>
+              )}
+              {clue.implication && (
+                <div>
+                  <h4 className="text-base font-medium mb-1">Implications</h4>
+                  <p className="text-foreground">{clue.implication}</p>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
     );
   };
@@ -830,19 +833,19 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
   }
   
   return (
-    <Card>
-      <CardHeader>
+    <Card className="overflow-hidden">
+      <CardHeader className="bg-gradient-to-r from-secondary/30 to-background border-b">
         <CardTitle className="text-2xl font-bold">{mysteryTitle}</CardTitle>
       </CardHeader>
       
-      <CardContent>
+      <CardContent className="p-0">
         <Tabs defaultValue="host-guide" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <div className="border-b pb-2 mb-4">
-            <div className="flex items-center justify-between">
-              <TabsList className="h-9 p-0 bg-transparent space-x-2">
+          <div className="border-b sticky top-0 z-10 bg-card px-6 py-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <TabsList className="h-10 p-1 bg-muted/50">
                 <TabsTrigger 
                   value="host-guide" 
-                  className="data-[state=active]:bg-primary/20 data-[state=active]:text-foreground px-3 py-1.5 h-9"
+                  className="text-sm data-[state=active]:bg-primary/10 data-[state=active]:text-foreground px-3 py-1.5 h-8"
                 >
                   <div className="flex items-center gap-2">
                     <Book className="h-4 w-4" />
@@ -851,7 +854,7 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
                 </TabsTrigger>
                 <TabsTrigger 
                   value="characters" 
-                  className="data-[state=active]:bg-primary/20 data-[state=active]:text-foreground px-3 py-1.5 h-9"
+                  className="text-sm data-[state=active]:bg-primary/10 data-[state=active]:text-foreground px-3 py-1.5 h-8"
                 >
                   <div className="flex items-center gap-2">
                     <Users className="h-4 w-4" />
@@ -860,7 +863,7 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
                 </TabsTrigger>
                 <TabsTrigger 
                   value="clues" 
-                  className="data-[state=active]:bg-primary/20 data-[state=active]:text-foreground px-3 py-1.5 h-9"
+                  className="text-sm data-[state=active]:bg-primary/10 data-[state=active]:text-foreground px-3 py-1.5 h-8"
                 >
                   <div className="flex items-center gap-2">
                     <FileText className="h-4 w-4" />
@@ -869,7 +872,7 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
                 </TabsTrigger>
                 <TabsTrigger 
                   value="inspector-script" 
-                  className="data-[state=active]:bg-primary/20 data-[state=active]:text-foreground px-3 py-1.5 h-9"
+                  className="text-sm data-[state=active]:bg-primary/10 data-[state=active]:text-foreground px-3 py-1.5 h-8"
                 >
                   <div className="flex items-center gap-2">
                     <FileCode className="h-4 w-4" />
@@ -878,7 +881,7 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
                 </TabsTrigger>
                 <TabsTrigger 
                   value="character-matrix" 
-                  className="data-[state=active]:bg-primary/20 data-[state=active]:text-foreground px-3 py-1.5 h-9"
+                  className="text-sm data-[state=active]:bg-primary/10 data-[state=active]:text-foreground px-3 py-1.5 h-8"
                 >
                   <div className="flex items-center gap-2">
                     <Grid2x2 className="h-4 w-4" />
@@ -888,10 +891,10 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
               </TabsList>
               
               <Button 
-                variant="outline" 
+                variant="secondary" 
                 size="sm" 
                 onClick={handleDownloadPDF}
-                className="flex items-center gap-2"
+                className="ml-auto flex items-center gap-2 h-10"
               >
                 <Download className="h-4 w-4" />
                 <span>Download PDF</span>
@@ -899,36 +902,38 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
             </div>
           </div>
           
-          <TabsContent value="host-guide" className="mt-4">
-            <div className="prose prose-stone dark:prose-invert max-w-none">
-              <ReactMarkdown>{tabData.hostGuide}</ReactMarkdown>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="characters" className="mt-4">
-            {renderCharacters()}
-          </TabsContent>
-          
-          <TabsContent value="clues" className="mt-4">
-            {renderClues()}
-          </TabsContent>
-          
-          <TabsContent value="inspector-script" className="mt-4">
-            <div className="prose prose-stone dark:prose-invert max-w-none">
-              <ReactMarkdown>{tabData.inspectorScript}</ReactMarkdown>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="character-matrix" className="mt-4">
-            {tabData.characterMatrix ? (
-              <div 
-                className="prose prose-stone dark:prose-invert max-w-none"
-                dangerouslySetInnerHTML={{ __html: tabData.characterMatrix }}
-              />
-            ) : (
-              <p className="text-center py-8">Character relationship matrix is not available.</p>
-            )}
-          </TabsContent>
+          <div className="p-6">
+            <TabsContent value="host-guide" className="mt-4 bg-card p-6 rounded-md shadow-sm">
+              <div className="prose prose-stone dark:prose-invert max-w-none">
+                <ReactMarkdown>{tabData.hostGuide}</ReactMarkdown>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="characters" className="mt-4">
+              {renderCharacters()}
+            </TabsContent>
+            
+            <TabsContent value="clues" className="mt-4">
+              {renderClues()}
+            </TabsContent>
+            
+            <TabsContent value="inspector-script" className="mt-4 bg-card p-6 rounded-md shadow-sm">
+              <div className="prose prose-stone dark:prose-invert max-w-none">
+                <ReactMarkdown>{tabData.inspectorScript}</ReactMarkdown>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="character-matrix" className="mt-4 bg-card p-6 rounded-md shadow-sm">
+              {tabData.characterMatrix ? (
+                <div 
+                  className="prose prose-stone dark:prose-invert max-w-none"
+                  dangerouslySetInnerHTML={{ __html: tabData.characterMatrix }}
+                />
+              ) : (
+                <p className="text-center py-8 text-muted-foreground">Character relationship matrix is not available.</p>
+              )}
+            </TabsContent>
+          </div>
         </Tabs>
       </CardContent>
     </Card>
