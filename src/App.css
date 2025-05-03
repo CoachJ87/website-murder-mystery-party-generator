@@ -160,3 +160,92 @@ body {
   border-left: 4px solid rgba(0, 0, 0, 0.1);
   font-style: italic;
 }
+
+/* Text animation for live generation */
+@keyframes text-appearing {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.text-revealing {
+  animation: text-appearing 0.5s ease-out;
+}
+
+/* Placeholder animation styles */
+@keyframes placeholder-pulse {
+  0% { 
+    background-color: rgba(0, 0, 0, 0.05);
+    transform: scale(1);
+  }
+  50% { 
+    background-color: rgba(0, 0, 0, 0.1); 
+    transform: scale(1.02);
+  }
+  100% { 
+    background-color: rgba(0, 0, 0, 0.05);
+    transform: scale(1);
+  }
+}
+
+.placeholder-text {
+  height: 1em;
+  border-radius: 3px;
+  background-color: rgba(0, 0, 0, 0.05);
+  margin-bottom: 0.5em;
+  width: var(--width, 100%);
+  animation: placeholder-pulse 2s ease-in-out infinite;
+}
+
+.placeholder-text-title {
+  height: 1.8em;
+  width: var(--width, 70%);
+}
+
+.placeholder-text-subtitle {
+  height: 1.5em;
+  width: var(--width, 85%);
+}
+
+.generating-section {
+  position: relative;
+  overflow: hidden;
+}
+
+.generating-section::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
+  pointer-events: none;
+}
+
+/* Tab with content indicator */
+.tab-with-content {
+  position: relative;
+}
+
+.tab-with-content::after {
+  content: '';
+  position: absolute;
+  right: -6px;
+  top: -6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #10B981;
+}
+
+/* Animation for active tab generation */
+@keyframes border-pulse {
+  0% { border-color: rgba(14, 165, 233, 0.5); }
+  50% { border-color: rgba(14, 165, 233, 1); }
+  100% { border-color: rgba(14, 165, 233, 0.5); }
+}
+
+.tab-generating {
+  animation: border-pulse 2s infinite;
+  border: 2px solid rgba(14, 165, 233, 0.7);
+}
