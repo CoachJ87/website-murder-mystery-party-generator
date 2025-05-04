@@ -1,4 +1,3 @@
-
 // src/components/MysteryPackageTabView.tsx
 import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -698,50 +697,51 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
                     </div>
                   )}
                   
-                  {(character.round2_statement || 
-                    character.round_scripts?.round2) && (
+                  {/* Revised Round 2 Response section - removed unlabeled statement */}
+                  {(character.round_scripts?.round2?.innocent || character.round_scripts?.round2?.guilty) && (
                     <div className="space-y-2">
                       <h3 className="text-base font-semibold text-primary">Round 2 Response</h3>
-                      {character.round2_statement && (
+                      {character.round_scripts.round2.innocent && (
                         <div className="p-4 bg-muted/30 rounded-md italic text-foreground border border-muted mb-2">
-                          "{character.round2_statement}"
+                          <span className="font-medium text-foreground not-italic">If innocent:</span> "{character.round_scripts.round2.innocent}"
                         </div>
                       )}
-                      {typeof character.round_scripts?.round2 !== 'string' && character.round_scripts?.round2?.innocent && (
+                      {character.round_scripts.round2.guilty && (
                         <div className="p-4 bg-muted/30 rounded-md italic text-foreground border border-muted mb-2">
-                          <span className="font-medium text-foreground not-italic">If Innocent:</span> "{character.round_scripts.round2.innocent}"
+                          <span className="font-medium text-foreground not-italic">If guilty:</span> "{character.round_scripts.round2.guilty}"
                         </div>
                       )}
-                      {typeof character.round_scripts?.round2 !== 'string' && character.round_scripts?.round2?.guilty && (
+                      {character.round_scripts.round2.accomplice && (
                         <div className="p-4 bg-muted/30 rounded-md italic text-foreground border border-muted mb-2">
-                          <span className="font-medium text-foreground not-italic">If Guilty:</span> "{character.round_scripts.round2.guilty}"
+                          <span className="font-medium text-foreground not-italic">If accomplice:</span> "{character.round_scripts.round2.accomplice}"
                         </div>
                       )}
                     </div>
                   )}
                   
-                  {(character.round3_statement || 
-                    character.round_scripts?.round3) && (
+                  {/* Revised Round 3 Response section - removed unlabeled statement */}
+                  {(character.round_scripts?.round3?.innocent || character.round_scripts?.round3?.guilty) && (
                     <div className="space-y-2">
                       <h3 className="text-base font-semibold text-primary">Round 3 Response</h3>
-                      {character.round3_statement && (
+                      {character.round_scripts.round3.innocent && (
                         <div className="p-4 bg-muted/30 rounded-md italic text-foreground border border-muted mb-2">
-                          "{character.round3_statement}"
+                          <span className="font-medium text-foreground not-italic">If innocent:</span> "{character.round_scripts.round3.innocent}"
                         </div>
                       )}
-                      {typeof character.round_scripts?.round3 !== 'string' && character.round_scripts?.round3?.innocent && (
+                      {character.round_scripts.round3.guilty && (
                         <div className="p-4 bg-muted/30 rounded-md italic text-foreground border border-muted mb-2">
-                          <span className="font-medium text-foreground not-italic">If Innocent:</span> "{character.round_scripts.round3.innocent}"
+                          <span className="font-medium text-foreground not-italic">If guilty:</span> "{character.round_scripts.round3.guilty}"
                         </div>
                       )}
-                      {typeof character.round_scripts?.round3 !== 'string' && character.round_scripts?.round3?.guilty && (
+                      {character.round_scripts.round3.accomplice && (
                         <div className="p-4 bg-muted/30 rounded-md italic text-foreground border border-muted mb-2">
-                          <span className="font-medium text-foreground not-italic">If Guilty:</span> "{character.round_scripts.round3.guilty}"
+                          <span className="font-medium text-foreground not-italic">If accomplice:</span> "{character.round_scripts.round3.accomplice}"
                         </div>
                       )}
                     </div>
                   )}
                   
+                  {/* Final Statement - keeping as is since it's already correctly formatted */}
                   {(character.round_scripts?.final?.innocent || 
                     character.round_scripts?.final?.guilty || 
                     character.round_scripts?.final?.accomplice) && (
