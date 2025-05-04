@@ -91,6 +91,9 @@ body {
   font-weight: 700;
   margin-top: 1.5em;
   margin-bottom: 0.75em;
+  color: #1D2B35;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(29, 43, 53, 0.2);
 }
 
 .mystery-prose h2 {
@@ -99,6 +102,10 @@ body {
   font-weight: 600;
   margin-top: 1.25em;
   margin-bottom: 0.6em;
+  color: #1D2B35;
+  background-color: rgba(230, 167, 62, 0.1);
+  padding: 0.5rem;
+  border-radius: 0.25rem;
 }
 
 .mystery-prose h3 {
@@ -107,6 +114,7 @@ body {
   font-weight: 600;
   margin-top: 1em;
   margin-bottom: 0.5em;
+  color: #C26E3E;
 }
 
 .mystery-prose p {
@@ -146,17 +154,56 @@ body {
   font-weight: 600;
   padding: 0.75em;
   text-align: left;
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: rgba(230, 167, 62, 0.15);
+  border: 1px solid rgba(29, 43, 53, 0.1);
 }
 
 .mystery-prose td {
   padding: 0.75em;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(29, 43, 53, 0.1);
 }
 
 .mystery-prose blockquote {
   margin: 1em 0;
-  padding-left: 1em;
-  border-left: 4px solid rgba(0, 0, 0, 0.1);
+  padding: 1em;
+  border-left: 4px solid #E6A73E;
+  font-style: italic;
+  background-color: rgba(246, 232, 198, 0.5);
+  border-radius: 0.25rem;
+}
+
+.mystery-prose code {
+  font-family: monospace;
+  background-color: rgba(29, 43, 53, 0.1);
+  padding: 0.2em 0.4em;
+  border-radius: 0.25rem;
+}
+
+.mystery-prose pre {
+  background-color: rgba(29, 43, 53, 0.05);
+  padding: 1em;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+}
+
+.mystery-prose hr {
+  margin: 2em 0;
+  border: none;
+  height: 2px;
+  background-color: rgba(29, 43, 53, 0.1);
+}
+
+.mystery-prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+}
+
+.mystery-prose strong {
+  font-weight: 600;
+  color: #C26E3E;
+}
+
+.mystery-prose em {
   font-style: italic;
 }

@@ -904,7 +904,7 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
           
           <div className="p-6">
             <TabsContent value="host-guide" className="mt-4 bg-card p-6 rounded-md shadow-sm">
-              <div className="prose prose-stone dark:prose-invert max-w-none">
+              <div className="prose prose-stone dark:prose-invert max-w-none mystery-prose">
                 <ReactMarkdown>{tabData.hostGuide}</ReactMarkdown>
               </div>
             </TabsContent>
@@ -918,7 +918,7 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
             </TabsContent>
             
             <TabsContent value="inspector-script" className="mt-4 bg-card p-6 rounded-md shadow-sm">
-              <div className="prose prose-stone dark:prose-invert max-w-none">
+              <div className="prose prose-stone dark:prose-invert max-w-none mystery-prose">
                 <ReactMarkdown>{tabData.inspectorScript}</ReactMarkdown>
               </div>
             </TabsContent>
@@ -926,7 +926,7 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
             <TabsContent value="character-matrix" className="mt-4 bg-card p-6 rounded-md shadow-sm">
               {tabData.characterMatrix ? (
                 <div 
-                  className="prose prose-stone dark:prose-invert max-w-none"
+                  className="prose prose-stone dark:prose-invert max-w-none mystery-prose"
                   dangerouslySetInnerHTML={{ __html: tabData.characterMatrix }}
                 />
               ) : (
