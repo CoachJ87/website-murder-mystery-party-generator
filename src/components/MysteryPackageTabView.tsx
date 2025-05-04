@@ -842,10 +842,10 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
         <Tabs defaultValue="host-guide" value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="border-b sticky top-0 z-10 bg-card px-6 py-4">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <TabsList className="h-10 p-1 bg-muted/50">
+              <TabsList className="h-10 p-1 bg-[#F6E8C6]">
                 <TabsTrigger 
                   value="host-guide" 
-                  className="text-sm data-[state=active]:bg-primary/10 data-[state=active]:text-foreground px-3 py-1.5 h-8"
+                  className="text-sm data-[state=active]:bg-background data-[state=active]:text-foreground px-3 py-1.5 h-8"
                 >
                   <div className="flex items-center gap-2">
                     <Book className="h-4 w-4" />
@@ -854,7 +854,7 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
                 </TabsTrigger>
                 <TabsTrigger 
                   value="characters" 
-                  className="text-sm data-[state=active]:bg-primary/10 data-[state=active]:text-foreground px-3 py-1.5 h-8"
+                  className="text-sm data-[state=active]:bg-background data-[state=active]:text-foreground px-3 py-1.5 h-8"
                 >
                   <div className="flex items-center gap-2">
                     <Users className="h-4 w-4" />
@@ -863,7 +863,7 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
                 </TabsTrigger>
                 <TabsTrigger 
                   value="clues" 
-                  className="text-sm data-[state=active]:bg-primary/10 data-[state=active]:text-foreground px-3 py-1.5 h-8"
+                  className="text-sm data-[state=active]:bg-background data-[state=active]:text-foreground px-3 py-1.5 h-8"
                 >
                   <div className="flex items-center gap-2">
                     <FileText className="h-4 w-4" />
@@ -872,7 +872,7 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
                 </TabsTrigger>
                 <TabsTrigger 
                   value="inspector-script" 
-                  className="text-sm data-[state=active]:bg-primary/10 data-[state=active]:text-foreground px-3 py-1.5 h-8"
+                  className="text-sm data-[state=active]:bg-background data-[state=active]:text-foreground px-3 py-1.5 h-8"
                 >
                   <div className="flex items-center gap-2">
                     <FileCode className="h-4 w-4" />
@@ -881,7 +881,7 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
                 </TabsTrigger>
                 <TabsTrigger 
                   value="character-matrix" 
-                  className="text-sm data-[state=active]:bg-primary/10 data-[state=active]:text-foreground px-3 py-1.5 h-8"
+                  className="text-sm data-[state=active]:bg-background data-[state=active]:text-foreground px-3 py-1.5 h-8"
                 >
                   <div className="flex items-center gap-2">
                     <Grid2x2 className="h-4 w-4" />
@@ -904,7 +904,7 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
           
           <div className="p-6">
             <TabsContent value="host-guide" className="mt-4 bg-card p-6 rounded-md shadow-sm">
-              <div className="prose prose-stone dark:prose-invert max-w-none mystery-prose">
+              <div className="prose prose-stone dark:prose-invert max-w-none mystery-prose host-guide">
                 <ReactMarkdown>{tabData.hostGuide}</ReactMarkdown>
               </div>
             </TabsContent>
@@ -917,16 +917,16 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
               {renderClues()}
             </TabsContent>
             
-            <TabsContent value="inspector-script" className="mt-4 bg-card p-6 rounded-md shadow-sm">
-              <div className="prose prose-stone dark:prose-invert max-w-none mystery-prose">
+            <TabsContent value="inspector-script" className="mt-4 bg-[#FEF7CD]/30 p-6 rounded-md shadow-sm">
+              <div className="prose prose-stone dark:prose-invert max-w-none mystery-prose inspector-script">
                 <ReactMarkdown>{tabData.inspectorScript}</ReactMarkdown>
               </div>
             </TabsContent>
             
-            <TabsContent value="character-matrix" className="mt-4 bg-card p-6 rounded-md shadow-sm">
+            <TabsContent value="character-matrix" className="mt-4 bg-[#F2FCE2]/30 p-6 rounded-md shadow-sm">
               {tabData.characterMatrix ? (
                 <div 
-                  className="prose prose-stone dark:prose-invert max-w-none mystery-prose"
+                  className="prose prose-stone dark:prose-invert max-w-none mystery-prose matrix-content"
                   dangerouslySetInnerHTML={{ __html: tabData.characterMatrix }}
                 />
               ) : (

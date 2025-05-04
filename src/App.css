@@ -92,8 +92,6 @@ body {
   margin-top: 1.5em;
   margin-bottom: 0.75em;
   color: #1D2B35;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid rgba(29, 43, 53, 0.2);
 }
 
 .mystery-prose h2 {
@@ -103,9 +101,6 @@ body {
   margin-top: 1.25em;
   margin-bottom: 0.6em;
   color: #1D2B35;
-  background-color: rgba(230, 167, 62, 0.1);
-  padding: 0.5rem;
-  border-radius: 0.25rem;
 }
 
 .mystery-prose h3 {
@@ -114,7 +109,6 @@ body {
   font-weight: 600;
   margin-top: 1em;
   margin-bottom: 0.5em;
-  color: #C26E3E;
 }
 
 .mystery-prose p {
@@ -206,4 +200,38 @@ body {
 
 .mystery-prose em {
   font-style: italic;
+}
+
+/* Specific tab content styling */
+.host-guide h1 {
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(29, 43, 53, 0.2);
+}
+
+.host-guide h2 {
+  background-color: rgba(230, 167, 62, 0.1);
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.host-guide h3 {
+  color: #C26E3E;
+}
+
+.inspector-script {
+  background-color: rgba(255, 250, 240, 0.5);
+}
+
+.inspector-script h2 {
+  background-color: rgba(194, 110, 62, 0.1);
+  border-radius: 0.25rem;
+  padding: 0.5rem;
+}
+
+.matrix-content table {
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.matrix-content th {
+  background-color: rgba(230, 167, 62, 0.2);
 }
