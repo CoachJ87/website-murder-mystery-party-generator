@@ -432,12 +432,18 @@ const MysteryView = () => {
       <Header />
       <main className="flex-1 py-12 px-4">
         <div className="container mx-auto max-w-4xl">
-          {!window.location.pathname.includes('/preview/') && (generationStatus?.status === 'completed' || packageContent) ? (
+          {/* Modified conditional - show tabbed view for purchased mysteries even if generation hasn't started */}
+          {(!window.location.pathname.includes('/preview/') && 
+            (generationStatus?.status === 'completed' || 
+             packageContent || 
+             (mystery && mystery.is_paid))) ? (
             <MysteryPackageTabView 
               packageContent={packageContent} 
               mysteryTitle={mystery?.title || "Mystery Package"} 
               generationStatus={generationStatus || undefined}
               conversationId={id}
+              onGenerateClick={handleGeneratePackage}
+              isGenerating={generating}
             />
           ) : (
             generationStatus?.status === 'in_progress' ? renderGenerationProgress() : (
