@@ -97,6 +97,11 @@ const CharacterRoleSelector: React.FC<CharacterRoleSelectorProps> = ({
   
   // Handle accomplice selection - should not be the same as murderer
   const handleAccompliceChange = (value: string) => {
+    if (value === "none") {
+      setAccomplice(null);
+      return;
+    }
+    
     if (value === murderer) {
       toast.error('Accomplice cannot be the same as the murderer');
       return;
@@ -106,6 +111,11 @@ const CharacterRoleSelector: React.FC<CharacterRoleSelectorProps> = ({
   
   // Handle murderer selection - should not be the same as accomplice
   const handleMurdererChange = (value: string) => {
+    if (value === "none") {
+      setMurderer(null);
+      return;
+    }
+    
     if (value === accomplice) {
       toast.error('Murderer cannot be the same as the accomplice');
       return;
@@ -133,12 +143,12 @@ const CharacterRoleSelector: React.FC<CharacterRoleSelectorProps> = ({
                 <span>Murderer</span>
                 <Badge variant="outline" className="ml-1 font-normal">Required</Badge>
               </label>
-              <Select value={murderer || ""} onValueChange={handleMurdererChange}>
+              <Select value={murderer || "none"} onValueChange={handleMurdererChange}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select the murderer" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">None selected</SelectItem>
+                  <SelectItem value="none">None selected</SelectItem>
                   {characters.map(character => (
                     <SelectItem 
                       key={character.id} 
@@ -162,12 +172,12 @@ const CharacterRoleSelector: React.FC<CharacterRoleSelectorProps> = ({
                 <span>Accomplice</span>
                 <Badge variant="outline" className="ml-1 font-normal">Optional</Badge>
               </label>
-              <Select value={accomplice || ""} onValueChange={handleAccompliceChange}>
+              <Select value={accomplice || "none"} onValueChange={handleAccompliceChange}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select the accomplice (optional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">None selected</SelectItem>
+                  <SelectItem value="none">None selected</SelectItem>
                   {characters.map(character => (
                     <SelectItem 
                       key={character.id} 

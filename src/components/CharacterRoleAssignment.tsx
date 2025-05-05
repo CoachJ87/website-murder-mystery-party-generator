@@ -54,14 +54,14 @@ const CharacterRoleAssignment: React.FC<CharacterRoleAssignmentProps> = ({
         <div className="space-y-2">
           <Label htmlFor="guilty-character">Who is the murderer?</Label>
           <Select 
-            value={guiltyCharacterId || ""} 
+            value={guiltyCharacterId || "none"} 
             onValueChange={handleGuiltyChange}
           >
             <SelectTrigger id="guilty-character">
               <SelectValue placeholder="Select the murderer" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">None Selected</SelectItem>
+              <SelectItem value="none">None Selected</SelectItem>
               {characters.map((character) => (
                 <SelectItem key={character.id} value={character.id}>
                   {character.character_name}
@@ -84,7 +84,7 @@ const CharacterRoleAssignment: React.FC<CharacterRoleAssignmentProps> = ({
           <div className="space-y-2">
             <Label htmlFor="accomplice-character">Who is the accomplice?</Label>
             <Select 
-              value={accompliceCharacterId || ""} 
+              value={accompliceCharacterId || "none"} 
               onValueChange={handleAccompliceChange}
               disabled={!useAccomplice}
             >
@@ -92,7 +92,7 @@ const CharacterRoleAssignment: React.FC<CharacterRoleAssignmentProps> = ({
                 <SelectValue placeholder="Select the accomplice" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">None Selected</SelectItem>
+                <SelectItem value="none">None Selected</SelectItem>
                 {characters
                   .filter(c => c.id !== guiltyCharacterId)
                   .map((character) => (
