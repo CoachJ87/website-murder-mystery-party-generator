@@ -33,7 +33,7 @@ const MysteryPreview = () => {
     const [generationAbandoned, setGenerationAbandoned] = useState(false);
     const [generationStatus, setGenerationStatus] = useState<any | null>(null);
     const [currentContent, setCurrentContent] = useState("");
-    const [streamingContent, setStreamingContent<{
+    const [streamingContent, setStreamingContent] = useState<{
         hostGuide?: string;
         characters?: MysteryCharacter[];
         clues?: any[];
