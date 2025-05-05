@@ -788,3 +788,26 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
                     <CardContent className="section-card-content">
                       <div className="prose prose-stone dark:prose-invert max-w-none mystery-prose">
                         <ReactMarkdown>{extractSection(finalTabData.hostGuide, "SETUP")}</ReactMarkdown>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-muted/10 p-6 rounded-lg border border-dashed border-muted flex items-center justify-center">
+              <p className="text-muted-foreground text-center">
+                {isGenerating ? "Generating host guide..." : "Host guide not available yet"}
+                {isTabGenerating('host-guide') && typingCursor}
+              </p>
+            </div>
+          )}
+        </TabsContent>
+
+        {/* Additional TabsContent sections for other tabs would go here */}
+      </Tabs>
+    </div>
+  );
+};
+
+export default MysteryPackageTabView;
