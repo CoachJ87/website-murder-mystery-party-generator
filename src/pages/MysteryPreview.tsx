@@ -16,7 +16,6 @@ import MysteryPackageTabView from "@/components/MysteryPackageTabView";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { MysteryCharacter } from "@/interfaces/mystery";
-import { crypto } from "crypto";
 
 const MysteryPreview = () => {
     const [mystery, setMystery] = useState<any | null>(null);
@@ -34,7 +33,7 @@ const MysteryPreview = () => {
     const [generationAbandoned, setGenerationAbandoned] = useState(false);
     const [generationStatus, setGenerationStatus] = useState<any | null>(null);
     const [currentContent, setCurrentContent] = useState("");
-    const [streamingContent, setStreamingContent] = useState<{
+    const [streamingContent, setStreamingContent<{
         hostGuide?: string;
         characters?: MysteryCharacter[];
         clues?: any[];
@@ -244,9 +243,9 @@ const MysteryPreview = () => {
                 const characterName = match[1].trim();
                 const characterContent = match[2].trim();
                 
-                // Create a simple character object
+                // Create a simple character object with a generated UUID using the browser's Crypto API
                 characters.push({
-                    id: crypto.randomUUID(), // Generate a temporary ID
+                    id: crypto.randomUUID(), // Use browser's built-in crypto.randomUUID()
                     package_id: id || "",
                     character_name: characterName,
                     description: characterContent.substring(0, characterContent.indexOf('\n\n')) || '',
