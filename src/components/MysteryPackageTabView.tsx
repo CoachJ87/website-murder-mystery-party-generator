@@ -62,16 +62,17 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
   
   const isMobile = useIsMobile();
   
-  // Determine if we're in empty state where no content is available yet
-  const isEmpty = !packageContent && 
+  // Improved isEmpty check - Fix to ensure the EmptyStateView shows up correctly
+  const isEmpty = (!packageContent || packageContent === '') && 
     !streamingContent?.hostGuide && 
-    streamingContent?.characters?.length === 0 && 
-    streamingContent?.clues?.length === 0 && 
+    (!streamingContent?.characters || streamingContent?.characters.length === 0) && 
+    (!streamingContent?.clues || streamingContent?.clues.length === 0) && 
     !streamingContent?.inspectorScript &&
     !tabData.hostGuide && 
-    tabData.characters.length === 0 && 
-    tabData.clues.length === 0 && 
-    !tabData.inspectorScript;
+    (tabData.characters.length === 0) && 
+    (tabData.clues.length === 0) && 
+    !tabData.inspectorScript &&
+    generationStatus?.status !== 'in_progress';
 
   // Cursor blink effect for live generation
   const [showCursor, setShowCursor] = useState(true);
@@ -662,21 +663,31 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
     characterMatrix: streamingContent?.characterMatrix || tabData.characterMatrix
   };
 
-  // Empty state component
+  // Improved Empty state component with clearer call to action
   const EmptyStateView = () => (
     <div className="flex flex-col items-center justify-center h-96 text-center">
-      <Sparkles className="h-16 w-16 text-muted-foreground mb-4" />
-      <h3 className="text-2xl font-semibold mb-2">Your mystery package awaits creation</h3>
+      <Sparkles className="h-16 w-16 text-primary/70 mb-4 animate-pulse" />
+      <h3 className="text-2xl font-semibold mb-2">Your mystery package is ready to be generated</h3>
       <p className="text-muted-foreground mb-6 max-w-md">
-        Generate your complete murder mystery with character guides, host instructions, and all game materials.
+        You've purchased this mystery! Click the button below to create your complete murder mystery package with all game materials.
       </p>
       <Button 
         size="lg" 
-        className="animate-pulse" 
         onClick={onGenerateClick}
+        className="animate-pulse bg-primary hover:bg-primary/90"
+        disabled={isGenerating}
       >
-        <Sparkles className="h-5 w-5 mr-2" />
-        Generate Mystery Package
+        {isGenerating ? (
+          <>
+            <Sparkles className="h-5 w-5 mr-2 animate-spin" />
+            Generating...
+          </>
+        ) : (
+          <>
+            <Sparkles className="h-5 w-5 mr-2" />
+            Generate Mystery Package
+          </>
+        )}
       </Button>
     </div>
   );
@@ -714,6 +725,7 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
     );
   }
 
+  // Critical fix: Check if we should show the empty state view
   if (isEmpty && onGenerateClick) {
     return <EmptyStateView />;
   }
@@ -781,6 +793,31 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* Show a prominent banner if the tabs are empty but we're not showing the EmptyStateView */}
+      {finalTabData.hostGuide === '' && 
+       finalTabData.characters.length === 0 && 
+       finalTabData.clues.length === 0 && 
+       finalTabData.inspectorScript === '' &&
+       !isEmpty && onGenerateClick && !isGenerating && (
+        <Card className="bg-muted/20 border-primary/30 mb-6">
+          <CardContent className="pt-6 pb-6 flex flex-col md:flex-row items-center gap-4">
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold">Ready to generate your mystery?</h3>
+              <p className="text-muted-foreground">
+                Your mystery is purchased and ready to be generated. Click the button to create your complete package.
+              </p>
+            </div>
+            <Button 
+              onClick={onGenerateClick}
+              className="md:flex-shrink-0"
+            >
+              <Sparkles className="h-4 w-4 mr-2" />
+              Generate Package
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         {isMobile ? (
           <MobileTabSelector />

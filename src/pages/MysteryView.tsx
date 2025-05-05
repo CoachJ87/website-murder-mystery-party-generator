@@ -1,4 +1,3 @@
-
 // src/pages/MysteryView.tsx
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -154,6 +153,13 @@ const MysteryView = () => {
           return;
         }
 
+        console.log("Mystery data loaded:", {
+          id: conversation.id,
+          is_paid: conversation.is_paid,
+          needs_package_generation: conversation.needs_package_generation,
+          has_complete_package: conversation.has_complete_package
+        });
+
         setMystery(conversation);
 
         // Fresh purchase - clear any previous status check interval
@@ -284,7 +290,8 @@ const MysteryView = () => {
       // Reset notification state on new generation start
       packageReadyNotified.current = false;
       
-      generateCompletePackage(id)
+      // Start the generation process and update UI
+      await generateCompletePackage(id)
         .then(content => {
           setPackageContent(content);
           setGenerating(false);
@@ -297,6 +304,7 @@ const MysteryView = () => {
           toast.error("There was an issue generating your package. Please try again.");
         });
       
+      // Get initial status and start polling
       const initialStatus = await getPackageGenerationStatus(id);
       setGenerationStatus(initialStatus);
       startStatusPolling();
@@ -432,7 +440,7 @@ const MysteryView = () => {
       <Header />
       <main className="flex-1 py-12 px-4">
         <div className="container mx-auto max-w-4xl">
-          {/* Modified conditional - show tabbed view for purchased mysteries even if generation hasn't started */}
+          {/* Always show tabbed view for purchased mysteries, but let the tab view handle empty states */}
           {(!window.location.pathname.includes('/preview/') && 
             (generationStatus?.status === 'completed' || 
              packageContent || 
