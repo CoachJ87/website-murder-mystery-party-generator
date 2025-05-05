@@ -202,36 +202,165 @@ body {
   font-style: italic;
 }
 
-/* Specific tab content styling */
-.host-guide h1 {
+/* Tab-specific styling */
+.host-guide-content {
+  background-color: rgba(242, 252, 226, 0.5);
+  border-radius: 0.5rem;
+}
+
+.host-guide-content h1 {
+  color: #1D2B35;
+  border-bottom: 2px solid #C26E3E;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid rgba(29, 43, 53, 0.2);
+  margin-bottom: 1rem;
+  font-size: 1.75rem;
 }
 
-.host-guide h2 {
-  background-color: rgba(230, 167, 62, 0.1);
+.host-guide-content h2 {
+  background-color: rgba(230, 167, 62, 0.15);
   padding: 0.5rem;
   border-radius: 0.25rem;
-}
-
-.host-guide h3 {
   color: #C26E3E;
+  font-size: 1.5rem;
+  margin-top: 1.5rem;
 }
 
-.inspector-script {
-  background-color: rgba(255, 250, 240, 0.5);
+.host-guide-content h3 {
+  color: #C26E3E;
+  font-weight: 600;
+  margin-top: 1.25rem;
+  font-size: 1.25rem;
 }
 
-.inspector-script h2 {
-  background-color: rgba(194, 110, 62, 0.1);
-  border-radius: 0.25rem;
+.host-guide-content p {
+  margin-bottom: 1rem;
+}
+
+.host-guide-content ul, 
+.host-guide-content ol {
+  margin-bottom: 1.25rem;
+}
+
+.detective-script-content {
+  background-color: rgba(254, 247, 205, 0.5);
+  border-radius: 0.5rem;
+}
+
+.detective-script-content h1 {
+  color: #1D2B35;
+  border-bottom: 2px solid #0EA5E9;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 1.75rem;
+}
+
+.detective-script-content h2 {
+  background-color: rgba(14, 165, 233, 0.15);
   padding: 0.5rem;
+  border-radius: 0.25rem;
+  color: #0EA5E9;
+  font-size: 1.5rem;
+  margin-top: 1.5rem;
 }
 
-.matrix-content table {
-  background-color: rgba(255, 255, 255, 0.7);
+.detective-script-content h3 {
+  color: #0EA5E9;
+  font-weight: 600;
+  margin-top: 1.25rem;
+  font-size: 1.25rem;
 }
 
-.matrix-content th {
-  background-color: rgba(230, 167, 62, 0.2);
+.detective-script-content p {
+  margin-bottom: 1rem;
+}
+
+.detective-script-content blockquote {
+  border-left-color: #0EA5E9;
+  background-color: rgba(14, 165, 233, 0.1);
+}
+
+.character-matrix-content {
+  background-color: rgba(211, 228, 253, 0.5);
+  border-radius: 0.5rem;
+}
+
+.character-matrix-content table {
+  border: 1px solid rgba(29, 43, 53, 0.2);
+}
+
+.character-matrix-content th {
+  background-color: rgba(14, 165, 233, 0.2);
+  color: #1D2B35;
+}
+
+.character-matrix-content td {
+  background-color: rgba(255, 255, 255, 0.6);
+}
+
+.clues-content {
+  background-color: rgba(254, 198, 161, 0.2);
+  border-radius: 0.5rem;
+}
+
+.characters-content {
+  background-color: rgba(229, 222, 255, 0.2);
+  border-radius: 0.5rem;
+}
+
+/* Mystery tabs navigation */
+.mystery-tabs-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: #FFFFFF;
+  padding: 1rem;
+  border-bottom: 1px solid #E9E5DC;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .mystery-tabs-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.mystery-download-button {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .mystery-download-button {
+    width: auto;
+    margin-top: 0;
+  }
+}
+
+/* Section-specific Cards styling */
+.section-card {
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(29, 43, 53, 0.1);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.section-card-header {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(29, 43, 53, 0.1);
+}
+
+.host-guide-card .section-card-header {
+  background-color: rgba(230, 167, 62, 0.15);
+}
+
+.detective-script-card .section-card-header {
+  background-color: rgba(14, 165, 233, 0.15);
+}
+
+.section-card-content {
+  padding: 1.5rem;
 }

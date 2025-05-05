@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { MysteryCharacter } from "@/interfaces/mystery";
 import CharacterDetailView from "./CharacterDetailView";
 import CharacterRoleAssignment from "./CharacterRoleAssignment";
+import { Separator } from "./ui/separator";
 
 export interface MysteryPackageTabViewProps {
   packageContent?: string;
@@ -532,15 +533,18 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
     return characters;
   };
 
-  const extractSection = (content: string, sectionName: string): string => {
-    const pattern = new RegExp(`##\\s*(?:${sectionName})\\s*\\n([\\s\\S]*?)(?=##|$)`, 'i');
-    const match = content.match(pattern);
-    if (match) return match[1].trim();
+  const extractSection = (content: string, sectionName: string, nextSectionName: string): string => {
+    if (!content) return '';
     
-    // Try alternative pattern with no ## markers
-    const altPattern = new RegExp(`${sectionName}\\s*\\n([\\s\\S]*?)(?=(?:ROUND|YOUR|FINAL|CHOOSE|$))`, 'i');
-    const altMatch = content.match(altPattern);
-    return altMatch ? altMatch[1].trim() : '';
+    const sectionPattern = new RegExp(`(?:##?\\s*${sectionName}|${sectionName}:)([\\s\\S]*?)${nextSectionName ? `(?:##?\\s*${nextSectionName}|${nextSectionName}:)` : '$'}`, 'i');
+    const match = content.match(sectionPattern);
+    
+    if (match && match[1]) {
+      return match[1].trim();
+    }
+    
+    // If specific section not found, return full content or empty string
+    return nextSectionName ? '' : content;
   };
 
   const extractContentFromMarkdown = (content: string) => {
@@ -840,98 +844,202 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
       
       <CardContent className="p-0">
         <Tabs defaultValue="host-guide" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <div className="border-b sticky top-0 z-10 bg-card px-6 py-4">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <TabsList className="h-10 p-1 bg-[#F6E8C6]">
-                <TabsTrigger 
-                  value="host-guide" 
-                  className="text-sm data-[state=active]:bg-background data-[state=active]:text-foreground px-3 py-1.5 h-8"
-                >
-                  <div className="flex items-center gap-2">
-                    <Book className="h-4 w-4" />
-                    <span>Host Guide</span>
-                  </div>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="characters" 
-                  className="text-sm data-[state=active]:bg-background data-[state=active]:text-foreground px-3 py-1.5 h-8"
-                >
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4" />
-                    <span>Characters</span>
-                  </div>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="clues" 
-                  className="text-sm data-[state=active]:bg-background data-[state=active]:text-foreground px-3 py-1.5 h-8"
-                >
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-4 w-4" />
-                    <span>Clues</span>
-                  </div>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="inspector-script" 
-                  className="text-sm data-[state=active]:bg-background data-[state=active]:text-foreground px-3 py-1.5 h-8"
-                >
-                  <div className="flex items-center gap-2">
-                    <FileCode className="h-4 w-4" />
-                    <span>Inspector Script</span>
-                  </div>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="character-matrix" 
-                  className="text-sm data-[state=active]:bg-background data-[state=active]:text-foreground px-3 py-1.5 h-8"
-                >
-                  <div className="flex items-center gap-2">
-                    <Grid2x2 className="h-4 w-4" />
-                    <span>Character Matrix</span>
-                  </div>
-                </TabsTrigger>
-              </TabsList>
-              
-              <Button 
-                variant="secondary" 
-                size="sm" 
-                onClick={handleDownloadPDF}
-                className="ml-auto flex items-center gap-2 h-10"
+          <div className="border-b mystery-tabs-header">
+            <TabsList className="h-10 p-1">
+              <TabsTrigger 
+                value="host-guide" 
+                className="text-sm data-[state=active]:bg-background data-[state=active]:text-foreground px-3 py-1.5 h-8"
               >
-                <Download className="h-4 w-4" />
-                <span>Download PDF</span>
-              </Button>
-            </div>
+                <div className="flex items-center gap-2">
+                  <Book className="h-4 w-4" />
+                  <span>Host Guide</span>
+                </div>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="characters" 
+                className="text-sm data-[state=active]:bg-background data-[state=active]:text-foreground px-3 py-1.5 h-8"
+              >
+                <div className="flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  <span>Characters</span>
+                </div>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="clues" 
+                className="text-sm data-[state=active]:bg-background data-[state=active]:text-foreground px-3 py-1.5 h-8"
+              >
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  <span>Clues</span>
+                </div>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="detective-script" 
+                className="text-sm data-[state=active]:bg-background data-[state=active]:text-foreground px-3 py-1.5 h-8"
+              >
+                <div className="flex items-center gap-2">
+                  <FileCode className="h-4 w-4" />
+                  <span>Detective Script</span>
+                </div>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="character-matrix" 
+                className="text-sm data-[state=active]:bg-background data-[state=active]:text-foreground px-3 py-1.5 h-8"
+              >
+                <div className="flex items-center gap-2">
+                  <Grid2x2 className="h-4 w-4" />
+                  <span>Character Matrix</span>
+                </div>
+              </TabsTrigger>
+            </TabsList>
+            
+            <Button 
+              variant="secondary" 
+              size="sm" 
+              onClick={handleDownloadPDF}
+              className="mystery-download-button flex items-center gap-2 h-10"
+            >
+              <Download className="h-4 w-4" />
+              <span>Download PDF</span>
+            </Button>
           </div>
           
           <div className="p-6">
-            <TabsContent value="host-guide" className="mt-4 bg-card p-6 rounded-md shadow-sm">
-              <div className="prose prose-stone dark:prose-invert max-w-none mystery-prose host-guide">
-                <ReactMarkdown>{tabData.hostGuide}</ReactMarkdown>
+            <TabsContent value="host-guide" className="mt-4">
+              <div className="host-guide-content p-6 rounded-md shadow-sm">
+                {tabData.hostGuide ? (
+                  <>
+                    <Card className="section-card host-guide-card mb-6">
+                      <CardHeader className="section-card-header">
+                        <CardTitle>Introduction</CardTitle>
+                      </CardHeader>
+                      <CardContent className="section-card-content">
+                        <div className="prose prose-stone dark:prose-invert max-w-none mystery-prose">
+                          <ReactMarkdown>{extractSection(tabData.hostGuide, "INTRODUCTION", "SETUP")}</ReactMarkdown>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card className="section-card host-guide-card mb-6">
+                      <CardHeader className="section-card-header">
+                        <CardTitle>Setup Instructions</CardTitle>
+                      </CardHeader>
+                      <CardContent className="section-card-content">
+                        <div className="prose prose-stone dark:prose-invert max-w-none mystery-prose">
+                          <ReactMarkdown>{extractSection(tabData.hostGuide, "SETUP", "GAMEPLAY")}</ReactMarkdown>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card className="section-card host-guide-card">
+                      <CardHeader className="section-card-header">
+                        <CardTitle>Gameplay & Facilitation</CardTitle>
+                      </CardHeader>
+                      <CardContent className="section-card-content">
+                        <div className="prose prose-stone dark:prose-invert max-w-none mystery-prose">
+                          <ReactMarkdown>{extractSection(tabData.hostGuide, "GAMEPLAY", "")}</ReactMarkdown>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No host guide content available.
+                  </div>
+                )}
               </div>
             </TabsContent>
             
             <TabsContent value="characters" className="mt-4">
-              {renderCharacters()}
-            </TabsContent>
-            
-            <TabsContent value="clues" className="mt-4">
-              {renderClues()}
-            </TabsContent>
-            
-            <TabsContent value="inspector-script" className="mt-4 bg-[#FEF7CD]/30 p-6 rounded-md shadow-sm">
-              <div className="prose prose-stone dark:prose-invert max-w-none mystery-prose inspector-script">
-                <ReactMarkdown>{tabData.inspectorScript}</ReactMarkdown>
+              <div className="characters-content p-6 rounded-md shadow-sm">
+                {renderCharacters()}
               </div>
             </TabsContent>
             
-            <TabsContent value="character-matrix" className="mt-4 bg-[#F2FCE2]/30 p-6 rounded-md shadow-sm">
-              {tabData.characterMatrix ? (
-                <div 
-                  className="prose prose-stone dark:prose-invert max-w-none mystery-prose matrix-content"
-                  dangerouslySetInnerHTML={{ __html: tabData.characterMatrix }}
-                />
-              ) : (
-                <p className="text-center py-8 text-muted-foreground">Character relationship matrix is not available.</p>
-              )}
+            <TabsContent value="clues" className="mt-4">
+              <div className="clues-content p-6 rounded-md shadow-sm">
+                {renderClues()}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="detective-script" className="mt-4">
+              <div className="detective-script-content p-6 rounded-md shadow-sm">
+                {tabData.inspectorScript ? (
+                  <>
+                    <Card className="section-card detective-script-card mb-6">
+                      <CardHeader className="section-card-header">
+                        <CardTitle>Detective's Introduction</CardTitle>
+                      </CardHeader>
+                      <CardContent className="section-card-content">
+                        <div className="prose prose-stone dark:prose-invert max-w-none mystery-prose">
+                          <ReactMarkdown>{extractSection(tabData.inspectorScript, "INTRODUCTION", "ROUND 1")}</ReactMarkdown>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card className="section-card detective-script-card mb-6">
+                      <CardHeader className="section-card-header">
+                        <CardTitle>Round 1: Initial Investigation</CardTitle>
+                      </CardHeader>
+                      <CardContent className="section-card-content">
+                        <div className="prose prose-stone dark:prose-invert max-w-none mystery-prose">
+                          <ReactMarkdown>{extractSection(tabData.inspectorScript, "ROUND 1", "ROUND 2")}</ReactMarkdown>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card className="section-card detective-script-card mb-6">
+                      <CardHeader className="section-card-header">
+                        <CardTitle>Round 2: Deeper Revelations</CardTitle>
+                      </CardHeader>
+                      <CardContent className="section-card-content">
+                        <div className="prose prose-stone dark:prose-invert max-w-none mystery-prose">
+                          <ReactMarkdown>{extractSection(tabData.inspectorScript, "ROUND 2", "ROUND 3")}</ReactMarkdown>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card className="section-card detective-script-card mb-6">
+                      <CardHeader className="section-card-header">
+                        <CardTitle>Round 3: Final Clues</CardTitle>
+                      </CardHeader>
+                      <CardContent className="section-card-content">
+                        <div className="prose prose-stone dark:prose-invert max-w-none mystery-prose">
+                          <ReactMarkdown>{extractSection(tabData.inspectorScript, "ROUND 3", "CONCLUSION")}</ReactMarkdown>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card className="section-card detective-script-card">
+                      <CardHeader className="section-card-header">
+                        <CardTitle>Conclusion & Solution</CardTitle>
+                      </CardHeader>
+                      <CardContent className="section-card-content">
+                        <div className="prose prose-stone dark:prose-invert max-w-none mystery-prose">
+                          <ReactMarkdown>{extractSection(tabData.inspectorScript, "CONCLUSION", "")}</ReactMarkdown>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    Detective script is not available.
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="character-matrix" className="mt-4">
+              <div className="character-matrix-content p-6 rounded-md shadow-sm">
+                {tabData.characterMatrix ? (
+                  <div 
+                    className="prose prose-stone dark:prose-invert max-w-none mystery-prose matrix-content"
+                    dangerouslySetInnerHTML={{ __html: tabData.characterMatrix }}
+                  />
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">Character relationship matrix is not available.</div>
+                )}
+              </div>
             </TabsContent>
           </div>
         </Tabs>
