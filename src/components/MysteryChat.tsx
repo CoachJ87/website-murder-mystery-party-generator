@@ -581,7 +581,10 @@ ${responseText.split('\n\n').slice(1).join('\n\n')}`;
     }, []);
 
     return (
-        <div data-testid="mystery-chat" className={cn("flex flex-col h-full", isMobile && "h-[calc(100vh-120px)]")}>
+        <div data-testid="mystery-chat" className={cn(
+            "flex flex-col h-full", 
+            isMobile && "h-[calc(100vh-90px)]"
+        )}>
             {error && (
                 <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 mb-4 flex items-start gap-3">
                     <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
@@ -603,7 +606,7 @@ ${responseText.split('\n\n').slice(1).join('\n\n')}`;
             <div 
                 className={cn(
                     "flex-1 overflow-y-auto mb-4 space-y-4 p-4 border rounded-lg bg-background/50",
-                    isMobile ? "min-h-[60vh] max-h-[70vh] border-0 p-2 -mx-2" : "min-h-[400px] max-h-[500px]"
+                    isMobile ? "min-h-[70vh] max-h-none border-0 p-2 -mx-2 mobile-full-height" : "min-h-[400px] max-h-[500px]"
                 )}
             >
                 {isLoadingHistory ? (
@@ -623,7 +626,7 @@ ${responseText.split('\n\n').slice(1).join('\n\n')}`;
                                 "max-w-[80%]",
                                 message.is_ai ? "ml-0" : "ml-auto",
                                 message.is_ai ? "bg-background" : "bg-primary text-primary-foreground",
-                                isMobile && "shadow-sm border-0"
+                                isMobile && "shadow-none border-0"
                             )}
                         >
                             <CardContent className={cn("p-4", isMobile && "p-3")}>
@@ -680,7 +683,11 @@ ${responseText.split('\n\n').slice(1).join('\n\n')}`;
 
             {messages.length > 1 && !loading && (
                 <div className={cn("border-t", isMobile ? "p-2" : "p-4")}>
-                    <Button onClick={handleGenerateFinalClick} variant="secondary" size={isMobile ? "sm" : "default"}>
+                    <Button 
+                        onClick={handleGenerateFinalClick} 
+                        variant="destructive" 
+                        size={isMobile ? "sm" : "default"}
+                    >
                         <Wand2 className={cn("mr-2", isMobile ? "h-3 w-3" : "h-4 w-4")} /> 
                         Generate Final Mystery
                     </Button>

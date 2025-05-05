@@ -104,6 +104,22 @@
   
   /* Fix viewport height issues on mobile */
   .mobile-vh-fix {
-    height: calc(100vh - 120px);
+    height: calc(100vh - 80px);
+  }
+  
+  /* Expanded chat container for mobile */
+  .mobile-chat-container {
+    @apply min-h-[80vh] border-0 p-0;
+  }
+  
+  /* Remove borders for mobile chat experience */
+  .mobile-borderless {
+    @apply border-0 shadow-none bg-transparent;
+  }
+  
+  /* Full height chat on mobile */
+  .mobile-full-height {
+    height: calc(100vh - 100px);
+    max-height: none;
   }
 }

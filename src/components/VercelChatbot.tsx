@@ -7,6 +7,8 @@ import { AIInputWithLoading } from "@/components/ui/ai-input-with-loading";
 import { MessageCircle, ExternalLink } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 type Message = {
   id: string;
@@ -27,6 +29,7 @@ const VercelChatbot = () => {
   const { user, isAuthenticated } = useAuth();
   const { id } = useParams();
   const initialDataLoaded = useRef(false);
+  const isMobile = useIsMobile();
 
   // Load or create conversation
   useEffect(() => {
@@ -145,7 +148,7 @@ const VercelChatbot = () => {
           return;
         }
 
-        const accessToken = sessionData.session.access_token;
+        const accessToken = sessionData.session?.access_token;
         console.log("Making request to generate chatbot token");
         
         // Use the fully qualified URL with project ID
@@ -372,29 +375,36 @@ const VercelChatbot = () => {
   return (
     <div className="flex flex-col space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">Create Your Murder Mystery</h2>
+        <h2 className={cn("text-xl font-semibold", isMobile && "text-lg")}>Create Your Murder Mystery</h2>
         <div className="flex gap-2">
           {chatbotUrl && (
-            <Button variant="outline" onClick={openChatbotInNewWindow}>
-              <ExternalLink className="h-4 w-4 mr-2" />
-              Open Full Chatbot
+            <Button variant="outline" onClick={openChatbotInNewWindow} size={isMobile ? "sm" : "default"}>
+              <ExternalLink className={cn("mr-2", isMobile ? "h-3 w-3" : "h-4 w-4")} />
+              {isMobile ? "External" : "Open Full Chatbot"}
             </Button>
           )}
-          <Button onClick={handleGenerateMystery} disabled={messages.length < 3}>
-            Finalize Mystery
+          <Button 
+            onClick={handleGenerateMystery} 
+            disabled={messages.length < 3}
+            size={isMobile ? "sm" : "default"}
+          >
+            Finalize
           </Button>
         </div>
       </div>
       
-      <Card className="p-4">
+      <Card className={cn("p-4", isMobile && "p-2 border-0 shadow-none bg-transparent")}>
         <div className="flex items-center gap-2 mb-4 border-b pb-2">
           <MessageCircle className="h-5 w-5 text-primary" />
           <h3 className="font-medium text-lg">Murder Mystery Creator</h3>
         </div>
         
         <div 
-          className="overflow-y-auto pr-2 mb-4" 
-          style={{ height: `${getMessagesHeight()}px` }}
+          className={cn(
+            "overflow-y-auto pr-2 mb-4",
+            isMobile && "mobile-full-height"
+          )}
+          style={{ height: isMobile ? 'calc(100vh - 180px)' : `${getMessagesHeight()}px` }}
         >
           {messages.map((message) => (
             <div
@@ -423,7 +433,7 @@ const VercelChatbot = () => {
           <div ref={messagesEndRef} />
         </div>
         
-        <div className="mt-4">
+        <div className={cn("mt-4", isMobile && "mt-2")}>
           <AIInputWithLoading
             value={input}
             setValue={setInput}
@@ -435,13 +445,14 @@ const VercelChatbot = () => {
       </Card>
 
       <div className="flex flex-col md:flex-row justify-between gap-4">
-        <p className="text-muted-foreground text-sm">
+        <p className={cn("text-muted-foreground text-sm", isMobile && "text-xs")}>
           When you're satisfied with your mystery, finalize it to continue.
         </p>
         <Button 
           onClick={handleGenerateMystery} 
           className="self-end"
           disabled={messages.length < 3}
+          size={isMobile ? "sm" : "default"}
         >
           Finalize Mystery
         </Button>

@@ -179,7 +179,10 @@ Present your mystery preview in an engaging, dramatic format that will excite th
   };
 
   return (
-    <div className={cn("w-full h-full", isMobile && "h-[calc(100vh-120px)]")}>
+    <div className={cn(
+      "w-full h-full", 
+      isMobile && "h-[calc(100vh-90px)] mobile-borderless"
+    )}>
       <MysteryChat
         initialTheme={formData?.theme || ""}
         initialPlayerCount={formData?.playerCount}
