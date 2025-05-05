@@ -79,8 +79,8 @@ export interface MysteryCharacter {
   round2_statement?: string;
   round3_statement?: string;
   questioning_options?: QuestionOption[];
-  created_at: string;
-  updated_at: string;
+  created_at?: string; // Make created_at optional
+  updated_at?: string; // Make updated_at optional
   [key: string]: any; // To allow for additional properties
 }
 
@@ -147,4 +147,3 @@ export function normalizeCharacterSecrets(secrets: any): string[] {
   
   return [];
 }
-

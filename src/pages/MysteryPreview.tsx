@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -17,6 +16,7 @@ import MysteryPackageTabView from "@/components/MysteryPackageTabView";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { MysteryCharacter } from "@/interfaces/mystery";
+import { crypto } from "crypto";
 
 const MysteryPreview = () => {
     const [mystery, setMystery] = useState<any | null>(null);
@@ -246,13 +246,13 @@ const MysteryPreview = () => {
                 
                 // Create a simple character object
                 characters.push({
+                    id: crypto.randomUUID(), // Generate a temporary ID
+                    package_id: id || "",
                     character_name: characterName,
                     description: characterContent.substring(0, characterContent.indexOf('\n\n')) || '',
                     background: '',
                     relationships: [],
-                    secrets: [],
-                    id: '',
-                    package_id: ''
+                    secrets: []
                 });
             }
             
