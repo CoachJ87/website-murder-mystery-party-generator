@@ -533,7 +533,8 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
     return characters;
   };
 
-  const extractSection = (content: string, sectionName: string, nextSectionName: string): string => {
+  // Fix the extractSection function to make the third parameter optional
+  const extractSection = (content: string, sectionName: string, nextSectionName?: string): string => {
     if (!content) return '';
     
     const sectionPattern = new RegExp(`(?:##?\\s*${sectionName}|${sectionName}:)([\\s\\S]*?)${nextSectionName ? `(?:##?\\s*${nextSectionName}|${nextSectionName}:)` : '$'}`, 'i');
@@ -937,7 +938,7 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
                       </CardHeader>
                       <CardContent className="section-card-content">
                         <div className="prose prose-stone dark:prose-invert max-w-none mystery-prose">
-                          <ReactMarkdown>{extractSection(tabData.hostGuide, "GAMEPLAY", "")}</ReactMarkdown>
+                          <ReactMarkdown>{extractSection(tabData.hostGuide, "GAMEPLAY")}</ReactMarkdown>
                         </div>
                       </CardContent>
                     </Card>
@@ -1016,7 +1017,7 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
                       </CardHeader>
                       <CardContent className="section-card-content">
                         <div className="prose prose-stone dark:prose-invert max-w-none mystery-prose">
-                          <ReactMarkdown>{extractSection(tabData.inspectorScript, "CONCLUSION", "")}</ReactMarkdown>
+                          <ReactMarkdown>{extractSection(tabData.inspectorScript, "CONCLUSION")}</ReactMarkdown>
                         </div>
                       </CardContent>
                     </Card>
