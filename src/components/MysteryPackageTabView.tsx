@@ -1,4 +1,3 @@
-
 // src/components/MysteryPackageTabView.tsx
 import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -773,6 +772,13 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
     </div>
   );
 
+  // Add a function to handle role assignments
+  const handleRoleAssign = (guiltyId: string | null, accompliceId: string | null) => {
+    console.log("Role assigned:", { guiltyId, accompliceId });
+    toast.success("Character roles assigned");
+    // In a real implementation, you might want to save this to your state or database
+  };
+
   return (
     <div className="space-y-6">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -890,7 +896,11 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
               
               <div className="bg-card p-4 md:p-6 rounded-lg shadow-sm">
                 <h2 className="text-xl font-semibold mb-4">Character Role Assignment</h2>
-                <CharacterRoleAssignment characters={finalTabData.characters} />
+                <CharacterRoleAssignment 
+                  characters={finalTabData.characters} 
+                  onRoleAssign={handleRoleAssign}
+                  hasAccomplice={true}
+                />
               </div>
             </div>
           ) : (
