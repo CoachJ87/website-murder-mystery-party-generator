@@ -338,36 +338,31 @@ const MysteryPurchase = () => {
     
     try {
       setProcessing(true);
-      toast.info("Preparing your checkout...");
+      toast.info("Processing your purchase...");
       
-      // Call our API endpoint to create a checkout session
-      const response = await fetch('/api/create-checkout-session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          mysteryId: id,
-          userId: user?.id,
-        }),
-      });
-
-      const data = await response.json();
+      // Directly mark the conversation as purchased
+      const { error } = await supabase
+        .from('conversations')
+        .update({ 
+          is_paid: true,
+          purchase_date: new Date().toISOString()
+        })
+        .eq('id', id);
+        
+      if (error) {
+        throw new Error(error.message);
+      }
       
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      if (data.url) {
-        // Redirect to Stripe checkout
-        window.location.href = data.url;
-      } else {
-        throw new Error("No checkout URL returned from the server");
-      }
+      toast.success("Purchase successful! Redirecting to your mystery...");
+      
+      // Redirect to the full mystery page after a short delay
+      setTimeout(() => {
+        navigate(`/mystery/${id}`);
+      }, 1500);
       
     } catch (error) {
       console.error("Error processing payment:", error);
-      toast.error("Payment preparation failed. Please try again.");
+      toast.error("Payment processing failed. Please try again.");
     } finally {
       setProcessing(false);
     }
