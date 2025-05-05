@@ -22,6 +22,7 @@ export interface GenerationStatus {
   };
   lastUpdated?: string; // Timestamp of last update
   resumable?: boolean; // Whether generation can be resumed
+  currentSection?: string; // Current section being generated
 }
 
 /**
@@ -114,7 +115,8 @@ export const generateCompletePackage = async (
               clues: false
             },
             resumable: true,
-            lastUpdated: new Date().toISOString()
+            lastUpdated: new Date().toISOString(),
+            currentSection: 'hostGuide' // Start with host guide
           },
           updated_at: new Date().toISOString()
         })
@@ -136,7 +138,8 @@ export const generateCompletePackage = async (
               clues: false
             },
             resumable: true,
-            lastUpdated: new Date().toISOString()
+            lastUpdated: new Date().toISOString(),
+            currentSection: 'hostGuide' // Start with host guide
           },
           created_at: new Date().toISOString()
         })
@@ -195,7 +198,8 @@ export const generateCompletePackage = async (
             clues: true
           },
           lastUpdated: new Date().toISOString(),
-          resumable: false
+          resumable: false,
+          currentSection: 'completed'
         },
         updated_at: new Date().toISOString()
       })
@@ -496,6 +500,7 @@ const parseRelationshipMatrix = (matrixText: string): any => {
 
 /**
  * Generate the package in logical chunks to avoid timeouts with improved resumability
+ * With more frequent updates for streaming effect
  */
 const generatePackageInChunks = async (
   messages: Message[], 
@@ -573,10 +578,17 @@ const generatePackageInChunks = async (
         partial: false
       },
       {
-        name: "Printable Materials",
-        prompt: "Create printable materials such as evidence cards, name tags, or other props needed for the mystery.",
+        name: "Detective Script",
+        prompt: "Create a detective script for the person who will play the inspector/detective role in the mystery.",
         progress: 85,
-        sectionKey: "clues",
+        sectionKey: "inspectorScript",
+        partial: false
+      },
+      {
+        name: "Character Matrix",
+        prompt: "Create a character relationship matrix showing how all characters are connected.",
+        progress: 95,
+        sectionKey: "characterMatrix",
         partial: false
       }
     ];
@@ -615,7 +627,8 @@ const generatePackageInChunks = async (
         lastCompletedSection: i > 0 ? sectionsToGenerate[i-1].name : lastCompletedSection,
         progress: section.progress,
         currentStep: `About to generate ${section.name}`,
-        sections: completedSections
+        sections: completedSections,
+        currentSection: section.sectionKey
       });
       
       while (retries < maxRetries) {
@@ -624,11 +637,12 @@ const generatePackageInChunks = async (
             mysteryId, 
             packageId, 
             section.progress, 
-            `Generating ${section.name} (5-10 minutes total generation time)`, 
+            `Generating ${section.name}`, 
             {
               ...completedSections,
               [section.sectionKey]: section.partial ? false : true
-            }
+            },
+            section.sectionKey // Pass current section for streaming UI updates
           );
           
           const sectionPrompt: Message = {
@@ -645,6 +659,11 @@ const generatePackageInChunks = async (
             sectionPrompt
           ];
           
+          // For streaming effect, let's update more frequently for live generation
+          // Simulate streaming by sending small updates (about 10 updates per section)
+          const updateCount = 10;
+          const chunkSize = Math.max(20, Math.floor(testMode ? 100 : 200) / updateCount);
+          
           sectionContent = await getAIResponse(
             contextMessages,
             "paid",
@@ -659,6 +678,33 @@ const generatePackageInChunks = async (
           fullPackage += sectionContent;
           currentContent += sectionContent;
           
+          // Simulate streaming by updating package content in smaller chunks
+          // for real-time visual feedback in the UI
+          for (let j = 1; j <= updateCount; j++) {
+            const partialContent = fullPackage.substring(0, 
+              Math.floor(existingContent.length + (j * sectionContent.length / updateCount))
+            );
+            
+            await updatePackageContent(packageId, partialContent);
+            
+            // Update progress incrementally
+            const chunkProgress = section.progress - (sectionsToGenerate[i-1]?.progress || 0);
+            const progressIncrement = (sectionsToGenerate[i-1]?.progress || 0) + 
+              (chunkProgress * (j / updateCount));
+            
+            await updateGenerationStatus(
+              mysteryId,
+              packageId,
+              progressIncrement,
+              `Generating ${section.name}`,
+              completedSections,
+              section.sectionKey // Current section for streaming updates
+            );
+            
+            // Small delay to simulate typing effect
+            await new Promise(resolve => setTimeout(resolve, testMode ? 100 : 200));
+          }
+          
           // Store incremental results - both in database and local storage
           await updatePackageContent(packageId, fullPackage);
           saveGenerationState(mysteryId, {
@@ -669,7 +715,8 @@ const generatePackageInChunks = async (
             sections: {
               ...completedSections,
               [section.sectionKey]: !section.partial
-            }
+            },
+            currentSection: section.sectionKey
           });
           
           // Mark section as completed
@@ -691,7 +738,8 @@ const generatePackageInChunks = async (
             progress: section.progress,
             currentStep: `Error in ${section.name}, attempt ${retries}`,
             error: error.message,
-            sections: completedSections
+            sections: completedSections,
+            currentSection: section.sectionKey
           });
           
           if (retries >= maxRetries) {
@@ -780,7 +828,7 @@ const generatePackageInChunks = async (
         hostGuide: fullPackage.includes("Host Guide"),
         characters: fullPackage.includes("Character"),
         clues: fullPackage.includes("Clues") || fullPackage.includes("Evidence")
-      }, true);
+      }, undefined, true);
       
       console.log("Returning partial content after error");
       return fullPackage + "\n\n[Note: Generation was incomplete due to an error. You can try resuming the generation.]\n\n";
@@ -820,6 +868,7 @@ const updateGenerationStatus = async (
     characters: false,
     clues: false
   },
+  currentSection?: string,
   isFailed = false
 ): Promise<void> => {
   try {
@@ -836,7 +885,8 @@ const updateGenerationStatus = async (
           currentStep,
           sections,
           lastUpdated: timestamp,
-          resumable: status !== 'completed'
+          resumable: status !== 'completed',
+          currentSection
         }
       })
       .eq("id", packageId);
@@ -850,7 +900,8 @@ const updateGenerationStatus = async (
         mystery_data: {
           ...(mysteryData || {}),
           generationProgress: progress < 0 ? 0 : progress,
-          generationStep: currentStep
+          generationStep: currentStep,
+          currentSection
         }
       })
       .eq("id", mysteryId);
@@ -861,7 +912,8 @@ const updateGenerationStatus = async (
       currentStep,
       sections,
       lastUpdated: timestamp,
-      status
+      status,
+      currentSection
     });
   } catch (error) {
     console.error("Error updating generation progress:", error);

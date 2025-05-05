@@ -1,10 +1,9 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -12,11 +11,12 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
 import { Message } from "@/components/types";
 import ReactMarkdown from 'react-markdown';
-import { AlertTriangle, Loader2, RefreshCw } from "lucide-react";
+import { AlertTriangle, RefreshCw } from "lucide-react";
 import { generateCompletePackage, resumePackageGeneration, getPackageGenerationStatus, toggleTestMode, getTestModeEnabled } from "@/services/mysteryPackageService";
 import MysteryPackageTabView from "@/components/MysteryPackageTabView";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { MysteryCharacter } from "@/interfaces/mystery";
 
 const MysteryPreview = () => {
     const [mystery, setMystery] = useState<any | null>(null);
@@ -34,10 +34,24 @@ const MysteryPreview = () => {
     const [generationAbandoned, setGenerationAbandoned] = useState(false);
     const [generationStatus, setGenerationStatus] = useState<any | null>(null);
     const [currentContent, setCurrentContent] = useState("");
-    const [activeTab, setActiveTab] = useState("host-guide");
+    const [streamingContent, setStreamingContent] = useState<{
+        hostGuide?: string;
+        characters?: MysteryCharacter[];
+        clues?: any[];
+        inspectorScript?: string;
+        characterMatrix?: string;
+        currentlyGenerating?: string;
+    }>({});
     
     // Add ref to track toast notifications
     const packageReadyNotified = useRef<boolean>(false);
+    // Track last update times for streaming effect
+    const lastUpdateTime = useRef<Record<string, number>>({});
+    // Track if view is ready for streaming
+    const viewReady = useRef<boolean>(false);
+    
+    // Setup socket or long-polling for real-time content updates
+    const setupStreamingConnection = useRef<any>(null);
 
     useEffect(() => {
         const checkPurchaseStatus = async () => {
@@ -64,6 +78,7 @@ const MysteryPreview = () => {
         };
 
         checkPurchaseStatus();
+        viewReady.current = true;
     }, [id, user, navigate]);
 
     useEffect(() => {
@@ -176,6 +191,17 @@ const MysteryPreview = () => {
                 
                 await checkForAbandonedGeneration();
                 
+                // Check for existing content
+                const { data: packageData } = await supabase
+                    .from("mystery_packages")
+                    .select("content")
+                    .eq("conversation_id", id)
+                    .single();
+                    
+                if (packageData?.content) {
+                    setCurrentContent(packageData.content);
+                }
+                
             } catch (error) {
                 console.error("Error fetching mystery:", error);
                 toast.error("Failed to load mystery data");
@@ -186,6 +212,98 @@ const MysteryPreview = () => {
         
         fetchMystery();
     }, [id, user, navigate]);
+
+    // Function to simulate content streaming during generation
+    const simulateContentStreaming = (content: string, section: string) => {
+        if (!content) return;
+        
+        // Define sections and their content patterns
+        const sectionPatterns = {
+            hostGuide: /# .+ - HOST GUIDE\n([\s\S]*?)(?=# |$)/i,
+            characters: /# ([^-\n]+) - CHARACTER GUIDE\n([\s\S]*?)(?=# \w+ - CHARACTER GUIDE|# |$)/g,
+            inspectorScript: /# (?:INSPECTOR|DETECTIVE) SCRIPT\n([\s\S]*?)(?=# |$)/i,
+            clues: /# EVIDENCE: (.*?)\n([\s\S]*?)(?=# EVIDENCE:|# |$)/gi,
+            characterMatrix: /# CHARACTER RELATIONSHIP MATRIX\n([\s\S]*?)(?=# |$)/i
+        };
+        
+        // Extract content for the current section
+        if (section === 'hostGuide') {
+            const match = content.match(sectionPatterns.hostGuide);
+            if (match) {
+                setStreamingContent(prev => ({
+                    ...prev,
+                    hostGuide: match[1].trim(),
+                    currentlyGenerating: 'hostGuide'
+                }));
+            }
+        } else if (section === 'characters') {
+            const characters: MysteryCharacter[] = [];
+            let match;
+            
+            while ((match = sectionPatterns.characters.exec(content)) !== null) {
+                const characterName = match[1].trim();
+                const characterContent = match[2].trim();
+                
+                // Create a simple character object
+                characters.push({
+                    character_name: characterName,
+                    description: characterContent.substring(0, characterContent.indexOf('\n\n')) || '',
+                    background: '',
+                    relationships: [],
+                    secrets: [],
+                    id: '',
+                    package_id: ''
+                });
+            }
+            
+            if (characters.length > 0) {
+                setStreamingContent(prev => ({
+                    ...prev,
+                    characters,
+                    currentlyGenerating: 'characters'
+                }));
+            }
+        } else if (section === 'clues') {
+            const clues: any[] = [];
+            let match;
+            
+            while ((match = sectionPatterns.clues.exec(content)) !== null) {
+                const title = match[1].trim();
+                const clueContent = match[2].trim();
+                
+                clues.push({
+                    title,
+                    content: clueContent
+                });
+            }
+            
+            if (clues.length > 0) {
+                setStreamingContent(prev => ({
+                    ...prev,
+                    clues,
+                    currentlyGenerating: 'clues'
+                }));
+            }
+        } else if (section === 'inspectorScript') {
+            const match = content.match(sectionPatterns.inspectorScript);
+            if (match) {
+                setStreamingContent(prev => ({
+                    ...prev,
+                    inspectorScript: match[1].trim(),
+                    currentlyGenerating: 'inspectorScript'
+                }));
+            }
+        } else if (section === 'characterMatrix') {
+            const match = content.match(sectionPatterns.characterMatrix);
+            if (match) {
+                setStreamingContent(prev => ({
+                    ...prev,
+                    characterMatrix: match[1].trim(),
+                    currentlyGenerating: 'characterMatrix'
+                }));
+            }
+        }
+    };
 
     const checkGenerationStatus = async () => {
         if (!id) return;
@@ -201,6 +319,19 @@ const MysteryPreview = () => {
                 
             if (packageData?.content) {
                 setCurrentContent(packageData.content);
+                
+                // Determine which section to simulate streaming for based on current status
+                if (status.currentStep.includes('Host Guide')) {
+                    simulateContentStreaming(packageData.content, 'hostGuide');
+                } else if (status.currentStep.includes('Character')) {
+                    simulateContentStreaming(packageData.content, 'characters');
+                } else if (status.currentStep.includes('Clue') || status.currentStep.includes('Evidence')) {
+                    simulateContentStreaming(packageData.content, 'clues');
+                } else if (status.currentStep.includes('Inspector') || status.currentStep.includes('Detective')) {
+                    simulateContentStreaming(packageData.content, 'inspectorScript');
+                } else if (status.currentStep.includes('Matrix')) {
+                    simulateContentStreaming(packageData.content, 'characterMatrix');
+                }
             }
             
             if (status.status === 'completed') {
@@ -208,8 +339,9 @@ const MysteryPreview = () => {
                 if (!packageReadyNotified.current) {
                     toast.success("Your mystery package is ready!");
                     packageReadyNotified.current = true;
+                    setGenerating(false);
+                    navigate(`/mystery/${id}`);
                 }
-                navigate(`/mystery/${id}`);
             }
         } catch (error) {
             console.error("Error checking generation status:", error);
@@ -217,37 +349,12 @@ const MysteryPreview = () => {
     };
 
     useEffect(() => {
-        checkGenerationStatus();
-        const interval = setInterval(checkGenerationStatus, 5000);
-        return () => clearInterval(interval);
-    }, [id, navigate]);
-
-    const renderGenerationProgress = () => {
-        if (!generationStatus) return null;
-
-        return (
-            <div className="space-y-4 mb-6">
-                <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                        <span>{generationStatus.currentStep}</span>
-                        <span>{generationStatus.progress}%</span>
-                    </div>
-                    <Progress value={generationStatus.progress} className="h-2" />
-                </div>
-                <div className="flex gap-2 flex-wrap">
-                    {Object.entries(generationStatus.sections || {}).map(([key, isComplete]) => (
-                        <Badge 
-                            key={key}
-                            variant={isComplete ? "default" : "outline"}
-                            className={isComplete ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300" : ""}
-                        >
-                            {key.charAt(0).toUpperCase() + key.slice(1)} {isComplete ? "✓" : "..."}
-                        </Badge>
-                    ))}
-                </div>
-            </div>
-        );
-    };
+        if (generating) {
+            checkGenerationStatus();
+            const interval = setInterval(checkGenerationStatus, 2000);
+            return () => clearInterval(interval);
+        }
+    }, [id, generating, navigate]);
 
     const handleGenerateClick = async () => {
         if (!isAuthenticated) {
@@ -274,6 +381,7 @@ const MysteryPreview = () => {
 
         try {
             setGenerating(true);
+            setStreamingContent({});
             
             const status = await getPackageGenerationStatus(id);
             const isResuming = status.status === 'in_progress' || status.status === 'failed';
@@ -283,18 +391,22 @@ const MysteryPreview = () => {
                     <div className="font-semibold">
                         {isResuming ? "Resuming generation..." : "Starting generation..."}
                     </div>
-                    <p className="text-sm">This will take about 5-10 minutes. Please keep this browser tab open.</p>
+                    <p className="text-sm">Watch as your mystery package is generated! Keep this tab open.</p>
                 </div>
             );
             
             // Reset notification state
             packageReadyNotified.current = false;
             
+            // Start the generation process
             if (isResuming) {
                 await resumePackageGeneration(id);
             } else {
                 await generateCompletePackage(id);
             }
+            
+            // Initial status check
+            await checkGenerationStatus();
             
         } catch (error) {
             console.error("Error generating package:", error);
@@ -341,7 +453,7 @@ const MysteryPreview = () => {
                 <main className="flex-1 py-12 px-4">
                     <div className="container mx-auto max-w-4xl">
                         <div className="flex justify-center">
-                            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+                            <div className="animate-spin h-12 w-12 border-4 border-primary border-t-transparent rounded-full"></div>
                         </div>
                     </div>
                 </main>
@@ -358,11 +470,11 @@ const MysteryPreview = () => {
                     <div className="mb-8">
                         <h1 className="text-3xl font-bold mb-2">{title}</h1>
                         <p className="text-muted-foreground">
-                            Preview your murder mystery and generate the complete package.
+                            {generating ? "Watch as your murder mystery is generated in real-time!" : "Preview your murder mystery and generate the complete package."}
                         </p>
                     </div>
                     
-                    {generationAbandoned && (
+                    {generationAbandoned && !generating && (
                         <Alert variant="warning" className="mb-6">
                             <AlertTriangle className="h-4 w-4" />
                             <AlertTitle>Incomplete Generation Found</AlertTitle>
@@ -372,22 +484,7 @@ const MysteryPreview = () => {
                         </Alert>
                     )}
 
-                    {generating ? (
-                        <>
-                            {renderGenerationProgress && renderGenerationProgress()}
-                            <Card>
-                                <CardContent className="pt-6">
-                                    <MysteryPackageTabView 
-                                        packageContent={currentContent || "Generation in progress..."}
-                                        mysteryTitle={title}
-                                        generationStatus={generationStatus}
-                                        isGenerating={true}
-                                        conversationId={id}
-                                    />
-                                </CardContent>
-                            </Card>
-                        </>
-                    ) : (
+                    {!generating && !currentContent && (
                         <Card className="mb-6">
                             <CardHeader>
                                 <CardTitle>Mystery Preview</CardTitle>
@@ -416,53 +513,64 @@ const MysteryPreview = () => {
                         </Card>
                     )}
                     
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>
-                                {generationStatus?.status === 'in_progress' ? 'Generating Your Mystery Package' : 'Generate Your Mystery Package'}
-                            </CardTitle>
-                            <CardDescription>
-                                {generationStatus?.status === 'in_progress' 
-                                    ? 'Your mystery package is being generated. Please keep this browser tab open.'
-                                    : 'Start generating your custom murder mystery package with all materials included.'}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="flex flex-col sm:flex-row items-center gap-4">
-                            <div className="flex items-center space-x-2 mb-4 sm:mb-0">
-                                <Switch 
-                                    id="test-mode" 
-                                    checked={testModeEnabled} 
-                                    onCheckedChange={handleTestModeChange}
+                    <Card className={`${generating || currentContent ? 'mb-6' : ''}`}>
+                        {!generating && !currentContent ? (
+                            <>
+                                <CardHeader>
+                                    <CardTitle>
+                                        Generate Your Mystery Package
+                                    </CardTitle>
+                                    <CardDescription>
+                                        Start generating your custom murder mystery package with all materials included.
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent className="flex flex-col sm:flex-row items-center gap-4">
+                                    <div className="flex items-center space-x-2 mb-4 sm:mb-0">
+                                        <Switch 
+                                            id="test-mode" 
+                                            checked={testModeEnabled} 
+                                            onCheckedChange={handleTestModeChange}
+                                        />
+                                        <Label htmlFor="test-mode">Test Mode (Faster, Less Content)</Label>
+                                    </div>
+                                    <Button
+                                        onClick={handleGenerateClick}
+                                        disabled={generating}
+                                        className="w-full sm:w-auto ml-auto"
+                                    >
+                                        {generationAbandoned ? (
+                                            <>
+                                                <RefreshCw className="mr-2 h-4 w-4" />
+                                                Resume Generation
+                                            </>
+                                        ) : (
+                                            "Generate Package"
+                                        )}
+                                    </Button>
+                                </CardContent>
+                            </>
+                        ) : (
+                            <CardContent className="pt-6">
+                                <MysteryPackageTabView 
+                                    packageContent={currentContent}
+                                    mysteryTitle={title}
+                                    generationStatus={generationStatus}
+                                    isGenerating={generating}
+                                    conversationId={id}
+                                    onGenerateClick={handleGenerateClick}
+                                    streamingContent={streamingContent}
                                 />
-                                <Label htmlFor="test-mode">Test Mode (Faster, Less Content)</Label>
-                            </div>
-                            <Button
-                                onClick={handleGenerateClick}
-                                disabled={generating}
-                                className="w-full sm:w-auto ml-auto"
-                            >
-                                {generating ? (
-                                    <>
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                        {generationStatus?.status === 'in_progress' ? "Generating..." : "Starting..."}
-                                    </>
-                                ) : generationAbandoned ? (
-                                    <>
-                                        <RefreshCw className="mr-2 h-4 w-4" />
-                                        Resume Generation
-                                    </>
-                                ) : (
-                                    "Generate Package"
-                                )}
-                            </Button>
-                        </CardContent>
+                            </CardContent>
+                        )}
                     </Card>
 
-                    <div className="flex justify-center mt-8">
-                        <Button variant="outline" onClick={() => navigate("/dashboard")}>
-                            Back to Dashboard
-                        </Button>
-                    </div>
+                    {!generating && !currentContent && (
+                        <div className="flex justify-center mt-8">
+                            <Button variant="outline" onClick={() => navigate("/dashboard")}>
+                                Back to Dashboard
+                            </Button>
+                        </div>
+                    )}
                 </div>
             </main>
             <Footer />
