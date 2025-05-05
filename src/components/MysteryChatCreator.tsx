@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -12,6 +11,8 @@ import MysteryChat from "@/components/MysteryChat";
 import { useAuth } from "@/context/AuthContext";
 import { Message, FormValues } from "@/components/types";
 import { Wand2 } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 const MysteryChatCreator = () => {
     const [saving, setSaving] = useState(false);
@@ -22,6 +23,7 @@ const MysteryChatCreator = () => {
     const { id } = useParams();
     const isEditing = !!id;
     const { isAuthenticated, user } = useAuth();
+    const isMobile = useIsMobile();
     const [chatMessages, setChatMessages] = useState<Message[]>([]); // To hold chat messages
     const [generating, setGenerating] = useState(false);
 
@@ -189,10 +191,10 @@ const MysteryChatCreator = () => {
     return (
         <div className="min-h-screen flex flex-col">
             <Header />
-            <main className="flex-1 py-12 px-4">
-                <div className="container mx-auto max-w-4xl">
-                    <div className="mb-8">
-                        <h1 className="text-3xl font-bold mb-2">
+            <main className={cn("flex-1", isMobile ? "py-4 px-2" : "py-12 px-4")}>
+                <div className={cn("container mx-auto", isMobile ? "max-w-full" : "max-w-4xl")}>
+                    <div className={cn("mb-8", isMobile && "mb-4")}>
+                        <h1 className={cn("text-3xl font-bold mb-2", isMobile && "text-2xl mb-1")}>
                             {isEditing ? "Edit Mystery" : "Create New Mystery"}
                         </h1>
                         <p className="text-muted-foreground">
@@ -202,8 +204,8 @@ const MysteryChatCreator = () => {
                         </p>
                     </div>
 
-                    <Card>
-                        <CardContent className="p-6">
+                    <Card className={isMobile ? "border-0 shadow-none bg-transparent" : ""}>
+                        <CardContent className={cn("p-6", isMobile && "p-0")}>
                             {showChatUI ? (
                                 <div className="w-full h-full">
                                     <MysteryChat
@@ -227,16 +229,21 @@ const MysteryChatCreator = () => {
                         </CardContent>
                     </Card>
 
-                    <div className="mt-8 flex justify-center gap-4">
+                    <div className={cn("mt-8 flex justify-center gap-4", isMobile && "mt-4")}>
                       {showChatUI ? (
                         <Button
                           variant="outline"
                           onClick={() => navigate("/dashboard")}
+                          size={isMobile ? "sm" : "default"}
                         >
                           Back to Dashboard
                         </Button>
                       ) : (
-                        <Button variant="outline" onClick={() => navigate("/dashboard")}>
+                        <Button 
+                            variant="outline" 
+                            onClick={() => navigate("/dashboard")}
+                            size={isMobile ? "sm" : "default"}
+                        >
                           Back to Dashboard
                         </Button>
                       )}

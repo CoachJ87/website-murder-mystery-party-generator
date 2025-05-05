@@ -83,3 +83,27 @@
 .assistant-bubble {
   @apply chat-bubble bg-card text-foreground self-start;
 }
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .chat-bubble {
+    @apply p-3 rounded-md max-w-[85%];
+  }
+  
+  .message-container {
+    @apply min-h-[70vh] p-2 border-0;
+  }
+  
+  .chat-card {
+    @apply border-0 shadow-none bg-transparent;
+  }
+  
+  .input-container {
+    @apply p-2 space-x-2;
+  }
+  
+  /* Fix viewport height issues on mobile */
+  .mobile-vh-fix {
+    height: calc(100vh - 120px);
+  }
+}

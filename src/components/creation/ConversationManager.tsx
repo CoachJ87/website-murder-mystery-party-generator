@@ -4,6 +4,8 @@ import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { Message, FormValues } from "@/components/types";
 import MysteryChat from "@/components/MysteryChat";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 interface ConversationManagerProps {
   conversationId: string | null;
@@ -24,6 +26,7 @@ export const ConversationManager = ({
   const [initialDataLoaded, setInitialDataLoaded] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const [systemInstruction, setSystemInstruction] = useState<string | null>(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (conversationId && !initialDataLoaded) {
@@ -176,7 +179,7 @@ Present your mystery preview in an engaging, dramatic format that will excite th
   };
 
   return (
-    <div className="w-full h-full">
+    <div className={cn("w-full h-full", isMobile && "h-[calc(100vh-120px)]")}>
       <MysteryChat
         initialTheme={formData?.theme || ""}
         initialPlayerCount={formData?.playerCount}

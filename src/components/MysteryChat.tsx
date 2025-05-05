@@ -8,6 +8,8 @@ import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import { Message } from "@/components/types";
 import { Loader2, AlertCircle, Send, Wand2 } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 interface MysteryChatProps {
     initialTheme?: string;
@@ -47,6 +49,7 @@ const MysteryChat = ({
     const isEditModeRef = useRef(!!savedMysteryId);
     const [hasUserEditedInSession, setHasUserEditedInSession] = useState(false);
     const initialFormPromptSaved = useRef(false);
+    const isMobile = useIsMobile();
 
     console.log("DEBUG: MysteryChat rendering with props:", {
         initialTheme,
@@ -578,7 +581,7 @@ ${responseText.split('\n\n').slice(1).join('\n\n')}`;
     }, []);
 
     return (
-        <div data-testid="mystery-chat" className="flex flex-col h-full">
+        <div data-testid="mystery-chat" className={cn("flex flex-col h-full", isMobile && "h-[calc(100vh-120px)]")}>
             {error && (
                 <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 mb-4 flex items-start gap-3">
                     <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
@@ -597,7 +600,12 @@ ${responseText.split('\n\n').slice(1).join('\n\n')}`;
                 </div>
             )}
 
-            <div className="flex-1 overflow-y-auto mb-4 space-y-4 p-4 border rounded-lg bg-background/50 min-h-[400px] max-h-[500px]">
+            <div 
+                className={cn(
+                    "flex-1 overflow-y-auto mb-4 space-y-4 p-4 border rounded-lg bg-background/50",
+                    isMobile ? "min-h-[60vh] max-h-[70vh] border-0 p-2 -mx-2" : "min-h-[400px] max-h-[500px]"
+                )}
+            >
                 {isLoadingHistory ? (
                     <div className="flex flex-col items-center justify-center h-full">
                         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -611,11 +619,14 @@ ${responseText.split('\n\n').slice(1).join('\n\n')}`;
                     messages.map((message) => (
                         <Card
                             key={message.id}
-                            className={`max-w-[80%] ${message.is_ai ? 'ml-0' : 'ml-auto'} ${
-                                message.is_ai ? 'bg-background' : 'bg-primary text-primary-foreground'
-                            }`}
+                            className={cn(
+                                "max-w-[80%]",
+                                message.is_ai ? "ml-0" : "ml-auto",
+                                message.is_ai ? "bg-background" : "bg-primary text-primary-foreground",
+                                isMobile && "shadow-sm border-0"
+                            )}
                         >
-                            <CardContent className="p-4">
+                            <CardContent className={cn("p-4", isMobile && "p-3")}>
                                 <div className={`prose prose-sm ${message.is_ai ? 'prose-stone dark:prose-invert' : 'text-primary-foreground prose-invert'} max-w-none`}>
                                     {message.content && typeof message.content === 'string' ? (
                                         <ReactMarkdown
@@ -647,29 +658,31 @@ ${responseText.split('\n\n').slice(1).join('\n\n')}`;
                 <div ref={messagesEndRef} />
             </div>
 
-            <form onSubmit={handleSubmit} className="p-4 border-t">
-                <div className="flex items-center space-x-4">
+            <form onSubmit={handleSubmit} className={cn("border-t", isMobile ? "p-2" : "p-4")}>
+                <div className={cn("flex items-center", isMobile ? "space-x-2" : "space-x-4")}>
                     <Textarea
                         placeholder="Ask the AI..."
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleKeyDown}
                         className="flex-1 resize-none"
+                        rows={isMobile ? 2 : 3}
                     />
-                    <Button type="submit" disabled={loading} className="ml-2">
+                    <Button type="submit" disabled={loading} className="ml-2" size={isMobile ? "sm" : "default"}>
                         {loading ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <Loader2 className={cn("animate-spin", isMobile ? "h-3 w-3" : "h-4 w-4")} />
                         ) : (
-                            <Send className="h-4 w-4" />
+                            <Send className={cn(isMobile ? "h-3 w-3" : "h-4 w-4")} />
                         )}
                     </Button>
                 </div>
             </form>
 
             {messages.length > 1 && !loading && (
-                <div className="p-4 border-t">
-                    <Button onClick={handleGenerateFinalClick} variant="secondary">
-                        <Wand2 className="h-4 w-4 mr-2" /> Generate Final Mystery
+                <div className={cn("border-t", isMobile ? "p-2" : "p-4")}>
+                    <Button onClick={handleGenerateFinalClick} variant="secondary" size={isMobile ? "sm" : "default"}>
+                        <Wand2 className={cn("mr-2", isMobile ? "h-3 w-3" : "h-4 w-4")} /> 
+                        Generate Final Mystery
                     </Button>
                 </div>
             )}
