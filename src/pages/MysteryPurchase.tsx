@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -316,9 +317,9 @@ const MysteryPurchase = () => {
         })
         .eq('id', id);
         
-      toast.success("Purchase simulated! Redirecting to mystery page...");
+      toast.success("Purchase simulated! Redirecting to generate package...");
       
-      // Redirect to the full mystery page
+      // Redirect to the mystery page view (with the tabs)
       setTimeout(() => {
         navigate(`/mystery/${id}`);
       }, 1500);
@@ -345,7 +346,10 @@ const MysteryPurchase = () => {
         .from('conversations')
         .update({ 
           is_paid: true,
-          purchase_date: new Date().toISOString()
+          purchase_date: new Date().toISOString(),
+          // Make sure package generation is needed
+          needs_package_generation: true,
+          display_status: "purchased"
         })
         .eq('id', id);
         
@@ -353,9 +357,9 @@ const MysteryPurchase = () => {
         throw new Error(error.message);
       }
       
-      toast.success("Purchase successful! Redirecting to your mystery...");
+      toast.success("Purchase successful! Redirecting to generate your package...");
       
-      // Redirect to the full mystery page after a short delay
+      // Redirect to the tab UI in MysteryView component
       setTimeout(() => {
         navigate(`/mystery/${id}`);
       }, 1500);

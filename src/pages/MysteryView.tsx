@@ -1,3 +1,4 @@
+
 // src/pages/MysteryView.tsx
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -133,6 +134,14 @@ const MysteryView = () => {
 
       setLoading(true);
       try {
+        // Check if this is a redirect from a purchase
+        const urlParams = new URLSearchParams(window.location.search);
+        const purchaseStatus = urlParams.get('purchase');
+        
+        if (purchaseStatus === 'success') {
+          toast.success("Purchase successful! You now have full access to this mystery package.");
+        }
+        
         const { data: conversation, error } = await supabase
           .from("conversations")
           .select("*, mystery_data, is_paid, has_complete_package, needs_package_generation")
@@ -146,6 +155,12 @@ const MysteryView = () => {
         }
 
         setMystery(conversation);
+
+        // Fresh purchase - clear any previous status check interval
+        if (statusCheckInterval) {
+          clearInterval(statusCheckInterval);
+          setStatusCheckInterval(null);
+        }
 
         if (conversation.needs_package_generation) {
           const status = await getPackageGenerationStatus(id);

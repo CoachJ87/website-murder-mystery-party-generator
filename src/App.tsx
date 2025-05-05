@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -108,14 +107,8 @@ const AppRoutes = () => (
       path="/mystery/purchase/:id" 
       element={<MysteryPurchase />} 
     />
-    <Route 
-      path="/mystery/:id" 
-      element={
-        <ProtectedRoute>
-          <MysteryView />
-        </ProtectedRoute>
-      } 
-    />
+    {/* Main mystery view - allow both auth and non-auth users for preview vs purchased states */}
+    <Route path="/mystery/:id" element={<MysteryView />} />
     
     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
     <Route path="*" element={<NotFound />} />
