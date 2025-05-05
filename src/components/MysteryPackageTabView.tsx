@@ -1,8 +1,9 @@
+
 // src/components/MysteryPackageTabView.tsx
 import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Book, Users, FileText, Grid2x2, FileCode, Download, Sparkles } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Book, Users, FileText, Grid2x2, FileCode, Download, Sparkles, ChevronDown } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 import { Button } from "@/components/ui/button";
 import { GenerationStatus } from "@/services/mysteryPackageService";
@@ -13,6 +14,8 @@ import { MysteryCharacter } from "@/interfaces/mystery";
 import CharacterDetailView from "./CharacterDetailView";
 import CharacterRoleAssignment from "./CharacterRoleAssignment";
 import { Separator } from "./ui/separator";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export interface MysteryPackageTabViewProps {
   packageContent?: string;
@@ -57,6 +60,8 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
     inspectorScript: '',
     characterMatrix: ''
   });
+  
+  const isMobile = useIsMobile();
   
   // Determine if we're in empty state where no content is available yet
   const isEmpty = !packageContent && 
@@ -714,73 +719,131 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
     return <EmptyStateView />;
   }
 
+  // Mobile dropdown tab selector
+  const MobileTabSelector = () => (
+    <div className="w-full mb-4">
+      <Select value={activeTab} onValueChange={setActiveTab}>
+        <SelectTrigger className="w-full">
+          <SelectValue>
+            {activeTab === 'host-guide' && <><Book className="h-4 w-4 mr-2 inline" /> Host Guide</>}
+            {activeTab === 'characters' && <><Users className="h-4 w-4 mr-2 inline" /> Characters</>}
+            {activeTab === 'clues' && <><FileText className="h-4 w-4 mr-2 inline" /> Clues & Evidence</>}
+            {activeTab === 'detective-script' && <><FileCode className="h-4 w-4 mr-2 inline" /> Detective Script</>}
+            {activeTab === 'character-matrix' && <><Grid2x2 className="h-4 w-4 mr-2 inline" /> Character Matrix</>}
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="host-guide">
+            <div className="flex items-center">
+              <Book className="h-4 w-4 mr-2" />
+              <span>Host Guide</span>
+              {isTabGenerating('host-guide') && <span className="ml-2 text-xs">(Generating...)</span>}
+            </div>
+          </SelectItem>
+          <SelectItem value="characters">
+            <div className="flex items-center">
+              <Users className="h-4 w-4 mr-2" />
+              <span>Characters</span>
+              {isTabGenerating('characters') && <span className="ml-2 text-xs">(Generating...)</span>}
+            </div>
+          </SelectItem>
+          <SelectItem value="clues">
+            <div className="flex items-center">
+              <FileText className="h-4 w-4 mr-2" />
+              <span>Clues & Evidence</span>
+              {isTabGenerating('clues') && <span className="ml-2 text-xs">(Generating...)</span>}
+            </div>
+          </SelectItem>
+          <SelectItem value="detective-script">
+            <div className="flex items-center">
+              <FileCode className="h-4 w-4 mr-2" />
+              <span>Detective Script</span>
+              {isTabGenerating('detective-script') && <span className="ml-2 text-xs">(Generating...)</span>}
+            </div>
+          </SelectItem>
+          <SelectItem value="character-matrix">
+            <div className="flex items-center">
+              <Grid2x2 className="h-4 w-4 mr-2" />
+              <span>Character Matrix</span>
+              {isTabGenerating('character-matrix') && <span className="ml-2 text-xs">(Generating...)</span>}
+            </div>
+          </SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
+  );
+
   return (
     <div className="space-y-6">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="w-full flex flex-wrap justify-start mb-4 bg-muted/20">
-          <TabsTrigger 
-            value="host-guide" 
-            className={`${isTabGenerating('host-guide') ? 'animate-pulse' : ''}`}
-            disabled={isEmpty && !isGenerating}
-          >
-            <Book className="h-4 w-4 mr-2" />
-            <span>Host Guide</span>
-            {isTabGenerating('host-guide') && <span className="ml-2 text-xs">(Generating...)</span>}
-          </TabsTrigger>
-          
-          <TabsTrigger 
-            value="characters"
-            className={`${isTabGenerating('characters') ? 'animate-pulse' : ''}`}
-            disabled={isEmpty && !isGenerating}
-          >
-            <Users className="h-4 w-4 mr-2" />
-            <span>Characters</span>
-            {isTabGenerating('characters') && <span className="ml-2 text-xs">(Generating...)</span>}
-          </TabsTrigger>
-          
-          <TabsTrigger 
-            value="clues"
-            className={`${isTabGenerating('clues') ? 'animate-pulse' : ''}`}
-            disabled={isEmpty && !isGenerating}
-          >
-            <FileText className="h-4 w-4 mr-2" />
-            <span>Clues & Evidence</span>
-            {isTabGenerating('clues') && <span className="ml-2 text-xs">(Generating...)</span>}
-          </TabsTrigger>
-          
-          <TabsTrigger 
-            value="detective-script"
-            className={`${isTabGenerating('detective-script') ? 'animate-pulse' : ''}`}
-            disabled={isEmpty && !isGenerating}
-          >
-            <FileCode className="h-4 w-4 mr-2" />
-            <span>Detective Script</span>
-            {isTabGenerating('detective-script') && <span className="ml-2 text-xs">(Generating...)</span>}
-          </TabsTrigger>
-          
-          <TabsTrigger 
-            value="character-matrix"
-            className={`${isTabGenerating('character-matrix') ? 'animate-pulse' : ''}`}
-            disabled={isEmpty && !isGenerating}
-          >
-            <Grid2x2 className="h-4 w-4 mr-2" />
-            <span>Character Matrix</span>
-            {isTabGenerating('character-matrix') && <span className="ml-2 text-xs">(Generating...)</span>}
-          </TabsTrigger>
-        </TabsList>
+        {isMobile ? (
+          <MobileTabSelector />
+        ) : (
+          <TabsList className="w-full flex flex-wrap justify-start mb-4 bg-muted/20">
+            <TabsTrigger 
+              value="host-guide" 
+              className={`${isTabGenerating('host-guide') ? 'animate-pulse' : ''}`}
+              disabled={isEmpty && !isGenerating}
+            >
+              <Book className="h-4 w-4 mr-2" />
+              <span>Host Guide</span>
+              {isTabGenerating('host-guide') && <span className="ml-2 text-xs">(Generating...)</span>}
+            </TabsTrigger>
+            
+            <TabsTrigger 
+              value="characters"
+              className={`${isTabGenerating('characters') ? 'animate-pulse' : ''}`}
+              disabled={isEmpty && !isGenerating}
+            >
+              <Users className="h-4 w-4 mr-2" />
+              <span>Characters</span>
+              {isTabGenerating('characters') && <span className="ml-2 text-xs">(Generating...)</span>}
+            </TabsTrigger>
+            
+            <TabsTrigger 
+              value="clues"
+              className={`${isTabGenerating('clues') ? 'animate-pulse' : ''}`}
+              disabled={isEmpty && !isGenerating}
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              <span>Clues & Evidence</span>
+              {isTabGenerating('clues') && <span className="ml-2 text-xs">(Generating...)</span>}
+            </TabsTrigger>
+            
+            <TabsTrigger 
+              value="detective-script"
+              className={`${isTabGenerating('detective-script') ? 'animate-pulse' : ''}`}
+              disabled={isEmpty && !isGenerating}
+            >
+              <FileCode className="h-4 w-4 mr-2" />
+              <span>Detective Script</span>
+              {isTabGenerating('detective-script') && <span className="ml-2 text-xs">(Generating...)</span>}
+            </TabsTrigger>
+            
+            <TabsTrigger 
+              value="character-matrix"
+              className={`${isTabGenerating('character-matrix') ? 'animate-pulse' : ''}`}
+              disabled={isEmpty && !isGenerating}
+            >
+              <Grid2x2 className="h-4 w-4 mr-2" />
+              <span>Character Matrix</span>
+              {isTabGenerating('character-matrix') && <span className="ml-2 text-xs">(Generating...)</span>}
+            </TabsTrigger>
+          </TabsList>
+        )}
 
         <TabsContent value="host-guide" className="mt-4">
           {finalTabData.hostGuide ? (
             <div className="space-y-6">
-              <div className="bg-card p-6 rounded-lg shadow-sm">
-                <div className="prose prose-stone dark:prose-invert max-w-none mystery-prose">
+              <div className="bg-card p-4 md:p-6 rounded-lg shadow-sm">
+                <div className="prose prose-stone dark:prose-invert max-w-none mystery-prose overflow-x-auto">
                   <ReactMarkdown>{finalTabData.hostGuide}</ReactMarkdown>
                   {isTabGenerating('host-guide') && typingCursor}
                 </div>
               </div>
 
-              <div className="bg-card p-6 rounded-lg shadow-sm">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="bg-card p-4 md:p-6 rounded-lg shadow-sm">
+                <div className="grid grid-cols-1 gap-6">
                   <Card className="section-card border-0 shadow-sm">
                     <CardHeader className="pb-2">
                       <CardTitle>Setup</CardTitle>
@@ -804,7 +867,120 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
           )}
         </TabsContent>
 
-        {/* Additional TabsContent sections for other tabs would go here */}
+        <TabsContent value="characters" className="mt-4">
+          {finalTabData.characters.length > 0 ? (
+            <div className="space-y-6">
+              <div className="bg-card p-4 md:p-6 rounded-lg shadow-sm">
+                <h2 className="text-xl font-semibold mb-4">Character Information</h2>
+                <div className="grid grid-cols-1 gap-4">
+                  {finalTabData.characters.map((character, index) => (
+                    <Accordion type="single" collapsible key={character.id || index}>
+                      <AccordionItem value={`character-${index}`}>
+                        <AccordionTrigger className="hover:bg-muted/20 px-4 rounded-md">
+                          {character.character_name}
+                        </AccordionTrigger>
+                        <AccordionContent className="p-4">
+                          <CharacterDetailView character={character} />
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="bg-card p-4 md:p-6 rounded-lg shadow-sm">
+                <h2 className="text-xl font-semibold mb-4">Character Role Assignment</h2>
+                <CharacterRoleAssignment characters={finalTabData.characters} />
+              </div>
+            </div>
+          ) : (
+            <div className="bg-muted/10 p-6 rounded-lg border border-dashed border-muted flex items-center justify-center">
+              <p className="text-muted-foreground text-center">
+                {isGenerating ? "Generating character details..." : "Character information not available yet"}
+                {isTabGenerating('characters') && typingCursor}
+              </p>
+            </div>
+          )}
+        </TabsContent>
+          
+        <TabsContent value="clues" className="mt-4">
+          {finalTabData.clues.length > 0 ? (
+            <div className="space-y-6">
+              <div className="bg-card p-4 md:p-6 rounded-lg shadow-sm">
+                <h2 className="text-xl font-semibold mb-4">Clues & Evidence</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {finalTabData.clues.map((clue, index) => (
+                    <Card key={index} className="overflow-hidden">
+                      <CardHeader className="bg-muted/20 pb-2">
+                        <CardTitle className="text-lg">{clue.title}</CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-4">
+                        <div className="prose prose-stone dark:prose-invert max-w-none mystery-prose">
+                          <ReactMarkdown>{clue.content}</ReactMarkdown>
+                        </div>
+                        {clue.implication && (
+                          <>
+                            <Separator className="my-3" />
+                            <p className="font-medium text-sm text-muted-foreground mt-2">Implication:</p>
+                            <p className="italic text-sm">{clue.implication}</p>
+                          </>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-muted/10 p-6 rounded-lg border border-dashed border-muted flex items-center justify-center">
+              <p className="text-muted-foreground text-center">
+                {isGenerating ? "Generating clues and evidence..." : "Clues and evidence not available yet"}
+                {isTabGenerating('clues') && typingCursor}
+              </p>
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="detective-script" className="mt-4">
+          {finalTabData.inspectorScript ? (
+            <div className="space-y-6">
+              <div className="bg-card p-4 md:p-6 rounded-lg shadow-sm">
+                <div className="prose prose-stone dark:prose-invert max-w-none mystery-prose detective-script-content overflow-x-auto">
+                  <ReactMarkdown>{finalTabData.inspectorScript}</ReactMarkdown>
+                  {isTabGenerating('detective-script') && typingCursor}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-muted/10 p-6 rounded-lg border border-dashed border-muted flex items-center justify-center">
+              <p className="text-muted-foreground text-center">
+                {isGenerating ? "Generating detective script..." : "Detective script not available yet"}
+                {isTabGenerating('detective-script') && typingCursor}
+              </p>
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="character-matrix" className="mt-4">
+          {finalTabData.characterMatrix ? (
+            <div className="space-y-6">
+              <div className="bg-card p-4 md:p-6 rounded-lg shadow-sm">
+                <h2 className="text-xl font-semibold mb-4">Character Relationship Matrix</h2>
+                <div className="character-matrix-content overflow-x-auto">
+                  <div dangerouslySetInnerHTML={{ __html: finalTabData.characterMatrix }} />
+                </div>
+                {isTabGenerating('character-matrix') && typingCursor}
+              </div>
+            </div>
+          ) : (
+            <div className="bg-muted/10 p-6 rounded-lg border border-dashed border-muted flex items-center justify-center">
+              <p className="text-muted-foreground text-center">
+                {isGenerating ? "Generating character matrix..." : "Character matrix not available yet"}
+                {isTabGenerating('character-matrix') && typingCursor}
+              </p>
+            </div>
+          )}
+        </TabsContent>
       </Tabs>
     </div>
   );

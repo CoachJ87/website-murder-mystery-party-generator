@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -245,7 +246,7 @@ const MysteryPreview = () => {
                 
                 // Create a simple character object with a generated UUID using the browser's Crypto API
                 characters.push({
-                    id: crypto.randomUUID(), // Use browser's built-in crypto.randomUUID()
+                    id: crypto.randomUUID(), // Browser's built-in crypto API
                     package_id: id || "",
                     character_name: characterName,
                     description: characterContent.substring(0, characterContent.indexOf('\n\n')) || '',
@@ -464,10 +465,10 @@ const MysteryPreview = () => {
     return (
         <div className="min-h-screen flex flex-col">
             <Header />
-            <main className="flex-1 py-12 px-4">
+            <main className="flex-1 py-6 md:py-12 px-4">
                 <div className="container mx-auto max-w-4xl">
-                    <div className="mb-8">
-                        <h1 className="text-3xl font-bold mb-2">{title}</h1>
+                    <div className="mb-6 md:mb-8">
+                        <h1 className="text-2xl md:text-3xl font-bold mb-2">{title}</h1>
                         <p className="text-muted-foreground">
                             {generating ? "Watch as your murder mystery is generated in real-time!" : "Preview your murder mystery and generate the complete package."}
                         </p>
@@ -549,7 +550,7 @@ const MysteryPreview = () => {
                                 </CardContent>
                             </>
                         ) : (
-                            <CardContent className="pt-6">
+                            <CardContent className="pt-4 md:pt-6">
                                 <MysteryPackageTabView 
                                     packageContent={currentContent}
                                     mysteryTitle={title}
