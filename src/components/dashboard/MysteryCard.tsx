@@ -64,26 +64,93 @@ export const MysteryCard = ({ mystery, onStatusChange, onDelete, onEdit }: Myste
         )}
         
         <div className="flex flex-wrap justify-end gap-2 pt-2">
-          <Button
-            size="sm"
-            variant={isPurchased ? "default" : "secondary"}
-            onClick={() => isPurchased ? window.location.href = `/mystery/${mystery.id}` : onEdit(mystery.id)}
-            className="flex-1 min-w-[80px]"
-          >
-            {isPurchased ? (
-              <>
+          {/* For purchased mysteries, we're switching the positions of "View Mystery" and "Delete" */}
+          {isPurchased ? (
+            <>
+              {/* Delete button moved to the left */}
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button 
+                    size="sm" 
+                    variant="destructive"
+                    className="flex-1 min-w-[80px]"
+                  >
+                    <Trash className="h-4 w-4 mr-2" />
+                    Delete
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete your mystery from our servers.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => onDelete(mystery.id)}>
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+              
+              {/* View Mystery button moved to the right */}
+              <Button
+                size="sm"
+                variant="default"
+                onClick={() => window.location.href = `/mystery/${mystery.id}`}
+                className="flex-1 min-w-[80px]"
+              >
                 <Eye className="h-4 w-4 mr-2" />
                 View Mystery
-              </>
-            ) : (
-              <>
+              </Button>
+            </>
+          ) : (
+            <>
+              {/* For draft mysteries, we're switching the positions of "Edit" and "Delete" */}
+              {/* Delete button moved to the left */}
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button 
+                    size="sm" 
+                    variant="destructive"
+                    className="flex-1 min-w-[80px]"
+                  >
+                    <Trash className="h-4 w-4 mr-2" />
+                    Delete
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete your mystery from our servers.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => onDelete(mystery.id)}>
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+              
+              {/* Edit button moved to the right */}
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => onEdit(mystery.id)}
+                className="flex-1 min-w-[80px]"
+              >
                 <Edit className="h-4 w-4 mr-2" />
                 Edit
-              </>
-            )}
-          </Button>
+              </Button>
+            </>
+          )}
           
-          {/* Archive/Unarchive button - now shown for all mysteries including purchased ones */}
+          {/* Archive/Unarchive button */}
           {mystery.status !== "archived" ? (
             <Button
               size="sm"
@@ -105,34 +172,6 @@ export const MysteryCard = ({ mystery, onStatusChange, onDelete, onEdit }: Myste
               Unarchive
             </Button>
           )}
-          
-          {/* Delete button - now shown for all mysteries including purchased ones */}
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button 
-                size="sm" 
-                variant="destructive"
-                className="flex-1 min-w-[80px]"
-              >
-                <Trash className="h-4 w-4 mr-2" />
-                Delete
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete your mystery from our servers.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={() => onDelete(mystery.id)}>
-                  Delete
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
         </div>
       </CardContent>
     </Card>
