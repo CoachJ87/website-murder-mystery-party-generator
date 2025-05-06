@@ -89,6 +89,8 @@ const MysteryPackage = ({ mysteryId, title }: MysteryPackageProps) => {
         const status = await getPackageGenerationStatus(mysteryId);
         setGenerationStatus(status);
         
+        console.log("Status check:", status);
+        
         if (status.status === 'completed') {
           // Package generation complete, fetch content
           const { data: packageData } = await supabase
@@ -205,13 +207,13 @@ const MysteryPackage = ({ mysteryId, title }: MysteryPackageProps) => {
     return (
       <div className="space-y-2 mb-4">
         <div className="flex justify-between text-sm">
-          <span>{generationStatus.currentStep}</span>
+          <span>{generationStatus.currentStep || "Generating..."}</span>
           <span>{generationStatus.progress}%</span>
         </div>
         <Progress value={generationStatus.progress} />
         
         <div className="flex gap-2 mt-2 flex-wrap">
-          {Object.entries(generationStatus.sections || {}).map(([key, isComplete]) => (
+          {generationStatus.sections && Object.entries(generationStatus.sections).map(([key, isComplete]) => (
             key !== 'solution' && (
               <Badge 
                 key={key}
@@ -220,7 +222,10 @@ const MysteryPackage = ({ mysteryId, title }: MysteryPackageProps) => {
               >
                 {key === "hostGuide" ? "Host Guide" : 
                  key === "characters" ? "Characters" :
-                 key === "clues" ? "Clues" : ""}
+                 key === "clues" ? "Clues" : 
+                 key === "inspectorScript" ? "Inspector Script" :
+                 key === "characterMatrix" ? "Character Matrix" : 
+                 key}
                 {isComplete ? " ✓" : ""}
               </Badge>
             )

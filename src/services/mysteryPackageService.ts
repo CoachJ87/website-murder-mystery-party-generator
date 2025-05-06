@@ -1,3 +1,4 @@
+
 import { supabase } from "@/lib/supabase";
 import { getAIResponse, saveGenerationState, getGenerationState, clearGenerationState } from "@/services/aiService";
 import { toast } from "sonner";
@@ -44,7 +45,7 @@ export const getPackageGenerationStatus = async (mysteryId: string): Promise<Gen
     
     const { data, error } = await supabase
       .from("mystery_packages")
-      .select("status, progress, current_step, error_message, is_resumable")
+      .select("generation_status, content, updated_at")
       .eq("conversation_id", mysteryId)
       .single();
       
@@ -56,24 +57,36 @@ export const getPackageGenerationStatus = async (mysteryId: string): Promise<Gen
     if (!data) {
       return {
         status: "not_started",
-        progress: 0
+        progress: 0,
+        currentStep: "Not started"
       };
     }
 
-    const generationStatus: GenerationStatus = {
-      status: data.status || "not_started",
-      progress: data.progress || 0,
-      currentStep: data.current_step,
-      error: data.error_message,
-      resumable: data.is_resumable,
-      sections: {
-        hostGuide: data.progress >= 30,
-        characters: data.progress >= 60,
-        clues: data.progress >= 80,
-        inspectorScript: data.progress >= 90,
-        characterMatrix: data.progress >= 95
+    // Extract status from the JSONB generation_status field
+    const generationStatus: GenerationStatus = data.generation_status ? {
+      status: data.generation_status.status || "not_started",
+      progress: data.generation_status.progress || 0,
+      currentStep: data.generation_status.currentStep || "Initializing",
+      error: data.generation_status.error,
+      resumable: data.generation_status.status === "failed",
+      sections: data.generation_status.sections || {
+        hostGuide: false,
+        characters: false,
+        clues: false,
+        inspectorScript: false,
+        characterMatrix: false
       }
+    } : {
+      status: "not_started",
+      progress: 0,
+      currentStep: "Not started"
     };
+    
+    // If we have content but status doesn't reflect it, update the status
+    if (data.content && generationStatus.status !== "completed") {
+      generationStatus.status = "completed";
+      generationStatus.progress = 100;
+    }
     
     // Save the status in local storage for future reference
     const existingState = getGenerationState(mysteryId) || {};
@@ -107,7 +120,7 @@ export const generateCompletePackage = async (mysteryId: string, testMode: boole
     // Check if any partial generation exists
     const { data: existingPackage, error: packageError } = await supabase
       .from("mystery_packages")
-      .select("id, status")
+      .select("id, generation_status")
       .eq("conversation_id", mysteryId)
       .maybeSingle();
       
@@ -117,14 +130,26 @@ export const generateCompletePackage = async (mysteryId: string, testMode: boole
     }
     
     // Initialize or update the package record
+    const initialStatus = {
+      status: "in_progress",
+      progress: 0,
+      currentStep: "Starting generation...",
+      sections: {
+        hostGuide: false,
+        characters: false,
+        clues: false,
+        inspectorScript: false,
+        characterMatrix: false,
+        solution: false
+      }
+    };
+    
     if (!existingPackage) {
       const { error: createError } = await supabase.from("mystery_packages").insert({
         conversation_id: mysteryId,
-        status: "in_progress",
-        progress: 0,
-        current_step: "Starting generation...",
+        generation_status: initialStatus,
         content: "",
-        is_test_mode: testMode
+        partial_content: { is_test_mode: testMode }
       });
       
       if (createError) {
@@ -135,12 +160,14 @@ export const generateCompletePackage = async (mysteryId: string, testMode: boole
       const { error: updateError } = await supabase
         .from("mystery_packages")
         .update({
-          status: "in_progress",
-          progress: 0,
-          current_step: "Restarting generation...",
-          is_test_mode: testMode,
-          error_message: null,
-          is_resumable: false
+          generation_status: initialStatus,
+          partial_content: { 
+            ...existingPackage.partial_content, 
+            is_test_mode: testMode,
+            error_message: null,
+            is_resumable: false
+          },
+          updated_at: new Date().toISOString()
         })
         .eq("id", existingPackage.id);
         
@@ -162,6 +189,14 @@ export const generateCompletePackage = async (mysteryId: string, testMode: boole
       throw convError;
     }
     
+    // Save the initial state to localStorage for streaming effect
+    saveGenerationState(mysteryId, {
+      currentlyGenerating: 'hostGuide',
+      hostGuide: 'Starting generation...',
+      generationStatus: initialStatus,
+      lastUpdated: new Date().toISOString()
+    });
+    
     // Start the generation process (this will happen asynchronously)
     generatePackageContent(mysteryId, conversation, testMode);
     
@@ -174,9 +209,12 @@ export const generateCompletePackage = async (mysteryId: string, testMode: boole
     await supabase
       .from("mystery_packages")
       .update({
-        status: "failed",
-        error_message: error.message,
-        is_resumable: true
+        generation_status: {
+          status: "failed",
+          error: error.message,
+          resumable: true
+        },
+        updated_at: new Date().toISOString()
       })
       .eq("conversation_id", mysteryId);
       
@@ -198,7 +236,7 @@ export const resumePackageGeneration = async (mysteryId: string, testMode: boole
     // Get the existing package data
     const { data: existingPackage, error: packageError } = await supabase
       .from("mystery_packages")
-      .select("id, content, host_guide, evidence_cards, detective_script, relationship_matrix")
+      .select("id, content, host_guide, evidence_cards, detective_script, relationship_matrix, generation_status, partial_content")
       .eq("conversation_id", mysteryId)
       .single();
       
@@ -208,13 +246,24 @@ export const resumePackageGeneration = async (mysteryId: string, testMode: boole
     }
     
     // Update status to in_progress
+    const resumeStatus = {
+      status: "in_progress",
+      progress: existingPackage.content ? 30 : 0, // Start with some progress if we have some content
+      currentStep: "Resuming generation...",
+      sections: {
+        hostGuide: existingPackage.host_guide ? true : false,
+        characters: existingPackage.partial_content?.characters ? true : false,
+        clues: existingPackage.evidence_cards?.length > 0 ? true : false,
+        inspectorScript: existingPackage.detective_script ? true : false,
+        characterMatrix: existingPackage.relationship_matrix ? true : false
+      }
+    };
+    
     const { error: updateError } = await supabase
       .from("mystery_packages")
       .update({
-        status: "in_progress",
-        progress: existingPackage.content ? 30 : 0, // Start with some progress if we have some content
-        current_step: "Resuming generation...",
-        error_message: null
+        generation_status: resumeStatus,
+        updated_at: new Date().toISOString()
       })
       .eq("id", existingPackage.id);
       
@@ -222,6 +271,14 @@ export const resumePackageGeneration = async (mysteryId: string, testMode: boole
       console.error("Error updating package status:", updateError);
       throw updateError;
     }
+    
+    // Save the resume state to localStorage for streaming effect
+    saveGenerationState(mysteryId, {
+      currentlyGenerating: 'hostGuide',
+      hostGuide: existingPackage.host_guide || 'Resuming generation...',
+      generationStatus: resumeStatus,
+      lastUpdated: new Date().toISOString()
+    });
     
     // Fetch conversation data for context
     const { data: conversation, error: convError } = await supabase
@@ -236,7 +293,6 @@ export const resumePackageGeneration = async (mysteryId: string, testMode: boole
     }
     
     // Resume the generation process
-    const testMode = false; // We don't use test mode for resume
     generatePackageContent(mysteryId, conversation, testMode, existingPackage);
     
     // Return empty string since this is an async operation
@@ -248,9 +304,12 @@ export const resumePackageGeneration = async (mysteryId: string, testMode: boole
     await supabase
       .from("mystery_packages")
       .update({
-        status: "failed",
-        error_message: `Resume failed: ${error.message}`,
-        is_resumable: true
+        generation_status: {
+          status: "failed",
+          error: `Resume failed: ${error.message}`,
+          resumable: true
+        },
+        updated_at: new Date().toISOString()
       })
       .eq("conversation_id", mysteryId);
       
@@ -260,15 +319,47 @@ export const resumePackageGeneration = async (mysteryId: string, testMode: boole
 
 const updateSectionProgress = async (mysteryId: string, section: string, progress: number, content?: any) => {
   try {
+    // Get current generation status first
+    const { data, error } = await supabase
+      .from("mystery_packages")
+      .select("generation_status, id")
+      .eq("conversation_id", mysteryId)
+      .single();
+      
+    if (error) {
+      console.error("Error getting current generation status:", error);
+      throw error;
+    }
+    
+    // Prepare updated status
+    const currentStatus = data.generation_status || {
+      status: "in_progress",
+      progress: 0,
+      sections: {}
+    };
+    
+    const updatedStatus = {
+      ...currentStatus,
+      currentStep: section,
+      progress: progress,
+      sections: {
+        ...currentStatus.sections,
+        hostGuide: progress >= 30 || currentStatus.sections?.hostGuide,
+        characters: progress >= 60 || currentStatus.sections?.characters,
+        clues: progress >= 80 || currentStatus.sections?.clues,
+        inspectorScript: progress >= 90 || currentStatus.sections?.inspectorScript,
+        characterMatrix: progress >= 95 || currentStatus.sections?.characterMatrix
+      }
+    };
+    
     // Update the database with current progress
     await supabase
       .from("mystery_packages")
       .update({
-        current_step: section,
-        progress,
+        generation_status: updatedStatus,
         updated_at: new Date().toISOString()
       })
-      .eq("conversation_id", mysteryId);
+      .eq("id", data.id);
       
     // Save streaming content to local storage for UI updates
     const existingState = getGenerationState(mysteryId) || {};
@@ -293,18 +384,8 @@ const updateSectionProgress = async (mysteryId: string, section: string, progres
     }
     
     // Update generationStatus
-    updatedState.generationStatus = {
-      status: "in_progress",
-      progress,
-      currentStep: section,
-      sections: {
-        hostGuide: progress >= 30,
-        characters: progress >= 60,
-        clues: progress >= 80,
-        inspectorScript: progress >= 90,
-        characterMatrix: progress >= 95
-      }
-    };
+    updatedState.generationStatus = updatedStatus;
+    updatedState.lastUpdated = new Date().toISOString();
     
     saveGenerationState(mysteryId, updatedState);
     
