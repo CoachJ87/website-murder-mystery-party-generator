@@ -184,7 +184,7 @@ export const generateCompletePackage = async (mysteryId: string, testMode: boole
   }
 };
 
-export const resumePackageGeneration = async (mysteryId: string): Promise<string> => {
+export const resumePackageGeneration = async (mysteryId: string, testMode: boolean = false): Promise<string> => {
   // Use the testModeEnabled value if testMode is not explicitly provided
   if (testMode === undefined) {
     testMode = getTestModeEnabled();
