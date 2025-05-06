@@ -1,4 +1,3 @@
-
 import { supabase } from "@/lib/supabase";
 import { getAIResponse, saveGenerationState, getGenerationState, clearGenerationState } from "@/services/aiService";
 import { toast } from "sonner";
@@ -120,7 +119,7 @@ export const generateCompletePackage = async (mysteryId: string, testMode: boole
     // Check if any partial generation exists
     const { data: existingPackage, error: packageError } = await supabase
       .from("mystery_packages")
-      .select("id, generation_status")
+      .select("id, generation_status, partial_content")
       .eq("conversation_id", mysteryId)
       .maybeSingle();
       
@@ -157,18 +156,31 @@ export const generateCompletePackage = async (mysteryId: string, testMode: boole
         throw createError;
       }
     } else {
+      // Create a safe update object that includes partial_content if it exists
+      const updateData: any = {
+        generation_status: initialStatus,
+        updated_at: new Date().toISOString()
+      };
+      
+      // Add partial_content to the update if it exists
+      if (existingPackage.partial_content) {
+        updateData.partial_content = { 
+          ...existingPackage.partial_content, 
+          is_test_mode: testMode,
+          error_message: null,
+          is_resumable: false
+        };
+      } else {
+        updateData.partial_content = { 
+          is_test_mode: testMode,
+          error_message: null,
+          is_resumable: false
+        };
+      }
+      
       const { error: updateError } = await supabase
         .from("mystery_packages")
-        .update({
-          generation_status: initialStatus,
-          partial_content: { 
-            ...existingPackage.partial_content, 
-            is_test_mode: testMode,
-            error_message: null,
-            is_resumable: false
-          },
-          updated_at: new Date().toISOString()
-        })
+        .update(updateData)
         .eq("id", existingPackage.id);
         
       if (updateError) {
