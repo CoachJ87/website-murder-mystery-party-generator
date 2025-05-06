@@ -1,4 +1,3 @@
-
 // src/interfaces/mystery.ts
 
 export interface MysteryData {
@@ -55,6 +54,7 @@ export interface Mystery {
     };
   };
   purchase_date?: string;
+  has_complete_package?: boolean; // Added this missing property
 }
 
 export interface MysteryCharacter {
