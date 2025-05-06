@@ -83,58 +83,56 @@ export const MysteryCard = ({ mystery, onStatusChange, onDelete, onEdit }: Myste
             )}
           </Button>
           
-          {!isPurchased && (
-            <>
-              {mystery.status !== "archived" ? (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => onStatusChange(mystery.id, "archived")}
-                  className="flex-1 min-w-[80px]"
-                >
-                  <Archive className="h-4 w-4 mr-2" />
-                  Archive
-                </Button>
-              ) : (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => onStatusChange(mystery.id, "draft")}
-                  className="flex-1 min-w-[80px]"
-                >
-                  <Edit className="h-4 w-4 mr-2" />
-                  Unarchive
-                </Button>
-              )}
-              
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button 
-                    size="sm" 
-                    variant="destructive"
-                    className="flex-1 min-w-[80px]"
-                  >
-                    <Trash className="h-4 w-4 mr-2" />
-                    Delete
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete your mystery from our servers.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => onDelete(mystery.id)}>
-                      Delete
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </>
+          {/* Archive/Unarchive button - now shown for all mysteries including purchased ones */}
+          {mystery.status !== "archived" ? (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => onStatusChange(mystery.id, "archived")}
+              className="flex-1 min-w-[80px]"
+            >
+              <Archive className="h-4 w-4 mr-2" />
+              Archive
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => onStatusChange(mystery.id, "draft")}
+              className="flex-1 min-w-[80px]"
+            >
+              <Edit className="h-4 w-4 mr-2" />
+              Unarchive
+            </Button>
           )}
+          
+          {/* Delete button - now shown for all mysteries including purchased ones */}
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button 
+                size="sm" 
+                variant="destructive"
+                className="flex-1 min-w-[80px]"
+              >
+                <Trash className="h-4 w-4 mr-2" />
+                Delete
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete your mystery from our servers.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={() => onDelete(mystery.id)}>
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </CardContent>
     </Card>

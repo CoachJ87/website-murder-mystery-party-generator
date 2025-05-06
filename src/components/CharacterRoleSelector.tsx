@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Crown, ShieldAlert, RefreshCw } from "lucide-react";
+import { Crown, RefreshCw } from "lucide-react";
 import { MysteryCharacter } from "@/interfaces/mystery";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
@@ -21,7 +21,6 @@ const CharacterRoleSelector: React.FC<CharacterRoleSelectorProps> = ({
   const [characters, setCharacters] = useState<MysteryCharacter[]>([]);
   const [loading, setLoading] = useState(true);
   const [murderer, setMurderer] = useState<string | null>(null);
-  const [accomplice, setAccomplice] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   
   // Fetch characters and current role assignments
@@ -54,7 +53,6 @@ const CharacterRoleSelector: React.FC<CharacterRoleSelectorProps> = ({
         } else if (packageData?.partial_content) {
           const roles = packageData.partial_content.roles || {};
           setMurderer(roles.murderer || null);
-          setAccomplice(roles.accomplice || null);
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -77,8 +75,7 @@ const CharacterRoleSelector: React.FC<CharacterRoleSelectorProps> = ({
         .update({
           partial_content: {
             roles: {
-              murderer,
-              accomplice
+              murderer
             }
           }
         })
@@ -94,40 +91,12 @@ const CharacterRoleSelector: React.FC<CharacterRoleSelectorProps> = ({
       setIsSaving(false);
     }
   };
-  
-  // Handle accomplice selection - should not be the same as murderer
-  const handleAccompliceChange = (value: string) => {
-    if (value === "none") {
-      setAccomplice(null);
-      return;
-    }
-    
-    if (value === murderer) {
-      toast.error('Accomplice cannot be the same as the murderer');
-      return;
-    }
-    setAccomplice(value);
-  };
-  
-  // Handle murderer selection - should not be the same as accomplice
-  const handleMurdererChange = (value: string) => {
-    if (value === "none") {
-      setMurderer(null);
-      return;
-    }
-    
-    if (value === accomplice) {
-      toast.error('Murderer cannot be the same as the accomplice');
-      return;
-    }
-    setMurderer(value);
-  };
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Character Roles</CardTitle>
-        <CardDescription>Assign the murderer and accomplice roles for your mystery</CardDescription>
+        <CardDescription>Assign the murderer role for your mystery</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {loading ? (
@@ -136,65 +105,33 @@ const CharacterRoleSelector: React.FC<CharacterRoleSelectorProps> = ({
             <p className="mt-2 text-muted-foreground">Loading characters...</p>
           </div>
         ) : (
-          <>
-            <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center gap-2">
-                <Crown className="h-4 w-4 text-red-500" />
-                <span>Murderer</span>
-                <Badge variant="outline" className="ml-1 font-normal">Required</Badge>
-              </label>
-              <Select value={murderer || "none"} onValueChange={handleMurdererChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select the murderer" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">None selected</SelectItem>
-                  {characters.map(character => (
-                    <SelectItem 
-                      key={character.id} 
-                      value={character.id}
-                      disabled={character.id === accomplice}
-                    >
-                      {character.character_name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              
-              <div className="text-xs text-muted-foreground mt-1 pl-6">
-                The character who committed the murder
-              </div>
-            </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium flex items-center gap-2">
+              <Crown className="h-4 w-4 text-red-500" />
+              <span>Murderer</span>
+              <Badge variant="outline" className="ml-1 font-normal">Required</Badge>
+            </label>
+            <Select value={murderer || "none"} onValueChange={setMurderer}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select the murderer" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">None selected</SelectItem>
+                {characters.map(character => (
+                  <SelectItem 
+                    key={character.id} 
+                    value={character.id}
+                  >
+                    {character.character_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             
-            <div className="space-y-2 pt-2">
-              <label className="text-sm font-medium flex items-center gap-2">
-                <ShieldAlert className="h-4 w-4 text-amber-500" />
-                <span>Accomplice</span>
-                <Badge variant="outline" className="ml-1 font-normal">Optional</Badge>
-              </label>
-              <Select value={accomplice || "none"} onValueChange={handleAccompliceChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select the accomplice (optional)" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">None selected</SelectItem>
-                  {characters.map(character => (
-                    <SelectItem 
-                      key={character.id} 
-                      value={character.id}
-                      disabled={character.id === murderer}
-                    >
-                      {character.character_name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              
-              <div className="text-xs text-muted-foreground mt-1 pl-6">
-                An optional character who helped the murderer
-              </div>
+            <div className="text-xs text-muted-foreground mt-1 pl-6">
+              The character who committed the murder
             </div>
-          </>
+          </div>
         )}
       </CardContent>
       <CardFooter className="border-t pt-4">

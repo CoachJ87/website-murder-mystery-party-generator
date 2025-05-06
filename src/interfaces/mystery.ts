@@ -5,7 +5,6 @@ export interface MysteryData {
   title?: string;
   theme?: string;
   playerCount?: number;
-  hasAccomplice?: boolean;
   scriptType?: 'full' | 'summary';
   additionalDetails?: string;
   status?: "draft" | "purchased" | "archived";
@@ -92,7 +91,6 @@ interface RelationshipInfo {
 interface RoundScriptOptions {
   innocent?: string;
   guilty?: string;
-  accomplice?: string;
 }
 
 interface QuestionOption {
