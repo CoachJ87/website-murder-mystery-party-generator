@@ -64,10 +64,10 @@ export const MysteryCard = ({ mystery, onStatusChange, onDelete, onEdit }: Myste
         )}
         
         <div className="flex flex-wrap justify-end gap-2 pt-2">
-          {/* For purchased mysteries, we're switching the positions of "View Mystery" and "Delete" */}
+          {/* For purchased mysteries */}
           {isPurchased ? (
             <>
-              {/* Delete button moved to the left */}
+              {/* Delete button on left */}
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button 
@@ -95,21 +95,31 @@ export const MysteryCard = ({ mystery, onStatusChange, onDelete, onEdit }: Myste
                 </AlertDialogContent>
               </AlertDialog>
               
-              {/* View Mystery button moved to the right */}
+              {/* Archive button on right */}
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => onStatusChange(mystery.id, "archived")}
+                className="flex-1 min-w-[80px]"
+              >
+                <Archive className="h-4 w-4 mr-2" />
+                Archive
+              </Button>
+              
+              {/* View Mystery button at the bottom (full width) */}
               <Button
                 size="sm"
                 variant="default"
                 onClick={() => window.location.href = `/mystery/${mystery.id}`}
-                className="flex-1 min-w-[80px]"
+                className="w-full"
               >
                 <Eye className="h-4 w-4 mr-2" />
                 View Mystery
               </Button>
             </>
-          ) : (
+          ) : mystery.status === "archived" ? (
             <>
-              {/* For draft mysteries, we're switching the positions of "Edit" and "Delete" */}
-              {/* Delete button moved to the left */}
+              {/* For archived mysteries - delete on left, unarchive on right */}
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button 
@@ -137,40 +147,70 @@ export const MysteryCard = ({ mystery, onStatusChange, onDelete, onEdit }: Myste
                 </AlertDialogContent>
               </AlertDialog>
               
-              {/* Edit button moved to the right */}
+              {/* Unarchive button on right */}
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => onStatusChange(mystery.id, "draft")}
+                className="flex-1 min-w-[80px]"
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                Unarchive
+              </Button>
+            </>
+          ) : (
+            <>
+              {/* For draft mysteries */}
+              {/* Delete button on left */}
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button 
+                    size="sm" 
+                    variant="destructive"
+                    className="flex-1 min-w-[80px]"
+                  >
+                    <Trash className="h-4 w-4 mr-2" />
+                    Delete
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete your mystery from our servers.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => onDelete(mystery.id)}>
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+              
+              {/* Archive button on right */}
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => onStatusChange(mystery.id, "archived")}
+                className="flex-1 min-w-[80px]"
+              >
+                <Archive className="h-4 w-4 mr-2" />
+                Archive
+              </Button>
+              
+              {/* Edit button at the bottom (full width) */}
               <Button
                 size="sm"
                 variant="secondary"
                 onClick={() => onEdit(mystery.id)}
-                className="flex-1 min-w-[80px]"
+                className="w-full"
               >
                 <Edit className="h-4 w-4 mr-2" />
                 Edit
               </Button>
             </>
-          )}
-          
-          {/* Archive/Unarchive button */}
-          {mystery.status !== "archived" ? (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => onStatusChange(mystery.id, "archived")}
-              className="flex-1 min-w-[80px]"
-            >
-              <Archive className="h-4 w-4 mr-2" />
-              Archive
-            </Button>
-          ) : (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => onStatusChange(mystery.id, "draft")}
-              className="flex-1 min-w-[80px]"
-            >
-              <Edit className="h-4 w-4 mr-2" />
-              Unarchive
-            </Button>
           )}
         </div>
       </CardContent>
