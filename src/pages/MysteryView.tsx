@@ -1,3 +1,4 @@
+
 // src/pages/MysteryView.tsx
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -18,6 +19,8 @@ import { RefreshCw, AlertTriangle, Clock, CheckCircle2 } from "lucide-react";
 import MysteryPackageTabView from "@/components/MysteryPackageTabView";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { MysteryCharacter } from "@/interfaces/mystery";
+import { getGenerationState, saveGenerationState, clearGenerationState } from "@/services/aiService";
 
 const MysteryView = () => {
   const [mystery, setMystery] = useState<any | null>(null);
@@ -34,6 +37,16 @@ const MysteryView = () => {
   
   // Add refs to track notification states
   const packageReadyNotified = useRef<boolean>(false);
+  
+  // Add streamingContent state
+  const [streamingContent, setStreamingContent] = useState<{
+    hostGuide?: string;
+    characters?: MysteryCharacter[];
+    clues?: any[];
+    inspectorScript?: string;
+    characterMatrix?: string;
+    currentlyGenerating?: string;
+  }>({});
 
   const isPageVisible = () => document.visibilityState === 'visible';
 
@@ -53,6 +66,43 @@ const MysteryView = () => {
     };
   }, [id]);
 
+  // Function to update streaming content state based on generation progress
+  const updateStreamingContent = (status: GenerationStatus) => {
+    if (!status) return;
+    
+    const savedState = getGenerationState(id || '');
+    console.log("Retrieved generation state:", savedState);
+    
+    // Update the streaming content based on the generation status and saved state
+    setStreamingContent(currentContent => {
+      const newContent = { ...currentContent };
+      
+      // Update currently generating section
+      if (status.currentStep?.toLowerCase().includes('host guide')) {
+        newContent.currentlyGenerating = 'hostGuide';
+      } else if (status.currentStep?.toLowerCase().includes('character')) {
+        newContent.currentlyGenerating = 'characters';
+      } else if (status.currentStep?.toLowerCase().includes('clue') || status.currentStep?.toLowerCase().includes('evidence')) {
+        newContent.currentlyGenerating = 'clues';
+      } else if (status.currentStep?.toLowerCase().includes('detective') || status.currentStep?.toLowerCase().includes('inspector')) {
+        newContent.currentlyGenerating = 'inspectorScript';
+      } else if (status.currentStep?.toLowerCase().includes('matrix') || status.currentStep?.toLowerCase().includes('relationship')) {
+        newContent.currentlyGenerating = 'characterMatrix';
+      }
+      
+      // If we have saved state data, use it
+      if (savedState) {
+        if (savedState.hostGuide) newContent.hostGuide = savedState.hostGuide;
+        if (savedState.characters) newContent.characters = savedState.characters;
+        if (savedState.clues) newContent.clues = savedState.clues;
+        if (savedState.inspectorScript) newContent.inspectorScript = savedState.inspectorScript;
+        if (savedState.characterMatrix) newContent.characterMatrix = savedState.characterMatrix;
+      }
+      
+      return newContent;
+    });
+  };
+
   const checkGenerationStatus = useCallback(async () => {
     if (!id) return;
     
@@ -60,6 +110,9 @@ const MysteryView = () => {
       const status = await getPackageGenerationStatus(id);
       setGenerationStatus(status);
       setLastUpdate(new Date());
+      
+      // Update streaming content based on status
+      updateStreamingContent(status);
       
       if (status.status === 'completed') {
         const { data: packageData } = await supabase
@@ -71,6 +124,12 @@ const MysteryView = () => {
         if (packageData) {
           setPackageContent(packageData.content);
           clearStatusPolling();
+          
+          // Clear streaming content state once complete
+          setStreamingContent({});
+          
+          // Clear saved generation state
+          clearGenerationState(id);
           
           // Only show the notification if we haven't shown it before
           if (!packageReadyNotified.current) {
@@ -173,6 +232,9 @@ const MysteryView = () => {
           setGenerationStatus(status);
           setLastUpdate(new Date());
           
+          // Update streaming content based on status
+          updateStreamingContent(status);
+          
           if (status.status === 'in_progress') {
             startStatusPolling();
           } else if (status.status === 'completed') {
@@ -248,12 +310,20 @@ const MysteryView = () => {
       // Reset notification state on new generation start
       packageReadyNotified.current = false;
       
+      // Reset streaming content
+      setStreamingContent({
+        currentlyGenerating: 'hostGuide',
+        hostGuide: 'Resuming generation...'
+      });
+      
       resumePackageGeneration(id)
         .then(content => {
           setPackageContent(content);
           setGenerating(false);
+          setStreamingContent({}); // Clear streaming content
           toast.success("Your complete mystery package is ready!");
           packageReadyNotified.current = true;
+          clearGenerationState(id);
         })
         .catch(error => {
           console.error("Error in package generation:", error);
@@ -263,6 +333,7 @@ const MysteryView = () => {
       
       const initialStatus = await getPackageGenerationStatus(id);
       setGenerationStatus(initialStatus);
+      updateStreamingContent(initialStatus);
       startStatusPolling();
       
     } catch (error: any) {
@@ -290,13 +361,27 @@ const MysteryView = () => {
       // Reset notification state on new generation start
       packageReadyNotified.current = false;
       
+      // Initialize streaming content with starting state
+      setStreamingContent({
+        currentlyGenerating: 'hostGuide',
+        hostGuide: 'Starting generation...'
+      });
+      
+      // Save initial generation state
+      saveGenerationState(id, {
+        currentlyGenerating: 'hostGuide',
+        hostGuide: 'Starting generation...'
+      });
+      
       // Start the generation process and update UI
-      await generateCompletePackage(id)
+      generateCompletePackage(id)
         .then(content => {
           setPackageContent(content);
           setGenerating(false);
+          setStreamingContent({}); // Clear streaming content when done
           toast.success("Your complete mystery package is ready!");
           packageReadyNotified.current = true;
+          clearGenerationState(id);
         })
         .catch(error => {
           console.error("Error in package generation:", error);
@@ -307,6 +392,7 @@ const MysteryView = () => {
       // Get initial status and start polling
       const initialStatus = await getPackageGenerationStatus(id);
       setGenerationStatus(initialStatus);
+      updateStreamingContent(initialStatus);
       startStatusPolling();
       
     } catch (error: any) {
@@ -452,6 +538,7 @@ const MysteryView = () => {
               conversationId={id}
               onGenerateClick={handleGeneratePackage}
               isGenerating={generating}
+              streamingContent={streamingContent}  // Pass the streaming content
             />
           ) : (
             generationStatus?.status === 'in_progress' ? renderGenerationProgress() : (
