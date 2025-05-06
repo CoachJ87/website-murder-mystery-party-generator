@@ -1,4 +1,3 @@
-
 // src/components/MysteryPackageTabView.tsx
 import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -241,13 +240,41 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
       
       // Format evidence cards properly
       let evidenceCards: any[] = [];
-      if (packageData?.evidence_cards && Array.isArray(packageData.evidence_cards)) {
-        evidenceCards = packageData.evidence_cards.map((card: any, index: number) => ({
-          title: card.title || `Evidence ${index + 1}`,
-          content: card.content || '',
-          description: card.description || '',
-          implication: card.implication || ''
-        }));
+      if (packageData?.evidence_cards) {
+        // Fix here: Ensure evidence_cards is an array before mapping
+        if (Array.isArray(packageData.evidence_cards)) {
+          evidenceCards = packageData.evidence_cards.map((card: any, index: number) => ({
+            title: card.title || `Evidence ${index + 1}`,
+            content: card.content || '',
+            description: card.description || '',
+            implication: card.implication || ''
+          }));
+        } else if (typeof packageData.evidence_cards === 'object') {
+          // Handle case where evidence_cards is an object
+          evidenceCards = Object.entries(packageData.evidence_cards).map(([key, value]: [string, any]) => ({
+            title: value.title || key,
+            content: value.content || '',
+            description: value.description || '',
+            implication: value.implication || ''
+          }));
+        } else if (typeof packageData.evidence_cards === 'string') {
+          // Handle case where evidence_cards is a string (possibly JSON)
+          try {
+            const parsed = JSON.parse(packageData.evidence_cards);
+            if (Array.isArray(parsed)) {
+              evidenceCards = parsed.map((card: any, index: number) => ({
+                title: card.title || `Evidence ${index + 1}`,
+                content: card.content || '',
+                description: card.description || '',
+                implication: card.implication || ''
+              }));
+            }
+          } catch (e) {
+            console.error("Failed to parse evidence_cards string:", e);
+            // Default to empty array if parsing fails
+            evidenceCards = [];
+          }
+        }
       }
       
       // Format inspector script
@@ -653,10 +680,15 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
   const finalTabData = {
     hostGuide: streamingContent?.hostGuide || tabData.hostGuide,
     characters: streamingContent?.characters?.length ? streamingContent.characters : tabData.characters,
-    clues: streamingContent?.clues?.length ? streamingContent.clues : tabData.clues,
+    clues: streamingContent?.clues || tabData.clues,
     inspectorScript: streamingContent?.inspectorScript || tabData.inspectorScript,
     characterMatrix: streamingContent?.characterMatrix || tabData.characterMatrix
   };
+
+  // Make sure clues are always an array to prevent the ".map is not a function" error
+  if (!Array.isArray(finalTabData.clues)) {
+    finalTabData.clues = [];
+  }
 
   // Improved Empty state component with clearer call to action
   const EmptyStateView = () => (
