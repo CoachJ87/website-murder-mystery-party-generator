@@ -1,3 +1,4 @@
+
 // src/components/MysteryPackageTabView.tsx
 import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -526,7 +527,7 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
       const round3Statement = round3Match ? round3Match[1].trim() : '';
 
       // Extract scripts for different roles
-      // Find innocent, guilty and accomplice statements
+      // Find innocent and guilty statements only (removing accomplice)
       const extractRoleScript = (text: string, role: string): string => {
         const pattern = new RegExp(`IF YOU ARE ${role}:\\s*"([^"]+)"`, 'i');
         const match = text.match(pattern);
@@ -535,15 +536,12 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
       
       const finalInnocent = extractRoleScript(finalStatementText, 'INNOCENT');
       const finalGuilty = extractRoleScript(finalStatementText, 'GUILTY');
-      const finalAccomplice = extractRoleScript(finalStatementText, 'ACCOMPLICE');
       
       const round2Innocent = extractRoleScript(round2Text, 'INNOCENT');
       const round2Guilty = extractRoleScript(round2Text, 'GUILTY');
-      const round2Accomplice = extractRoleScript(round2Text, 'ACCOMPLICE');
       
       const round3Innocent = extractRoleScript(round3Text, 'INNOCENT');
       const round3Guilty = extractRoleScript(round3Text, 'GUILTY');
-      const round3Accomplice = extractRoleScript(round3Text, 'ACCOMPLICE');
       
       const characterObj: MysteryCharacter = {
         id: '',  // Will be assigned when saved to DB
@@ -564,18 +562,15 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
           round1: round1Statement,
           round2: {
             innocent: round2Innocent,
-            guilty: round2Guilty,
-            accomplice: round2Accomplice
+            guilty: round2Guilty
           },
           round3: {
             innocent: round3Innocent,
-            guilty: round3Guilty,
-            accomplice: round3Accomplice
+            guilty: round3Guilty
           },
           final: {
             innocent: finalInnocent,
-            guilty: finalGuilty,
-            accomplice: finalAccomplice
+            guilty: finalGuilty
           }
         },
         created_at: new Date().toISOString(),
@@ -784,9 +779,9 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
     </div>
   );
 
-  // Add a function to handle role assignments
-  const handleRoleAssign = (guiltyId: string | null, accompliceId: string | null) => {
-    console.log("Role assigned:", { guiltyId, accompliceId });
+  // Add a function to handle role assignments - Updated to remove accompliceId parameter
+  const handleRoleAssign = (guiltyId: string | null) => {
+    console.log("Role assigned:", { guiltyId });
     toast.success("Character roles assigned");
     // In a real implementation, you might want to save this to your state or database
   };
@@ -936,7 +931,6 @@ const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
                 <CharacterRoleAssignment 
                   characters={finalTabData.characters} 
                   onRoleAssign={handleRoleAssign}
-                  hasAccomplice={true}
                 />
               </div>
             </div>

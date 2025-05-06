@@ -13,7 +13,6 @@ export interface FormValues {
   numberOfGuests?: number;
   playerCount?: number;
   timeFrame?: string;
-  hasAccomplice?: boolean;
   scriptType?: 'full' | 'pointForm'; // Changed back to match the expected type
   additionalDetails?: string;
   [key: string]: any;
@@ -29,22 +28,18 @@ export interface CharacterScript {
   round1?: {
     innocent?: string;
     guilty?: string;
-    accomplice?: string;
   };
   round2?: {
     innocent?: string;
     guilty?: string;
-    accomplice?: string;
   };
   round3?: {
     innocent?: string;
     guilty?: string;
-    accomplice?: string;
   };
   final?: {
     innocent?: string;
     guilty?: string;
-    accomplice?: string;
   };
 }
 
@@ -69,7 +64,6 @@ export interface CharacterSecret {
 export interface RoundScript {
   innocent: string;
   guilty: string;
-  accomplice?: string;
 }
 
 export interface CharacterRoundScripts {
