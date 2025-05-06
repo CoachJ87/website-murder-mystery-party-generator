@@ -1,4 +1,3 @@
-
 import { supabase } from "@/lib/supabase";
 import { getAIResponse, saveGenerationState, getGenerationState, clearGenerationState } from "@/services/aiService";
 import { toast } from "sonner";
@@ -21,6 +20,19 @@ export interface GenerationStatus {
 
 // Mock data for testing UI without actual generation
 const useMockData = false;
+
+// Add test mode functionality
+let testModeEnabled = false;
+
+export const toggleTestMode = (enabled: boolean) => {
+  testModeEnabled = enabled;
+  localStorage.setItem('mysteryTestMode', enabled ? 'true' : 'false');
+};
+
+export const getTestModeEnabled = (): boolean => {
+  const storedValue = localStorage.getItem('mysteryTestMode');
+  return storedValue ? storedValue === 'true' : testModeEnabled;
+};
 
 export const getPackageGenerationStatus = async (mysteryId: string): Promise<GenerationStatus> => {
   try {
@@ -82,6 +94,11 @@ export const getPackageGenerationStatus = async (mysteryId: string): Promise<Gen
 };
 
 export const generateCompletePackage = async (mysteryId: string, testMode: boolean = false): Promise<string> => {
+  // Use the testModeEnabled value if testMode is not explicitly provided
+  if (testMode === undefined) {
+    testMode = getTestModeEnabled();
+  }
+  
   if (useMockData) {
     return mockGeneratePackage(mysteryId);
   }
@@ -168,6 +185,11 @@ export const generateCompletePackage = async (mysteryId: string, testMode: boole
 };
 
 export const resumePackageGeneration = async (mysteryId: string): Promise<string> => {
+  // Use the testModeEnabled value if testMode is not explicitly provided
+  if (testMode === undefined) {
+    testMode = getTestModeEnabled();
+  }
+  
   if (useMockData) {
     return mockGeneratePackage(mysteryId);
   }
@@ -297,6 +319,11 @@ const generatePackageContent = async (
   testMode: boolean = false,
   existingPackage?: any
 ) => {
+  // Use the testModeEnabled value if testMode is not explicitly provided
+  if (testMode === undefined) {
+    testMode = getTestModeEnabled();
+  }
+  
   try {
     let fullContent = "";
     
