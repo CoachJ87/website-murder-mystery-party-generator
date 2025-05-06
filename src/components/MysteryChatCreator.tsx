@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -10,7 +11,6 @@ import MysteryForm from "@/components/MysteryForm";
 import MysteryChat from "@/components/MysteryChat";
 import { useAuth } from "@/context/AuthContext";
 import { Message, FormValues } from "@/components/types";
-import { Wand2 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 
@@ -83,7 +83,12 @@ const MysteryChatCreator = () => {
                             title: data.title || `${data.theme} Mystery`,
                             mystery_data: data,
                             user_id: user.id,
-                            status: "draft"
+                            status: "draft",
+                            // Initialize these fields to avoid update errors later
+                            has_complete_package: false,
+                            needs_package_generation: false,
+                            is_paid: false,
+                            is_completed: false
                         })
                         .select()
                         .single();
@@ -91,6 +96,7 @@ const MysteryChatCreator = () => {
                     if (error) {
                         console.error("Error saving mystery:", error);
                         toast.error("Failed to save mystery data");
+                        return;
                     } else if (newConversation) {
                         newConversationId = newConversation.id;
                         setConversationId(newConversationId);
@@ -108,6 +114,7 @@ const MysteryChatCreator = () => {
                     if (error) {
                         console.error("Error updating mystery:", error);
                         toast.error("Failed to update mystery data");
+                        return;
                     }
                 }
 
@@ -131,7 +138,7 @@ const MysteryChatCreator = () => {
     const handleSaveChatMessage = async (message: Message) => {
         if (!isAuthenticated || !user || !conversationId) {
             console.log("Cannot save message: missing auth or conversation ID");
-            return;
+            return Promise.resolve();
         }
 
         try {
@@ -152,8 +159,11 @@ const MysteryChatCreator = () => {
                 console.log("Message saved successfully");
                 setChatMessages(prev => [...prev, message]); // Update local chat messages
             }
+            
+            return Promise.resolve();
         } catch (error) {
             console.error("Error saving message:", error);
+            return Promise.reject(error);
         }
     };
 
@@ -170,13 +180,20 @@ const MysteryChatCreator = () => {
             toast.info("Preparing your mystery preview...");
 
             // Save a flag that the user requested the final generation
-            await supabase
+            const { error: updateError } = await supabase
                 .from("conversations")
                 .update({
                     generation_requested: true,
+                    needs_package_generation: true, // Flag to indicate generation is needed
                     updated_at: new Date().toISOString(),
                 })
                 .eq("id", conversationId);
+                
+            if (updateError) {
+                console.error("Error updating conversation record:", updateError);
+                toast.error("Failed to prepare mystery preview");
+                return;
+            }
 
             // Navigate to purchase page instead of preview
             navigate(`/mystery/purchase/${conversationId}`);

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Calendar, Clock, Edit, Archive, Trash, Eye, CheckCircle2 } from "lucide-react";
 import { Mystery } from "@/interfaces/mystery";
+import { toast } from "@/hooks/use-toast";
 
 interface MysteryCardProps {
   mystery: Mystery;
@@ -17,6 +18,31 @@ export const MysteryCard = ({ mystery, onStatusChange, onDelete, onEdit }: Myste
   // Check multiple status indicators for purchase status
   const isPurchased = mystery.status === "purchased" || 
                       mystery.is_purchased === true;
+
+  // Handle navigation with error handling
+  const handleViewMystery = () => {
+    try {
+      // Check if the mystery has a complete package first
+      if (mystery.has_complete_package) {
+        window.location.href = `/mystery/${mystery.id}`;
+      } else {
+        // If no complete package, go to the preview/generation page
+        window.location.href = `/mystery/preview/${mystery.id}`;
+        toast({
+          title: "Package generation required",
+          description: "Your mystery needs to be generated first before viewing the full package.",
+          variant: "default"
+        });
+      }
+    } catch (error) {
+      console.error("Navigation error:", error);
+      toast({
+        title: "Navigation error",
+        description: "There was a problem navigating to your mystery. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
 
   return (
     <Card className={`${isPurchased ? "border-primary border-2" : ""}`}>
@@ -110,7 +136,7 @@ export const MysteryCard = ({ mystery, onStatusChange, onDelete, onEdit }: Myste
               <Button
                 size="sm"
                 variant="default"
-                onClick={() => window.location.href = `/mystery/${mystery.id}`}
+                onClick={handleViewMystery}
                 className="w-full"
               >
                 <Eye className="h-4 w-4 mr-2" />

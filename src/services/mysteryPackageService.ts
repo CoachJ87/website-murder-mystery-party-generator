@@ -47,7 +47,7 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
     // Get conversation data to retrieve mystery details
     const { data: conversation, error: conversationError } = await supabase
       .from("conversations")
-      .select("title, mystery_data")
+      .select("title, mystery_data, messages(*)")
       .eq("id", mysteryId)
       .single();
       
@@ -133,10 +133,26 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
       packageId = newPackage.id;
     }
     
-    // Call the AI generation function
+    // Start the generation process
     try {
-      // Start the generation process
+      // Call the actual generation process
       const content = await processGeneration(mysteryId, conversation, packageId, testMode, existingContent);
+      
+      // Update the conversation record to indicate successful generation
+      try {
+        await supabase
+          .from("conversations")
+          .update({
+            has_complete_package: true,
+            needs_package_generation: false,
+            updated_at: new Date().toISOString()
+          })
+          .eq("id", mysteryId);
+      } catch (updateErr) {
+        console.error("Warning: Could not update conversation record:", updateErr);
+        // Don't throw here, as the generation was successful
+      }
+      
       return content;
     } catch (error) {
       const err = error as ServiceError;
@@ -193,7 +209,7 @@ export async function resumePackageGeneration(mysteryId: string): Promise<string
     
     const { data: conversation, error: conversationError } = await supabase
       .from("conversations")
-      .select("title, mystery_data")
+      .select("title, mystery_data, messages(*)")
       .eq("id", mysteryId)
       .single();
       
@@ -292,16 +308,25 @@ async function processGeneration(
       content = `# ${conversation.title || "Murder Mystery"} - FULL PACKAGE\n\n`;
     }
     
-    // Mock generation for now - this would be replaced with actual AI calls
+    // Define sections to generate
     const sections = [
-      { name: "Host Guide", key: "hostGuide", progress: 20 },
-      { name: "Characters", key: "characters", progress: 40 },
-      { name: "Evidence Cards", key: "clues", progress: 60 },
-      { name: "Inspector Script", key: "inspectorScript", progress: 80 },
-      { name: "Character Relationship Matrix", key: "characterMatrix", progress: 90 }
+      { name: "Host Guide", key: "hostGuide", progress: 20, prompt: "Create a comprehensive host guide for this murder mystery" },
+      { name: "Characters", key: "characters", progress: 40, prompt: "Create detailed character descriptions for all characters in this murder mystery" },
+      { name: "Evidence Cards", key: "clues", progress: 60, prompt: "Create evidence cards and clues for this murder mystery" },
+      { name: "Inspector Script", key: "inspectorScript", progress: 80, prompt: "Create an inspector or detective script for this murder mystery" },
+      { name: "Character Relationship Matrix", key: "characterMatrix", progress: 90, prompt: "Create a character relationship matrix showing how all characters relate to each other" }
     ];
     
-    // In a real implementation, this would call AI to generate each section
+    // Prepare messages for AI generation
+    const baseMessages = conversation.messages || [];
+    
+    // Convert messages to format expected by AI service
+    const formattedMessages = baseMessages.map((msg: any) => ({
+      role: msg.role || (msg.is_ai ? "assistant" : "user"),
+      content: msg.content
+    }));
+    
+    // Generate each section
     for (const section of sections) {
       // Update status
       const status: GenerationStatus = {
@@ -317,6 +342,7 @@ async function processGeneration(
         }
       };
       
+      // Update database status
       await supabase
         .from("mystery_packages")
         .update({
@@ -324,18 +350,126 @@ async function processGeneration(
           updated_at: new Date().toISOString()
         })
         .eq("id", packageId);
-        
+      
+      // Update local status for real-time display
       await saveGenerationState(mysteryId, {
         currentlyGenerating: section.key,
         [section.key]: `Generating ${section.name}...`,
         generationStatus: status
       });
       
-      // In an actual implementation, you'd generate content for each section here
-      // For now, we'll just simulate delay and update
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // In test mode, just add placeholder content after a short delay
+      if (testMode) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        content += `\n\n# ${section.name.toUpperCase()}\n\n`;
+        content += `This is a test mode ${section.name.toLowerCase()}. In production, this would contain real generated content.\n`;
+        continue;
+      }
       
-      // Update content in database
+      try {
+        // Create the specific prompt for this section
+        const sectionMessages = [...formattedMessages];
+        
+        // Add a system message for the specific section
+        sectionMessages.push({
+          role: "user",
+          content: `Based on the mystery we've discussed, ${section.prompt}. Make it detailed and comprehensive. Format it in markdown.`
+        });
+        
+        // Call the AI service to generate content for this section
+        console.log(`Generating ${section.name} with ${sectionMessages.length} messages`);
+        const sectionContent = await getAIResponse(
+          sectionMessages,
+          'paid', // Use paid version for complete package
+          `You are a creative murder mystery writer tasked with creating a ${section.name.toLowerCase()} for the mystery we've been discussing. 
+           Provide detailed and comprehensive content formatted in markdown.`,
+          testMode
+        );
+        
+        // Add the generated section to the content
+        content += `\n\n# ${section.name.toUpperCase()}\n\n`;
+        content += sectionContent.trim();
+        
+        // Add a separator
+        content += "\n\n---\n\n";
+        
+        // Update database with the current content
+        await supabase
+          .from("mystery_packages")
+          .update({
+            content: content,
+            updated_at: new Date().toISOString()
+          })
+          .eq("id", packageId);
+        
+        // Short delay between sections to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 500));
+      } catch (sectionError) {
+        console.error(`Error generating ${section.name}:`, sectionError);
+        
+        // Add error note to content
+        content += `\n\n# ${section.name.toUpperCase()}\n\n`;
+        content += `*There was an error generating this section. Please try regenerating the package.*\n\n`;
+        
+        // Continue with next section - don't break the whole generation
+      }
+    }
+    
+    // Add a solution section at the end
+    try {
+      const solutionStatus: GenerationStatus = {
+        status: 'in_progress',
+        progress: 95,
+        currentStep: 'Generating Solution...',
+        sections: {
+          hostGuide: true,
+          characters: true,
+          clues: true,
+          inspectorScript: true,
+          characterMatrix: true,
+          solution: true
+        }
+      };
+      
+      await supabase
+        .from("mystery_packages")
+        .update({
+          generation_status: solutionStatus,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", packageId);
+      
+      await saveGenerationState(mysteryId, {
+        currentlyGenerating: 'solution',
+        solution: 'Generating Solution...',
+        generationStatus: solutionStatus
+      });
+      
+      if (!testMode) {
+        // Generate a solution summary
+        const solutionMessages = [...formattedMessages];
+        solutionMessages.push({
+          role: "user",
+          content: "Please provide a concise solution to the murder mystery, explaining who the murderer is, their motive, and how they committed the crime."
+        });
+        
+        const solutionContent = await getAIResponse(
+          solutionMessages,
+          'paid',
+          'Provide a concise solution to the murder mystery, explaining who the murderer is, their motive, and how they committed the crime.',
+          testMode
+        );
+        
+        content += `\n\n# SOLUTION\n\n`;
+        content += solutionContent.trim();
+      } else {
+        // Test mode placeholder
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        content += `\n\n# SOLUTION\n\n`;
+        content += `This is a test mode solution. In production, this would reveal the murderer and their motives.\n`;
+      }
+      
+      // Final content update
       await supabase
         .from("mystery_packages")
         .update({
@@ -343,6 +477,10 @@ async function processGeneration(
           updated_at: new Date().toISOString()
         })
         .eq("id", packageId);
+    } catch (solutionError) {
+      console.error("Error generating solution:", solutionError);
+      content += `\n\n# SOLUTION\n\n`;
+      content += `*There was an error generating the solution. Please try regenerating the package.*\n\n`;
     }
     
     // Mark as completed
@@ -355,7 +493,8 @@ async function processGeneration(
         characters: true,
         clues: true,
         inspectorScript: true,
-        characterMatrix: true
+        characterMatrix: true,
+        solution: true
       }
     };
     
@@ -370,6 +509,21 @@ async function processGeneration(
     await saveGenerationState(mysteryId, {
       generationStatus: completedStatus
     });
+    
+    // Update the conversation record to mark package as generated
+    try {
+      await supabase
+        .from("conversations")
+        .update({
+          has_complete_package: true,
+          needs_package_generation: false,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", mysteryId);
+    } catch (updateErr) {
+      console.error("Warning: Could not update conversation record:", updateErr);
+      // Don't throw here as generation was successful
+    }
     
     await clearGenerationState(mysteryId);
     
