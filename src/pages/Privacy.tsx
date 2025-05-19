@@ -1,10 +1,16 @@
 
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import Head from "@/components/Head";
 
 const Privacy = () => {
   return (
     <div className="min-h-screen flex flex-col">
+      <Head 
+        title="Privacy Policy" 
+        description="Our commitment to protecting your privacy and personal information when using the Murder Mystery Party Generator."
+        canonical="https://murder-mystery.party/privacy"
+      />
       <Header />
       
       <main className="flex-1 py-16 px-4">

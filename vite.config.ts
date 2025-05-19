@@ -3,6 +3,19 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
+import ssr from 'vite-plugin-ssr/plugin';
+
+// List of routes to prerender for SEO
+const routesToPrerender = [
+  "/",
+  "/showcase",
+  "/contact",
+  "/privacy",
+  "/support",
+  "/sign-in",
+  "/sign-up",
+  "/forgot-password",
+];
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -14,6 +27,13 @@ export default defineConfig(({ mode }) => ({
     react(),
     mode === 'development' &&
     componentTagger(),
+    // Add SSR plugin for static generation
+    ssr({
+      prerender: {
+        routes: routesToPrerender,
+        partial: true, // Allow client-side routing for non-prerendered routes
+      },
+    }),
   ].filter(Boolean),
   resolve: {
     alias: {
@@ -27,5 +47,20 @@ export default defineConfig(({ mode }) => ({
   },
   optimizeDeps: {
     include: ['react-markdown', 'rehype-raw']
+  },
+  build: {
+    // Generate source maps for better debugging
+    sourcemap: true,
+    // Make output directory clean on each build
+    emptyOutDir: true,
+    // Optimize chunks for better loading performance
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          ui: ['@radix-ui/react-tabs', '@radix-ui/react-toast'],
+        }
+      }
+    }
   }
 }));

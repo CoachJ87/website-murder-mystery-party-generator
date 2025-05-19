@@ -2,6 +2,7 @@
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Footer from "@/components/Footer";
+import Head from "@/components/Head";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { FeatureSteps } from "@/components/ui/feature-steps";
@@ -57,6 +58,10 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <Head 
+        title="Create Custom Murder Mystery Parties" 
+        description="Generate unique murder mystery party scenarios with our AI-powered tool. Customize themes, characters, and plots for unforgettable events."
+      />
       <Header />
       
       <main className="flex-1">
