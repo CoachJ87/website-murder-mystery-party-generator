@@ -45,12 +45,14 @@ export default defineConfig(({ mode }) => ({
     sourcemap: true,
     // Make output directory clean on each build
     emptyOutDir: true,
+    // Output directory
+    outDir: 'dist',
     // Optimize chunks for better loading performance
     rollupOptions: {
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-router-dom'],
-          ui: ['@radix-ui/react-tabs', '@radix-ui/react-toast'],
+          ui: ['@radix-ui/react-tabs', '@radix-ui/react-toast']
         }
       }
     }

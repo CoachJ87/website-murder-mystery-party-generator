@@ -7,8 +7,8 @@
 
 # Specify Node.js version (using LTS version)
 [build.environment]
-  NODE_VERSION = "18" # Using Node.js 18.x LTS
-  NPM_VERSION = "9" # Use npm 9 which is stable with Node 18
+  NODE_VERSION = "18"
+  NPM_VERSION = "9"
   # Disable corepack to prevent pnpm auto-detection
   NETLIFY_USE_PNPM = "false"
   NETLIFY_USE_YARN = "false"
