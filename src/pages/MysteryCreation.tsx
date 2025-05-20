@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -6,7 +7,6 @@ import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { supabase } from "@/lib/supabase";
-import MysteryForm from "@/components/MysteryForm";
 import MysteryChat from "@/components/MysteryChat";
 import { useAuth } from "@/context/AuthContext";
 import { Message, FormValues } from "@/components/types";
@@ -14,12 +14,12 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 
 const MysteryCreation = () => {
-    const [saving, setSaving] = useState(false);
-    const [showChatUI, setShowChatUI] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [formData, setFormData] = useState<FormValues | null>(null);
     const [conversationId, setConversationId] = useState<string | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);
     const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+    const [systemInstruction, setSystemInstruction] = useState<string | null>(null);
     const navigate = useNavigate();
     const { id } = useParams();
     const isEditing = !!id;
@@ -30,34 +30,10 @@ const MysteryCreation = () => {
         if (isEditing && id) {
             console.log("useEffect [id] triggered. ID:", id);
             loadExistingConversation(id);
+        } else {
+            setLoading(false);
         }
     }, [id]);
-
-    // Create a system message based on form data
-    const createSystemMessage = (data: FormValues) => {
-        let systemMsg = "This is a murder mystery creation conversation. ";
-        systemMsg += "The user has ALREADY selected the following preferences, so DO NOT ask about these again: ";
-        
-        if (data.theme) {
-            systemMsg += `Theme: ${data.theme}. `;
-        }
-        if (data.playerCount) {
-            systemMsg += `Player count: ${data.playerCount}. `;
-        }
-        if (data.hasAccomplice !== undefined) {
-            systemMsg += `Accomplice: ${data.hasAccomplice ? "Yes" : "No"}. `;
-        }
-        if (data.scriptType) {
-            systemMsg += `Script type: ${data.scriptType}. `;
-        }
-        if (data.additionalDetails) {
-            systemMsg += `Additional details: ${data.additionalDetails}. `;
-        }
-        
-        systemMsg += "Please start directly with creating a suitable murder mystery based on these preferences without asking clarifying questions about these specified parameters. You may ask about other aspects of the mystery if needed.";
-        
-        return systemMsg;
-    };
 
     const extractTitleFromMessages = (messages: any[]) => {
         if (!messages || messages.length === 0) return null;
@@ -105,7 +81,7 @@ const MysteryCreation = () => {
             console.log("Loading conversation with ID:", conversationId);
             const { data, error } = await supabase
                 .from("conversations")
-                .select("*, messages(*)")
+                .select("*, messages(*), system_instruction")
                 .eq("id", conversationId)
                 .maybeSingle();
 
@@ -119,13 +95,22 @@ const MysteryCreation = () => {
             
             if (data) {
                 console.log("Loaded conversation data:", data);
-                setShowChatUI(true);
                 setConversationId(data.id);
                 setMessages(data.messages as Message[] || []);
+                setSystemInstruction(data.system_instruction);
 
-                if (data.mystery_data) {
-                    setFormData(data.mystery_data as FormValues);
+                // Create minimal form data with just the theme
+                let theme = "Murder Mystery";
+                if (data.mystery_data && typeof data.mystery_data === 'object') {
+                    theme = data.mystery_data.theme || theme;
                 }
+                
+                const minimalFormData: FormValues = {
+                    theme: theme,
+                    title: data.title || `${theme} Mystery`,
+                };
+                
+                setFormData(minimalFormData);
 
                 if (data.messages && data.messages.length > 0) {
                     const aiTitle = extractTitleFromMessages(data.messages);
@@ -149,6 +134,7 @@ const MysteryCreation = () => {
             toast.error("Failed to load conversation");
         } finally {
             setIsLoadingHistory(false);
+            setLoading(false);
         }
     };
 
@@ -176,75 +162,6 @@ const MysteryCreation = () => {
             }
         } catch (error) {
             console.error("Error saving message:", error);
-        }
-    };
-
-    const handleSave = async (data: FormValues) => {
-        try {
-            setSaving(true);
-            console.log("formData on save:", data);
-
-            await new Promise<void>((resolve) => {
-                setFormData(data);
-                resolve();
-            });
-
-            if (isAuthenticated && user) {
-                let newConversationId = id;
-
-                // Create system instruction based on form data
-                const systemInstruction = createSystemMessage(data);
-
-                if (!isEditing) {
-                    const { data: newConversation, error } = await supabase
-                        .from("conversations")
-                        .insert({
-                            title: data.title || `${data.theme} Mystery`,
-                            mystery_data: data,
-                            user_id: user.id,
-                            system_instruction: systemInstruction  // Save the system instruction
-                        })
-                        .select()
-                        .single();
-
-                    if (error) {
-                        console.error("Error saving mystery:", error);
-                        toast.error("Failed to save mystery data");
-                    } else if (newConversation) {
-                        newConversationId = newConversation.id;
-                        setConversationId(newConversationId);
-                    }
-                } else {
-                    const { error } = await supabase
-                        .from("conversations")
-                        .update({
-                            title: data.title || `${data.theme} Mystery`,
-                            mystery_data: data,
-                            updated_at: new Date().toISOString(),
-                            system_instruction: systemInstruction  // Update the system instruction
-                        })
-                        .eq("id", id);
-
-                    if (error) {
-                        console.error("Error updating mystery:", error);
-                        toast.error("Failed to update mystery data");
-                    }
-                }
-
-                setShowChatUI(true);
-                if (newConversationId && newConversationId !== id) {
-                    navigate(`/mystery/edit/${newConversationId}`, { replace: true });
-                }
-            } else {
-                setShowChatUI(true);
-            }
-
-            await new Promise(resolve => setTimeout(resolve, 500));
-        } catch (error) {
-            console.error("Error saving mystery:", error);
-            toast.error(`Failed to ${isEditing ? "update" : "create"} mystery`);
-        } finally {
-            setSaving(false);
         }
     };
 
@@ -280,6 +197,21 @@ const MysteryCreation = () => {
         }
     };
 
+    if (loading) {
+        return (
+            <div className="min-h-screen flex flex-col">
+                <Header />
+                <main className="flex-1 flex items-center justify-center">
+                    <div className="animate-pulse flex flex-col items-center">
+                        <div className="h-8 w-64 bg-secondary rounded mb-4"></div>
+                        <div className="h-4 w-48 bg-muted rounded"></div>
+                    </div>
+                </main>
+                <Footer />
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen flex flex-col">
             <Header />
@@ -290,15 +222,13 @@ const MysteryCreation = () => {
                             {isEditing ? "Edit Mystery" : "Create New Mystery"}
                         </h1>
                         <p className="text-muted-foreground">
-                            {showChatUI
-                                ? "Chat with our AI to refine your murder mystery"
-                                : "Start your new mystery by selecting from the options below."}
+                            Chat with our AI to refine your murder mystery
                         </p>
                     </div>
 
                     <Card className={isMobile ? "border-0 shadow-none bg-transparent" : ""}>
                         <CardContent className={cn("p-6", isMobile && "p-0")}>
-                            {showChatUI && formData ? (
+                            {formData ? (
                                 <MysteryChat
                                     initialTheme={formData?.theme}
                                     savedMysteryId={id}
@@ -310,35 +240,30 @@ const MysteryCreation = () => {
                                     initialAdditionalDetails={formData?.additionalDetails}
                                     initialMessages={messages}
                                     isLoadingHistory={isLoadingHistory}
-                                    systemInstruction={createSystemMessage(formData)}
+                                    systemInstruction={systemInstruction}
                                 />
                             ) : (
-                                <MysteryForm
-                                    onSave={handleSave}
-                                    isSaving={saving}
-                                />
+                                <div className="p-8 text-center">
+                                    <p>No mystery data found. Please return to the dashboard and try again.</p>
+                                    <Button 
+                                        className="mt-4"
+                                        onClick={() => navigate("/dashboard")}
+                                    >
+                                        Back to Dashboard
+                                    </Button>
+                                </div>
                             )}
                         </CardContent>
                     </Card>
 
                     <div className={cn("mt-8 flex justify-center gap-4", isMobile && "mt-4")}>
-                        {showChatUI ? (
-                            <Button
-                                variant="outline"
-                                onClick={() => navigate("/dashboard")}
-                                size={isMobile ? "sm" : "default"}
-                            >
-                                Back to Dashboard
-                            </Button>
-                        ) : (
-                            <Button 
-                                variant="outline" 
-                                onClick={() => navigate("/dashboard")}
-                                size={isMobile ? "sm" : "default"}
-                            >
-                                Back to Dashboard
-                            </Button>
-                        )}
+                        <Button
+                            variant="outline"
+                            onClick={() => navigate("/dashboard")}
+                            size={isMobile ? "sm" : "default"}
+                        >
+                            Back to Dashboard
+                        </Button>
                     </div>
                 </div>
             </main>

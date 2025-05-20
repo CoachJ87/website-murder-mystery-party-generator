@@ -76,22 +76,95 @@ const Hero = () => {
     setInputValue(prompt);
   };
 
+  // Extract theme from prompt
+  const extractThemeFromPrompt = (prompt: string) => {
+    // Check if the prompt directly mentions a theme
+    const themeMatch = prompt.match(/theme[d]?\s+(is|of|as|for|about|like)?\s+([a-zA-Z0-9\s'"-]+)/i);
+    if (themeMatch && themeMatch[2]) {
+      return themeMatch[2].trim();
+    }
+    
+    // Check for direct mentions of settings
+    const settings = [
+      "speakeasy", "hollywood", "castle", "space", "gallery", "bakery", "resort", 
+      "train", "university", "tournament", "dreamworld", "waterworld", "jungle", 
+      "magical", "gaming", "80s", "beach", "opera", "vineyard", "safari", "fashion", 
+      "casino", "fairy tale", "colony", "superhero", "underwater", "wild west", 
+      "viking", "candy", "dragon", "time travel", "atlantis", "toys", "vampire", 
+      "dimension", "cyberpunk", "ghost ship", "plant"
+    ];
+    
+    const lowerPrompt = prompt.toLowerCase();
+    for (const setting of settings) {
+      if (lowerPrompt.includes(setting)) {
+        return setting.charAt(0).toUpperCase() + setting.slice(1);
+      }
+    }
+    
+    // Default to a generic theme if none detected
+    return "Murder Mystery";
+  };
+
+  const createSystemInstruction = (prompt: string, theme: string) => {
+    let systemMsg = "This is a murder mystery creation conversation. ";
+    systemMsg += `The user wants to create a murder mystery with theme: ${theme}. `;
+    systemMsg += "Please proceed with creating a murder mystery based on this theme. ";
+    
+    // Important change: Include the full output format guidance
+    systemMsg += `\n\nYou MUST follow this exact output format for ALL your responses:
+
+## OUTPUT FORMAT
+Present your mystery preview in an engaging, dramatic format that will excite the user. Include:
+
+# "[CREATIVE TITLE]" - A [THEME] MURDER MYSTERY
+
+## PREMISE
+[2-3 paragraphs setting the scene, describing the event where the murder takes place, and creating dramatic tension]
+
+## VICTIM
+**[Victim Name]** - [Vivid description of the victim, their role in the story, personality traits, and why they might have made enemies]
+
+## CHARACTER LIST ([PLAYER COUNT] PLAYERS)
+1. **[Character 1 Name]** - [Engaging one-sentence description including profession and connection to victim]
+2. **[Character 2 Name]** - [Engaging one-sentence description including profession and connection to victim]
+[Continue for all characters]
+
+## MURDER METHOD
+[Paragraph describing how the murder was committed, interesting details about the method, and what clues might be found]
+
+[After presenting the mystery concept, ask if the concept works for them and explain that they can continue to make edits and that once they are done they can press the 'Generate Mystery' button where they can create a complete game package with detailed character guides, host instructions, and game materials if they choose to purchase.]`;
+
+    return systemMsg;
+  };
+
   const createNewConversation = async (prompt: string) => {
     if (!user?.id) return;
     
     setIsCreating(true);
     
     try {
+      // Extract theme from prompt
+      const theme = extractThemeFromPrompt(prompt);
+      
+      // Create system instruction
+      const systemInstruction = createSystemInstruction(prompt, theme);
+      
+      // Create mystery data
+      const mysteryData = {
+        theme: theme,
+        prompt: prompt,
+      };
+      
+      console.log("Creating new conversation with theme:", theme);
+      
       // Create a new conversation in the database
       const { data: conversation, error: conversationError } = await supabase
         .from("conversations")
         .insert({
           user_id: user.id,
-          title: "New Mystery",
-          mystery_data: {
-            prompt: prompt,
-            status: "draft"
-          },
+          title: `${theme} Mystery`,
+          mystery_data: mysteryData,
+          system_instruction: systemInstruction
         })
         .select()
         .single();
