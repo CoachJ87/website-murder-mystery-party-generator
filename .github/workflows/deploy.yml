@@ -15,10 +15,12 @@ jobs:
           node-version: '18'
           cache: 'npm'
 
-      - name: Delete pnpm and yarn lock files if they exist
+      - name: Delete all lock files except package-lock.json
         run: |
           rm -f pnpm-lock.yaml
           rm -f yarn.lock
+          rm -f .pnpmfile.cjs
+          rm -f .pnp.*
 
       - name: Clean npm cache
         run: npm cache clean --force

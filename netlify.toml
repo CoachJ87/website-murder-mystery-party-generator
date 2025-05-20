@@ -16,6 +16,10 @@
   COREPACK_ENABLE = "0"
   # Force npm usage
   FORCE_NPM_USAGE = "true"
+  # Extra npm configuration
+  NPM_CONFIG_ENGINE_STRICT = "true"
+  NPM_CONFIG_PACKAGE_LOCK = "true"
+  NPM_CONFIG_PACKAGE_LOCK_ONLY = "false"
 
 # Handle client-side routing for SPA
 [[redirects]]
