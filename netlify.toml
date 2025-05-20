@@ -2,13 +2,13 @@
 # netlify.toml
 
 [build]
-  command = "npm run build"
+  command = "npm ci && npm run build"
   publish = "dist"
 
 # Specify Node.js version (using LTS version)
 [build.environment]
   NODE_VERSION = "18" # Using Node.js 18.x LTS
-  NPM_FLAGS = "--no-frozen-lockfile" # Allow dependency updates during build
+  NPM_VERSION = "9" # Use npm 9 which is stable with Node 18
 
 # Handle client-side routing for SPA
 [[redirects]]
