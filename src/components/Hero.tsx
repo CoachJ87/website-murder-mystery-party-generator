@@ -6,6 +6,8 @@ import { AIInputWithLoading } from "@/components/ui/ai-input-with-loading";
 import SignInPrompt from "@/components/SignInPrompt";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { supabase } from "@/lib/supabase";
 
 // Define all possible mystery themes with their corresponding prompts
 const MYSTERY_THEMES = [
@@ -54,7 +56,8 @@ const Hero = () => {
   const [selectedThemes, setSelectedThemes] = useState<typeof MYSTERY_THEMES>([]);
   const [inputValue, setInputValue] = useState("");
   const [showSignInPrompt, setShowSignInPrompt] = useState(false);
-  const { isAuthenticated } = useAuth();
+  const [isCreating, setIsCreating] = useState(false);
+  const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
 
   // Function to randomly select themes
@@ -73,9 +76,71 @@ const Hero = () => {
     setInputValue(prompt);
   };
 
+  const createNewConversation = async (prompt: string) => {
+    if (!user?.id) return;
+    
+    setIsCreating(true);
+    
+    try {
+      // Create a new conversation in the database
+      const { data: conversation, error: conversationError } = await supabase
+        .from("conversations")
+        .insert({
+          user_id: user.id,
+          title: "New Mystery",
+          mystery_data: {
+            prompt: prompt,
+            status: "draft"
+          },
+        })
+        .select()
+        .single();
+
+      if (conversationError) {
+        toast.error("Failed to create new conversation");
+        console.error(conversationError);
+        return;
+      }
+
+      if (!conversation?.id) {
+        toast.error("Failed to get conversation ID");
+        return;
+      }
+      
+      // Add the initial message to the conversation
+      const { error: messageError } = await supabase
+        .from("messages")
+        .insert({
+          conversation_id: conversation.id,
+          content: prompt,
+          role: "user"
+        });
+
+      if (messageError) {
+        toast.error("Failed to create initial message");
+        console.error(messageError);
+        return;
+      }
+
+      // Navigate to the mystery creation page with the conversation ID
+      navigate(`/mystery/edit/${conversation.id}`);
+      
+    } catch (error) {
+      console.error("Error creating conversation:", error);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
   const handleSubmit = (value: string) => {
+    if (!value.trim()) {
+      toast.error("Please enter a description for your mystery");
+      return;
+    }
+    
     if (isAuthenticated) {
-      navigate("/mystery/create");
+      createNewConversation(value);
     } else {
       setShowSignInPrompt(true);
     }
@@ -92,15 +157,20 @@ const Hero = () => {
           Host a Killer Party Tonight.
         </h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-5">
-          Generate custom murder mysteries with characters, clues, and everything you need.
+          {isAuthenticated 
+            ? "Tell us what you'd like to create and we'll make it happen."
+            : "Generate custom murder mysteries with characters, clues, and everything you need."}
         </p>
         
         <div className="max-w-xl mx-auto">
           <AIInputWithLoading
-            placeholder="What kind of murder mystery would you like to host?"
+            placeholder={isAuthenticated 
+              ? "What kind of murder mystery would you like to create today?" 
+              : "What kind of murder mystery would you like to host?"}
             value={inputValue}
             setValue={setInputValue}
             onSubmit={handleSubmit}
+            loading={isCreating}
           />
         </div>
         
