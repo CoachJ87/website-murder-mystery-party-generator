@@ -122,7 +122,7 @@ const Hero = () => {
         return;
       }
 
-      // Navigate to the mystery creation page with the conversation ID
+      // Navigate directly to the mystery creation page with the conversation ID
       navigate(`/mystery/edit/${conversation.id}`);
       
     } catch (error) {

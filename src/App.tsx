@@ -13,7 +13,6 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import CheckEmail from "./pages/CheckEmail";
 import AccountSettings from "./pages/AccountSettings";
-import MysteryDashboard from "./pages/MysteryDashboard";
 import MysteryCreation from "./pages/MysteryCreation";
 import MysteryPreview from "./pages/MysteryPreview";
 import MysteryPurchase from "./pages/MysteryPurchase";
@@ -75,15 +74,15 @@ const AppRoutes = () => (
     <Route path="/support" element={<Support />} />
     
     {/* Payment success and cancel routes */}
-    <Route path="/payment-success" element={<Navigate to="/dashboard" replace />} />
-    <Route path="/payment-canceled" element={<Navigate to="/dashboard" replace />} />
+    <Route path="/payment-success" element={<Navigate to="/" replace />} />
+    <Route path="/payment-canceled" element={<Navigate to="/" replace />} />
     
     {/* Protected routes */}
     <Route 
       path="/dashboard" 
       element={
         <ProtectedRoute>
-          <MysteryDashboard />
+          <Index />
         </ProtectedRoute>
       } 
     />
