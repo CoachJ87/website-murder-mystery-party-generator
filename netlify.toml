@@ -5,6 +5,11 @@
   command = "npm run build"
   publish = "dist"
 
+# Specify Node.js version (using LTS version)
+[build.environment]
+  NODE_VERSION = "18" # Using Node.js 18.x LTS
+  NPM_FLAGS = "--no-frozen-lockfile" # Allow dependency updates during build
+
 # Handle client-side routing for SPA
 [[redirects]]
   from = "/*"
