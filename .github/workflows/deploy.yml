@@ -15,11 +15,16 @@ jobs:
           node-version: '18'
           cache: 'npm'
 
-      - name: Delete pnpm lock file if it exists
-        run: rm -f pnpm-lock.yaml
+      - name: Delete pnpm and yarn lock files if they exist
+        run: |
+          rm -f pnpm-lock.yaml
+          rm -f yarn.lock
 
       - name: Clean npm cache
         run: npm cache clean --force
+
+      - name: Create fresh package-lock.json
+        run: npm install --package-lock-only
 
       - name: Install dependencies with npm
         run: npm ci

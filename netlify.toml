@@ -14,6 +14,8 @@
   NETLIFY_USE_YARN = "false"
   # Disable Corepack to prevent package manager auto-detection
   COREPACK_ENABLE = "0"
+  # Force npm usage
+  FORCE_NPM_USAGE = "true"
 
 # Handle client-side routing for SPA
 [[redirects]]
