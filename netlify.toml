@@ -20,6 +20,9 @@
   NPM_CONFIG_ENGINE_STRICT = "true"
   NPM_CONFIG_PACKAGE_LOCK = "true"
   NPM_CONFIG_PACKAGE_LOCK_ONLY = "false"
+  # Disable pnpm
+  DISABLE_PNPM = "true"
+  PNPM_DISABLE = "true"
 
 # Handle client-side routing for SPA
 [[redirects]]
