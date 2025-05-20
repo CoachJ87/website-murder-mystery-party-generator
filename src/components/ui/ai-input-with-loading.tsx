@@ -19,6 +19,7 @@ interface AIInputWithLoadingProps {
   autoAnimate?: boolean;
   value?: string;
   setValue?: (value: string) => void;
+  loading?: boolean; // Add the loading prop here
 }
 
 export function AIInputWithLoading({
@@ -32,10 +33,11 @@ export function AIInputWithLoading({
   className,
   autoAnimate = false,
   value,
-  setValue
+  setValue,
+  loading = false, // Add default value for loading
 }: AIInputWithLoadingProps) {
   const [inputValue, setInputValue] = useState(value || "");
-  const [submitted, setSubmitted] = useState(autoAnimate);
+  const [submitted, setSubmitted] = useState(autoAnimate || loading); // Update to use loading prop
   const [isAnimating, setIsAnimating] = useState(autoAnimate);
   
   const { textareaRef, adjustHeight } = useAutoResizeTextarea({
@@ -49,6 +51,11 @@ export function AIInputWithLoading({
       setTimeout(() => adjustHeight(), 0);
     }
   }, [value, adjustHeight]);
+
+  // Update submitted state when loading prop changes
+  useEffect(() => {
+    setSubmitted(loading);
+  }, [loading]);
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
