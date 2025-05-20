@@ -13,10 +13,19 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '18'
+          cache: 'npm'
 
-      - run: npm install
+      - name: Delete pnpm lock file if it exists
+        run: rm -f pnpm-lock.yaml
 
-      - run: npm run build
+      - name: Clean npm cache
+        run: npm cache clean --force
+
+      - name: Install dependencies with npm
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
 
       - name: Copy index.html to 404.html
         run: cp dist/index.html dist/404.html
