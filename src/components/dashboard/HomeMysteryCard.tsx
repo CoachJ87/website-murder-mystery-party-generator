@@ -19,30 +19,28 @@ export function HomeMysteryCard({ mystery, onViewMystery }: HomeMysteryCardProps
       onClick={() => onViewMystery(mystery.id)}
     >
       <CardHeader className="pb-2">
-        <CardTitle className="flex justify-between items-start gap-2 line-clamp-2 min-h-[3rem]">
-          <span>{mystery.title}</span>
-          {isPurchased ? (
-            <span className="text-xs px-2 py-1 bg-primary text-primary-foreground rounded-full shrink-0">
-              <CheckCircle2 className="h-3 w-3 inline-block mr-1" />
-              Purchased
-            </span>
-          ) : (
-            <span className="text-xs px-2 py-1 bg-secondary text-secondary-foreground rounded-full shrink-0">
-              Draft
-            </span>
-          )}
-        </CardTitle>
+        <div className="flex items-start justify-between gap-2">
+          <CardTitle className="line-clamp-2 min-h-[3rem]">
+            {mystery.title}
+          </CardTitle>
+          <div className="shrink-0">
+            {isPurchased ? (
+              <span className="text-xs px-2 py-1 bg-primary text-primary-foreground rounded-full inline-flex items-center whitespace-nowrap">
+                <CheckCircle2 className="h-3 w-3 mr-1" />
+                Purchased
+              </span>
+            ) : (
+              <span className="text-xs px-2 py-1 bg-secondary text-secondary-foreground rounded-full inline-flex items-center whitespace-nowrap">
+                Draft
+              </span>
+            )}
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <p className="text-sm text-muted-foreground mb-4">
           Edited {formatRelativeTime(mystery.updated_at)}
         </p>
-        
-        {mystery.guests && (
-          <p className="text-sm text-muted-foreground mb-4">
-            Players: {mystery.guests}
-          </p>
-        )}
         
         <Button 
           size="sm" 
