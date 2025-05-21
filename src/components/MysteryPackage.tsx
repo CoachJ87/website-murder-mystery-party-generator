@@ -1,4 +1,3 @@
-
 // src/components/MysteryPackage.tsx
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
@@ -262,6 +261,7 @@ const MysteryPackage = ({ mysteryId, title }: MysteryPackageProps) => {
               mysteryTitle={title}
               generationStatus={generationStatus || undefined}
               conversationId={mysteryId}
+              isGenerating={generating} // Add the missing isGenerating prop
             />
             
             {generationStatus?.status === 'failed' && (

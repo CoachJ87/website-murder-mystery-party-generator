@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
@@ -10,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import HomeDashboard from "@/components/dashboard/HomeDashboard";
+import { HomeDashboard } from "@/components/dashboard/HomeDashboard";
 
 const Dashboard = () => {
   const navigate = useNavigate();

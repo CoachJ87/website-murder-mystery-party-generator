@@ -11,7 +11,7 @@ import { useAuth } from "@/context/AuthContext";
 import { PlusCircle } from "lucide-react";
 import SignInPrompt from "@/components/SignInPrompt";
 import { MysteryFilters } from "@/components/dashboard/MysteryFilters";
-import { MysteryList } from "@/components/dashboard/MysteryList";
+import MysteryList from "@/components/dashboard/MysteryList";
 import { Mystery } from "@/interfaces/mystery";
 
 const MysteryDashboard = () => {
