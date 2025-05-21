@@ -10,9 +10,11 @@ import { Faq1 } from "@/components/ui/faq1";
 import { HowItWorks } from "@/components/ui/how-it-works";
 import { useAuth } from "@/context/AuthContext";
 import { HomeDashboard } from "@/components/dashboard/HomeDashboard";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   
   // Feature Steps data
   const features = [
@@ -60,6 +62,10 @@ const Index = () => {
     }
   ];
 
+  const handleCreateNew = () => {
+    navigate("/mystery/new");
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Head 
@@ -74,7 +80,7 @@ const Index = () => {
         
         {isAuthenticated ? (
           // Content for logged-in users
-          <HomeDashboard />
+          <HomeDashboard onCreateNew={handleCreateNew} />
         ) : (
           // Content for non-logged-in users
           <>

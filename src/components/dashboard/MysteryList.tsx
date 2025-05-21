@@ -90,7 +90,7 @@ const MysteryList = ({ mysteries, isLoading, onRefresh }: MysteryListProps) => {
               key={mystery.id}
               mystery={mystery}
               onDelete={() => handleDeleteMystery(mystery.id)}
-              onClick={() => navigate(`/mystery/${mystery.id}`)}
+              onEdit={() => navigate(`/mystery/${mystery.id}`)}
             />
           ))}
         </div>

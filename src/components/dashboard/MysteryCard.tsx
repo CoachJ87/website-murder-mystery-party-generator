@@ -9,12 +9,11 @@ import { toast } from "@/hooks/use-toast";
 
 interface MysteryCardProps {
   mystery: Mystery;
-  onStatusChange: (id: string, status: "draft" | "purchased" | "archived") => void;
   onDelete: (id: string) => void;
   onEdit: (id: string) => void;
 }
 
-export const MysteryCard = ({ mystery, onStatusChange, onDelete, onEdit }: MysteryCardProps) => {
+export const MysteryCard = ({ mystery, onDelete, onEdit }: MysteryCardProps) => {
   // Check multiple status indicators for purchase status
   const isPurchased = mystery.status === "purchased" || 
                       mystery.is_purchased === true;
@@ -125,7 +124,6 @@ export const MysteryCard = ({ mystery, onStatusChange, onDelete, onEdit }: Myste
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => onStatusChange(mystery.id, "archived")}
                 className="flex-1 min-w-[80px]"
               >
                 <Archive className="h-4 w-4 mr-2" />
@@ -136,7 +134,7 @@ export const MysteryCard = ({ mystery, onStatusChange, onDelete, onEdit }: Myste
               <Button
                 size="sm"
                 variant="default"
-                onClick={handleViewMystery}
+                onClick={() => onEdit(mystery.id)}
                 className="w-full"
               >
                 <Eye className="h-4 w-4 mr-2" />
@@ -177,7 +175,6 @@ export const MysteryCard = ({ mystery, onStatusChange, onDelete, onEdit }: Myste
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => onStatusChange(mystery.id, "draft")}
                 className="flex-1 min-w-[80px]"
               >
                 <Edit className="h-4 w-4 mr-2" />
@@ -219,7 +216,6 @@ export const MysteryCard = ({ mystery, onStatusChange, onDelete, onEdit }: Myste
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => onStatusChange(mystery.id, "archived")}
                 className="flex-1 min-w-[80px]"
               >
                 <Archive className="h-4 w-4 mr-2" />

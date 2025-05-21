@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -254,8 +253,8 @@ const MysteryDashboard = () => {
     navigate("/mystery/create");
   };
 
-  const handleEdit = (id: string) => {
-    navigate(`/mystery/edit/${id}`);
+  const handleRefresh = () => {
+    fetchUserMysteries();
   };
 
   return (
@@ -301,10 +300,8 @@ const MysteryDashboard = () => {
 
                 <MysteryList
                   mysteries={filteredMysteries}
-                  onStatusChange={handleStatusChange}
-                  onDelete={handleDeleteMystery}
-                  onEdit={handleEdit}
-                  loading={loading}
+                  isLoading={loading}
+                  onRefresh={handleRefresh}
                 />
               </Tabs>
             </>
