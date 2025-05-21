@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -12,7 +11,11 @@ import { Search, ArrowDown } from "lucide-react";
 import { MysteryFilterTabs } from "./MysteryFilterTabs";
 import { HomeMysteryCard } from "./HomeMysteryCard";
 
-export const HomeDashboard = () => {
+interface HomeDashboardProps {
+  onCreateNew: () => void;
+}
+
+export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [mysteries, setMysteries] = useState<Mystery[]>([]);

@@ -8,24 +8,13 @@ import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import { Mystery } from "@/interfaces/mystery";
 
 interface Message {
   id: string;
   content: string;
   is_ai: boolean;
   created_at: string;
-}
-
-interface Mystery {
-  id: string;
-  title: string;
-  created_at: string;
-  updated_at: string;
-  display_status: string;
-  mystery_data: any;
-  is_paid: boolean;
-  messages: Message[];
-  [key: string]: any;
 }
 
 interface MysteryListProps {
