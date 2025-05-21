@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -237,6 +238,11 @@ export const HomeDashboard = () => {
     }
   };
 
+  const handleMysteryUpdated = () => {
+    fetchMysteries(1, true);
+    fetchMysteryCounts();
+  };
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
@@ -300,6 +306,7 @@ export const HomeDashboard = () => {
                   key={mystery.id} 
                   mystery={mystery}
                   onViewMystery={handleViewMystery}
+                  onMysteryUpdated={handleMysteryUpdated}
                 />
               ))}
             </div>

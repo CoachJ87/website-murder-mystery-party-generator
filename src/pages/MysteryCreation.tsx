@@ -15,11 +15,11 @@ import { cn } from "@/lib/utils";
 
 const MysteryCreation = () => {
     const [loading, setLoading] = useState(true);
-    const [formData, setFormData] = useState<FormValues | null>(null);
-    const [conversationId, setConversationId] = useState<string | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);
     const [isLoadingHistory, setIsLoadingHistory] = useState(false);
     const [systemInstruction, setSystemInstruction] = useState<string | null>(null);
+    const [conversationId, setConversationId] = useState<string | null>(null);
+    const [theme, setTheme] = useState<string>("Murder Mystery");
     const navigate = useNavigate();
     const { id } = useParams();
     const isEditing = !!id;
@@ -28,7 +28,6 @@ const MysteryCreation = () => {
 
     useEffect(() => {
         if (isEditing && id) {
-            console.log("useEffect [id] triggered. ID:", id);
             loadExistingConversation(id);
         } else {
             setLoading(false);
@@ -81,7 +80,7 @@ const MysteryCreation = () => {
             console.log("Loading conversation with ID:", conversationId);
             const { data, error } = await supabase
                 .from("conversations")
-                .select("*, messages(*), system_instruction")
+                .select("*, messages(*), system_instruction, mystery_data")
                 .eq("id", conversationId)
                 .maybeSingle();
 
@@ -94,23 +93,16 @@ const MysteryCreation = () => {
             console.log("Conversation data loaded:", data);
             
             if (data) {
-                console.log("Loaded conversation data:", data);
                 setConversationId(data.id);
                 setMessages(data.messages as Message[] || []);
                 setSystemInstruction(data.system_instruction);
 
-                // Create minimal form data with just the theme
-                let theme = "Murder Mystery";
+                // Extract theme from mystery_data
+                let extractedTheme = "Murder Mystery";
                 if (data.mystery_data && typeof data.mystery_data === 'object') {
-                    theme = data.mystery_data.theme || theme;
+                    extractedTheme = data.mystery_data.theme || extractedTheme;
                 }
-                
-                const minimalFormData: FormValues = {
-                    theme: theme,
-                    title: data.title || `${theme} Mystery`,
-                };
-                
-                setFormData(minimalFormData);
+                setTheme(extractedTheme);
 
                 if (data.messages && data.messages.length > 0) {
                     const aiTitle = extractTitleFromMessages(data.messages);
@@ -228,31 +220,15 @@ const MysteryCreation = () => {
 
                     <Card className={isMobile ? "border-0 shadow-none bg-transparent" : ""}>
                         <CardContent className={cn("p-6", isMobile && "p-0")}>
-                            {formData ? (
-                                <MysteryChat
-                                    initialTheme={formData?.theme}
-                                    savedMysteryId={id}
-                                    onSave={handleSaveMessages}
-                                    onGenerateFinal={handleGenerateMystery}
-                                    initialPlayerCount={formData?.playerCount}
-                                    initialHasAccomplice={formData?.hasAccomplice}
-                                    initialScriptType={formData?.scriptType as 'full' | 'pointForm'}
-                                    initialAdditionalDetails={formData?.additionalDetails}
-                                    initialMessages={messages}
-                                    isLoadingHistory={isLoadingHistory}
-                                    systemInstruction={systemInstruction}
-                                />
-                            ) : (
-                                <div className="p-8 text-center">
-                                    <p>No mystery data found. Please return to the dashboard and try again.</p>
-                                    <Button 
-                                        className="mt-4"
-                                        onClick={() => navigate("/dashboard")}
-                                    >
-                                        Back to Dashboard
-                                    </Button>
-                                </div>
-                            )}
+                            <MysteryChat
+                                initialTheme={theme}
+                                savedMysteryId={id}
+                                onSave={handleSaveMessages}
+                                onGenerateFinal={handleGenerateMystery}
+                                initialMessages={messages}
+                                isLoadingHistory={isLoadingHistory}
+                                systemInstruction={systemInstruction}
+                            />
                         </CardContent>
                     </Card>
 

@@ -12,7 +12,13 @@ interface Message {
   role?: string;
 }
 
-export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVersion: 'free' | 'paid', systemInstruction?: string, testMode: boolean = false): Promise<string> => {
+export const getAIResponse = async (
+  messages: ApiMessage[] | Message[], 
+  promptVersion: 'free' | 'paid', 
+  systemInstruction?: string, 
+  testMode: boolean = false,
+  onStream?: (chunk: string) => void
+): Promise<string> => {
   try {
     console.log(`DEBUG: Starting getAIResponse with ${messages.length} messages, promptVersion: ${promptVersion}, testMode: ${testMode}`);
     
@@ -56,6 +62,9 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
       
     console.log(`DEBUG: Request classified as ${isLargeRequest ? 'large' : 'standard'}, chunk size: ${chunkSize}, test mode: ${testMode}`);
     
+    // Enable streaming if a stream handler is provided
+    const useStreaming = !!onStream;
+    
     while (attempts < maxAttempts) {
       attempts++;
       console.log(`DEBUG: Attempt ${attempts} of ${maxAttempts}`);
@@ -70,9 +79,9 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
           Math.min(1000, chunkSize) : // Keep test mode chunks small
           Math.min(2000, chunkSize * attempts);
           
-        console.log(`DEBUG: Using chunk size: ${adjustedChunkSize} with streaming: ${isLargeRequest}`);
+        console.log(`DEBUG: Using chunk size: ${adjustedChunkSize} with streaming: ${useStreaming || isLargeRequest}`);
         
-        // Use streaming for large requests
+        // Use streaming if explicitly requested or for large requests
         const { data: functionData, error: functionError } = await supabase.functions.invoke('mystery-ai', {
           body: {
             messages: standardMessages,
@@ -80,7 +89,7 @@ export const getAIResponse = async (messages: ApiMessage[] | Message[], promptVe
             promptVersion,
             requireFormatValidation: promptVersion === 'free', // Only enforce strict validation for free prompts
             chunkSize: adjustedChunkSize,
-            stream: isLargeRequest, // Enable streaming for large requests
+            stream: useStreaming || isLargeRequest, // Enable streaming when requested or for large requests
             testMode // Pass test mode flag to the edge function
           }
         });
@@ -233,5 +242,27 @@ export const clearGenerationState = (mysteryId: string) => {
     sessionStorage.removeItem(`mystery_generation_${mysteryId}`);
   } catch (error) {
     console.error("Failed to clear generation state:", error);
+  }
+};
+
+// Add a function to send mystery data to the webhook for paid users
+export const sendMysteryToWebhook = async (conversationId: string) => {
+  try {
+    console.log(`Sending mystery ${conversationId} to webhook for processing`);
+    
+    const { data, error } = await supabase.functions.invoke('mystery-webhook-trigger', {
+      body: { conversationId }
+    });
+    
+    if (error) {
+      console.error("Error calling webhook trigger function:", error);
+      throw new Error(`Failed to trigger webhook: ${error.message}`);
+    }
+    
+    console.log("Webhook trigger response:", data);
+    return data;
+  } catch (error) {
+    console.error("Error in sendMysteryToWebhook:", error);
+    throw error;
   }
 };

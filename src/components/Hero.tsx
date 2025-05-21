@@ -109,6 +109,8 @@ const Hero = () => {
     let systemMsg = "This is a murder mystery creation conversation. ";
     systemMsg += `The user wants to create a murder mystery with theme: ${theme}. `;
     systemMsg += "Please proceed with creating a murder mystery based on this theme. ";
+    systemMsg += "IMPORTANT: Answer only ONE question at a time. Do not combine multiple responses. ";
+    systemMsg += "Wait for the user to respond before continuing to the next step. ";
     
     // Important change: Include the full output format guidance
     systemMsg += `\n\nYou MUST follow this exact output format for ALL your responses:
@@ -146,7 +148,7 @@ Present your mystery preview in an engaging, dramatic format that will excite th
       // Extract theme from prompt
       const theme = extractThemeFromPrompt(prompt);
       
-      // Create system instruction
+      // Create system instruction with explicit instruction to answer one question at a time
       const systemInstruction = createSystemInstruction(prompt, theme);
       
       // Create mystery data
