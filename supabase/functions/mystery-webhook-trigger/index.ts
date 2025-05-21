@@ -35,7 +35,7 @@ serve(async (req) => {
     // Check if mystery is paid or should be processed for test mode
     const { data: conversation, error: conversationError } = await supabase
       .from("conversations")
-      .select("*, is_paid, display_status")
+      .select("*, user_id, title, is_paid, display_status")
       .eq("id", conversationId)
       .single();
 
@@ -47,6 +47,8 @@ serve(async (req) => {
       });
     }
 
+    const userId = conversation.user_id;
+    
     // Only proceed if the mystery is paid or in test mode
     if (!conversation.is_paid && conversation.display_status !== "purchased" && !testMode) {
       console.error("Cannot generate package for unpaid mystery without test mode");
@@ -88,6 +90,15 @@ serve(async (req) => {
       // Continue despite error, as this is not critical
     }
 
+    // Format conversation data for the webhook
+    const messages = fullConversation.messages || [];
+    
+    // Combine all messages into a single string for easier parsing
+    const concatenatedMessages = messages.map(msg => {
+      const role = msg.is_ai ? 'AI' : 'User';
+      return `${role}: ${msg.content}`;
+    }).join('\n\n');
+
     // Send data to Make.com webhook
     console.log(`Sending data to webhook for conversation: ${conversationId}`);
     const webhookResponse = await fetch(webhookUrl, {
@@ -96,8 +107,11 @@ serve(async (req) => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        conversationId,
-        conversation: fullConversation,
+        userId: userId,
+        conversationId: conversationId,
+        title: fullConversation.title || "Mystery",
+        conversationContent: concatenatedMessages,
+        fullConversation: fullConversation, // Send the full conversation object as backup
         timestamp: new Date().toISOString(),
         testMode
       })

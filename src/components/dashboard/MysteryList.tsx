@@ -66,6 +66,11 @@ const MysteryList = ({ mysteries, isLoading, onRefresh }: MysteryListProps) => {
     }
   };
 
+  // Handle editing a mystery
+  const handleEditMystery = (mysteryId: string) => {
+    navigate(`/mystery/${mysteryId}`);
+  };
+
   return (
     <div className="space-y-6">
       {/* Search */}
@@ -90,7 +95,7 @@ const MysteryList = ({ mysteries, isLoading, onRefresh }: MysteryListProps) => {
               key={mystery.id}
               mystery={mystery}
               onDelete={() => handleDeleteMystery(mystery.id)}
-              onEdit={() => navigate(`/mystery/${mystery.id}`)}
+              onEdit={() => handleEditMystery(mystery.id)}
             />
           ))}
         </div>

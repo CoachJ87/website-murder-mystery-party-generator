@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -148,7 +147,7 @@ const MysteryChatCreator = () => {
                 .insert({
                     conversation_id: conversationId,
                     content: message.content,
-                    is_ai: message.is_ai,
+                    is_ai: message.is_ai, // Ensure this value is correctly passed from the Message object
                     role: message.is_ai ? "assistant" : "user", // Set role based on is_ai
                 });
 

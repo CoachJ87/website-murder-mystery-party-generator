@@ -1,3 +1,4 @@
+
 // api/webhook.js
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
@@ -82,7 +83,8 @@ export default async function handler(req) {
           const { error: conversationUpdateError } = await supabaseAdmin
             .from('conversations')
             .update({ 
-              is_paid: true, 
+              is_paid: true,
+              display_status: "purchased",
               purchase_date: new Date().toISOString() 
             })
             .eq('id', mysteryId);
@@ -94,20 +96,41 @@ export default async function handler(req) {
           }
 
           console.log("Database updates complete for mystery ID:", mysteryId);
-          return new Response(null, { status: 200 });
+          return new Response(JSON.stringify({ success: true }), { 
+            status: 200,
+            headers: { 'Content-Type': 'application/json' }
+          });
         } catch (error) {
           console.error('Error processing webhook:', error);
-          return new Response('Error processing webhook', { status: 500 });
+          return new Response(JSON.stringify({ 
+            error: 'Error processing webhook',
+            details: error.message 
+          }), { 
+            status: 500,
+            headers: { 'Content-Type': 'application/json' }
+          });
         }
       } else {
         console.log('Missing mystery ID or user ID in checkout session metadata.');
         console.log('Session metadata:', session.metadata);
-        return new Response('Missing metadata', { status: 200 });
+        return new Response(JSON.stringify({
+          warning: 'Missing metadata',
+          received: session.metadata
+        }), { 
+          status: 200,
+          headers: { 'Content-Type': 'application/json' }
+        });
       }
     } else {
       // Handle other event types if needed
       console.log(`Received event type: ${event.type}`);
-      return new Response(null, { status: 200 });
+      return new Response(JSON.stringify({ 
+        received: true,
+        eventType: event.type
+      }), { 
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
   } else {
     return new Response('Method Not Allowed', { status: 405 });

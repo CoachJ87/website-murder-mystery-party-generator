@@ -35,6 +35,11 @@ export function HomeMysteryCard({ mystery, onViewMystery, onMysteryUpdated }: Ho
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Truncate title if longer than 40 characters
+  const displayTitle = mystery.title && mystery.title.length > 40 
+    ? `${mystery.title.substring(0, 40)}...` 
+    : mystery.title;
+
   const handleArchiveMystery = async (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsLoading(true);
@@ -109,10 +114,7 @@ export function HomeMysteryCard({ mystery, onViewMystery, onMysteryUpdated }: Ho
       >
         <CardHeader className="pb-2">
           <div className="flex items-start justify-between gap-2">
-            <CardTitle className="line-clamp-2 min-h-[3rem]">
-              {mystery.title}
-            </CardTitle>
-            <div className="shrink-0 flex items-center gap-2">
+            <div>
               {isPurchased ? (
                 <span className="text-xs px-2 py-1 bg-primary text-primary-foreground rounded-full inline-flex items-center whitespace-nowrap">
                   <CheckCircle2 className="h-3 w-3 mr-1" />
@@ -123,7 +125,8 @@ export function HomeMysteryCard({ mystery, onViewMystery, onMysteryUpdated }: Ho
                   Draft
                 </span>
               )}
-
+            </div>
+            <div className="shrink-0">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                   <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
@@ -156,6 +159,9 @@ export function HomeMysteryCard({ mystery, onViewMystery, onMysteryUpdated }: Ho
               </DropdownMenu>
             </div>
           </div>
+          <CardTitle className="mt-2">
+            {displayTitle}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground mb-4">

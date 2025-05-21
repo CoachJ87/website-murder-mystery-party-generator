@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Calendar, Clock, Edit, Archive, Trash, Eye, CheckCircle2 } from "lucide-react";
 import { Mystery } from "@/interfaces/mystery";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 interface MysteryCardProps {
   mystery: Mystery;
@@ -18,36 +18,15 @@ export const MysteryCard = ({ mystery, onDelete, onEdit }: MysteryCardProps) => 
   const isPurchased = mystery.status === "purchased" || 
                       mystery.is_purchased === true;
 
-  // Handle navigation with error handling
-  const handleViewMystery = () => {
-    try {
-      // Check if the mystery has a complete package first
-      if (mystery.has_complete_package) {
-        window.location.href = `/mystery/${mystery.id}`;
-      } else {
-        // If no complete package, go to the preview/generation page
-        window.location.href = `/mystery/preview/${mystery.id}`;
-        toast({
-          title: "Package generation required",
-          description: "Your mystery needs to be generated first before viewing the full package.",
-          variant: "default"
-        });
-      }
-    } catch (error) {
-      console.error("Navigation error:", error);
-      toast({
-        title: "Navigation error",
-        description: "There was a problem navigating to your mystery. Please try again.",
-        variant: "destructive"
-      });
-    }
-  };
+  // Truncate title if longer than 40 characters
+  const displayTitle = mystery.title && mystery.title.length > 40 
+    ? `${mystery.title.substring(0, 40)}...` 
+    : mystery.title;
 
   return (
     <Card className={`${isPurchased ? "border-primary border-2" : ""}`}>
       <CardHeader>
-        <CardTitle className="flex justify-between items-start gap-2">
-          <span className="truncate">{mystery.title}</span>
+        <div className="flex justify-between items-start gap-2">
           <div>
             {isPurchased ? (
               <Badge variant="default" className="bg-primary font-semibold">
@@ -60,6 +39,9 @@ export const MysteryCard = ({ mystery, onDelete, onEdit }: MysteryCardProps) => 
               <Badge variant="secondary">Draft</Badge>
             )}
           </div>
+        </div>
+        <CardTitle className="mt-2">
+          {displayTitle}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
@@ -125,6 +107,7 @@ export const MysteryCard = ({ mystery, onDelete, onEdit }: MysteryCardProps) => 
                 size="sm"
                 variant="outline"
                 className="flex-1 min-w-[80px]"
+                onClick={() => toast.info("Archive feature coming soon")}
               >
                 <Archive className="h-4 w-4 mr-2" />
                 Archive
@@ -176,6 +159,7 @@ export const MysteryCard = ({ mystery, onDelete, onEdit }: MysteryCardProps) => 
                 size="sm"
                 variant="outline"
                 className="flex-1 min-w-[80px]"
+                onClick={() => toast.info("Unarchive feature coming soon")}
               >
                 <Edit className="h-4 w-4 mr-2" />
                 Unarchive
@@ -217,6 +201,7 @@ export const MysteryCard = ({ mystery, onDelete, onEdit }: MysteryCardProps) => 
                 size="sm"
                 variant="outline"
                 className="flex-1 min-w-[80px]"
+                onClick={() => toast.info("Archive feature coming soon")}
               >
                 <Archive className="h-4 w-4 mr-2" />
                 Archive
