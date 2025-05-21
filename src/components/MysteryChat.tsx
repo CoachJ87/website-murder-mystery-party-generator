@@ -258,7 +258,7 @@ const MysteryChat = ({
             if (initialScriptType) initialChatMessage += ` with ${initialScriptType} scripts`;
             if (initialAdditionalDetails) initialChatMessage += `. Additional details: ${initialAdditionalDetails}`;
             initialChatMessage += ".";
-
+            
             console.log("DEBUG: Initial chat message:", initialChatMessage);
 
             const initialMessage: Message = {
@@ -384,7 +384,7 @@ const MysteryChat = ({
     };
 
     const handleAIResponse = async (userMessage: string, isUserInitiated: boolean = false) => {
-        console.log("DEBUG: handleAIResponse called with:", userMessage, "isUserInitiated:", isUserInitiated);
+        console.log("handleAIResponse called with:", userMessage, "isUserInitiated:", isUserInitiated);
         try {
             setLoading(true);
             setError(null);
@@ -398,348 +398,402 @@ const MysteryChat = ({
             // Use different context strategies based on whether this is a user-initiated message
             // in edit mode, and whether the user has edited in this session
             if (isEditModeRef.current && isUserInitiated) {
-                console.log("DEBUG: Edit mode with user-initiated message, limiting conversation context");
-                
-                const lastAiMessageIndex = [...messages].reverse().findIndex(m => m.is_ai);
-                
-                if (lastAiMessageIndex >= 0) {
-                    const lastAiMessage = [...messages].reverse()[lastAiMessageIndex];
-                    // Include the form data summary as context at the start of each new user message
-                    anthropicMessages = [
-                        {
-                            role: "assistant",
-                            content: lastAiMessage.content
-                        },
-                        {
-                            role: "user",
-                            content: userMessage
-                        }
-                    ];
-                    console.log("DEBUG: Using last AI response + new user message for context");
-                } else {
-                    anthropicMessages = [
-                        {
-                            role: "user",
-                            content: "Let's continue our murder mystery planning. " + userMessage
-                        }
-                    ];
-                    console.log("DEBUG: No AI messages found, using single message with context hint");
-                }
-            } else if (isEditModeRef.current && !isUserInitiated) {
-                console.log("DEBUG: Edit mode with auto-triggered response, using last few messages for context");
-                
-                // For initial load in edit mode, only take the last 3-4 messages to avoid context overload
-                const contextSize = 4; // Take the last 4 messages for context
-                const recentMessages = messages.slice(-contextSize);
-                
-                anthropicMessages = recentMessages.map(m => ({
-                    role: m.is_ai ? "assistant" : "user",
-                    content: m.content,
-                }));
-                
-                // Ensure the current user message is included if not already
-                if (anthropicMessages.length === 0 || 
-                    (anthropicMessages.length > 0 && 
-                     anthropicMessages[anthropicMessages.length - 1].content !== userMessage)) {
-                    anthropicMessages.push({
-                        role: "user",
-                        content: userMessage
-                    });
-                }
-                
-                console.log("DEBUG: Using last few messages for context in initial edit mode response");
-            } else {
-                // Standard approach for new mysteries - include full history
-                anthropicMessages = messages.map(m => ({
-                    role: m.is_ai ? "assistant" : "user",
-                    content: m.content,
-                }));
-
-                const currentUserMessage = {
+              console.log("Edit mode with user-initiated message, limiting conversation context");
+              
+              const lastAiMessageIndex = [...messages].reverse().findIndex(m => m.is_ai);
+              
+              if (lastAiMessageIndex >= 0) {
+                const lastAiMessage = [...messages].reverse()[lastAiMessageIndex];
+                // Include the form data summary as context at the start of each new user message
+                anthropicMessages = [
+                  {
+                    role: "assistant",
+                    content: lastAiMessage.content
+                  },
+                  {
                     role: "user",
-                    content: userMessage,
-                };
+                    content: userMessage
+                  }
+                ];
+                console.log("Using last AI response + new user message for context");
+              } else {
+                anthropicMessages = [
+                  {
+                    role: "user",
+                    content: "Let's continue our murder mystery planning. " + userMessage
+                  }
+                ];
+                console.log("No AI messages found, using single message with context hint");
+              }
+            } else if (isEditModeRef.current && !isUserInitiated) {
+              console.log("Edit mode with auto-triggered response, using last few messages for context");
+              
+              // For initial load in edit mode, only take the last 3-4 messages to avoid context overload
+              const contextSize = 4; // Take the last 4 messages for context
+              const recentMessages = messages.slice(-contextSize);
+              
+              anthropicMessages = recentMessages.map(m => ({
+                role: m.is_ai ? "assistant" : "user",
+                content: m.content,
+              }));
+              
+              // Ensure the current user message is included if not already
+              if (anthropicMessages.length === 0 || 
+                  (anthropicMessages.length > 0 && 
+                   anthropicMessages[anthropicMessages.length - 1].content !== userMessage)) {
+                anthropicMessages.push({
+                  role: "user",
+                  content: userMessage
+                });
+              }
+              
+              console.log("Using last few messages for context in initial edit mode response");
+            } else {
+              // Standard approach for new mysteries - include full history
+              anthropicMessages = messages.map(m => ({
+                role: m.is_ai ? "assistant" : "user",
+                content: m.content,
+              }));
 
-                if (anthropicMessages.length === 0 || 
-                    (anthropicMessages.length > 0 && 
-                    anthropicMessages[anthropicMessages.length - 1].content !== userMessage)) {
-                    anthropicMessages.push(currentUserMessage);
-                }
-                console.log("DEBUG: Using full conversation context for new mystery");
+              const currentUserMessage = {
+                role: "user",
+                content: userMessage,
+              };
+
+              if (anthropicMessages.length === 0 || 
+                  (anthropicMessages.length > 0 && 
+                  anthropicMessages[anthropicMessages.length - 1].content !== userMessage)) {
+                anthropicMessages.push(currentUserMessage);
+              }
+              console.log("Using full conversation context for new mystery");
             }
 
-            console.log("DEBUG: anthropicMessages being sent:", JSON.stringify(anthropicMessages.map((m, i) => ({
-                index: i,
-                role: m.role,
-                contentPreview: m.content.substring(0, 30) + '...'
+            console.log("anthropicMessages being sent:", JSON.stringify(anthropicMessages.map((m, i) => ({
+              index: i,
+              role: m.role,
+              contentPreview: m.content.substring(0, 30) + '...'
             })), null, 2));
 
             // Create a custom system instruction that emphasizes not to ask about already-provided preferences
             const customSystemInstruction = systemInstruction || createSystemMessage();
-            console.log("DEBUG: System instruction exists:", !!customSystemInstruction);
-            console.log("DEBUG: System instruction (first 100 chars):", customSystemInstruction.substring(0, 100) + "...");
+            console.log("System instruction exists:", !!customSystemInstruction);
+            console.log("System instruction (first 100 chars):", customSystemInstruction.substring(0, 100) + "...");
 
             try {
-                console.log("DEBUG: Calling getAIResponse with", {
-                    messageCount: anthropicMessages.length,
-                    promptVersion: 'free'
-                });
+              console.log("Calling getAIResponse with", {
+                messageCount: anthropicMessages.length,
+                promptVersion: 'free'
+              });
 
-                const response = await getAIResponse(
-                    anthropicMessages,
-                    'free',
-                    customSystemInstruction
-                );
+              // Add timeout for the AI request
+              const abortController = new AbortController();
+              const timeoutId = setTimeout(() => abortController.abort(), 120000); // 2 minute timeout
 
-                console.log("DEBUG: Received AI response:", response ? response.substring(0, 50) + "..." : "null");
+              // Create a promise that will be resolved when the AI response is received or rejected on error
+              const responsePromise = getAIResponse(
+                anthropicMessages,
+                'free',
+                customSystemInstruction
+              );
 
-                if (!response) {
-                    throw new Error("Failed to get a response from AI");
-                }
+              // Race the AI response promise against a timeout
+              let response;
+              try {
+                response = await responsePromise;
+                clearTimeout(timeoutId);
+              } catch (timeoutError) {
+                console.error("AI response timed out:", timeoutError);
+                throw new Error("The AI service took too long to respond. Please try again.");
+              }
 
-                if (response.includes("There was an error")) {
-                    throw new Error(response);
-                }
+              console.log("Received AI response:", response ? response.substring(0, 50) + "..." : "null");
 
-                // Check if the response is asking about already-provided information
-                const responseText = response;
-                const askingAboutPlayerCount = responseText.toLowerCase().includes("how many players") || 
-                                              (responseText.toLowerCase().includes("player count") && responseText.includes("?"));
-                const askingAboutTheme = (responseText.toLowerCase().includes("theme") || 
-                                          responseText.toLowerCase().includes("setting")) && 
-                                          responseText.includes("?") && responseText.toLowerCase().includes("prefer");
-                const askingAboutAccomplice = responseText.toLowerCase().includes("accomplice") && responseText.includes("?");
-                
-                let finalResponse = response;
-                
-                if (askingAboutPlayerCount || askingAboutTheme || askingAboutAccomplice) {
-                    console.log("DEBUG: AI asking about already provided info, creating corrected response");
-                    // Create a modified response that acknowledges the preferences
-                    finalResponse = `I'll create a murder mystery based on your specifications: ${initialTheme} theme${initialPlayerCount ? `, ${initialPlayerCount} players` : ''}${initialHasAccomplice !== undefined ? (initialHasAccomplice ? ', with an accomplice' : ', without an accomplice') : ''}${initialScriptType ? `, with ${initialScriptType} scripts` : ''}.
+              if (!response) {
+                throw new Error("Failed to get a response from AI");
+              }
+
+              if (response.includes("There was an error")) {
+                throw new Error(response);
+              }
+
+              // Check if the response is asking about already-provided information
+              const responseText = response;
+              const askingAboutPlayerCount = responseText.toLowerCase().includes("how many players") || 
+                                            (responseText.toLowerCase().includes("player count") && responseText.includes("?"));
+              const askingAboutTheme = (responseText.toLowerCase().includes("theme") || 
+                                        responseText.toLowerCase().includes("setting")) && 
+                                        responseText.includes("?") && responseText.toLowerCase().includes("prefer");
+              const askingAboutAccomplice = responseText.toLowerCase().includes("accomplice") && responseText.includes("?");
+              
+              let finalResponse = response;
+              
+              if (askingAboutPlayerCount || askingAboutTheme || askingAboutAccomplice) {
+                console.log("AI asking about already provided info, creating corrected response");
+                // Create a modified response that acknowledges the preferences
+                finalResponse = `I'll create a murder mystery based on your specifications: ${initialTheme} theme${initialPlayerCount ? `, ${initialPlayerCount} players` : ''}${initialHasAccomplice !== undefined ? (initialHasAccomplice ? ', with an accomplice' : ', without an accomplice') : ''}${initialScriptType ? `, with ${initialScriptType} scripts` : ''}.
 
 ${responseText.split('\n\n').slice(1).join('\n\n')}`;
+              }
+
+              const aiMessage: Message = {
+                id: Date.now().toString(),
+                content: finalResponse,
+                is_ai: true,
+                timestamp: new Date(),
+              };
+
+              setMessages(prev => {
+                const updatedMessages = [...prev, aiMessage];
+
+                if (onSave) {
+                  console.log("Calling onSave with AI message added");
+                  onSave(aiMessage);
                 }
 
-                const aiMessage: Message = {
-                    id: Date.now().toString(),
-                    content: finalResponse,
-                    is_ai: true,
-                    timestamp: new Date(),
-                };
+                return updatedMessages;
+              });
 
-                setMessages(prev => {
-                    const updatedMessages = [...prev, aiMessage];
-
-                    if (onSave) {
-                        console.log("DEBUG: Calling onSave with AI message added");
-                        onSave(aiMessage);
-                    }
-
-                    return updatedMessages;
-                });
-
-                toast.success("AI response received!");
+              toast.success("AI response received!");
             } catch (error) {
-                console.error("DEBUG: Error in getAIResponse:", error);
-                setError(error instanceof Error ? error.message : "Unknown error occurred");
-                toast.error("Failed to get AI response. Please try again.");
-                
-                // Reset the aiHasRespondedRef so user can retry
-                aiHasRespondedRef.current = false;
+              console.error("Error in getAIResponse:", error);
+              
+              let errorMessage = "Failed to get AI response. Please try again.";
+              
+              if (error.message) {
+                if (error.message.includes("Edge Function error")) {
+                  errorMessage = "Error connecting to AI service: Edge Function error: Failed to send a request to the Edge Function";
+                } else if (error.message.includes("timeout") || error.message.includes("aborted")) {
+                  errorMessage = "The AI service took too long to respond. Please try again.";
+                } else if (error.message.includes("network") || error.message.includes("connection")) {
+                  errorMessage = "Network error when connecting to AI service. Please check your internet connection and try again.";
+                } else {
+                  errorMessage = `Error: ${error.message}`;
+                }
+              }
+              
+              setError(errorMessage);
+              toast.error(errorMessage);
+              
+              // Reset the aiHasRespondedRef so user can retry
+              aiHasRespondedRef.current = false;
 
-                const fallbackMessage: Message = {
-                    id: Date.now().toString(),
-                    content: "I'm having trouble connecting to my AI service right now. Please try again in a moment.",
-                    is_ai: true,
-                    timestamp: new Date(),
-                };
+              const fallbackMessage: Message = {
+                id: Date.now().toString(),
+                content: "I'm having trouble connecting to my AI service right now. Please try again in a moment.",
+                is_ai: true,
+                timestamp: new Date(),
+              };
 
-                setMessages(prev => {
-                    const updatedMessages = [...prev, fallbackMessage];
+              setMessages(prev => {
+                const updatedMessages = [...prev, fallbackMessage];
 
-                    if (onSave) {
-                        console.log("DEBUG: Calling onSave with fallback message");
-                        onSave(fallbackMessage);
-                    }
+                if (onSave) {
+                  console.log("Calling onSave with fallback message");
+                  onSave(fallbackMessage);
+                }
 
-                    return updatedMessages;
-                });
+                return updatedMessages;
+              });
             }
         } catch (error) {
-            console.error("DEBUG: Error getting AI response:", error);
-            setError(error instanceof Error ? error.message : "Unknown error occurred");
-            toast.error("Failed to get AI response. Please try again.");
-            
-            // Reset the aiHasRespondedRef so user can retry
-            aiHasRespondedRef.current = false;
+          console.error("Error getting AI response:", error);
+          
+          let errorMessage = "Failed to get AI response. Please try again.";
+          
+          if (error.message) {
+            errorMessage = `${error.message}`;
+          }
+          
+          setError(errorMessage);
+          toast.error(errorMessage);
+          
+          // Reset the aiHasRespondedRef so user can retry
+          aiHasRespondedRef.current = false;
         } finally {
-            setLoading(false);
+          setLoading(false);
         }
-        console.log("DEBUG: handleAIResponse finished");
+        console.log("handleAIResponse finished");
     };
 
     const retryLastMessage = () => {
-        const lastUserMessageIndex = [...messages].reverse().findIndex(m => !m.is_ai);
-        if (lastUserMessageIndex >= 0) {
-            const lastUserMessage = [...messages].reverse()[lastUserMessageIndex];
-            const messagesUntilLastUser = messages.slice(0, messages.length - lastUserMessageIndex);
-            setMessages(messagesUntilLastUser);
-            handleAIResponse(lastUserMessage.content, true); // Treat retry as user-initiated
+      console.log("Retry button clicked");
+      // Reset error state
+      setError(null);
+      
+      // Reset AI response flag to allow retry
+      aiHasRespondedRef.current = false;
+      
+      const lastUserMessageIndex = [...messages].reverse().findIndex(m => !m.is_ai);
+      if (lastUserMessageIndex >= 0) {
+        console.log("Found last user message, retrying...");
+        const lastUserMessage = [...messages].reverse()[lastUserMessageIndex];
+        
+        // If the last message in the array is an AI error message, remove it before retrying
+        const lastMessage = messages[messages.length - 1];
+        if (lastMessage && lastMessage.is_ai && lastMessage.content.includes("trouble connecting")) {
+          setMessages(prevMessages => prevMessages.slice(0, -1));
         }
+        
+        // Retry with the last user message
+        handleAIResponse(lastUserMessage.content, true); // Treat retry as user-initiated
+      } else {
+        console.log("No user message found to retry");
+        toast.error("No message to retry. Please enter a new message.");
+      }
     };
 
     const handleGenerateFinalClick = () => {
-        console.log("DEBUG: Generate Final button clicked, sending all messages");
-        if (onGenerateFinal) {
-            onGenerateFinal(messages);
-        } else {
-            toast.error("Final generation callback not provided.");
-        }
+      console.log("DEBUG: Generate Final button clicked, sending all messages");
+      if (onGenerateFinal) {
+        onGenerateFinal(messages);
+      } else {
+        toast.error("Final generation callback not provided.");
+      }
     };
 
     useEffect(() => {
-        console.log("DEBUG: MysteryChat component mounted");
-        return () => {
-            console.log("DEBUG: MysteryChat component unmounted");
-        };
+      console.log("DEBUG: MysteryChat component mounted");
+      return () => {
+        console.log("DEBUG: MysteryChat component unmounted");
+      };
     }, []);
 
     return (
-        <div data-testid="mystery-chat" className={cn(
-            "flex flex-col h-full", 
-            isMobile && "h-[calc(100vh-90px)]"
-        )}>
-            {error && (
-                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 mb-4 flex items-start gap-3">
-                    <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
-                    <div>
-                        <h4 className="text-sm font-medium text-red-800 dark:text-red-300">Error connecting to AI service</h4>
-                        <p className="text-sm text-red-700 dark:text-red-400 mt-1">{error}</p>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            className="mt-2 text-xs"
-                            onClick={() => {
-                                // Find the last user message and retry sending it
-                                const lastUserMessageIndex = [...messages].reverse().findIndex(m => !m.is_ai);
-                                if (lastUserMessageIndex >= 0) {
-                                    const lastUserMessage = [...messages].reverse()[lastUserMessageIndex];
-                                    // Reset AI response flag to allow retry
-                                    aiHasRespondedRef.current = false;
-                                    handleAIResponse(lastUserMessage.content, true);
-                                }
-                            }}
-                        >
-                            Try Again
-                        </Button>
-                    </div>
-                </div>
-            )}
-
-            <div 
-                className={cn(
-                    "flex-1 overflow-y-auto mb-4 space-y-4 p-4 border rounded-lg bg-background/50",
-                    isMobile ? "min-h-[70vh] max-h-none border-0 p-2 -mx-2 mobile-full-height" : "min-h-[400px] max-h-[500px]"
-                )}
-            >
-                {isLoadingHistory ? (
-                    <div className="flex flex-col items-center justify-center h-full">
-                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                        <p className="mt-2 text-muted-foreground">Loading conversation history...</p>
-                    </div>
-                ) : messages.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
-                        <p>Start creating your murder mystery by sending your first message.</p>
-                    </div>
-                ) : (
-                    messages.map((message) => (
-                        <Card
-                            key={message.id}
-                            className={cn(
-                                "max-w-[80%]",
-                                message.is_ai ? "ml-0" : "ml-auto",
-                                message.is_ai ? "bg-background" : "bg-primary text-primary-foreground",
-                                isMobile && "shadow-none border-0"
-                            )}
-                        >
-                            <CardContent className={cn("p-4", isMobile && "p-3")}>
-                                <div className={`prose prose-sm ${message.is_ai ? 'prose-stone dark:prose-invert' : 'text-primary-foreground prose-invert'} max-w-none`}>
-                                    {message.content && typeof message.content === 'string' ? (
-                                        <ReactMarkdown
-                                            rehypePlugins={[rehypeRaw]}
-                                            components={{
-                                                h1: ({ node, ...props }) => <h1 className="text-xl font-bold my-2" {...props} />,
-                                                h2: ({ node, ...props }) => <h2 className="text-lg font-bold my-2" {...props} />,
-                                                h3: ({ node, ...props }) => <h3 className="text-md font-bold my-1" {...props} />,
-                                                ul: ({ node, ...props }) => <ul className="list-disc ml-4 my-2" {...props} />,
-                                                ol: ({ node, ...props }) => <ol className="list-decimal ml-4 my-2" {...props} />,
-                                                li: ({ node, ...props }) => <li className="my-1" {...props} />,
-                                                p: ({ node, ...props }) => <p className="my-2" {...props} />,
-                                                a: ({ node, ...props }) => <a className="text-blue-500 underline" {...props} />,
-                                                em: ({ node, ...props }) => <em className="italic" {...props} />,
-                                                strong: ({ node, ...props }) => <strong className="font-bold" {...props} />,
-                                                code: ({ node, ...props }) => <code className="bg-gray-200 dark:bg-gray-700 px-1 py-0.5 rounded" {...props} />
-                                            }}
-                                        >
-                                            {message.content}
-                                        </ReactMarkdown>
-                                    ) : (
-                                        <p>Unable to display message</p>
-                                    )}
-                                </div>
-                            </CardContent>
-                        </Card>
-                    ))
-                )}
-                <div ref={messagesEndRef} />
+      <div data-testid="mystery-chat" className={cn(
+        "flex flex-col h-full", 
+        isMobile && "h-[calc(100vh-90px)]"
+      )}>
+        {error && (
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 mb-4 flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+            <div>
+              <h4 className="text-sm font-medium text-red-800 dark:text-red-300">Error connecting to AI service</h4>
+              <p className="text-sm text-red-700 dark:text-red-400 mt-1">{error}</p>
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-2 text-xs"
+                onClick={() => {
+                  // Find the last user message and retry sending it
+                  const lastUserMessageIndex = [...messages].reverse().findIndex(m => !m.is_ai);
+                  if (lastUserMessageIndex >= 0) {
+                    const lastUserMessage = [...messages].reverse()[lastUserMessageIndex];
+                    // Reset AI response flag to allow retry
+                    aiHasRespondedRef.current = false;
+                    handleAIResponse(lastUserMessage.content, true);
+                  }
+                }}
+              >
+                Try Again
+              </Button>
             </div>
+          </div>
+        )}
 
-            <form onSubmit={handleSubmit} className={cn("border-t", isMobile ? "p-2" : "p-4")}>
-                <div className={cn("flex items-center", isMobile ? "space-x-2" : "space-x-4")}>
-                    <Textarea
-                        placeholder="Ask the AI..."
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        onKeyDown={(event) => {
-                            if (event.key === 'Enter' && !event.shiftKey) {
-                                console.log("DEBUG: Enter key pressed (without shift), submitting form");
-                                event.preventDefault();
-                                handleSubmit(event as unknown as React.FormEvent);
-                            }
+        <div 
+          className={cn(
+            "flex-1 overflow-y-auto mb-4 space-y-4 p-4 border rounded-lg bg-background/50",
+            isMobile ? "min-h-[70vh] max-h-none border-0 p-2 -mx-2 mobile-full-height" : "min-h-[400px] max-h-[500px]"
+          )}
+        >
+          {isLoadingHistory ? (
+            <div className="flex flex-col items-center justify-center h-full">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <p className="mt-2 text-muted-foreground">Loading conversation history...</p>
+            </div>
+          ) : messages.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
+              <p>Start creating your murder mystery by sending your first message.</p>
+            </div>
+          ) : (
+            messages.map((message) => (
+              <Card
+                key={message.id}
+                className={cn(
+                  "max-w-[80%]",
+                  message.is_ai ? "ml-0" : "ml-auto",
+                  message.is_ai ? "bg-background" : "bg-primary text-primary-foreground",
+                  isMobile && "shadow-none border-0"
+                )}
+              >
+                <CardContent className={cn("p-4", isMobile && "p-3")}>
+                  <div className={`prose prose-sm ${message.is_ai ? 'prose-stone dark:prose-invert' : 'text-primary-foreground prose-invert'} max-w-none`}>
+                    {message.content && typeof message.content === 'string' ? (
+                      <ReactMarkdown
+                        rehypePlugins={[rehypeRaw]}
+                        components={{
+                          h1: ({ node, ...props }) => <h1 className="text-xl font-bold my-2" {...props} />,
+                          h2: ({ node, ...props }) => <h2 className="text-lg font-bold my-2" {...props} />,
+                          h3: ({ node, ...props }) => <h3 className="text-md font-bold my-1" {...props} />,
+                          ul: ({ node, ...props }) => <ul className="list-disc ml-4 my-2" {...props} />,
+                          ol: ({ node, ...props }) => <ol className="list-decimal ml-4 my-2" {...props} />,
+                          li: ({ node, ...props }) => <li className="my-1" {...props} />,
+                          p: ({ node, ...props }) => <p className="my-2" {...props} />,
+                          a: ({ node, ...props }) => <a className="text-blue-500 underline" {...props} />,
+                          em: ({ node, ...props }) => <em className="italic" {...props} />,
+                          strong: ({ node, ...props }) => <strong className="font-bold" {...props} />,
+                          code: ({ node, ...props }) => <code className="bg-gray-200 dark:bg-gray-700 px-1 py-0.5 rounded" {...props} />
                         }}
-                        className="flex-1 resize-none"
-                        rows={isMobile ? 2 : 3}
-                    />
-                    <Button type="submit" disabled={loading} className="ml-2" size={isMobile ? "sm" : "default"}>
-                        {loading ? (
-                            <Loader2 className={cn("animate-spin", isMobile ? "h-3 w-3" : "h-4 w-4")} />
-                        ) : (
-                            <Send className={cn(isMobile ? "h-3 w-3" : "h-4 w-4")} />
-                        )}
-                    </Button>
-                </div>
-            </form>
-
-            {messages.length > 1 && !loading && (
-                <div className={cn("border-t", isMobile ? "p-2" : "p-4")}>
-                    <Button 
-                        onClick={() => {
-                            if (onGenerateFinal) {
-                                console.log("DEBUG: Generate Final button clicked, sending all messages");
-                                onGenerateFinal(messages);
-                            } else {
-                                toast.error("Final generation callback not provided.");
-                            }
-                        }} 
-                        variant="destructive" 
-                        size={isMobile ? "sm" : "default"}
-                    >
-                        <Wand2 className={cn("mr-2", isMobile ? "h-3 w-3" : "h-4 w-4")} /> 
-                        Generate Final Mystery
-                    </Button>
-                </div>
-            )}
+                      >
+                        {message.content}
+                      </ReactMarkdown>
+                    ) : (
+                      <p>Unable to display message</p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
+          <div ref={messagesEndRef} />
         </div>
+
+        <form onSubmit={handleSubmit} className={cn("border-t", isMobile ? "p-2" : "p-4")}>
+          <div className={cn("flex items-center", isMobile ? "space-x-2" : "space-x-4")}>
+            <Textarea
+              placeholder="Ask the AI..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                  console.log("DEBUG: Enter key pressed (without shift), submitting form");
+                  event.preventDefault();
+                  handleSubmit(event as unknown as React.FormEvent);
+                }
+              }}
+              className="flex-1 resize-none"
+              rows={isMobile ? 2 : 3}
+            />
+            <Button type="submit" disabled={loading} className="ml-2" size={isMobile ? "sm" : "default"}>
+              {loading ? (
+                <Loader2 className={cn("animate-spin", isMobile ? "h-3 w-3" : "h-4 w-4")} />
+              ) : (
+                <Send className={cn(isMobile ? "h-3 w-3" : "h-4 w-4")} />
+              )}
+            </Button>
+          </div>
+        </form>
+
+        {messages.length > 1 && !loading && (
+          <div className={cn("border-t", isMobile ? "p-2" : "p-4")}>
+            <Button 
+              onClick={() => {
+                if (onGenerateFinal) {
+                  console.log("DEBUG: Generate Final button clicked, sending all messages");
+                  onGenerateFinal(messages);
+                } else {
+                  toast.error("Final generation callback not provided.");
+                }
+              }} 
+              variant="destructive" 
+              size={isMobile ? "sm" : "default"}
+            >
+              <Wand2 className={cn("mr-2", isMobile ? "h-3 w-3" : "h-4 w-4")} /> 
+              Generate Final Mystery
+            </Button>
+          </div>
+        )}
+      </div>
     );
 };
 

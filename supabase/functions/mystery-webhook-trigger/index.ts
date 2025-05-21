@@ -1,152 +1,166 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.21.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+// Configure CORS headers
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+// Initialize Supabase client with environment variables
+const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
+const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+// Define webhook URL from environment
+const webhookUrl = Deno.env.get("WEBHOOK_URL") || "";
 
 serve(async (req) => {
   // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
+  if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const supabaseUrl = Deno.env.get('SUPABASE_URL') as string;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') as string;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    const webhookUrl = "https://hook.eu2.make.com/uannnuc9hc79vorh1iyxwb9t5lp484n3";
-
-    // Parse request body
-    const requestData = await req.json();
-    const { conversationId, testMode = false } = requestData;
-    
-    console.log(`Processing webhook trigger for conversation: ${conversationId}, testMode: ${testMode}`);
+    // Parse request body to get conversation ID
+    const { conversationId, testMode = false } = await req.json();
 
     if (!conversationId) {
-      return new Response(JSON.stringify({ error: "Conversation ID is required" }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      throw new Error("Conversation ID is required");
     }
 
-    // Check if mystery is paid or should be processed for test mode
+    console.log(`Processing webhook for conversation: ${conversationId}, testMode: ${testMode}`);
+
+    // Retrieve conversation data with user_id and messages
     const { data: conversation, error: conversationError } = await supabase
       .from("conversations")
-      .select("*, user_id, title, is_paid, display_status")
+      .select("*, messages(*), user_id")
       .eq("id", conversationId)
       .single();
 
     if (conversationError) {
       console.error("Error fetching conversation:", conversationError);
-      return new Response(JSON.stringify({ error: "Failed to fetch conversation data" }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      throw new Error(`Failed to fetch conversation: ${conversationError.message}`);
     }
 
+    if (!conversation) {
+      throw new Error("Conversation not found");
+    }
+
+    console.log(`Found conversation with ${conversation.messages?.length || 0} messages`);
+
+    // Extract user_id from the conversation
     const userId = conversation.user_id;
     
-    // Only proceed if the mystery is paid or in test mode
-    if (!conversation.is_paid && conversation.display_status !== "purchased" && !testMode) {
-      console.error("Cannot generate package for unpaid mystery without test mode");
-      return new Response(JSON.stringify({ 
-        error: "This mystery requires purchase before generating a complete package",
-        requiresPurchase: true
-      }), {
-        status: 403,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    if (!userId) {
+      console.warn("Warning: No user_id found for conversation");
+    }
+
+    // Format all messages into a concatenated string for easier parsing
+    const messageContents = conversation.messages
+      ? conversation.messages.map((msg: any) => {
+          const role = msg.role === "assistant" ? "AI" : "User";
+          return `${role}: ${msg.content}`;
+        }).join("\n\n---\n\n")
+      : "";
+
+    // Structure the payload with clear fields
+    const webhookPayload = {
+      userId,
+      conversationId,
+      conversationTitle: conversation.title || "Untitled Mystery",
+      createdAt: conversation.created_at,
+      updatedAt: conversation.updated_at,
+      // Send the full concatenated message string for easier parsing
+      conversationContent: messageContents,
+      // Also include raw messages for more detailed processing if needed
+      rawMessages: conversation.messages,
+      testMode
+    };
+
+    console.log(`Sending payload to webhook: ${webhookUrl}`);
+    console.log(`Payload size: ${JSON.stringify(webhookPayload).length} characters`);
+
+    if (webhookUrl) {
+      // Send data to webhook
+      const webhookResponse = await fetch(webhookUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(webhookPayload),
       });
-    }
 
-    // Fetch the conversation with all messages
-    const { data: fullConversation, error: fullConversationError } = await supabase
-      .from("conversations")
-      .select("*, messages(*), system_instruction")
-      .eq("id", conversationId)
-      .single();
-
-    if (fullConversationError) {
-      console.error("Error fetching full conversation:", fullConversationError);
-      return new Response(JSON.stringify({ error: "Failed to fetch complete conversation data with messages" }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    // Update conversation to indicate package generation is in progress
-    const { error: updateError } = await supabase
-      .from("conversations")
-      .update({
-        needs_package_generation: true,
-        updated_at: new Date().toISOString()
-      })
-      .eq("id", conversationId);
-
-    if (updateError) {
-      console.error("Error updating conversation:", updateError);
-      // Continue despite error, as this is not critical
-    }
-
-    // Format conversation data for the webhook
-    const messages = fullConversation.messages || [];
-    
-    // Combine all messages into a single string for easier parsing
-    const concatenatedMessages = messages.map(msg => {
-      const role = msg.is_ai ? 'AI' : 'User';
-      return `${role}: ${msg.content}`;
-    }).join('\n\n');
-
-    // Send data to Make.com webhook
-    console.log(`Sending data to webhook for conversation: ${conversationId}`);
-    const webhookResponse = await fetch(webhookUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        userId: userId,
-        conversationId: conversationId,
-        title: fullConversation.title || "Mystery",
-        conversationContent: concatenatedMessages,
-        fullConversation: fullConversation, // Send the full conversation object as backup
-        timestamp: new Date().toISOString(),
-        testMode
-      })
-    });
-
-    if (!webhookResponse.ok) {
-      let webhookErrorText = "";
-      try {
-        const errorData = await webhookResponse.json();
-        webhookErrorText = errorData.error || webhookResponse.statusText;
-      } catch (e) {
-        webhookErrorText = await webhookResponse.text() || webhookResponse.statusText;
+      if (!webhookResponse.ok) {
+        const errorText = await webhookResponse.text();
+        console.error(`Webhook returned error: ${webhookResponse.status}`, errorText);
+        throw new Error(`Webhook request failed with status ${webhookResponse.status}: ${errorText}`);
       }
+
+      const responseData = await webhookResponse.json();
+      console.log("Webhook response:", responseData);
+
+      // Update conversation to mark it as processed
+      const { error: updateError } = await supabase
+        .from("conversations")
+        .update({
+          webhook_sent: true,
+          webhook_sent_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", conversationId);
+
+      if (updateError) {
+        console.error("Error updating conversation:", updateError);
+      }
+
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          message: "Webhook successfully triggered",
+          webhookResponse: responseData
+        }),
+        { 
+          headers: { 
+            ...corsHeaders, 
+            "Content-Type": "application/json" 
+          } 
+        }
+      );
+    } else {
+      console.warn("No webhook URL configured. Skipping webhook call.");
       
-      console.error("Webhook error:", webhookErrorText);
-      throw new Error(`Webhook returned ${webhookResponse.status}: ${webhookErrorText}`);
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          message: "No webhook URL configured"
+        }),
+        { 
+          headers: { 
+            ...corsHeaders, 
+            "Content-Type": "application/json" 
+          },
+          status: 400
+        }
+      );
     }
-
-    const webhookData = await webhookResponse.json();
-    console.log("Webhook response:", webhookData);
-
-    return new Response(JSON.stringify({
-      success: true,
-      message: "Mystery generation initiated",
-      estimatedProcessingTime: "3-5 minutes",
-      conversationId
-    }), {
-      status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
   } catch (error) {
-    console.error("Error in mystery-webhook-trigger:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    console.error("Error processing webhook:", error);
+    
+    return new Response(
+      JSON.stringify({ 
+        success: false, 
+        error: error.message,
+        stack: error.stack
+      }),
+      { 
+        status: 500, 
+        headers: { 
+          ...corsHeaders, 
+          "Content-Type": "application/json" 
+        } 
+      }
+    );
   }
 });

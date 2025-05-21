@@ -83,45 +83,78 @@ serve(async (req) => {
     console.log(`Using model: ${model} with max tokens: ${maxTokens}`);
 
     // Clean and standardize messages for the API
-    const standardizedMessages = messages.map(msg => ({
-      role: msg.role || (msg.is_ai ? 'assistant' : 'user'),
-      content: msg.content || ''
-    })).filter(msg => msg.content && msg.content.trim() !== '');
+    const standardizedMessages = messages.map(msg => {
+      // Check if the message has is_ai flag or role
+      if (msg.is_ai !== undefined) {
+        return {
+          role: msg.is_ai ? "assistant" : "user",
+          content: msg.content || ''
+        };
+      } else {
+        return {
+          role: msg.role || 'user',
+          content: msg.content || ''
+        };
+      }
+    }).filter(msg => msg.content && msg.content.trim() !== '');
+    
+    console.log("Standardized messages:", JSON.stringify(standardizedMessages.slice(0, 2))); // Log first few messages for debugging
 
-    // Make the API call to Anthropic
-    const response = await anthropic.messages.create({
-      model: model,
-      max_tokens: maxTokens,
-      system: systemMessage,
-      messages: standardizedMessages,
-      temperature: 0.7
-    });
+    // Make the API call to Anthropic with enhanced error handling
+    try {
+      const response = await anthropic.messages.create({
+        model: model,
+        max_tokens: maxTokens,
+        system: systemMessage,
+        messages: standardizedMessages,
+        temperature: 0.7
+      });
 
-    console.log("Received response from Anthropic API");
-    console.log(`Response length: ${response.content[0].text.length} characters`);
+      console.log("Received response from Anthropic API");
+      console.log(`Response length: ${response.content[0].text.length} characters`);
 
-    // Format the response as expected by the client
-    const formattedResponse = {
-      choices: [
-        {
-          message: {
-            role: "assistant",
-            content: response.content[0].text
+      // Format the response as expected by the client
+      const formattedResponse = {
+        choices: [
+          {
+            message: {
+              role: "assistant",
+              content: response.content[0].text
+            }
           }
-        }
-      ]
-    };
+        ]
+      };
 
-    // Return the response to the client
-    return new Response(
-      JSON.stringify(formattedResponse),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+      // Return the response to the client
+      return new Response(
+        JSON.stringify(formattedResponse),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    } catch (apiError) {
+      console.error(`Anthropic API error: ${apiError.message}`);
+      console.error(apiError.stack);
+      
+      // More detailed error for Anthropic-specific issues
+      return new Response(
+        JSON.stringify({ 
+          error: `Anthropic API error: ${apiError.message}`,
+          details: apiError.status || 'Unknown',
+          stack: apiError.stack
+        }),
+        { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
   } catch (error) {
-    // Log and handle errors
+    // Log and handle errors with more detailed information
     console.error(`Error in mystery-ai edge function: ${error.message}`);
+    console.error(error.stack);
+    
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message, 
+        stack: error.stack,
+        type: error.constructor.name
+      }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

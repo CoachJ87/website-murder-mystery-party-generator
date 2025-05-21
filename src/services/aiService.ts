@@ -1,4 +1,3 @@
-
 import { supabase } from "@/lib/supabase";
 
 interface ApiMessage {
@@ -20,10 +19,10 @@ export const getAIResponse = async (
   onStream?: (chunk: string) => void
 ): Promise<string> => {
   try {
-    console.log(`DEBUG: Starting getAIResponse with ${messages.length} messages, promptVersion: ${promptVersion}, testMode: ${testMode}`);
+    console.log(`Starting getAIResponse with ${messages.length} messages, promptVersion: ${promptVersion}, testMode: ${testMode}`);
     
     if (systemInstruction) {
-      console.log(`DEBUG: Using custom system instruction (first 100 chars): ${systemInstruction.substring(0, 100)}...`);
+      console.log(`Using custom system instruction (first 100 chars): ${systemInstruction.substring(0, 100)}...`);
     }
     
     // Convert messages to a standard format first
@@ -39,8 +38,13 @@ export const getAIResponse = async (
     // Filter out messages with empty content to prevent API errors
     .filter(msg => msg.content && msg.content.trim() !== '');
     
-    console.log(`DEBUG: Filtered to ${standardMessages.length} valid messages`);
-    console.log("DEBUG: Calling mystery-ai Edge Function");
+    console.log(`Filtered to ${standardMessages.length} valid messages`);
+    
+    if (standardMessages.length === 0) {
+      throw new Error("No valid messages to send to AI service");
+    }
+    
+    console.log("Calling mystery-ai Edge Function");
 
     let attempts = 0;
     const maxAttempts = 3; // Increased to 3 for reliability
@@ -60,17 +64,17 @@ export const getAIResponse = async (
       800 : // Small size for test mode
       isLargeRequest ? 1500 : 1000;
       
-    console.log(`DEBUG: Request classified as ${isLargeRequest ? 'large' : 'standard'}, chunk size: ${chunkSize}, test mode: ${testMode}`);
+    console.log(`Request classified as ${isLargeRequest ? 'large' : 'standard'}, chunk size: ${chunkSize}, test mode: ${testMode}`);
     
     // Enable streaming if a stream handler is provided
     const useStreaming = !!onStream;
     
     while (attempts < maxAttempts) {
       attempts++;
-      console.log(`DEBUG: Attempt ${attempts} of ${maxAttempts}`);
+      console.log(`Attempt ${attempts} of ${maxAttempts}`);
       
       try {
-        // Set a longer timeout for the function call - not needed since we'll use streaming
+        // Set a longer timeout for the function call
         const abortController = new AbortController();
         const timeoutId = setTimeout(() => abortController.abort(), 180000); // 3 minute timeout for safety
         
@@ -79,7 +83,7 @@ export const getAIResponse = async (
           Math.min(1000, chunkSize) : // Keep test mode chunks small
           Math.min(2000, chunkSize * attempts);
           
-        console.log(`DEBUG: Using chunk size: ${adjustedChunkSize} with streaming: ${useStreaming || isLargeRequest}`);
+        console.log(`Using chunk size: ${adjustedChunkSize} with streaming: ${useStreaming || isLargeRequest}`);
         
         // Use streaming if explicitly requested or for large requests
         const { data: functionData, error: functionError } = await supabase.functions.invoke('mystery-ai', {
@@ -91,29 +95,36 @@ export const getAIResponse = async (
             chunkSize: adjustedChunkSize,
             stream: useStreaming || isLargeRequest, // Enable streaming when requested or for large requests
             testMode // Pass test mode flag to the edge function
-          }
+          },
+          signal: abortController.signal,
         });
         
         clearTimeout(timeoutId);
 
         if (functionError) {
+          console.error("Edge Function error details:", functionError);
+          
           if (functionError.message?.includes('aborted') || functionError.message?.includes('timeout')) {
-            console.error("DEBUG: Edge Function timeout:", functionError);
+            console.error("Edge Function timeout:", functionError);
             throw new Error(`Edge Function timeout. This may indicate the response is too large.`);
           }
           
-          console.error("DEBUG: Edge Function error:", functionError);
           throw new Error(`Edge Function error: ${functionError.message}`);
         }
 
-        if (!functionData?.choices?.[0]?.message?.content) {
-          console.error("DEBUG: Invalid response format from Edge Function");
+        if (!functionData) {
+          console.error("Empty response from Edge Function");
+          throw new Error("Empty response from Edge Function");
+        }
+
+        if (!functionData.choices?.[0]?.message?.content) {
+          console.error("Invalid response format from Edge Function:", functionData);
           throw new Error("Invalid response format from Edge Function");
         }
 
         responseContent = functionData.choices[0].message.content;
-        console.log(`DEBUG: Received response (length: ${responseContent.length})`);
-        console.log(`DEBUG: Response preview (first 100 chars): ${responseContent.substring(0, 100)}...`);
+        console.log(`Received response (length: ${responseContent.length})`);
+        console.log(`Response preview (first 100 chars): ${responseContent.substring(0, 100)}...`);
         
         // For paid responses, we're more lenient with validation
         if (promptVersion === 'paid') {
@@ -131,7 +142,7 @@ export const getAIResponse = async (
           // If format is valid or we've exhausted attempts, return the response
           return responseContent;
         } else {
-          console.log("DEBUG: Response does not follow required format, retrying...");
+          console.log("Response does not follow required format, retrying...");
           // If format is invalid and we haven't exhausted attempts, continue to next attempt
           
           // Add a stronger format instruction for the next attempt
@@ -143,7 +154,7 @@ export const getAIResponse = async (
       } catch (error) {
         // For timeouts, we might want to break the request into smaller chunks
         if (error.message?.includes('timeout') && attempts >= maxAttempts) {
-          console.error(`DEBUG: Repeated timeouts in getAIResponse. The response may be too large.`);
+          console.error(`Repeated timeouts in getAIResponse. The response may be too large.`);
           
           // Try one last attempt with a smaller scope
           try {
@@ -169,25 +180,25 @@ export const getAIResponse = async (
               return responseContent + "\n\n[Note: This response was condensed due to size limitations.]";
             }
           } catch (fallbackError) {
-            console.error("DEBUG: Even fallback request failed:", fallbackError);
+            console.error("Even fallback request failed:", fallbackError);
           }
         }
         
         if (attempts >= maxAttempts) {
-          console.error(`DEBUG: Error in getAIResponse (attempt ${attempts}): ${error.message}`);
+          console.error(`Error in getAIResponse (attempt ${attempts}): ${error.message}`);
           throw error;
         }
         
-        console.warn(`DEBUG: Error in attempt ${attempts}, retrying: ${error.message}`);
+        console.warn(`Error in attempt ${attempts}, retrying: ${error.message}`);
         await new Promise(resolve => setTimeout(resolve, 2000 * attempts)); // Exponential backoff
       }
     }
     
     // If we've made it here, we've exhausted attempts but didn't get a valid response
-    console.error("DEBUG: Failed to get a properly formatted response after multiple attempts");
+    console.error("Failed to get a properly formatted response after multiple attempts");
     return responseContent || "Failed to generate content. Please try again.";
   } catch (error) {
-    console.error(`DEBUG: Error in getAIResponse: ${error.message}`);
+    console.error(`Error in getAIResponse: ${error.message}`);
     throw error;
   }
 };
