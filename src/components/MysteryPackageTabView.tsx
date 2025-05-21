@@ -1,1060 +1,292 @@
-// src/components/MysteryPackageTabView.tsx
+
 import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Book, Users, FileText, Grid2x2, FileCode, Download, Sparkles, ChevronDown } from "lucide-react";
-import ReactMarkdown from 'react-markdown';
 import { Button } from "@/components/ui/button";
-import { GenerationStatus } from "@/services/mysteryPackageService";
-import { supabase } from "@/lib/supabase";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { toast } from "sonner";
+import ReactMarkdown from "react-markdown";
+import { Progress } from "@/components/ui/progress";
+import { Loader2, Wand2 } from "lucide-react";
 import { MysteryCharacter } from "@/interfaces/mystery";
-import CharacterDetailView from "./CharacterDetailView";
-import CharacterRoleAssignment from "./CharacterRoleAssignment";
-import { Separator } from "./ui/separator";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-export interface MysteryPackageTabViewProps {
-  packageContent?: string;
+interface MysteryPackageTabViewProps {
+  packageContent: string;
   mysteryTitle: string;
-  generationStatus?: GenerationStatus;
-  isGenerating?: boolean;
+  generationStatus?: any;
+  isGenerating: boolean;
   conversationId?: string;
-  onGenerateClick?: () => void; // New callback for generation button
+  onGenerateClick?: () => void;
   streamingContent?: {
     hostGuide?: string;
     characters?: MysteryCharacter[];
     clues?: any[];
     inspectorScript?: string;
     characterMatrix?: string;
-    currentlyGenerating?: string; // Indicates which tab is currently being generated
+    currentlyGenerating?: string;
   };
 }
 
-interface TabData {
-  hostGuide: string;
-  characters: MysteryCharacter[];
-  clues: any[];
-  inspectorScript: string;
-  characterMatrix: string;
-}
-
-const MysteryPackageTabView: React.FC<MysteryPackageTabViewProps> = ({
+const MysteryPackageTabView = ({
   packageContent,
   mysteryTitle,
   generationStatus,
   isGenerating,
   conversationId,
   onGenerateClick,
-  streamingContent
-}) => {
-  const [activeTab, setActiveTab] = useState("host-guide");
-  const [loading, setLoading] = useState(true);
-  const [tabData, setTabData] = useState<TabData>({
-    hostGuide: '',
-    characters: [],
-    clues: [],
-    inspectorScript: '',
-    characterMatrix: ''
-  });
-  
-  const isMobile = useIsMobile();
-  
-  // Improved isEmpty check - Fix to ensure the EmptyStateView shows up correctly
-  const isEmpty = (!packageContent || packageContent === '') && 
-    !streamingContent?.hostGuide && 
-    (!streamingContent?.characters || streamingContent?.characters.length === 0) && 
-    (!streamingContent?.clues || streamingContent?.clues.length === 0) && 
-    !streamingContent?.inspectorScript &&
-    !tabData.hostGuide && 
-    (tabData.characters.length === 0) && 
-    (tabData.clues.length === 0) && 
-    !tabData.inspectorScript &&
-    generationStatus?.status !== 'in_progress';
+  streamingContent = {}
+}: MysteryPackageTabViewProps) => {
+  const [activeTab, setActiveTab] = useState("overview");
+  const [progress, setProgress] = useState(0);
+  const [statusMessage, setStatusMessage] = useState("Starting generation...");
 
-  // Cursor blink effect for live generation
-  const [showCursor, setShowCursor] = useState(true);
+  // Update progress and status message based on generationStatus
   useEffect(() => {
-    if (isGenerating) {
-      const interval = setInterval(() => {
-        setShowCursor(prev => !prev);
-      }, 530);
-      return () => clearInterval(interval);
+    if (generationStatus) {
+      setProgress(generationStatus.progress || 0);
+      setStatusMessage(generationStatus.currentStep || "Processing...");
     }
-    return undefined;
-  }, [isGenerating]);
-  
-  // Auto-switch to tab that's being generated
-  useEffect(() => {
-    if (streamingContent?.currentlyGenerating && isGenerating) {
-      switch (streamingContent.currentlyGenerating) {
-        case 'hostGuide':
-          setActiveTab('host-guide');
-          break;
-        case 'characters':
-          setActiveTab('characters');
-          break;
-        case 'clues':
-          setActiveTab('clues');
-          break;
-        case 'inspectorScript':
-          setActiveTab('detective-script');
-          break;
-        case 'characterMatrix':
-          setActiveTab('character-matrix');
-          break;
-      }
-    }
-  }, [streamingContent?.currentlyGenerating, isGenerating]);
+  }, [generationStatus]);
 
-  useEffect(() => {
-    if (conversationId) {
-      fetchFullContent(conversationId);
-    } else if (packageContent) {
-      extractContentFromMarkdown(packageContent);
-    }
-  }, [conversationId, packageContent]);
-
-  const fetchFullContent = async (conversationId: string) => {
-    try {
-      setLoading(true);
-      console.log("Fetching content for conversation ID:", conversationId);
-      
-      // Fetch package data with all needed fields
-      const { data: packageData, error: packageError } = await supabase
-        .from("mystery_packages")
-        .select("id, content, host_guide, evidence_cards, detective_script, relationship_matrix")
-        .eq("conversation_id", conversationId)
-        .maybeSingle();
-        
-      if (packageError) {
-        console.error("Error fetching mystery package:", packageError);
-        setLoading(false);
-        return;
-      }
-      
-      console.log("Package data fetched:", {
-        id: packageData?.id,
-        hostGuideLength: packageData?.host_guide?.length || 0,
-        evidenceCardsCount: Array.isArray(packageData?.evidence_cards) ? packageData?.evidence_cards.length : 0,
-        hasDetectiveScript: !!packageData?.detective_script,
-        hasRelationshipMatrix: !!packageData?.relationship_matrix
-      });
-      
-      // Fetch characters if we have a package ID
-      let charactersData: MysteryCharacter[] = [];
-      if (packageData?.id) {
-        const { data: chars, error: charsError } = await supabase
-          .from("mystery_characters")
-          .select("*")
-          .eq("package_id", packageData.id);
-          
-        if (charsError) {
-          console.error("Error fetching characters:", charsError);
-        } else if (chars && chars.length > 0) {
-          // Transform character data to ensure consistent structure
-          charactersData = chars.map(character => {
-            // Normalize relationships to expected format
-            let relationships = [];
-            
-            // Handle database format with name/relation pairs
-            if (Array.isArray(character.relationships)) {
-              relationships = character.relationships.map((rel: any) => {
-                // Support both name/relation and character/description formats
-                if (rel.name && rel.relation) {
-                  return {
-                    character: rel.name,
-                    description: rel.relation
-                  };
-                } else if (rel.character && rel.description) {
-                  return rel; // Already in correct format
-                } else {
-                  // Try to extract from simple object
-                  const characterName = Object.keys(rel)[0];
-                  return {
-                    character: characterName,
-                    description: rel[characterName] || ''
-                  };
-                }
-              });
-            }
-            
-            // Normalize secrets to array format
-            let secrets: string[] = [];
-            if (typeof character.secrets === 'string') {
-              // If it's a single string, convert to array
-              secrets = [character.secrets];
-            } else if (Array.isArray(character.secrets)) {
-              // If array, ensure all items are strings
-              secrets = character.secrets.map(secret => 
-                typeof secret === 'string' ? secret : JSON.stringify(secret)
-              );
-            } else if (character.secrets && typeof character.secrets === 'object') {
-              // If it's an object, convert to array of strings
-              secrets = Object.entries(character.secrets).map(
-                ([key, value]) => `${key}: ${value}`
-              );
-            }
-            
-            // Normalize round scripts
-            let round_scripts = character.round_scripts || {};
-            if (typeof round_scripts !== 'object') {
-              round_scripts = {};
-            }
-            
-            // Ensure the character data conforms to our interface
-            return {
-              id: character.id || '',
-              package_id: character.package_id || '',
-              character_name: character.character_name || 'Unknown Character',
-              description: character.description || '',
-              background: character.background || '',
-              relationships: relationships.filter(r => r.character && r.character.trim().length > 0),
-              secrets: secrets.filter(s => s && s.trim().length > 0),
-              round_scripts: {
-                introduction: character.round_scripts?.introduction || character.introduction || '',
-                round1: character.round1_statement || '',
-                round2: character.round_scripts?.round2 || {},
-                round3: character.round_scripts?.round3 || {},
-                final: character.round_scripts?.final || {}
-              },
-              introduction: character.introduction || '',
-              whereabouts: character.whereabouts || '',
-              round1_statement: character.round1_statement || '',
-              round2_statement: character.round2_statement || '',
-              round3_statement: character.round3_statement || '',
-              questioning_options: character.questioning_options || [],
-              created_at: character.created_at || new Date().toISOString(),
-              updated_at: character.updated_at || new Date().toISOString()
-            };
-          });
-          
-          console.log(`Found and processed ${charactersData.length} characters`);
-        }
-      }
-
-      // Now we have all the data we need, let's process and display it correctly
-      const hostGuideContent = packageData?.host_guide || '';
-      
-      // Format evidence cards properly
-      let evidenceCards: any[] = [];
-      if (packageData?.evidence_cards) {
-        // Fix here: Ensure evidence_cards is an array before mapping
-        if (Array.isArray(packageData.evidence_cards)) {
-          evidenceCards = packageData.evidence_cards.map((card: any, index: number) => ({
-            title: card.title || `Evidence ${index + 1}`,
-            content: card.content || '',
-            description: card.description || '',
-            implication: card.implication || ''
-          }));
-        } else if (typeof packageData.evidence_cards === 'object') {
-          // Handle case where evidence_cards is an object
-          evidenceCards = Object.entries(packageData.evidence_cards).map(([key, value]: [string, any]) => ({
-            title: value.title || key,
-            content: value.content || '',
-            description: value.description || '',
-            implication: value.implication || ''
-          }));
-        } else if (typeof packageData.evidence_cards === 'string') {
-          // Handle case where evidence_cards is a string (possibly JSON)
-          try {
-            const parsed = JSON.parse(packageData.evidence_cards);
-            if (Array.isArray(parsed)) {
-              evidenceCards = parsed.map((card: any, index: number) => ({
-                title: card.title || `Evidence ${index + 1}`,
-                content: card.content || '',
-                description: card.description || '',
-                implication: card.implication || ''
-              }));
-            }
-          } catch (e) {
-            console.error("Failed to parse evidence_cards string:", e);
-            // Default to empty array if parsing fails
-            evidenceCards = [];
-          }
-        }
-      }
-      
-      // Format inspector script
-      const inspectorScript = packageData?.detective_script || '';
-      
-      // Format relationship matrix - convert to HTML table if it's just text
-      let characterMatrix = packageData?.relationship_matrix || '';
-      if (typeof characterMatrix === 'string' && characterMatrix.includes('|')) {
-        characterMatrix = formatMatrixAsTable(characterMatrix);
-      } else if (typeof characterMatrix === 'object') {
-        characterMatrix = formatMatrixObjectAsTable(characterMatrix);
-      }
-      
-      // If we still don't have character data, try extracting it from content
-      if (charactersData.length === 0 && packageData?.content) {
-        const extractedCharacters = extractCharactersFromContent(packageData.content);
-        if (extractedCharacters.length > 0) {
-          charactersData = extractedCharacters;
-          console.log(`Extracted ${extractedCharacters.length} characters from content`);
-          
-          // If we have a package_id, save these characters to the database
-          if (packageData?.id) {
-            try {
-              for (const character of extractedCharacters) {
-                await supabase.from("mystery_characters").insert({
-                  package_id: packageData.id,
-                  character_name: character.character_name,
-                  description: character.description,
-                  background: character.background,
-                  relationships: character.relationships,
-                  secrets: character.secrets,
-                  round_scripts: character.round_scripts,
-                  introduction: character.introduction || character.round_scripts?.introduction,
-                  whereabouts: character.whereabouts,
-                  round1_statement: character.round1_statement || (character.round_scripts?.round2 as any)?.innocent,
-                  round2_statement: character.round2_statement || (character.round_scripts?.round3 as any)?.innocent,
-                  round3_statement: character.round3_statement || (character.round_scripts?.final as any)?.innocent,
-                  questioning_options: character.questioning_options
-                });
-              }
-              toast.success("Character data saved to database");
-            } catch (error) {
-              console.error("Error saving extracted characters to database:", error);
-            }
-          }
-        }
-      }
-      
-      // If character data is still empty but we have a content string that likely contains characters
-      if (charactersData.length === 0 && packageData?.content && 
-          packageData.content.includes("CHARACTER GUIDE")) {
-        toast.info("Extracting character information from raw content");
-      }
-      
-      // Store all the data
-      setTabData({
-        hostGuide: hostGuideContent,
-        characters: charactersData,
-        clues: evidenceCards,
-        inspectorScript: inspectorScript,
-        characterMatrix: characterMatrix
-      });
-      
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching mystery content:", error);
-      toast.error("Failed to load mystery content");
-      setLoading(false);
-    }
+  // Sections from package content extraction helpers
+  const extractHostGuide = () => {
+    if (streamingContent?.hostGuide) return streamingContent.hostGuide;
+    
+    if (!packageContent) return "";
+    
+    const hostGuidePattern = /# .+ - HOST GUIDE\n([\s\S]*?)(?=# |$)/i;
+    const match = packageContent.match(hostGuidePattern);
+    return match ? match[1].trim() : "";
   };
 
-  const formatMatrixAsTable = (matrixText: string): string => {
-    if (!matrixText.includes('|')) return matrixText;
+  const extractInspectorScript = () => {
+    if (streamingContent?.inspectorScript) return streamingContent.inspectorScript;
     
-    const lines = matrixText.split('\n').filter(line => line.trim());
-    let tableHtml = '<table class="min-w-full border-collapse border border-gray-300">\n';
+    if (!packageContent) return "";
     
-    // Process header row
-    if (lines.length > 0) {
-      const headerCells = lines[0].split('|').map(cell => cell.trim());
-      tableHtml += '  <thead>\n    <tr>\n';
-      headerCells.forEach(cell => {
-        tableHtml += `      <th class="border border-gray-300 px-4 py-2 bg-muted">${cell}</th>\n`;
-      });
-      tableHtml += '    </tr>\n  </thead>\n';
-    }
-    
-    // Process body rows
-    if (lines.length > 1) {
-      tableHtml += '  <tbody>\n';
-      for (let i = 1; i < lines.length; i++) {
-        if (lines[i].includes('---')) continue; // Skip separator rows
-        
-        const cells = lines[i].split('|').map(cell => cell.trim());
-        tableHtml += '    <tr>\n';
-        cells.forEach((cell, index) => {
-          if (index === 0) {
-            tableHtml += `      <td class="border border-gray-300 px-4 py-2 font-semibold bg-muted/50">${cell}</td>\n`;
-          } else {
-            tableHtml += `      <td class="border border-gray-300 px-4 py-2 bg-card">${cell}</td>\n`;
-          }
-        });
-        tableHtml += '    </tr>\n';
-      }
-      tableHtml += '  </tbody>\n';
-    }
-    
-    tableHtml += '</table>';
-    return tableHtml;
+    const inspectorPattern = /# (?:INSPECTOR|DETECTIVE) SCRIPT\n([\s\S]*?)(?=# |$)/i;
+    const match = packageContent.match(inspectorPattern);
+    return match ? match[1].trim() : "";
   };
 
-  const formatMatrixObjectAsTable = (matrixObj: any): string => {
-    if (!matrixObj || typeof matrixObj !== 'object') return '';
+  const extractCharacterMatrix = () => {
+    if (streamingContent?.characterMatrix) return streamingContent.characterMatrix;
     
-    const characters = Object.keys(matrixObj);
-    if (characters.length === 0) return '';
+    if (!packageContent) return "";
     
-    let tableHtml = '<table class="min-w-full border-collapse border border-gray-300">\n';
-    
-    // Header row
-    tableHtml += '  <thead>\n    <tr>\n';
-    tableHtml += '      <th class="border border-gray-300 px-4 py-2 bg-muted">Character</th>\n';
-    tableHtml += '      <th class="border border-gray-300 px-4 py-2 bg-muted">Primary Connection</th>\n';
-    tableHtml += '      <th class="border border-gray-300 px-4 py-2 bg-muted">Secondary Connections</th>\n';
-    tableHtml += '      <th class="border border-gray-300 px-4 py-2 bg-muted">Secret Connections</th>\n';
-    tableHtml += '    </tr>\n  </thead>\n';
-    
-    // Body rows
-    tableHtml += '  <tbody>\n';
-    characters.forEach(character => {
-      const charData = matrixObj[character];
-      tableHtml += '    <tr>\n';
-      tableHtml += `      <td class="border border-gray-300 px-4 py-2 font-semibold bg-muted/50">${character}</td>\n`;
-      tableHtml += `      <td class="border border-gray-300 px-4 py-2 bg-card">${charData.primary_connection || ''}</td>\n`;
-      
-      let secondaryConn = '';
-      if (Array.isArray(charData.secondary_connections)) {
-        secondaryConn = charData.secondary_connections.join(', ');
-      } else if (typeof charData.secondary_connections === 'string') {
-        secondaryConn = charData.secondary_connections;
-      }
-      tableHtml += `      <td class="border border-gray-300 px-4 py-2 bg-card">${secondaryConn}</td>\n`;
-      
-      let secretConn = '';
-      if (Array.isArray(charData.secret_connections)) {
-        secretConn = charData.secret_connections.join(', ');
-      } else if (typeof charData.secret_connections === 'string') {
-        secretConn = charData.secret_connections;
-      }
-      tableHtml += `      <td class="border border-gray-300 px-4 py-2 bg-card">${secretConn}</td>\n`;
-      
-      tableHtml += '    </tr>\n';
-    });
-    tableHtml += '  </tbody>\n';
-    
-    tableHtml += '</table>';
-    return tableHtml;
+    const matrixPattern = /# CHARACTER RELATIONSHIP MATRIX\n([\s\S]*?)(?=# |$)/i;
+    const match = packageContent.match(matrixPattern);
+    return match ? match[1].trim() : "";
   };
 
-  const extractCharactersFromContent = (content: string): MysteryCharacter[] => {
+  const extractCharacters = () => {
+    if (streamingContent?.characters && Array.isArray(streamingContent.characters)) return streamingContent.characters;
+    
+    if (!packageContent) return [];
+    
     const characters: MysteryCharacter[] = [];
-    
-    // Try to match character sections
     const characterPattern = /# ([^-\n]+) - CHARACTER GUIDE\n([\s\S]*?)(?=# \w+ - CHARACTER GUIDE|# |$)/g;
-    let match;
     
-    while ((match = characterPattern.exec(content)) !== null) {
+    let match;
+    while ((match = characterPattern.exec(packageContent)) !== null) {
       const characterName = match[1].trim();
       const characterContent = match[2].trim();
       
-      // Extract character details
-      const description = extractSection(characterContent, "CHARACTER DESCRIPTION");
-      const background = extractSection(characterContent, "(?:YOUR )?BACKGROUND");
-      const relationshipsText = extractSection(characterContent, "(?:YOUR )?RELATIONSHIPS");
-      const secretsText = extractSection(characterContent, "(?:YOUR )?SECRETS?");
-      const whereaboutsText = extractSection(characterContent, "(?:YOUR )?WHEREABOUTS");
-      const round1Text = extractSection(characterContent, "ROUND 1: INITIAL INVESTIGATION");
-      const round2Text = extractSection(characterContent, "ROUND 2: DEEPER REVELATIONS");
-      const round3Text = extractSection(characterContent, "ROUND 3: FINAL CLUES");
-      const finalStatementText = extractSection(characterContent, "FINAL STATEMENT");
-      
-      // Extract introductory statement
-      const introPattern = /YOUR INTRODUCTION\s*\n([^#]+?)(?=CHOOSE|$)/is;
-      const introMatch = round1Text.match(introPattern);
-      const introduction = introMatch ? introMatch[1].trim().replace(/"([^"]+)"/, '$1') : '';
-      
-      // Extract questioning options
-      const questioningOptions: { target: string, question: string }[] = [];
-      const questioningPattern = /Ask ([^:]+):\s*"([^"]+)"/g;
-      let questionMatch;
-      const questioningSection = characterContent.includes("CHOOSE SOMEONE TO QUESTION") ? 
-                               extractSection(characterContent, "CHOOSE SOMEONE TO QUESTION") : '';
-                               
-      while ((questionMatch = questioningPattern.exec(questioningSection)) !== null) {
-        questioningOptions.push({
-          target: questionMatch[1].trim(),
-          question: questionMatch[2].trim()
-        });
-      }
-      
-      // Process relationships
-      const relationships: {character: string; description: string}[] = [];
-      
-      // Try different formatting patterns
-      const relationshipPatterns = [
-        /\*\*([^*]+)\*\*:\s*([^\n]+)/g, // Bold format: **Name**: Description
-        /\*([^*]+)\*:\s*([^\n]+)/g,     // Italic format: *Name*: Description
-        /^([^:]+):\s*(.+)$/gm           // Simple format: Name: Description
-      ];
-      
-      for (const pattern of relationshipPatterns) {
-        let relMatch;
-        while ((relMatch = pattern.exec(relationshipsText)) !== null) {
-          relationships.push({
-            character: relMatch[1].trim(),
-            description: relMatch[2].trim()
-          });
-        }
-      }
-      
-      // If no relationships were found using patterns, try paragraph-based extraction
-      if (relationships.length === 0 && relationshipsText) {
-        const paragraphs = relationshipsText.split('\n\n');
-        paragraphs.forEach(para => {
-          const parts = para.split(' - ');
-          if (parts.length >= 2) {
-            relationships.push({
-              character: parts[0].trim(),
-              description: parts.slice(1).join(' - ').trim()
-            });
-          }
-        });
-      }
-      
-      // Process secrets
-      let secrets: string[] = [];
-      if (secretsText) {
-        // Try numbered list pattern (1. Secret)
-        const numberedSecretPattern = /\d+\.\s*([^\n]+)/g;
-        let secretMatch;
-        while ((secretMatch = numberedSecretPattern.exec(secretsText)) !== null) {
-          secrets.push(secretMatch[1].trim());
-        }
-        
-        // Try bulleted list pattern (- Secret or * Secret)
-        if (secrets.length === 0) {
-          const bulletedSecretPattern = /[-*]\s*([^\n]+)/g;
-          while ((secretMatch = bulletedSecretPattern.exec(secretsText)) !== null) {
-            secrets.push(secretMatch[1].trim());
-          }
-        }
-        
-        // If no structured secrets found, use paragraphs
-        if (secrets.length === 0) {
-          secrets = secretsText.split('\n\n')
-            .map(s => s.trim())
-            .filter(s => s.length > 0);
-        }
-        
-        // If still empty but we have text, use the whole thing as one secret
-        if (secrets.length === 0 && secretsText.trim()) {
-          secrets = [secretsText.trim()];
-        }
-      }
-      
-      // Extract round statements
-      const round1StatementPattern = /IF YOU ARE INNOCENT:\s*"([^"]+)"/i;
-      const round1Match = round1Text.match(round1StatementPattern);
-      const round1Statement = round1Match ? round1Match[1].trim() : '';
-      
-      const round2StatementPattern = /IF YOU ARE INNOCENT:\s*"([^"]+)"/i;
-      const round2Match = round2Text.match(round2StatementPattern);
-      const round2Statement = round2Match ? round2Match[1].trim() : '';
-      
-      const round3StatementPattern = /IF YOU ARE INNOCENT:\s*"([^"]+)"/i;
-      const round3Match = round3Text.match(round3StatementPattern);
-      const round3Statement = round3Match ? round3Match[1].trim() : '';
-
-      // Extract scripts for different roles
-      // Find innocent and guilty statements only (removing accomplice)
-      const extractRoleScript = (text: string, role: string): string => {
-        const pattern = new RegExp(`IF YOU ARE ${role}:\\s*"([^"]+)"`, 'i');
-        const match = text.match(pattern);
-        return match ? match[1].trim() : '';
-      };
-      
-      const finalInnocent = extractRoleScript(finalStatementText, 'INNOCENT');
-      const finalGuilty = extractRoleScript(finalStatementText, 'GUILTY');
-      
-      const round2Innocent = extractRoleScript(round2Text, 'INNOCENT');
-      const round2Guilty = extractRoleScript(round2Text, 'GUILTY');
-      
-      const round3Innocent = extractRoleScript(round3Text, 'INNOCENT');
-      const round3Guilty = extractRoleScript(round3Text, 'GUILTY');
-      
-      const characterObj: MysteryCharacter = {
-        id: '',  // Will be assigned when saved to DB
-        package_id: '', // Will be assigned when saved to DB
+      characters.push({
+        id: crypto.randomUUID(),
+        package_id: conversationId || "",
         character_name: characterName,
-        description,
-        background,
-        relationships,
-        secrets,
-        introduction,
-        whereabouts: whereaboutsText,
-        round1_statement: round1Statement,
-        round2_statement: round2Statement,
-        round3_statement: round3Statement,
-        questioning_options: questioningOptions,
-        round_scripts: {
-          introduction,
-          round1: round1Statement,
-          round2: {
-            innocent: round2Innocent,
-            guilty: round2Guilty
-          },
-          round3: {
-            innocent: round3Innocent,
-            guilty: round3Guilty
-          },
-          final: {
-            innocent: finalInnocent,
-            guilty: finalGuilty
-          }
-        },
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
-      
-      characters.push(characterObj);
+        description: characterContent.substring(0, characterContent.indexOf('\n\n')) || '',
+        background: '',
+        relationships: [],
+        secrets: []
+      });
     }
     
     return characters;
   };
 
-  const extractContentFromMarkdown = (content: string) => {
-    if (!content) return;
+  const extractClues = () => {
+    if (streamingContent?.clues && Array.isArray(streamingContent.clues)) return streamingContent.clues;
     
-    try {
-      // Extract host guide
-      const hostGuideMatch = content.match(/# .+ - HOST GUIDE\n([\s\S]*?)(?=# |$)/i);
-      const hostGuide = hostGuideMatch ? hostGuideMatch[1].trim() : '';
+    if (!packageContent) return [];
+    
+    const clues: any[] = [];
+    const cluePattern = /# EVIDENCE: (.*?)\n([\s\S]*?)(?=# EVIDENCE:|# |$)/gi;
+    
+    let match;
+    while ((match = cluePattern.exec(packageContent)) !== null) {
+      const title = match[1].trim();
+      const clueContent = match[2].trim();
       
-      // Extract inspector script
-      const inspectorScriptMatch = content.match(/# (?:INSPECTOR|DETECTIVE) SCRIPT\n([\s\S]*?)(?=# |$)/i);
-      const inspectorScript = inspectorScriptMatch ? inspectorScriptMatch[1].trim() : '';
-      
-      // Extract evidence cards
-      const evidenceCards: any[] = [];
-      const evidencePattern = /# EVIDENCE: (.*?)\n([\s\S]*?)(?=# EVIDENCE:|# |$)/gi;
-      let evidenceMatch;
-      
-      while ((evidenceMatch = evidencePattern.exec(content)) !== null) {
-        const title = evidenceMatch[1].trim();
-        const cardContent = evidenceMatch[2].trim();
-        evidenceCards.push({
-          title,
-          content: cardContent,
-          description: '',
-          implication: ''
-        });
-      }
-      
-      // Extract character matrix
-      const matrixMatch = content.match(/# CHARACTER RELATIONSHIP MATRIX\n([\s\S]*?)(?=# |$)/i);
-      let characterMatrix = matrixMatch ? matrixMatch[1].trim() : '';
-      
-      // Convert matrix text to HTML table if needed
-      if (characterMatrix && characterMatrix.includes('|')) {
-        characterMatrix = formatMatrixAsTable(characterMatrix);
-      }
-      
-      // Extract characters
-      const extractedCharacters = extractCharactersFromContent(content);
-      
-      // Store the data
-      setTabData({
-        hostGuide,
-        characters: extractedCharacters,
-        clues: evidenceCards,
-        inspectorScript,
-        characterMatrix
+      clues.push({
+        title,
+        content: clueContent
       });
-      
-      setLoading(false);
-    } catch (error) {
-      console.error("Error extracting content:", error);
-      toast.error("Failed to process mystery content");
-      setLoading(false);
     }
-  };
-
-  const extractSection = (content: string, sectionName: string, nextSectionName?: string): string => {
-    if (!content) return '';
     
-    const sectionPattern = new RegExp(`(?:##?\\s*${sectionName}|${sectionName}:)([\\s\\S]*?)${nextSectionName ? `(?:##?\\s*${nextSectionName}|${nextSectionName}:)` : '$'}`, 'i');
-    const match = content.match(sectionPattern);
-    
-    return match ? match[1].trim() : '';
+    return clues;
   };
 
-  // Get any streaming content if available, otherwise use loaded content
-  const finalTabData = {
-    hostGuide: streamingContent?.hostGuide || tabData.hostGuide,
-    characters: streamingContent?.characters?.length ? streamingContent.characters : tabData.characters,
-    clues: streamingContent?.clues || tabData.clues,
-    inspectorScript: streamingContent?.inspectorScript || tabData.inspectorScript,
-    characterMatrix: streamingContent?.characterMatrix || tabData.characterMatrix
-  };
+  const hostGuide = extractHostGuide();
+  const inspectorScript = extractInspectorScript();
+  const relationshipMatrix = extractCharacterMatrix();
+  const characters = extractCharacters();
+  const clues = extractClues();
 
-  // Make sure clues are always an array to prevent the ".map is not a function" error
-  if (!Array.isArray(finalTabData.clues)) {
-    finalTabData.clues = [];
-  }
-
-  // Improved Empty state component with clearer call to action
-  const EmptyStateView = () => (
-    <div className="flex flex-col items-center justify-center h-96 text-center">
-      <Sparkles className="h-16 w-16 text-primary/70 mb-4 animate-pulse" />
-      <h3 className="text-2xl font-semibold mb-2">Your mystery package is ready to be generated</h3>
-      <p className="text-muted-foreground mb-6 max-w-md">
-        You've purchased this mystery! Click the button below to create your complete murder mystery package with all game materials.
-      </p>
-      <Button 
-        size="lg" 
-        onClick={onGenerateClick}
-        className="animate-pulse bg-primary hover:bg-primary/90"
-        disabled={isGenerating}
-      >
-        {isGenerating ? (
-          <>
-            <Sparkles className="h-5 w-5 mr-2 animate-spin" />
-            Generating...
-          </>
-        ) : (
-          <>
-            <Sparkles className="h-5 w-5 mr-2" />
-            Generate Mystery Package
-          </>
-        )}
-      </Button>
-    </div>
-  );
-
-  // Generate typing cursor effect
-  const typingCursor = isGenerating && showCursor ? (
-    <span className="inline-block w-2 h-4 bg-primary ml-1 animate-pulse" />
-  ) : null;
-
-  // Determine if each tab is currently being generated
-  const isTabGenerating = (tabId: string) => {
-    if (!isGenerating) return false;
-    
-    switch (tabId) {
-      case 'host-guide': 
-        return streamingContent?.currentlyGenerating === 'hostGuide';
-      case 'characters': 
-        return streamingContent?.currentlyGenerating === 'characters';
-      case 'clues': 
-        return streamingContent?.currentlyGenerating === 'clues';
-      case 'detective-script': 
-        return streamingContent?.currentlyGenerating === 'inspectorScript';
-      case 'character-matrix': 
-        return streamingContent?.currentlyGenerating === 'characterMatrix';
-      default: 
-        return false;
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
-      </div>
-    );
-  }
-
-  // Critical fix: Check if we should show the empty state view
-  if (isEmpty && onGenerateClick) {
-    return <EmptyStateView />;
-  }
-
-  // Mobile dropdown tab selector
-  const MobileTabSelector = () => (
-    <div className="w-full mb-4">
-      <Select value={activeTab} onValueChange={setActiveTab}>
-        <SelectTrigger className="w-full">
-          <SelectValue>
-            {activeTab === 'host-guide' && <><Book className="h-4 w-4 mr-2 inline" /> Host Guide</>}
-            {activeTab === 'characters' && <><Users className="h-4 w-4 mr-2 inline" /> Characters</>}
-            {activeTab === 'clues' && <><FileText className="h-4 w-4 mr-2 inline" /> Clues & Evidence</>}
-            {activeTab === 'detective-script' && <><FileCode className="h-4 w-4 mr-2 inline" /> Detective Script</>}
-            {activeTab === 'character-matrix' && <><Grid2x2 className="h-4 w-4 mr-2 inline" /> Character Matrix</>}
-          </SelectValue>
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="host-guide">
-            <div className="flex items-center">
-              <Book className="h-4 w-4 mr-2" />
-              <span>Host Guide</span>
-              {isTabGenerating('host-guide') && <span className="ml-2 text-xs">(Generating...)</span>}
-            </div>
-          </SelectItem>
-          <SelectItem value="characters">
-            <div className="flex items-center">
-              <Users className="h-4 w-4 mr-2" />
-              <span>Characters</span>
-              {isTabGenerating('characters') && <span className="ml-2 text-xs">(Generating...)</span>}
-            </div>
-          </SelectItem>
-          <SelectItem value="clues">
-            <div className="flex items-center">
-              <FileText className="h-4 w-4 mr-2" />
-              <span>Clues & Evidence</span>
-              {isTabGenerating('clues') && <span className="ml-2 text-xs">(Generating...)</span>}
-            </div>
-          </SelectItem>
-          <SelectItem value="detective-script">
-            <div className="flex items-center">
-              <FileCode className="h-4 w-4 mr-2" />
-              <span>Detective Script</span>
-              {isTabGenerating('detective-script') && <span className="ml-2 text-xs">(Generating...)</span>}
-            </div>
-          </SelectItem>
-          <SelectItem value="character-matrix">
-            <div className="flex items-center">
-              <Grid2x2 className="h-4 w-4 mr-2" />
-              <span>Character Matrix</span>
-              {isTabGenerating('character-matrix') && <span className="ml-2 text-xs">(Generating...)</span>}
-            </div>
-          </SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
-  );
-
-  // Add a function to handle role assignments - Updated to remove accompliceId parameter
-  const handleRoleAssign = (guiltyId: string | null) => {
-    console.log("Role assigned:", { guiltyId });
-    toast.success("Character roles assigned");
-    // In a real implementation, you might want to save this to your state or database
-  };
+  const isExternalProcessing = isGenerating && progress < 90 && !packageContent;
 
   return (
-    <div className="space-y-6">
-      {/* Show a prominent banner if the tabs are empty but we're not showing the EmptyStateView */}
-      {finalTabData.hostGuide === '' && 
-       finalTabData.characters.length === 0 && 
-       finalTabData.clues.length === 0 && 
-       finalTabData.inspectorScript === '' &&
-       !isEmpty && onGenerateClick && !isGenerating && (
-        <Card className="bg-muted/20 border-primary/30 mb-6">
-          <CardContent className="pt-6 pb-6 flex flex-col md:flex-row items-center gap-4">
-            <div className="flex-1">
-              <h3 className="text-lg font-semibold">Ready to generate your mystery?</h3>
-              <p className="text-muted-foreground">
-                Your mystery is purchased and ready to be generated. Click the button to create your complete package.
-              </p>
+    <div className="w-full">
+      {isGenerating && (
+        <div className="mb-6">
+          <div className="flex justify-between items-center mb-2">
+            <div className="text-sm font-medium">
+              {progress < 100 ? "Processing..." : "Generation Complete"}
             </div>
-            <Button 
-              onClick={onGenerateClick}
-              className="md:flex-shrink-0"
-            >
-              <Sparkles className="h-4 w-4 mr-2" />
-              Generate Package
-            </Button>
-          </CardContent>
-        </Card>
+            <div className="text-sm text-muted-foreground">{progress}%</div>
+          </div>
+          <Progress value={progress} className="h-2" />
+          <div className="mt-2 text-sm text-muted-foreground">
+            {statusMessage}
+          </div>
+        </div>
       )}
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        {isMobile ? (
-          <MobileTabSelector />
-        ) : (
-          <TabsList className="w-full flex flex-wrap justify-start mb-4 bg-muted/20">
-            <TabsTrigger 
-              value="host-guide" 
-              className={`${isTabGenerating('host-guide') ? 'animate-pulse' : ''}`}
-              disabled={isEmpty && !isGenerating}
-            >
-              <Book className="h-4 w-4 mr-2" />
-              <span>Host Guide</span>
-              {isTabGenerating('host-guide') && <span className="ml-2 text-xs">(Generating...)</span>}
+      {isExternalProcessing ? (
+        <div className="text-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
+          <h3 className="text-lg font-semibold mb-2">Processing Externally</h3>
+          <p className="text-muted-foreground mb-4">
+            Your mystery is being generated on our external service. This will take 3-5 minutes to complete.
+          </p>
+          <p className="text-sm text-muted-foreground">
+            You can wait here or check back later - you'll be notified when it's ready.
+          </p>
+        </div>
+      ) : (
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="w-full grid grid-cols-2 md:grid-cols-6 mb-4">
+            <TabsTrigger value="overview" className="whitespace-nowrap">
+              Overview
             </TabsTrigger>
-            
-            <TabsTrigger 
-              value="characters"
-              className={`${isTabGenerating('characters') ? 'animate-pulse' : ''}`}
-              disabled={isEmpty && !isGenerating}
-            >
-              <Users className="h-4 w-4 mr-2" />
-              <span>Characters</span>
-              {isTabGenerating('characters') && <span className="ml-2 text-xs">(Generating...)</span>}
+            <TabsTrigger value="host-guide" className="whitespace-nowrap" disabled={!hostGuide}>
+              Host Guide
             </TabsTrigger>
-            
             <TabsTrigger 
-              value="clues"
-              className={`${isTabGenerating('clues') ? 'animate-pulse' : ''}`}
-              disabled={isEmpty && !isGenerating}
+              value="characters" 
+              className="whitespace-nowrap" 
+              disabled={!characters || characters.length === 0}
             >
-              <FileText className="h-4 w-4 mr-2" />
-              <span>Clues & Evidence</span>
-              {isTabGenerating('clues') && <span className="ml-2 text-xs">(Generating...)</span>}
+              Characters ({characters && Array.isArray(characters) ? characters.length : 0})
             </TabsTrigger>
-            
             <TabsTrigger 
-              value="detective-script"
-              className={`${isTabGenerating('detective-script') ? 'animate-pulse' : ''}`}
-              disabled={isEmpty && !isGenerating}
+              value="clues" 
+              className="whitespace-nowrap" 
+              disabled={!clues || clues.length === 0}
             >
-              <FileCode className="h-4 w-4 mr-2" />
-              <span>Detective Script</span>
-              {isTabGenerating('detective-script') && <span className="ml-2 text-xs">(Generating...)</span>}
+              Clues ({clues && Array.isArray(clues) ? clues.length : 0})
             </TabsTrigger>
-            
-            <TabsTrigger 
-              value="character-matrix"
-              className={`${isTabGenerating('character-matrix') ? 'animate-pulse' : ''}`}
-              disabled={isEmpty && !isGenerating}
-            >
-              <Grid2x2 className="h-4 w-4 mr-2" />
-              <span>Character Matrix</span>
-              {isTabGenerating('character-matrix') && <span className="ml-2 text-xs">(Generating...)</span>}
+            <TabsTrigger value="inspector" className="whitespace-nowrap" disabled={!inspectorScript}>
+              Inspector
+            </TabsTrigger>
+            <TabsTrigger value="matrix" className="whitespace-nowrap" disabled={!relationshipMatrix}>
+              Relationships
             </TabsTrigger>
           </TabsList>
-        )}
 
-        <TabsContent value="host-guide" className="mt-4">
-          {finalTabData.hostGuide ? (
-            <div className="space-y-6">
-              <div className="bg-card p-4 md:p-6 rounded-lg shadow-sm">
-                <div className="prose prose-stone dark:prose-invert max-w-none mystery-prose overflow-x-auto">
-                  <ReactMarkdown>{finalTabData.hostGuide}</ReactMarkdown>
-                  {isTabGenerating('host-guide') && typingCursor}
-                </div>
-              </div>
-
-              <div className="bg-card p-4 md:p-6 rounded-lg shadow-sm">
-                <div className="grid grid-cols-1 gap-6">
-                  <Card className="section-card border-0 shadow-sm">
-                    <CardHeader className="pb-2">
-                      <CardTitle>Setup</CardTitle>
-                    </CardHeader>
-                    <CardContent className="section-card-content">
-                      <div className="prose prose-stone dark:prose-invert max-w-none mystery-prose">
-                        <ReactMarkdown>{extractSection(finalTabData.hostGuide, "SETUP")}</ReactMarkdown>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="bg-muted/10 p-6 rounded-lg border border-dashed border-muted flex items-center justify-center">
-              <p className="text-muted-foreground text-center">
-                {isGenerating ? "Generating host guide..." : "Host guide not available yet"}
-                {isTabGenerating('host-guide') && typingCursor}
-              </p>
-            </div>
-          )}
-        </TabsContent>
-
-        <TabsContent value="characters" className="mt-4">
-          {finalTabData.characters.length > 0 ? (
-            <div className="space-y-6">
-              <div className="bg-card p-4 md:p-6 rounded-lg shadow-sm">
-                <h2 className="text-xl font-semibold mb-4">Character Information</h2>
-                <div className="grid grid-cols-1 gap-4">
-                  {finalTabData.characters.map((character, index) => (
-                    <Accordion type="single" collapsible key={character.id || index}>
-                      <AccordionItem value={`character-${index}`}>
-                        <AccordionTrigger className="hover:bg-muted/20 px-4 rounded-md">
-                          {character.character_name}
-                        </AccordionTrigger>
-                        <AccordionContent className="p-4">
-                          <CharacterDetailView character={character} />
-                        </AccordionContent>
-                      </AccordionItem>
-                    </Accordion>
-                  ))}
-                </div>
-              </div>
+          <TabsContent value="overview" className="space-y-4">
+            <div className="prose prose-stone dark:prose-invert max-w-none">
+              <h2>{mysteryTitle}</h2>
               
-              <div className="bg-card p-4 md:p-6 rounded-lg shadow-sm">
-                <h2 className="text-xl font-semibold mb-4">Character Role Assignment</h2>
-                <CharacterRoleAssignment 
-                  characters={finalTabData.characters} 
-                  onRoleAssign={handleRoleAssign}
-                />
-              </div>
+              {isGenerating && !packageContent ? (
+                <div className="flex items-center space-x-2 text-muted-foreground">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Generation in progress...</span>
+                </div>
+              ) : !packageContent ? (
+                <div className="text-center py-12 space-y-4">
+                  <Wand2 className="h-12 w-12 mx-auto text-muted-foreground" />
+                  <h3 className="text-xl font-semibold">Ready to Generate Your Mystery</h3>
+                  <p className="text-muted-foreground">
+                    Click the button below to start generating your complete mystery package with all materials included.
+                  </p>
+                  {onGenerateClick && (
+                    <Button onClick={onGenerateClick} className="mt-4">
+                      Generate Package
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                <div>
+                  <p>Your mystery package is ready! Use the tabs above to explore all the components:</p>
+                  <ul>
+                    <li><strong>Host Guide:</strong> Complete instructions for running your murder mystery</li>
+                    <li><strong>Characters:</strong> Detailed character sheets for all players</li>
+                    <li><strong>Clues:</strong> Physical evidence to distribute during the game</li>
+                    <li><strong>Inspector:</strong> Role-playing instructions for the detective</li>
+                    <li><strong>Relationships:</strong> Character relationship matrix</li>
+                  </ul>
+                </div>
+              )}
             </div>
-          ) : (
-            <div className="bg-muted/10 p-6 rounded-lg border border-dashed border-muted flex items-center justify-center">
-              <p className="text-muted-foreground text-center">
-                {isGenerating ? "Generating character details..." : "Character information not available yet"}
-                {isTabGenerating('characters') && typingCursor}
-              </p>
+          </TabsContent>
+
+          <TabsContent value="host-guide">
+            <div className="prose prose-stone dark:prose-invert max-w-none">
+              <ReactMarkdown>{hostGuide}</ReactMarkdown>
             </div>
-          )}
-        </TabsContent>
-          
-        <TabsContent value="clues" className="mt-4">
-          {finalTabData.clues.length > 0 ? (
-            <div className="space-y-6">
-              <div className="bg-card p-4 md:p-6 rounded-lg shadow-sm">
-                <h2 className="text-xl font-semibold mb-4">Clues & Evidence</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {finalTabData.clues.map((clue, index) => (
-                    <Card key={index} className="overflow-hidden">
-                      <CardHeader className="bg-muted/20 pb-2">
-                        <CardTitle className="text-lg">{clue.title}</CardTitle>
-                      </CardHeader>
-                      <CardContent className="pt-4">
-                        <div className="prose prose-stone dark:prose-invert max-w-none mystery-prose">
-                          <ReactMarkdown>{clue.content}</ReactMarkdown>
-                        </div>
-                        {clue.implication && (
-                          <>
-                            <Separator className="my-3" />
-                            <p className="font-medium text-sm text-muted-foreground mt-2">Implication:</p>
-                            <p className="italic text-sm">{clue.implication}</p>
-                          </>
-                        )}
-                      </CardContent>
-                    </Card>
+          </TabsContent>
+
+          <TabsContent value="characters">
+            <div className="prose prose-stone dark:prose-invert max-w-none">
+              {Array.isArray(characters) && characters.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {characters.map((character, index) => (
+                    <div key={character.id || index} className="border rounded-lg p-4 bg-card">
+                      <h3 className="text-lg font-bold mb-2">{character.character_name}</h3>
+                      <p>{character.description}</p>
+                    </div>
                   ))}
                 </div>
-              </div>
-            </div>
-          ) : (
-            <div className="bg-muted/10 p-6 rounded-lg border border-dashed border-muted flex items-center justify-center">
-              <p className="text-muted-foreground text-center">
-                {isGenerating ? "Generating clues and evidence..." : "Clues and evidence not available yet"}
-                {isTabGenerating('clues') && typingCursor}
-              </p>
-            </div>
-          )}
-        </TabsContent>
-
-        <TabsContent value="detective-script" className="mt-4">
-          {finalTabData.inspectorScript ? (
-            <div className="space-y-6">
-              <div className="bg-card p-4 md:p-6 rounded-lg shadow-sm">
-                <div className="prose prose-stone dark:prose-invert max-w-none mystery-prose detective-script-content overflow-x-auto">
-                  <ReactMarkdown>{finalTabData.inspectorScript}</ReactMarkdown>
-                  {isTabGenerating('detective-script') && typingCursor}
+              ) : (
+                <div className="text-center py-6">
+                  <p className="text-muted-foreground">No character information available yet.</p>
                 </div>
-              </div>
+              )}
             </div>
-          ) : (
-            <div className="bg-muted/10 p-6 rounded-lg border border-dashed border-muted flex items-center justify-center">
-              <p className="text-muted-foreground text-center">
-                {isGenerating ? "Generating detective script..." : "Detective script not available yet"}
-                {isTabGenerating('detective-script') && typingCursor}
-              </p>
-            </div>
-          )}
-        </TabsContent>
+          </TabsContent>
 
-        <TabsContent value="character-matrix" className="mt-4">
-          {finalTabData.characterMatrix ? (
-            <div className="space-y-6">
-              <div className="bg-card p-4 md:p-6 rounded-lg shadow-sm">
-                <h2 className="text-xl font-semibold mb-4">Character Relationship Matrix</h2>
-                <div className="character-matrix-content overflow-x-auto">
-                  <div dangerouslySetInnerHTML={{ __html: finalTabData.characterMatrix }} />
+          <TabsContent value="clues">
+            <div className="prose prose-stone dark:prose-invert max-w-none">
+              {Array.isArray(clues) && clues.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {clues.map((clue, index) => (
+                    <div key={index} className="border rounded-lg p-4 bg-card">
+                      <h3 className="text-lg font-bold mb-2">{clue.title}</h3>
+                      <ReactMarkdown>{clue.content}</ReactMarkdown>
+                    </div>
+                  ))}
                 </div>
-                {isTabGenerating('character-matrix') && typingCursor}
-              </div>
+              ) : (
+                <div className="text-center py-6">
+                  <p className="text-muted-foreground">No clues available yet.</p>
+                </div>
+              )}
             </div>
-          ) : (
-            <div className="bg-muted/10 p-6 rounded-lg border border-dashed border-muted flex items-center justify-center">
-              <p className="text-muted-foreground text-center">
-                {isGenerating ? "Generating character matrix..." : "Character matrix not available yet"}
-                {isTabGenerating('character-matrix') && typingCursor}
-              </p>
+          </TabsContent>
+
+          <TabsContent value="inspector">
+            <div className="prose prose-stone dark:prose-invert max-w-none">
+              <ReactMarkdown>{inspectorScript}</ReactMarkdown>
             </div>
-          )}
-        </TabsContent>
-      </Tabs>
+          </TabsContent>
+
+          <TabsContent value="matrix">
+            <div className="prose prose-stone dark:prose-invert max-w-none">
+              <ReactMarkdown>{relationshipMatrix}</ReactMarkdown>
+            </div>
+          </TabsContent>
+        </Tabs>
+      )}
     </div>
   );
 };

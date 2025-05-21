@@ -20,8 +20,10 @@ serve(async (req) => {
     const webhookUrl = "https://hook.eu2.make.com/uannnuc9hc79vorh1iyxwb9t5lp484n3";
 
     // Parse request body
-    const { conversationId } = await req.json();
-    console.log(`Processing webhook trigger for conversation: ${conversationId}`);
+    const requestData = await req.json();
+    const { conversationId, testMode = false } = requestData;
+    
+    console.log(`Processing webhook trigger for conversation: ${conversationId}, testMode: ${testMode}`);
 
     if (!conversationId) {
       return new Response(JSON.stringify({ error: "Conversation ID is required" }), {
@@ -30,16 +32,43 @@ serve(async (req) => {
       });
     }
 
-    // Fetch the conversation with all messages
+    // Check if mystery is paid or should be processed for test mode
     const { data: conversation, error: conversationError } = await supabase
       .from("conversations")
-      .select("*, messages(*), system_instruction")
+      .select("*, is_paid, display_status")
       .eq("id", conversationId)
       .single();
 
     if (conversationError) {
       console.error("Error fetching conversation:", conversationError);
       return new Response(JSON.stringify({ error: "Failed to fetch conversation data" }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Only proceed if the mystery is paid or in test mode
+    if (!conversation.is_paid && conversation.display_status !== "purchased" && !testMode) {
+      console.error("Cannot generate package for unpaid mystery without test mode");
+      return new Response(JSON.stringify({ 
+        error: "This mystery requires purchase before generating a complete package",
+        requiresPurchase: true
+      }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Fetch the conversation with all messages
+    const { data: fullConversation, error: fullConversationError } = await supabase
+      .from("conversations")
+      .select("*, messages(*), system_instruction")
+      .eq("id", conversationId)
+      .single();
+
+    if (fullConversationError) {
+      console.error("Error fetching full conversation:", fullConversationError);
+      return new Response(JSON.stringify({ error: "Failed to fetch complete conversation data with messages" }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -56,6 +85,7 @@ serve(async (req) => {
 
     if (updateError) {
       console.error("Error updating conversation:", updateError);
+      // Continue despite error, as this is not critical
     }
 
     // Send data to Make.com webhook
@@ -67,13 +97,21 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         conversationId,
-        conversation,
+        conversation: fullConversation,
         timestamp: new Date().toISOString(),
+        testMode
       })
     });
 
     if (!webhookResponse.ok) {
-      const webhookErrorText = await webhookResponse.text();
+      let webhookErrorText = "";
+      try {
+        const errorData = await webhookResponse.json();
+        webhookErrorText = errorData.error || webhookResponse.statusText;
+      } catch (e) {
+        webhookErrorText = await webhookResponse.text() || webhookResponse.statusText;
+      }
+      
       console.error("Webhook error:", webhookErrorText);
       throw new Error(`Webhook returned ${webhookResponse.status}: ${webhookErrorText}`);
     }

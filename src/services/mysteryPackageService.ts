@@ -118,18 +118,29 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
     });
     
     try {
-      // Call the webhook trigger edge function instead of generating locally
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/mystery-webhook-trigger`, {
+      // IMPORTANT: Use environment variables, not the supabase client properties
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      
+      // Call the webhook trigger edge function
+      const response = await fetch(`${supabaseUrl}/functions/v1/mystery-webhook-trigger`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+          'Authorization': `Bearer ${supabaseAnonKey}`
         },
-        body: JSON.stringify({ conversationId: mysteryId })
+        body: JSON.stringify({ conversationId: mysteryId, testMode })
       });
       
       if (!response.ok) {
-        const errorText = await response.text();
+        let errorText = "";
+        try {
+          const errorData = await response.json();
+          errorText = errorData.error || response.statusText;
+        } catch (e) {
+          errorText = await response.text() || response.statusText;
+        }
+        
         console.error("Webhook trigger error:", errorText);
         throw new Error(`Failed to trigger webhook: ${response.status} ${errorText}`);
       }
@@ -141,7 +152,7 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
       const waitingStatus: GenerationStatus = {
         status: 'in_progress',
         progress: 20,
-        currentStep: 'Sent to external service. Waiting for processing (3-5 minutes)...',
+        currentStep: 'Sent to external service. Processing will take 3-5 minutes...',
         sections: {
           hostGuide: false,
           characters: false,
@@ -165,6 +176,15 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
         externalProcessing: 'Package generation sent to external service (3-5 minutes)...',
         generationStatus: waitingStatus
       });
+      
+      // Update the conversation to mark that it needs package generation
+      await supabase
+        .from("conversations")
+        .update({
+          needs_package_generation: true,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", mysteryId);
       
       // The content will be filled by the external service
       return "Sent to external generation service";
@@ -240,19 +260,4 @@ export async function getPackageGenerationStatus(mysteryId: string): Promise<Gen
     console.error("Error in getPackageGenerationStatus:", error);
     throw error;
   }
-}
-
-// Keeping these functions in case they are referenced elsewhere, but they now just display statuses
-async function processGeneration(
-  mysteryId: string, 
-  conversation: any, 
-  packageId: string,
-  testMode: boolean,
-  existingContent: string | null
-): Promise<string> {
-  // This function is no longer used for actual generation
-  // Just keeping it for compatibility with existing code
-  
-  // Just return a placeholder content
-  return "Processing via external service. Content will be available when processing completes.";
 }

@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -45,13 +44,13 @@ const MysteryChat = ({
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const [initialMessageSent, setInitialMessageSent] = useState(false);
     const messagesInitialized = useRef(false);
     const aiHasRespondedRef = useRef(false);
     const [error, setError] = useState<string | null>(null);
     const isEditModeRef = useRef(!!savedMysteryId);
     const [hasUserEditedInSession, setHasUserEditedInSession] = useState(false);
     const initialFormPromptSaved = useRef(false);
+    const initialFormPromptSent = useRef(false);
     const isMobile = useIsMobile();
 
     console.log("DEBUG: MysteryChat rendering with props:", {
@@ -63,7 +62,8 @@ const MysteryChat = ({
         initialAdditionalDetails,
         initialMessagesCount: initialMessages.length,
         isLoadingHistory,
-        hasSystemInstruction: !!systemInstruction
+        hasSystemInstruction: !!systemInstruction,
+        skipForm
     });
 
     // Create a strong system message function that emphasizes not asking about already provided info
@@ -200,7 +200,6 @@ const MysteryChat = ({
                 console.log("DEBUG: Last message is from AI:", !!lastMessage.is_ai);
             }
 
-            setInitialMessageSent(true);
             messagesInitialized.current = true;
             
             // Check if we already have the initial form prompt
@@ -208,6 +207,7 @@ const MysteryChat = ({
                 !msg.is_ai && msg.content.includes(`Let's create a murder mystery`)
             );
             initialFormPromptSaved.current = hasInitialFormPrompt;
+            initialFormPromptSent.current = hasInitialFormPrompt;
         }
     }, [initialMessages]);
 
@@ -222,27 +222,35 @@ const MysteryChat = ({
                 handleAIResponse(lastMessage.content, false); // Pass false to indicate not user-initiated
             }
         }
-    }, [messages, messagesInitialized.current, isLoadingHistory]);
+    }, [messages, isLoadingHistory]);
 
     useEffect(() => {
         console.log("DEBUG: Initial prompt creation effect", {
             messagesLength: messages.length,
-            initialMessageSent,
             messagesInitialized: messagesInitialized.current,
             isLoadingHistory,
             theme: initialTheme,
             aiHasResponded: aiHasRespondedRef.current,
             initialMessagesLength: initialMessages.length,
-            initialFormPromptSaved: initialFormPromptSaved.current
+            initialFormPromptSaved: initialFormPromptSaved.current,
+            initialFormPromptSent: initialFormPromptSent.current,
+            skipForm
         });
 
-        if (messages.length > 0 || initialMessageSent || messagesInitialized.current || isLoadingHistory) {
+        // Skip form prompt creation if skipForm is true
+        if (skipForm) {
+            console.log("DEBUG: Skipping form prompt creation because skipForm is true");
+            return;
+        }
+
+        if (messages.length > 0 || initialFormPromptSent.current || messagesInitialized.current || isLoadingHistory) {
             console.log("DEBUG: Skipping initial message creation - condition failed");
             return;
         }
 
-        if (initialTheme && initialMessages.length === 0 && !isLoadingHistory) {
+        if (initialTheme && initialMessages.length === 0 && !isLoadingHistory && !initialFormPromptSent.current) {
             console.log("DEBUG: Creating initial message with theme:", initialTheme);
+            
             let initialChatMessage = `Let's create a murder mystery`;
             if (initialTheme) initialChatMessage += ` with a ${initialTheme} theme`;
             if (initialPlayerCount) initialChatMessage += ` for ${initialPlayerCount} players`;
@@ -262,8 +270,8 @@ const MysteryChat = ({
 
             console.log("DEBUG: Setting initial user message:", initialMessage);
             setMessages([initialMessage]);
-            setInitialMessageSent(true);
             messagesInitialized.current = true;
+            initialFormPromptSent.current = true;
             
             // Save the initial form prompt message to the database
             if (onSave && !initialFormPromptSaved.current) {
@@ -274,10 +282,16 @@ const MysteryChat = ({
         } else if (initialMessages.length > 0 && !messagesInitialized.current) {
             console.log("DEBUG: Initial messages were provided, skipping initial prompt creation for theme");
         }
-    }, [initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails, messages.length, initialMessageSent, isLoadingHistory, initialMessages, onSave]);
+    }, [initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails, messages.length, isLoadingHistory, initialMessages, onSave, skipForm]);
 
     // Make sure form data gets saved for edit mode if not present
     useEffect(() => {
+        // Skip if skipForm is true
+        if (skipForm) {
+            console.log("DEBUG: Skipping form data check because skipForm is true");
+            return;
+        }
+
         if (isEditModeRef.current && messages.length > 0 && !initialFormPromptSaved.current && !isLoadingHistory) {
             console.log("DEBUG: Checking if we need to add the initial form prompt");
             
@@ -318,7 +332,7 @@ const MysteryChat = ({
                 initialFormPromptSaved.current = true;
             }
         }
-    }, [messages, isLoadingHistory, initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails, onSave]);
+    }, [messages, isLoadingHistory, initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails, onSave, skipForm]);
 
     const scrollToBottom = () => {
         console.log("DEBUG: Scrolling to bottom of messages");
@@ -375,6 +389,9 @@ const MysteryChat = ({
             setLoading(true);
             setError(null);
             toast.info("AI is thinking...");
+            
+            // Mark that AI is responding to prevent duplicate calls
+            aiHasRespondedRef.current = true;
 
             let anthropicMessages;
             
@@ -510,8 +527,6 @@ ${responseText.split('\n\n').slice(1).join('\n\n')}`;
                     timestamp: new Date(),
                 };
 
-                aiHasRespondedRef.current = true;
-
                 setMessages(prev => {
                     const updatedMessages = [...prev, aiMessage];
 
@@ -528,6 +543,9 @@ ${responseText.split('\n\n').slice(1).join('\n\n')}`;
                 console.error("DEBUG: Error in getAIResponse:", error);
                 setError(error instanceof Error ? error.message : "Unknown error occurred");
                 toast.error("Failed to get AI response. Please try again.");
+                
+                // Reset the aiHasRespondedRef so user can retry
+                aiHasRespondedRef.current = false;
 
                 const fallbackMessage: Message = {
                     id: Date.now().toString(),
@@ -551,6 +569,9 @@ ${responseText.split('\n\n').slice(1).join('\n\n')}`;
             console.error("DEBUG: Error getting AI response:", error);
             setError(error instanceof Error ? error.message : "Unknown error occurred");
             toast.error("Failed to get AI response. Please try again.");
+            
+            // Reset the aiHasRespondedRef so user can retry
+            aiHasRespondedRef.current = false;
         } finally {
             setLoading(false);
         }
@@ -598,7 +619,16 @@ ${responseText.split('\n\n').slice(1).join('\n\n')}`;
                             variant="outline"
                             size="sm"
                             className="mt-2 text-xs"
-                            onClick={retryLastMessage}
+                            onClick={() => {
+                                // Find the last user message and retry sending it
+                                const lastUserMessageIndex = [...messages].reverse().findIndex(m => !m.is_ai);
+                                if (lastUserMessageIndex >= 0) {
+                                    const lastUserMessage = [...messages].reverse()[lastUserMessageIndex];
+                                    // Reset AI response flag to allow retry
+                                    aiHasRespondedRef.current = false;
+                                    handleAIResponse(lastUserMessage.content, true);
+                                }
+                            }}
                         >
                             Try Again
                         </Button>
@@ -670,7 +700,13 @@ ${responseText.split('\n\n').slice(1).join('\n\n')}`;
                         placeholder="Ask the AI..."
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
-                        onKeyDown={handleKeyDown}
+                        onKeyDown={(event) => {
+                            if (event.key === 'Enter' && !event.shiftKey) {
+                                console.log("DEBUG: Enter key pressed (without shift), submitting form");
+                                event.preventDefault();
+                                handleSubmit(event as unknown as React.FormEvent);
+                            }
+                        }}
                         className="flex-1 resize-none"
                         rows={isMobile ? 2 : 3}
                     />
@@ -687,7 +723,14 @@ ${responseText.split('\n\n').slice(1).join('\n\n')}`;
             {messages.length > 1 && !loading && (
                 <div className={cn("border-t", isMobile ? "p-2" : "p-4")}>
                     <Button 
-                        onClick={handleGenerateFinalClick} 
+                        onClick={() => {
+                            if (onGenerateFinal) {
+                                console.log("DEBUG: Generate Final button clicked, sending all messages");
+                                onGenerateFinal(messages);
+                            } else {
+                                toast.error("Final generation callback not provided.");
+                            }
+                        }} 
                         variant="destructive" 
                         size={isMobile ? "sm" : "default"}
                     >
