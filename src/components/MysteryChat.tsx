@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -23,6 +24,7 @@ interface MysteryChatProps {
     initialMessages?: Message[];
     isLoadingHistory?: boolean;
     systemInstruction?: string;
+    skipForm?: boolean;
 }
 
 const MysteryChat = ({
@@ -36,7 +38,8 @@ const MysteryChat = ({
     initialAdditionalDetails,
     initialMessages = [],
     isLoadingHistory = false,
-    systemInstruction = ""
+    systemInstruction = "",
+    skipForm = false
 }: MysteryChatProps) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");

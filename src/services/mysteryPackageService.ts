@@ -1,3 +1,4 @@
+
 import { supabase } from "@/lib/supabase";
 import { getAIResponse, saveGenerationState, getGenerationState, clearGenerationState } from "@/services/aiService";
 import { toast } from "sonner";
@@ -118,11 +119,11 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
     
     try {
       // Call the webhook trigger edge function instead of generating locally
-      const response = await fetch(`${supabase.supabaseUrl}/functions/v1/mystery-webhook-trigger`, {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/mystery-webhook-trigger`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabase.supabaseKey}`
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
         },
         body: JSON.stringify({ conversationId: mysteryId })
       });
