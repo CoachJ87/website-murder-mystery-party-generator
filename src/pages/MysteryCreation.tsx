@@ -228,6 +228,7 @@ const MysteryCreation = () => {
                                 initialMessages={messages}
                                 isLoadingHistory={isLoadingHistory}
                                 systemInstruction={systemInstruction}
+                                skipForm={true} // Skip the form to go directly to chat
                             />
                         </CardContent>
                     </Card>

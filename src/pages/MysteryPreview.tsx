@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -321,15 +320,15 @@ const MysteryPreview = () => {
                 setCurrentContent(packageData.content);
                 
                 // Determine which section to simulate streaming for based on current status
-                if (status.currentStep.includes('Host Guide')) {
+                if (status.currentStep?.includes('Host Guide')) {
                     simulateContentStreaming(packageData.content, 'hostGuide');
-                } else if (status.currentStep.includes('Character')) {
+                } else if (status.currentStep?.includes('Character')) {
                     simulateContentStreaming(packageData.content, 'characters');
-                } else if (status.currentStep.includes('Clue') || status.currentStep.includes('Evidence')) {
+                } else if (status.currentStep?.includes('Clue') || status.currentStep?.includes('Evidence')) {
                     simulateContentStreaming(packageData.content, 'clues');
-                } else if (status.currentStep.includes('Inspector') || status.currentStep.includes('Detective')) {
+                } else if (status.currentStep?.includes('Inspector') || status.currentStep?.includes('Detective')) {
                     simulateContentStreaming(packageData.content, 'inspectorScript');
-                } else if (status.currentStep.includes('Matrix')) {
+                } else if (status.currentStep?.includes('Matrix')) {
                     simulateContentStreaming(packageData.content, 'characterMatrix');
                 }
             }
@@ -372,11 +371,11 @@ const MysteryPreview = () => {
             <div className="space-y-2">
                 <div className="font-semibold flex items-center gap-2">
                     <AlertTriangle className="h-4 w-4" />
-                    <span>Please keep this tab open</span>
+                    <span>External Processing Started</span>
                 </div>
-                <p className="text-sm">Generation takes 5-10 minutes and requires this browser tab to remain open and active. Closing will interrupt the process.</p>
+                <p className="text-sm">Your mystery package is being generated externally. This will take approximately 3-5 minutes. You'll receive an email when it's ready.</p>
             </div>,
-            { duration: 7000 }
+            { duration: 10000 }
         );
 
         try {
@@ -389,9 +388,9 @@ const MysteryPreview = () => {
             toast.info(
                 <div className="space-y-2">
                     <div className="font-semibold">
-                        {isResuming ? "Resuming generation..." : "Starting generation..."}
+                        {isResuming ? "Resuming external generation..." : "Starting external generation..."}
                     </div>
-                    <p className="text-sm">Watch as your mystery package is generated! Keep this tab open.</p>
+                    <p className="text-sm">Your mystery package is being generated on an external service. You'll be notified when it's ready.</p>
                 </div>
             );
             

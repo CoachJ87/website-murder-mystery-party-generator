@@ -72,6 +72,9 @@ serve(async (req) => {
       }
     }
 
+    // Add stronger instruction to prevent batching responses
+    systemMessage += "\n\nVERY IMPORTANT INSTRUCTION: Never answer more than one user question in a single response. If the user asks multiple questions, just answer the first one. NEVER batch answers to multiple questions.";
+
     // Prepare the model and max tokens based on the prompt version and test mode
     let model = promptVersion === 'paid' ? 'claude-3-opus-20240229' : 'claude-3-opus-20240229';
     let maxTokens = testMode ? 1000 : 2000;

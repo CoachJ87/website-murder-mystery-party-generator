@@ -75,8 +75,8 @@ enable_confirmations = true
 # Port to use for Functions API and serve.
 port = 9999
 
-# [functions.mystery-webhook-trigger]
-# verify_jwt = true
+[functions.mystery-webhook-trigger]
+verify_jwt = false
 
 [analytics]
 enabled = false
