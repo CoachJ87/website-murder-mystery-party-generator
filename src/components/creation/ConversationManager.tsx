@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
@@ -97,23 +96,13 @@ export const ConversationManager = ({
   };
 
   const constructInitialMessage = (data: FormValues): Message | null => {
+    // Simplify the initial message to only include the theme
     let initialChatMessage = `Let's create a murder mystery`;
     if (data.theme) {
       initialChatMessage += ` with a ${data.theme} theme`;
     }
-    if (data.playerCount) {
-      initialChatMessage += ` for ${data.playerCount} players`;
-    }
-    if (data.hasAccomplice !== undefined) {
-      initialChatMessage += data.hasAccomplice ? `, including an accomplice` : `, without an accomplice`;
-    }
-    if (data.scriptType) {
-      initialChatMessage += ` with ${data.scriptType} scripts`;
-    }
-    if (data.additionalDetails) {
-      initialChatMessage += `. Additional details: ${data.additionalDetails}`;
-    }
-    initialChatMessage += ".";
+    // Remove other details to force the AI to ask for them
+    initialChatMessage += ". Please guide me through creating this mystery step by step.";
 
     return {
       id: "initial-message",
@@ -131,31 +120,20 @@ export const ConversationManager = ({
   };
 
   const createSystemMessage = (data: FormValues) => {
-    // Create the base system message
-    let systemMsg = "This is a murder mystery creation conversation. ";
-    systemMsg += "The user has ALREADY selected the following preferences, so DO NOT ask about these again: ";
+    // Add the critical instruction at the very beginning of the system message
+    let systemMsg = "🚨 CRITICAL INSTRUCTION: Ask ONLY ONE QUESTION at a time. After each user response, address only that response before moving to the next question. NEVER batch multiple questions or proceed without user input. 🚨\n\n";
     
+    systemMsg += "This is a murder mystery creation conversation. ";
+    
+    // Only provide basic information about the theme as context
     if (data.theme) {
-      systemMsg += `Theme: ${data.theme}. `;
-    }
-    if (data.playerCount) {
-      systemMsg += `Player count: ${data.playerCount}. `;
-    }
-    if (data.hasAccomplice !== undefined) {
-      systemMsg += `Accomplice: ${data.hasAccomplice ? "Yes" : "No"}. `;
-    }
-    if (data.scriptType) {
-      systemMsg += `Script type: ${data.scriptType}. `;
-    }
-    if (data.additionalDetails) {
-      systemMsg += `Additional details: ${data.additionalDetails}. `;
+      systemMsg += `The user wants to create a murder mystery with theme: ${data.theme}. `;
     }
     
-    // IMPORTANT: Add stronger emphasis on the one-question-at-a-time instruction
-    systemMsg += "\n\n🚨 CRITICAL INSTRUCTION: Ask ONLY ONE QUESTION at a time. After each user response, address only that response before moving to the next question. NEVER batch multiple questions or proceed without user input. 🚨\n\n";
+    systemMsg += "Please proceed with creating a murder mystery based on this theme. IMPORTANT: Answer only ONE question at a time. Do not combine multiple responses. Wait for the user to respond before continuing to the next step. ";
     
     // Include the full output format directly in the system message
-    systemMsg += `You MUST follow this exact output format for ALL your responses:
+    systemMsg += `\n\nYou MUST follow this exact output format for ALL your responses:
 
 ## OUTPUT FORMAT
 Present your mystery preview in an engaging, dramatic format that will excite the user. Include:
@@ -178,6 +156,9 @@ Present your mystery preview in an engaging, dramatic format that will excite th
 
 [After presenting the mystery concept, ask if the concept works for them and explain that they can continue to make edits and that once they are done they can press the 'Generate Mystery' button where they can create a complete game package with detailed character guides, host instructions, and game materials if they choose to purchase.]`;
 
+    // Repeat the one-question-at-a-time instruction at the end for emphasis
+    systemMsg += "\n\n🚨 REMINDER: Ask ONLY ONE QUESTION at a time and wait for the user's response before proceeding. 🚨";
+    
     return systemMsg;
   };
 
