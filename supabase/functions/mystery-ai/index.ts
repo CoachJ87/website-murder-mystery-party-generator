@@ -26,6 +26,19 @@ serve(async (req) => {
 
   try {
     // Parse the request body
+    let requestBody;
+    try {
+      requestBody = await req.json();
+      console.log("Successfully parsed request body");
+    } catch (jsonError) {
+      console.error("Failed to parse request JSON:", jsonError);
+      return new Response(
+        JSON.stringify({ error: "Invalid JSON in request body" }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    // Destructure the request body with defaults
     const {
       messages,
       system = null,
@@ -34,15 +47,13 @@ serve(async (req) => {
       chunkSize = 1000,
       stream = false,
       testMode = false
-    } = await req.json();
+    } = requestBody;
 
-    console.log(`Processing request with ${messages.length} messages and prompt version: ${promptVersion}`);
-    console.log(`Streaming requested: ${stream}`);
-    console.log(`Chunk size requested: ${chunkSize}`);
-    console.log(`Test mode: ${testMode}`);
-
+    console.log(`Processing request with ${messages?.length || 0} messages and prompt version: ${promptVersion}`);
+    
     // Validate if messages exist and are in the correct format
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      console.error("No messages provided or invalid format");
       return new Response(
         JSON.stringify({ error: "No messages provided or invalid format" }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -53,10 +64,9 @@ serve(async (req) => {
     let systemMessage;
     
     if (system) {
-      console.log("Using provided system instruction with OUTPUT FORMAT appended");
+      console.log("Using provided system instruction");
       console.log(`System prompt length: ${system.length}`);
       console.log(`System prompt preview: ${system.substring(0, 50)}...`);
-      // Use the provided system instruction and append crucial formatting instructions
       systemMessage = system;
       
       // Add explicit instruction to answer one question at a time 
@@ -102,9 +112,7 @@ serve(async (req) => {
 
     // Make the API call to Anthropic with enhanced error handling
     try {
-      // Add a timeout for the Anthropic API call
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 60000); // 1 minute timeout
+      console.log("Starting Anthropic API call");
       
       let options = {
         model: model,
@@ -122,9 +130,18 @@ serve(async (req) => {
         temperature: options.temperature
       }));
       
-      const response = await anthropic.messages.create(options);
-      clearTimeout(timeoutId);
-
+      // Set a reasonable timeout for the API call
+      const timeoutMs = 45000; // 45 seconds
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error("Anthropic API request timed out")), timeoutMs);
+      });
+      
+      // Race between the API call and the timeout
+      const response = await Promise.race([
+        anthropic.messages.create(options),
+        timeoutPromise
+      ]) as any; // Type assertion needed due to race
+      
       console.log("Received response from Anthropic API");
       console.log(`Response length: ${response.content[0].text.length} characters`);
 
@@ -147,7 +164,15 @@ serve(async (req) => {
       );
     } catch (apiError) {
       console.error(`Anthropic API error: ${apiError.message}`);
-      console.error(apiError.stack);
+      
+      // Create a detailed error response
+      let errorDetail = {
+        message: apiError.message,
+        type: apiError.constructor.name,
+        status: apiError.status || 'Unknown'
+      };
+      
+      console.error("API Error details:", JSON.stringify(errorDetail));
       
       // Generate a simple fallback response for common errors
       if (apiError.message?.includes('timeout') || apiError.message?.includes('aborted')) {
@@ -159,7 +184,7 @@ serve(async (req) => {
             {
               message: {
                 role: "assistant",
-                content: "I apologize, but I'm having trouble processing your request right now. Let me try a simpler response. Could you please try again or break your question into smaller parts?"
+                content: "I apologize, but I'm having trouble processing your request right now. Please try again in a moment, or try breaking your question into smaller parts."
               }
             }
           ]
@@ -175,22 +200,20 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           error: `Anthropic API error: ${apiError.message}`,
-          details: apiError.status || 'Unknown',
-          stack: apiError.stack
+          details: errorDetail
         }),
         { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
   } catch (error) {
-    // Log and handle errors with more detailed information
+    // Log and handle general errors with more detailed information
     console.error(`Error in mystery-ai edge function: ${error.message}`);
-    console.error(error.stack);
+    console.error(`Error type: ${error.constructor.name}`);
     
     // Return a generalized error response that includes helpful information
     return new Response(
       JSON.stringify({ 
         error: error.message, 
-        stack: error.stack,
         type: error.constructor.name,
         suggestion: "This may be a temporary issue. Please try again with a simpler request or wait a moment."
       }),

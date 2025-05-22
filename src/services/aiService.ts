@@ -77,7 +77,7 @@ export const getAIResponse = async (
       try {
         // Set a longer timeout for the function call
         const abortController = new AbortController();
-        const timeoutId = setTimeout(() => abortController.abort(), 180000); // 3 minute timeout for safety
+        const timeoutId = setTimeout(() => abortController.abort(), 60000); // 1 minute timeout
         
         // Always use smaller chunk sizes for more reliable responses
         const adjustedChunkSize = testMode ? 
@@ -87,7 +87,7 @@ export const getAIResponse = async (
         console.log(`Using chunk size: ${adjustedChunkSize} with streaming: ${useStreaming || isLargeRequest}`);
         
         // Use streaming if explicitly requested or for large requests
-        // NOTE: Removed the 'signal' property as it's not supported in the FunctionInvokeOptions type
+        // Note: Removed the 'signal' property as it's not supported
         const { data: functionData, error: functionError } = await supabase.functions.invoke('mystery-ai', {
           body: {
             messages: standardMessages,
