@@ -12,7 +12,9 @@ const anthropic = new Anthropic({
 // Define CORS headers for cross-origin requests
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Max-Age': '86400',
 };
 
 // Define the request handler function
@@ -21,7 +23,10 @@ serve(async (req) => {
   
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { 
+      status: 204, 
+      headers: corsHeaders 
+    });
   }
 
   try {
@@ -160,7 +165,12 @@ serve(async (req) => {
       // Return the response to the client
       return new Response(
         JSON.stringify(formattedResponse),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { 
+          headers: { 
+            ...corsHeaders, 
+            'Content-Type': 'application/json' 
+          } 
+        }
       );
     } catch (apiError) {
       console.error(`Anthropic API error: ${apiError.message}`);
@@ -192,7 +202,12 @@ serve(async (req) => {
         
         return new Response(
           JSON.stringify(fallbackResponse),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { 
+            headers: { 
+              ...corsHeaders, 
+              'Content-Type': 'application/json' 
+            } 
+          }
         );
       }
       
@@ -202,7 +217,13 @@ serve(async (req) => {
           error: `Anthropic API error: ${apiError.message}`,
           details: errorDetail
         }),
-        { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { 
+          status: 502, 
+          headers: { 
+            ...corsHeaders, 
+            'Content-Type': 'application/json' 
+          } 
+        }
       );
     }
   } catch (error) {
@@ -217,7 +238,13 @@ serve(async (req) => {
         type: error.constructor.name,
         suggestion: "This may be a temporary issue. Please try again with a simpler request or wait a moment."
       }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { 
+        status: 500, 
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json' 
+        } 
+      }
     );
   }
 });

@@ -87,70 +87,78 @@ export const getAIResponse = async (
         console.log(`Using chunk size: ${adjustedChunkSize} with streaming: ${useStreaming || isLargeRequest}`);
         
         // Use streaming if explicitly requested or for large requests
-        // Note: Removed the 'signal' property as it's not supported
-        const { data: functionData, error: functionError } = await supabase.functions.invoke('mystery-ai', {
-          body: {
-            messages: standardMessages,
-            system: systemInstruction,
-            promptVersion,
-            requireFormatValidation: promptVersion === 'free', // Only enforce strict validation for free prompts
-            chunkSize: adjustedChunkSize,
-            stream: useStreaming || isLargeRequest, // Enable streaming when requested or for large requests
-            testMode // Pass test mode flag to the edge function
-          }
-        });
-        
-        clearTimeout(timeoutId);
-
-        if (functionError) {
-          console.error("Edge Function error details:", functionError);
-          
-          if (functionError.message?.includes('aborted') || functionError.message?.includes('timeout')) {
-            console.error("Edge Function timeout:", functionError);
-            throw new Error(`Edge Function timeout. This may indicate the response is too large.`);
-          }
-          
-          throw new Error(`Edge Function error: ${functionError.message}`);
-        }
-
-        if (!functionData) {
-          console.error("Empty response from Edge Function");
-          throw new Error("Empty response from Edge Function");
-        }
-
-        if (!functionData.choices?.[0]?.message?.content) {
-          console.error("Invalid response format from Edge Function:", functionData);
-          throw new Error("Invalid response format from Edge Function");
-        }
-
-        responseContent = functionData.choices[0].message.content;
-        console.log(`Received response (length: ${responseContent.length})`);
-        console.log(`Response preview (first 100 chars): ${responseContent.substring(0, 100)}...`);
-        
-        // For paid responses, we're more lenient with validation
-        if (promptVersion === 'paid') {
-          return responseContent; // Accept whatever we get for paid responses
-        }
-        
-        // For free responses, do a relaxed validation - just check for some key sections
-        const hasRequiredSections = 
-          responseContent.includes("#") && 
-          (responseContent.includes("PREMISE") || responseContent.includes("Premise")) && 
-          (responseContent.includes("VICTIM") || responseContent.includes("Victim")) && 
-          (responseContent.includes("CHARACTER") || responseContent.includes("Characters"));
-        
-        if (hasRequiredSections || attempts === maxAttempts) {
-          // If format is valid or we've exhausted attempts, return the response
-          return responseContent;
-        } else {
-          console.log("Response does not follow required format, retrying...");
-          // If format is invalid and we haven't exhausted attempts, continue to next attempt
-          
-          // Add a stronger format instruction for the next attempt
-          standardMessages.push({
-            role: "user",
-            content: "Please format your response exactly as requested, with sections for PREMISE, VICTIM, CHARACTER LIST, and MURDER METHOD. Make sure to use the '#' format for headings."
+        // Note: We're no longer using the 'signal' property as it's not supported
+        try {
+          const { data: functionData, error: functionError } = await supabase.functions.invoke('mystery-ai', {
+            body: {
+              messages: standardMessages,
+              system: systemInstruction,
+              promptVersion,
+              requireFormatValidation: promptVersion === 'free', // Only enforce strict validation for free prompts
+              chunkSize: adjustedChunkSize,
+              stream: useStreaming || isLargeRequest, // Enable streaming when requested or for large requests
+              testMode // Pass test mode flag to the edge function
+            }
           });
+          
+          clearTimeout(timeoutId);
+
+          if (functionError) {
+            console.error("Edge Function error details:", functionError);
+            
+            if (functionError.message?.includes('aborted') || functionError.message?.includes('timeout')) {
+              console.error("Edge Function timeout:", functionError);
+              throw new Error(`Edge Function timeout. This may indicate the response is too large.`);
+            }
+            
+            throw new Error(`Edge Function error: ${functionError.message}`);
+          }
+
+          if (!functionData) {
+            console.error("Empty response from Edge Function");
+            throw new Error("Empty response from Edge Function");
+          }
+
+          if (!functionData.choices?.[0]?.message?.content) {
+            console.error("Invalid response format from Edge Function:", functionData);
+            throw new Error("Invalid response format from Edge Function");
+          }
+
+          responseContent = functionData.choices[0].message.content;
+          console.log(`Received response (length: ${responseContent.length})`);
+          console.log(`Response preview (first 100 chars): ${responseContent.substring(0, 100)}...`);
+          
+          // For paid responses, we're more lenient with validation
+          if (promptVersion === 'paid') {
+            return responseContent; // Accept whatever we get for paid responses
+          }
+          
+          // For free responses, do a relaxed validation - just check for some key sections
+          const hasRequiredSections = 
+            responseContent.includes("#") && 
+            (responseContent.includes("PREMISE") || responseContent.includes("Premise")) && 
+            (responseContent.includes("VICTIM") || responseContent.includes("Victim")) && 
+            (responseContent.includes("CHARACTER") || responseContent.includes("Characters"));
+          
+          if (hasRequiredSections || attempts === maxAttempts) {
+            // If format is valid or we've exhausted attempts, return the response
+            return responseContent;
+          } else {
+            console.log("Response does not follow required format, retrying...");
+            // If format is invalid and we haven't exhausted attempts, continue to next attempt
+            
+            // Add a stronger format instruction for the next attempt
+            standardMessages.push({
+              role: "user",
+              content: "Please format your response exactly as requested, with sections for PREMISE, VICTIM, CHARACTER LIST, and MURDER METHOD. Make sure to use the '#' format for headings."
+            });
+          }
+        } catch (functionError) {
+          if (functionError.message?.includes('CORS') || functionError.message?.includes('blocked by CORS policy')) {
+            console.error("CORS error detected:", functionError);
+            throw new Error("CORS policy error when connecting to edge function. This is a server configuration issue.");
+          }
+          throw functionError; // Re-throw other errors
         }
       } catch (error) {
         // For timeouts, we might want to break the request into smaller chunks
@@ -183,6 +191,9 @@ export const getAIResponse = async (
           } catch (fallbackError) {
             console.error("Even fallback request failed:", fallbackError);
           }
+        } else if (error.message?.includes('CORS') || error.message?.includes('blocked by CORS policy')) {
+          console.error("CORS error detected:", error);
+          throw new Error("CORS policy error when connecting to edge function. Server configuration needs to be updated.");
         }
         
         if (attempts >= maxAttempts) {
@@ -276,5 +287,24 @@ export const sendMysteryToWebhook = async (conversationId: string) => {
   } catch (error) {
     console.error("Error in sendMysteryToWebhook:", error);
     throw error;
+  }
+};
+
+// Add a basic CORS-validation function to check if an endpoint is accessible
+export const validateEndpointCors = async (url: string): Promise<boolean> => {
+  try {
+    // Try a simple OPTIONS request to check CORS configuration
+    const response = await fetch(url, {
+      method: 'OPTIONS',
+      headers: {
+        'Access-Control-Request-Method': 'POST',
+        'Access-Control-Request-Headers': 'content-type,authorization'
+      }
+    });
+    
+    return response.ok || response.status === 204;
+  } catch (error) {
+    console.error("CORS validation error:", error);
+    return false;
   }
 };

@@ -78,6 +78,12 @@ port = 9999
 [functions.mystery-webhook-trigger]
 verify_jwt = false
 
+[functions.mystery-ai]
+verify_jwt = false
+
+[functions.cors-proxy]
+verify_jwt = false
+
 [analytics]
 enabled = false
 port = 54327
