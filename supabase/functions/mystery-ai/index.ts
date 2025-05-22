@@ -102,13 +102,28 @@ serve(async (req) => {
 
     // Make the API call to Anthropic with enhanced error handling
     try {
-      const response = await anthropic.messages.create({
+      // Add a timeout for the Anthropic API call
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000); // 1 minute timeout
+      
+      let options = {
         model: model,
         max_tokens: maxTokens,
         system: systemMessage,
         messages: standardizedMessages,
         temperature: 0.7
-      });
+      };
+      
+      console.log("Calling Anthropic API with options:", JSON.stringify({
+        model: options.model,
+        max_tokens: options.max_tokens,
+        system_length: options.system.length,
+        messages_count: options.messages.length,
+        temperature: options.temperature
+      }));
+      
+      const response = await anthropic.messages.create(options);
+      clearTimeout(timeoutId);
 
       console.log("Received response from Anthropic API");
       console.log(`Response length: ${response.content[0].text.length} characters`);
@@ -134,6 +149,28 @@ serve(async (req) => {
       console.error(`Anthropic API error: ${apiError.message}`);
       console.error(apiError.stack);
       
+      // Generate a simple fallback response for common errors
+      if (apiError.message?.includes('timeout') || apiError.message?.includes('aborted')) {
+        console.log("Generating simple fallback response due to timeout");
+        
+        // Create a simple fallback response
+        const fallbackResponse = {
+          choices: [
+            {
+              message: {
+                role: "assistant",
+                content: "I apologize, but I'm having trouble processing your request right now. Let me try a simpler response. Could you please try again or break your question into smaller parts?"
+              }
+            }
+          ]
+        };
+        
+        return new Response(
+          JSON.stringify(fallbackResponse),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
       // More detailed error for Anthropic-specific issues
       return new Response(
         JSON.stringify({ 
@@ -149,11 +186,13 @@ serve(async (req) => {
     console.error(`Error in mystery-ai edge function: ${error.message}`);
     console.error(error.stack);
     
+    // Return a generalized error response that includes helpful information
     return new Response(
       JSON.stringify({ 
         error: error.message, 
         stack: error.stack,
-        type: error.constructor.name
+        type: error.constructor.name,
+        suggestion: "This may be a temporary issue. Please try again with a simpler request or wait a moment."
       }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
