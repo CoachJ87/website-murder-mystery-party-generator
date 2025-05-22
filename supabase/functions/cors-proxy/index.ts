@@ -32,8 +32,14 @@ serve(async (req) => {
 
     // Create a safe headers object without CORS headers that might interfere
     const safeHeaders = { ...headers };
+    
+    // Remove any CORS headers from the request - these are handled by the proxy
     delete safeHeaders['access-control-allow-origin'];
     delete safeHeaders['Access-Control-Allow-Origin'];
+    delete safeHeaders['access-control-allow-headers'];
+    delete safeHeaders['Access-Control-Allow-Headers'];
+    delete safeHeaders['access-control-allow-methods'];
+    delete safeHeaders['Access-Control-Allow-Methods'];
     
     const fetchOptions: RequestInit = {
       method,

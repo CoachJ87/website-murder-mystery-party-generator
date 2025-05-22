@@ -4,14 +4,43 @@ export const config = {
 };
 
 export default async function handler(req) {
-  // This endpoint specifically handles OPTIONS requests for CORS preflight
-  return new Response(null, {
-    status: 200,
+  // Handle all HTTP methods
+  const allowedMethods = ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE'];
+  const method = req.method.toUpperCase();
+  
+  // Return proper CORS headers
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Max-Age': '86400',
+  };
+  
+  // For preflight requests
+  if (method === 'OPTIONS') {
+    return new Response(null, {
+      status: 204,
+      headers,
+    });
+  }
+  
+  // For actual requests
+  if (allowedMethods.includes(method)) {
+    return new Response(JSON.stringify({ success: true }), {
+      status: 200,
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json',
+      },
+    });
+  }
+  
+  // For unsupported methods
+  return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+    status: 405,
     headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': '*',
-      'Access-Control-Max-Age': '86400',
+      ...headers,
+      'Content-Type': 'application/json',
     },
   });
 }
