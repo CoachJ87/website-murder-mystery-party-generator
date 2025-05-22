@@ -18,7 +18,16 @@ serve(async (req) => {
   }
 
   try {
-    const requestData = await req.json();
+    let requestData;
+    try {
+      requestData = await req.json();
+    } catch (e) {
+      return new Response(
+        JSON.stringify({ error: "Invalid JSON in request body" }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
     const { url, method = 'GET', headers = {}, body } = requestData;
 
     if (!url) {
@@ -31,59 +40,78 @@ serve(async (req) => {
     console.log(`Proxying request to: ${url} with method: ${method}`);
 
     // Create a safe headers object without CORS headers that might interfere
-    const safeHeaders = { ...headers };
+    const safeHeaders = new Headers();
     
-    // Remove any CORS headers from the request - these are handled by the proxy
-    delete safeHeaders['access-control-allow-origin'];
-    delete safeHeaders['Access-Control-Allow-Origin'];
-    delete safeHeaders['access-control-allow-headers'];
-    delete safeHeaders['Access-Control-Allow-Headers'];
-    delete safeHeaders['access-control-allow-methods'];
-    delete safeHeaders['Access-Control-Allow-Methods'];
+    // Copy provided headers but exclude CORS-related ones
+    for (const [key, value] of Object.entries(headers)) {
+      if (!key.toLowerCase().startsWith('access-control-')) {
+        safeHeaders.append(key, value);
+      }
+    }
     
+    // Add a user agent
+    safeHeaders.append('User-Agent', 'CorsProxy/1.0');
+    
+    // Handle request body
+    let requestBody = undefined;
+    if (body && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
+      if (typeof body === 'object') {
+        requestBody = JSON.stringify(body);
+        
+        // Ensure content-type is set for JSON
+        if (!safeHeaders.has('content-type')) {
+          safeHeaders.append('Content-Type', 'application/json');
+        }
+      } else {
+        requestBody = String(body);
+      }
+    }
+
+    // Log the request we're about to make
+    console.log(`Fetch request: ${method} ${url}`);
+    console.log(`Headers: ${[...safeHeaders.entries()].map(([k,v]) => `${k}: ${v}`).join(', ')}`);
+
     const fetchOptions: RequestInit = {
       method,
-      headers: {
-        ...safeHeaders,
-        'User-Agent': 'CorsProxy/1.0',
-      },
+      headers: safeHeaders,
+      body: requestBody,
     };
-
-    if (body && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
-      fetchOptions.body = JSON.stringify(body);
-    }
 
     const response = await fetch(url, fetchOptions);
     
-    // Get response body as text
-    const responseText = await response.text();
-
-    try {
-      // Try to parse as JSON
-      const responseJson = JSON.parse(responseText);
-      return new Response(
-        JSON.stringify(responseJson),
-        { 
-          status: response.status,
-          headers: { 
-            ...corsHeaders, 
-            'Content-Type': 'application/json'
+    // Get response body
+    let responseBody;
+    const contentType = response.headers.get('content-type') || '';
+    
+    if (contentType.includes('application/json')) {
+      try {
+        responseBody = await response.json();
+        return new Response(
+          JSON.stringify(responseBody),
+          { 
+            status: response.status,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
           }
-        }
-      );
-    } catch (e) {
-      // Return as text if not valid JSON
-      return new Response(
-        responseText,
-        { 
-          status: response.status,
-          headers: { 
-            ...corsHeaders, 
-            'Content-Type': 'text/plain'
-          }
-        }
-      );
+        );
+      } catch (e) {
+        // If JSON parsing fails, fall back to text
+        responseBody = await response.text();
+      }
+    } else {
+      responseBody = await response.text();
     }
+
+    // If we got here, return as text
+    return new Response(
+      typeof responseBody === 'string' ? responseBody : JSON.stringify(responseBody),
+      { 
+        status: response.status,
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': contentType || 'text/plain'
+        }
+      }
+    );
   } catch (error) {
     console.error(`Error in cors-proxy: ${error.message}`);
     return new Response(

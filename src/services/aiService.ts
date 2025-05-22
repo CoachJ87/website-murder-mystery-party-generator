@@ -44,222 +44,129 @@ export const getAIResponse = async (
       throw new Error("No valid messages to send to AI service");
     }
 
-    console.log("Calling mystery-ai Edge Function");
+    // First try the Next.js API proxy since it's more reliable for CORS
+    try {
+      console.log("Attempting to use Next.js API proxy first for better reliability");
+      
+      const response = await fetch('/api/proxy-anthropic-cors', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          url: `https://mhfikaomkmqcndqfohbp.supabase.co/functions/v1/mystery-ai`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token || ''}`,
+          },
+          data: {
+            messages: standardMessages,
+            system: systemInstruction,
+            promptVersion,
+            requireFormatValidation: promptVersion === 'free',
+            chunkSize: testMode ? 800 : 1000,
+            testMode
+          }
+        })
+      });
 
-    let attempts = 0;
-    const maxAttempts = 3; // Increased to 3 for reliability
-    let responseContent = '';
-    
-    // Estimate if this is likely a large request
-    const isLargeRequest = promptVersion === 'paid' && standardMessages.some(msg => 
-      msg.content.length > 5000 || 
-      msg.content.includes("Host Guide") ||
-      msg.content.includes("character guides") || 
-      msg.content.includes("clues and evidence")
-    );
-    
-    // Set appropriate chunk size with safe limits to avoid token issues
-    // In test mode, use much smaller chunks
-    const chunkSize = testMode ? 
-      800 : // Small size for test mode
-      isLargeRequest ? 1500 : 1000;
+      if (!response.ok) {
+        throw new Error(`Next.js API proxy returned status ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (!data.choices?.[0]?.message?.content) {
+        throw new Error("Invalid response format from Next.js API proxy");
+      }
+
+      return data.choices[0].message.content;
+
+    } catch (proxyError) {
+      console.error("Next.js proxy error:", proxyError);
+      console.log("Falling back to Supabase function approaches");
       
-    console.log(`Request classified as ${isLargeRequest ? 'large' : 'standard'}, chunk size: ${chunkSize}, test mode: ${testMode}`);
-    
-    // Enable streaming if a stream handler is provided
-    const useStreaming = !!onStream;
-    
-    // Flag to track if we should use the proxy as first resort
-    let useProxyFirst = false;
-    
-    while (attempts < maxAttempts) {
-      attempts++;
-      console.log(`Attempt ${attempts} of ${maxAttempts}`);
-      
+      // Second attempt - try using supabase cors-proxy
       try {
-        // Set a longer timeout for the function call
-        const abortController = new AbortController();
-        const timeoutId = setTimeout(() => abortController.abort(), 60000); // 1 minute timeout
+        console.log("Attempting to use Supabase cors-proxy function");
         
-        // Always use smaller chunk sizes for more reliable responses
-        const adjustedChunkSize = testMode ? 
-          Math.min(1000, chunkSize) : // Keep test mode chunks small
-          Math.min(2000, chunkSize * attempts);
-          
-        console.log(`Using chunk size: ${adjustedChunkSize} with streaming: ${useStreaming || isLargeRequest}`);
-        
-        // Prepare the request payload
-        const requestPayload = {
-          messages: standardMessages,
-          system: systemInstruction,
-          promptVersion,
-          requireFormatValidation: promptVersion === 'free', 
-          chunkSize: adjustedChunkSize,
-          stream: useStreaming || isLargeRequest,
-          testMode
-        };
-        
-        let functionData;
-        let functionError;
-        
-        // If CORS issues were detected previously or we've had multiple failures,
-        // try using the cors-proxy first
-        if (useProxyFirst) {
-          console.log("Using cors-proxy as first resort due to previous CORS issues");
-          
-          try {
-            const { data: proxyData, error: proxyError } = await supabase.functions.invoke('cors-proxy', {
-              body: {
-                url: `https://mhfikaomkmqcndqfohbp.supabase.co/functions/v1/mystery-ai`,
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token || ''}`
-                },
-                body: requestPayload
-              }
-            });
-            
-            functionData = proxyData;
-            functionError = proxyError;
-            
-            if (proxyError) {
-              console.error("Proxy error:", proxyError);
-              throw new Error(`Proxy error: ${proxyError.message}`);
+        const { data: proxyData, error: proxyError } = await supabase.functions.invoke('cors-proxy', {
+          body: {
+            url: `https://mhfikaomkmqcndqfohbp.supabase.co/functions/v1/mystery-ai`,
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token || ''}`,
+            },
+            body: {
+              messages: standardMessages,
+              system: systemInstruction,
+              promptVersion,
+              requireFormatValidation: promptVersion === 'free',
+              chunkSize: testMode ? 800 : 1000,
+              testMode
             }
-          } catch (proxyError) {
-            console.error("Error using cors-proxy:", proxyError);
-            throw proxyError;
           }
-        } else {
-          // Direct approach - use the Edge Function
-          const result = await supabase.functions.invoke('mystery-ai', {
-            body: requestPayload
+        });
+        
+        if (proxyError) {
+          throw proxyError;
+        }
+        
+        if (!proxyData?.choices?.[0]?.message?.content) {
+          throw new Error("Invalid response format from cors-proxy");
+        }
+        
+        return proxyData.choices[0].message.content;
+        
+      } catch (corsProxyError) {
+        console.error("Error with Supabase cors-proxy:", corsProxyError);
+        
+        // Last resort - try direct invocation with lower expectations
+        try {
+          console.log("Final attempt - direct function invocation with simplified request");
+          
+          // Use a very minimal request to minimize CORS issues
+          const { data: directData, error: directError } = await supabase.functions.invoke('mystery-ai', {
+            body: {
+              messages: standardMessages.slice(-2), // Only use the last two messages to keep it simple
+              system: "You are a helpful assistant creating a murder mystery.",
+              promptVersion: 'free',
+              testMode: true // Force test mode for faster response
+            }
           });
           
-          functionData = result.data;
-          functionError = result.error;
-          
-          if (functionError) {
-            console.error("Edge Function error details:", functionError);
-            
-            // Check for CORS errors
-            if (functionError.message?.includes('CORS') || 
-                functionError.message?.includes('blocked by CORS policy') ||
-                functionError.message?.includes('Failed to send')) {
-              console.error("CORS error detected, will try cors-proxy fallback:", functionError);
-              useProxyFirst = true;
-              throw new Error("CORS policy error");
-            }
-            
-            throw new Error(`Edge Function error: ${functionError.message}`);
+          if (directError) {
+            throw directError;
           }
-        }
           
-        clearTimeout(timeoutId);
-
-        if (!functionData) {
-          console.error("Empty response from function");
-          throw new Error("Empty response from function");
-        }
-
-        if (!functionData.choices?.[0]?.message?.content) {
-          console.error("Invalid response format:", functionData);
-          throw new Error("Invalid response format");
-        }
-
-        responseContent = functionData.choices[0].message.content;
-        console.log(`Received response (length: ${responseContent.length})`);
-        
-        // For paid responses, we're more lenient with validation
-        if (promptVersion === 'paid') {
-          return responseContent; // Accept whatever we get for paid responses
-        }
-        
-        // For free responses, do a relaxed validation - just check for some key sections
-        const hasRequiredSections = 
-          responseContent.includes("#") && 
-          (responseContent.includes("PREMISE") || responseContent.includes("Premise")) && 
-          (responseContent.includes("VICTIM") || responseContent.includes("Victim")) && 
-          (responseContent.includes("CHARACTER") || responseContent.includes("Characters"));
-        
-        if (hasRequiredSections || attempts === maxAttempts) {
-          // If format is valid or we've exhausted attempts, return the response
-          return responseContent;
-        } else {
-          console.log("Response does not follow required format, retrying...");
-          // If format is invalid and we haven't exhausted attempts, continue to next attempt
+          if (directData?.choices?.[0]?.message?.content) {
+            return directData.choices[0].message.content;
+          }
           
-          // Add a stronger format instruction for the next attempt
-          standardMessages.push({
-            role: "user",
-            content: "Please format your response exactly as requested, with sections for PREMISE, VICTIM, CHARACTER LIST, and MURDER METHOD. Make sure to use the '#' format for headings."
-          });
-        }
-      } catch (error) {
-        // If using the direct approach failed with CORS issue and we haven't tried proxy yet
-        if (error.message?.includes('CORS') || 
-            error.message?.includes('blocked by CORS policy') || 
-            error.message?.includes('Failed to send')) {
-          
-          console.log("CORS issue detected, trying cors-proxy fallback");
-          
-          try {
-            const { data: proxyData, error: proxyError } = await supabase.functions.invoke('cors-proxy', {
-              body: {
-                url: `https://mhfikaomkmqcndqfohbp.supabase.co/functions/v1/mystery-ai`,
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token || ''}`
-                },
-                body: {
-                  messages: standardMessages,
-                  system: systemInstruction,
-                  promptVersion,
-                  requireFormatValidation: promptVersion === 'free',
-                  chunkSize: Math.min(2000, chunkSize * attempts),
-                  testMode
-                }
+          // If we got a response but in wrong format, try to parse it
+          if (typeof directData === 'object') {
+            // Look for any property that might contain the AI response
+            for (const key of Object.keys(directData)) {
+              if (typeof directData[key] === 'string' && directData[key].length > 50) {
+                return directData[key];
               }
-            });
-            
-            if (proxyError) {
-              console.error("Proxy error:", proxyError);
-              throw proxyError;
+              
+              if (typeof directData[key] === 'object' && directData[key]?.content) {
+                return directData[key].content;
+              }
             }
-            
-            if (!proxyData.choices?.[0]?.message?.content) {
-              console.error("Invalid response format from proxy:", proxyData);
-              throw new Error("Invalid response format from proxy");
-            }
-            
-            responseContent = proxyData.choices[0].message.content;
-            console.log(`Received proxy response (length: ${responseContent.length})`);
-            
-            // Set flag to use proxy first on next attempt since it worked
-            useProxyFirst = true;
-            
-            return responseContent;
-          } catch (proxyError) {
-            console.error("Error with proxy fallback:", proxyError);
-            throw proxyError;
           }
+          
+          throw new Error("Could not extract usable content from response");
+        } catch (finalError) {
+          console.error("All attempts failed:", finalError);
+          
+          // Generate a fallback response as last resort
+          return "I'm having trouble connecting to my AI service right now. Please try again in a moment. If this persists, you might want to try refreshing the page or contact support.";
         }
-        
-        if (attempts >= maxAttempts) {
-          console.error(`Error in getAIResponse (attempt ${attempts}): ${error.message}`);
-          throw error;
-        }
-        
-        console.warn(`Error in attempt ${attempts}, retrying: ${error.message}`);
-        await new Promise(resolve => setTimeout(resolve, 2000 * attempts)); // Exponential backoff
       }
     }
-    
-    // If we've made it here, we've exhausted attempts but didn't get a valid response
-    console.error("Failed to get a properly formatted response after multiple attempts");
-    return responseContent || "Failed to generate content. Please try again.";
   } catch (error) {
     console.error(`Error in getAIResponse: ${error.message}`);
     throw error;

@@ -9,11 +9,11 @@ const anthropic = new Anthropic({
   apiKey: Deno.env.get('ANTHROPIC_API_KEY')!,
 });
 
-// Define CORS headers for cross-origin requests
+// Define CORS headers for cross-origin requests - using more permissive settings
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+  'Access-Control-Allow-Headers': '*', // Allow all headers
   'Access-Control-Max-Age': '86400',
 };
 
