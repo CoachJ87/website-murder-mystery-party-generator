@@ -86,6 +86,7 @@ export const getAIResponse = async (
         console.log(`Using chunk size: ${adjustedChunkSize} with streaming: ${useStreaming || isLargeRequest}`);
         
         // Use streaming if explicitly requested or for large requests
+        // Remove the 'signal' property as it's not supported in the FunctionInvokeOptions type
         const { data: functionData, error: functionError } = await supabase.functions.invoke('mystery-ai', {
           body: {
             messages: standardMessages,
@@ -95,8 +96,8 @@ export const getAIResponse = async (
             chunkSize: adjustedChunkSize,
             stream: useStreaming || isLargeRequest, // Enable streaming when requested or for large requests
             testMode // Pass test mode flag to the edge function
-          },
-          signal: abortController.signal,
+          }
+          // Removed the 'signal' property here as it's not in the FunctionInvokeOptions type
         });
         
         clearTimeout(timeoutId);
