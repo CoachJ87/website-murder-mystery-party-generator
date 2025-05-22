@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
@@ -120,10 +119,8 @@ export const ConversationManager = ({
   };
 
   const handleSaveMessage = (message: Message) => {
-    if (onSave) {
-      return onSaveMessages(message);
-    }
-    return Promise.resolve();
+    // Fix: Use onSaveMessages instead of onSave
+    return onSaveMessages(message);
   };
 
   const createSystemMessage = (data: FormValues) => {
