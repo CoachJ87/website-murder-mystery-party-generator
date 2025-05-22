@@ -74,9 +74,9 @@ serve(async (req) => {
     console.log(`Fetch request: ${method} ${url}`);
     console.log(`Headers: ${[...safeHeaders.entries()].map(([k,v]) => `${k}: ${v}`).join(', ')}`);
 
-    // Set a timeout for the fetch operation
+    // Set a timeout for the fetch operation with a longer timeout
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout (increased from 30s)
 
     const fetchOptions: RequestInit = {
       method,

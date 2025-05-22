@@ -151,8 +151,11 @@ export const ConversationManager = ({
       systemMsg += `Additional details: ${data.additionalDetails}. `;
     }
     
-    // Important change: Always include the full output format directly in the system message
-    systemMsg += `\n\nYou MUST follow this exact output format for ALL your responses:
+    // IMPORTANT: Add stronger emphasis on the one-question-at-a-time instruction
+    systemMsg += "\n\n🚨 CRITICAL INSTRUCTION: Ask ONLY ONE QUESTION at a time. After each user response, address only that response before moving to the next question. NEVER batch multiple questions or proceed without user input. 🚨\n\n";
+    
+    // Include the full output format directly in the system message
+    systemMsg += `You MUST follow this exact output format for ALL your responses:
 
 ## OUTPUT FORMAT
 Present your mystery preview in an engaging, dramatic format that will excite the user. Include:

@@ -68,9 +68,9 @@ export default async function handler(req) {
       forwardHeaders.append('Content-Type', 'application/json');
     }
     
-    // Set a timeout for the request
+    // Set a timeout for the request with longer duration
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout (increased from 30s)
     
     // Call the target URL
     try {
@@ -93,6 +93,12 @@ export default async function handler(req) {
       try {
         parsedBody = JSON.parse(responseBody);
         console.log("Response successfully parsed as JSON");
+        
+        // Enhanced logging for debugging
+        if (parsedBody.choices && parsedBody.choices[0]?.message?.content) {
+          console.log("AI Response preview: " + parsedBody.choices[0].message.content.substring(0, 100) + "...");
+        }
+        
         return new Response(JSON.stringify(parsedBody), {
           status: response.status,
           headers: {
@@ -121,7 +127,7 @@ export default async function handler(req) {
       if (fetchError.name === 'AbortError') {
         return new Response(JSON.stringify({ 
           error: "Request timed out", 
-          timeoutMs: 30000 
+          timeoutMs: 60000 
         }), {
           status: 504, // Gateway Timeout
           headers: {

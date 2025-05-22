@@ -74,6 +74,12 @@ serve(async (req) => {
       console.log(`System prompt length: ${system.length}`);
       console.log(`System prompt preview: ${system.substring(0, 100)}...`);
       systemMessage = system;
+      
+      // Ensure the one-question-at-a-time instruction is included
+      if (!systemMessage.toLowerCase().includes("one question at a time")) {
+        console.log("Adding missing one-question-at-a-time instruction to system prompt");
+        systemMessage += "\n\n🚨 CRITICAL INSTRUCTION: Ask ONLY ONE QUESTION at a time. After each user response, address only that response before moving to the next question. NEVER batch multiple questions or proceed without user input. 🚨";
+      }
     } else {
       // Try to get the free prompt from environment variables
       const freePrompt = Deno.env.get('MYSTERY_FREE_PROMPT');
@@ -86,12 +92,24 @@ serve(async (req) => {
       } else {
         // Default system message if none provided and no env variable
         console.log("Using fallback default prompt");
-        systemMessage = "You are a helpful mystery writer. Your job is to help the user create an exciting murder mystery game. Follow the OUTPUT FORMAT structure exactly.";
+        systemMessage = `You are a helpful mystery writer. 
+        Your job is to help the user create an exciting murder mystery game.
+
+        🚨 CRITICAL INSTRUCTION: Ask ONLY ONE QUESTION at a time. After each user response, address only that response before moving to the next question. NEVER batch multiple questions or proceed without user input. 🚨
+        
+        Follow the OUTPUT FORMAT structure exactly.`;
       }
     }
     
     // Add stronger instruction to prevent batching responses
-    systemMessage += "\n\nVERY IMPORTANT INSTRUCTION: Never answer more than one user question in a single response. If the user asks multiple questions, just answer the first one. NEVER batch answers to multiple questions.";
+    if (!systemMessage.includes("NEVER batch answers")) {
+      systemMessage += "\n\nVERY IMPORTANT INSTRUCTION: Never answer more than one user question in a single response. If the user asks multiple questions, just answer the first one. NEVER batch answers to multiple questions.";
+    }
+
+    // Add explicit instruction for one-question-at-a-time approach
+    if (!systemMessage.includes("ONE QUESTION at a time")) {
+      systemMessage += "\n\n🚨 CRITICAL INSTRUCTION: Ask ONLY ONE QUESTION at a time. After each user response, address only that response before moving to the next question. NEVER batch multiple questions or proceed without user input. 🚨";
+    }
 
     // Add explicit instruction for consistent formatting
     if (promptVersion === 'free' && !systemMessage.includes("OUTPUT FORMAT")) {

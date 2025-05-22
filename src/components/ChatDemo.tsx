@@ -19,7 +19,7 @@ const initialMessages: Message[] = [
   {
     id: "1",
     role: "assistant",
-    content: "Hello! I'm your AI development assistant. What would you like to build today?",
+    content: "Hello! I'm your AI development assistant. Let me help you create a murder mystery. What theme would you like for your mystery?",
     timestamp: new Date(),
   },
 ];
@@ -60,14 +60,15 @@ const ChatDemo = () => {
     setTimeout(() => {
       let response = "";
       
+      // Ensure the AI response asks a follow-up question
       if (input.toLowerCase().includes("app") || input.toLowerCase().includes("website")) {
-        response = "I can help you build that! Let's start by defining the key features you want in your application.";
-      } else if (input.toLowerCase().includes("button") || input.toLowerCase().includes("component")) {
-        response = "I can create UI components for you. Would you like to see some sample code for this component?";
+        response = "I can help you build a murder mystery with that theme! Let's start by defining the setting. Would you prefer a modern-day setting or something historical?";
+      } else if (input.toLowerCase().includes("train") || input.toLowerCase().includes("train")) {
+        response = "A train murder mystery sounds thrilling! Would you like this set in the modern day, or perhaps on a vintage luxury train like the Orient Express?";
       } else if (input.toLowerCase().includes("help") || input.toLowerCase().includes("how")) {
-        response = "To get started, just describe what you want to build. I'll help you design and code it step by step.";
+        response = "To create your murder mystery, I'll guide you through the process step by step. First, what theme or setting interests you for your murder mystery?";
       } else {
-        response = "I understand. Let me help you implement that. Would you like me to explain how this would work or show you some sample code?";
+        response = "That's an interesting idea for a murder mystery! Now, let's think about the victim. What kind of character would you like as the victim?";
       }
 
       const assistantMessage: Message = {
@@ -85,7 +86,7 @@ const ChatDemo = () => {
   return (
     <div className="w-full max-w-4xl mx-auto my-8 bg-card rounded-xl shadow-lg border overflow-hidden">
       <div className="flex justify-between items-center p-4 border-b">
-        <h2 className="text-xl font-semibold">AI Chat</h2>
+        <h2 className="text-xl font-semibold">Murder Mystery Creator</h2>
         <div className="flex items-center space-x-2">
           <Switch 
             id="public-mode" 
