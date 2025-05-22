@@ -70,9 +70,15 @@ export const ConversationManager = ({
         
         formattedMessages.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
         
+        // Check if there's already an initial message about creating a mystery with a theme
+        const hasInitialFormPrompt = formattedMessages.some(msg => 
+          !msg.is_ai && msg.content.includes(`Let's create a murder mystery`)
+        );
+        
         setMessages(formattedMessages);
         
-        if (formData && formData.additionalDetails && (!formattedMessages[0] || formattedMessages[0].is_ai)) {
+        if (formData && formData.additionalDetails && !hasInitialFormPrompt && 
+            (!formattedMessages[0] || formattedMessages[0].is_ai)) {
           const initialUserMessage = constructInitialMessage(formData);
           if (initialUserMessage) {
             setMessages([initialUserMessage, ...formattedMessages]);
@@ -121,8 +127,11 @@ export const ConversationManager = ({
   };
 
   const createSystemMessage = (data: FormValues) => {
-    // Add the critical instruction at the very beginning of the system message
-    let systemMsg = "🚨 CRITICAL INSTRUCTION: Ask ONLY ONE QUESTION at a time. After each user response, address only that response before moving to the next question. NEVER batch multiple questions or proceed without user input. 🚨\n\n";
+    // Start with a clear directive: One question at a time and MUST ask for player count first
+    let systemMsg = "🚨 CRITICAL INSTRUCTION: You MUST ask ONLY ONE QUESTION at a time. After each user response, address only that response before moving to the next question. NEVER batch multiple questions or proceed without user input. 🚨\n\n";
+    
+    // Make player count request the absolute priority
+    systemMsg += "🚨 FIRST QUESTION REQUIRED: Your VERY FIRST question must be to ask how many players the user needs for their murder mystery. This is mandatory before proceeding with ANY other questions or content generation. 🚨\n\n";
     
     systemMsg += "This is a murder mystery creation conversation. ";
     
@@ -131,7 +140,7 @@ export const ConversationManager = ({
       systemMsg += `The user wants to create a murder mystery with theme: ${data.theme}. `;
     }
     
-    systemMsg += "Please proceed with creating a murder mystery based on this theme. IMPORTANT: You must collect all necessary details from the user one step at a time. First, ask for the number of players needed. Then ask if an accomplice is needed. Only after collecting these details should you start developing characters and the mystery scenario. ";
+    systemMsg += "IMPORTANT: You must collect all necessary details from the user one step at a time. First, ask for the number of players needed. Then ask if an accomplice is needed. Only after collecting these details should you start developing characters and the mystery scenario.\n\n";
     
     // Include the full output format directly in the system message
     systemMsg += `\n\nYou MUST follow this exact output format for ALL your responses:
@@ -157,11 +166,8 @@ Present your mystery preview in an engaging, dramatic format that will excite th
 
 [After presenting the mystery concept, ask if the concept works for them and explain that they can continue to make edits and that once they are done they can press the 'Generate Mystery' button where they can create a complete game package with detailed character guides, host instructions, and game materials if they choose to purchase.]`;
 
-    // Add stronger instruction that clarifies player count must be asked first
-    systemMsg += "\n\n🚨 IMPORTANT PROCESS: First, ask the user how many players they need for their mystery. Wait for their response. Next, ask if they want an accomplice. Wait for that response before proceeding with character development. DO NOT generate a full mystery without explicitly knowing the player count. 🚨";
-    
-    // Repeat the one-question-at-a-time instruction at the end for emphasis
-    systemMsg += "\n\n🚨 REMINDER: Ask ONLY ONE QUESTION at a time and wait for the user's response before proceeding. 🚨";
+    // Add stronger instruction about player count again at the end
+    systemMsg += "\n\n🚨 REMINDER: Your FIRST question to the user MUST be to ask how many players they need for their mystery. DO NOT generate ANY mystery content without knowing the player count. 🚨";
     
     return systemMsg;
   };
@@ -182,6 +188,7 @@ Present your mystery preview in an engaging, dramatic format that will excite th
         initialMessages={messages}
         isLoadingHistory={isLoadingHistory}
         systemInstruction={createSystemMessage(formData || {})}
+        preventDuplicateMessages={true}
       />
     </div>
   );

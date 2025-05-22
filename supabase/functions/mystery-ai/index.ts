@@ -66,7 +66,7 @@ serve(async (req) => {
       );
     }
 
-    // Prepare the system message with instructions based on provided system or default
+    // STRENGTHENED: Prepare the system message with EXTREMELY clear instructions
     let systemMessage;
     
     if (system) {
@@ -75,15 +75,15 @@ serve(async (req) => {
       console.log(`System prompt preview: ${system.substring(0, 100)}...`);
       systemMessage = system;
       
-      // ENHANCED: Make the "one question at a time" instruction more prominent and clear
-      const oneQuestionInstruction = "🚨 CRITICAL INSTRUCTION: Ask ONLY ONE QUESTION at a time. After each user response, address only that response before moving to the next question. NEVER batch multiple questions or proceed without user input. 🚨";
+      // ENHANCED: Make the "one question at a time" instruction unmistakable
+      const oneQuestionInstruction = "🚨 CRITICAL INSTRUCTION: Ask ONLY ONE QUESTION at a time. Wait for the user's response before proceeding to the next step. NEVER EVER ask multiple questions in the same response. 🚨";
       
-      // Enforce process instructions that require asking for player count first
-      const playerCountInstruction = "🚨 REQUIRED PROCESS: You MUST first ask the user how many players they want for their mystery game. Wait for their response before proceeding to the next step. DO NOT generate a complete mystery scenario without knowing the player count. 🚨";
+      // ENHANCED: Ensure the player count is asked first with absolute clarity
+      const playerCountInstruction = "🚨 REQUIRED FIRST QUESTION: Your VERY FIRST question must be 'How many players do you want for your murder mystery?' Ask NOTHING else until you get this answer. 🚨";
       
       // Check if the system message already has these instructions
       const hasOneQuestionInst = systemMessage.includes("ONE QUESTION at a time");
-      const hasPlayerCountInst = systemMessage.includes("how many players");
+      const hasPlayerCountInst = systemMessage.includes("players") && systemMessage.includes("first question");
       
       // Add or reinforce instructions as needed
       let updatedSystem = systemMessage;
@@ -95,14 +95,21 @@ serve(async (req) => {
         // If it has the instruction but not at the top, re-emphasize it at the top
         console.log("Moving one-question-at-a-time instruction to the top of system prompt");
         // Remove existing instruction and add it at the top
-        updatedSystem = updatedSystem.replace(/🚨.*?🚨/gs, '');
+        updatedSystem = updatedSystem.replace(/🚨.*?ONE QUESTION at a time.*?🚨/gs, '');
         updatedSystem = oneQuestionInstruction + "\n\n" + updatedSystem;
       }
       
       if (!hasPlayerCountInst) {
         console.log("Adding player count instruction to system prompt");
-        updatedSystem += "\n\n" + playerCountInstruction;
+        updatedSystem = updatedSystem + "\n\n" + playerCountInstruction;
       }
+      
+      // ENHANCED: Add a final section with BOLD formatting and emojis for emphasis
+      updatedSystem += "\n\n⚠️ FINAL INSTRUCTIONS ⚠️\n\n";
+      updatedSystem += "1. Ask EXACTLY ONE question at a time\n";
+      updatedSystem += "2. Your FIRST question MUST be about player count\n"; 
+      updatedSystem += "3. Wait for user responses before continuing\n";
+      updatedSystem += "4. NEVER provide multiple questions in one response\n";
       
       systemMessage = updatedSystem;
     } else {
@@ -115,43 +122,38 @@ serve(async (req) => {
         console.log(`Free prompt preview: ${freePrompt.substring(0, 100)}...`);
         systemMessage = freePrompt;
       } else {
-        // Default system message if none provided and no env variable
+        // ENHANCED default system message with stronger directives
         console.log("Using fallback default prompt");
         systemMessage = `🚨 CRITICAL INSTRUCTION: Ask ONLY ONE QUESTION at a time. After each user response, address only that response before moving to the next question. NEVER batch multiple questions or proceed without user input. 🚨
+
+🚨 REQUIRED FIRST QUESTION: Your VERY FIRST question must be 'How many players do you want for your murder mystery?' Ask NOTHING else until you get this answer. 🚨
 
 You are a helpful mystery writer. 
 Your job is to help the user create an exciting murder mystery game.
 
-First, ask the user how many players they want for their mystery. Wait for their response.
-Then, ask if they want an accomplice. Wait for their response.
-Only after these details are provided should you start creating character descriptions and the mystery scenario.
+Follow these steps in strict order, asking only ONE question at a time:
+1. Ask the user how many players they want for their mystery.
+2. After they answer, ask if they want an accomplice.
+3. Only after these details are provided should you start creating character descriptions and the mystery scenario.
 
-Follow the OUTPUT FORMAT structure exactly.`;
+⚠️ FINAL INSTRUCTIONS ⚠️
+1. Ask EXACTLY ONE question at a time
+2. Your FIRST question MUST be about player count
+3. Wait for user responses before continuing
+4. NEVER provide multiple questions in one response`;
       }
     }
     
-    // ENHANCED: Add stronger instruction to prevent batching responses if not already there
-    if (!systemMessage.includes("NEVER batch answers")) {
-      systemMessage += "\n\nVERY IMPORTANT INSTRUCTION: Never answer more than one user question in a single response. If the user asks multiple questions, just answer the first one. NEVER batch answers to multiple questions.";
-    }
-
-    // ENHANCED: Add explicit instruction for one-question-at-a-time approach if not already there
-    if (!systemMessage.includes("ONE QUESTION at a time")) {
-      systemMessage += "\n\n🚨 CRITICAL INSTRUCTION: Ask ONLY ONE QUESTION at a time. After each user response, address only that response before moving to the next question. NEVER batch multiple questions or proceed without user input. 🚨";
-    }
-
-    // ENHANCED: Add specific instruction about player count if not already there
-    if (!systemMessage.includes("how many players")) {
-      systemMessage += "\n\n🚨 REQUIRED PROCESS: You MUST first ask the user how many players they want for their mystery game. Wait for their response before proceeding to the next step. DO NOT generate a complete mystery scenario without knowing the player count. 🚨";
-    }
-
-    // Add explicit instruction for consistent formatting
-    if (promptVersion === 'free' && !systemMessage.includes("OUTPUT FORMAT")) {
-      systemMessage += "\n\nOUTPUT FORMAT: Your responses should always follow this structure:\n1. Brief response to the user's request\n2. Questions or suggestions for the next step";
-    }
-
-    // Log the complete system message for debugging
     console.log("Complete system message:", systemMessage);
+
+    // Check if this is the first user message and force the right first question from the AI
+    const isFirstUserMessageCheck = messages.length === 1 && !("is_ai" in messages[0] && messages[0].is_ai === true) && 
+      !("role" in messages[0] && messages[0].role === "assistant");
+    
+    if (isFirstUserMessageCheck) {
+      console.log("This appears to be the first message. Ensuring first response asks about player count.");
+      systemMessage = `${systemMessage}\n\n🚨 THIS IS THE FIRST USER MESSAGE. YOU MUST RESPOND BY ASKING HOW MANY PLAYERS THEY WANT. DO NOT PROVIDE ANY MYSTERY DETAILS YET. 🚨`;
+    }
 
     // Prepare the model and max tokens based on the prompt version and test mode
     let model = "claude-3-opus-20240229";
@@ -215,13 +217,68 @@ Follow the OUTPUT FORMAT structure exactly.`;
       console.log(`Response length: ${response.content[0].text.length} characters`);
       console.log(`Response preview: ${response.content[0].text.substring(0, 100)}...`);
 
+      // ENHANCED: Process the response to enforce one-question-at-a-time policy
+      let responseText = response.content[0].text;
+      
+      // Check if the response has multiple questions
+      const questionMarkCount = (responseText.match(/\?/g) || []).length;
+      const paragraphs = responseText.split('\n\n').filter(p => p.trim().length > 0);
+      
+      // Look for patterns indicating multiple questions
+      let hasMultipleQuestions = false;
+      if (questionMarkCount >= 2) {
+        // Check for numbered questions like "1. Question?" or bullet points "• Question?"
+        const numberedQuestionPattern = /(?:^|\n)[\d*•-]+\s*.*?\?/g;
+        const numberedQuestions = responseText.match(numberedQuestionPattern) || [];
+        
+        // Check for multiple question sentences in different paragraphs
+        let questionParagraphs = 0;
+        for (const paragraph of paragraphs) {
+          if (paragraph.includes('?')) questionParagraphs++;
+        }
+        
+        // If we find evidence of multiple questions, flag it
+        hasMultipleQuestions = numberedQuestions.length > 1 || questionParagraphs > 1;
+      }
+      
+      // If this is the first message and doesn't ask about player count, correct it
+      const isAskingForPlayerCount = 
+        responseText.toLowerCase().includes("how many players") || 
+        responseText.toLowerCase().includes("player count") || 
+        responseText.toLowerCase().includes("number of players");
+        
+      if (isFirstUserMessageCheck && !isAskingForPlayerCount) {
+        console.log("First AI response doesn't ask about player count - correcting it");
+        
+        // Craft a response that properly asks for player count
+        responseText = `Thanks for starting this murder mystery creation process! To begin crafting your mystery, I need to understand the basics.
+
+How many players do you want for your murder mystery game?`;
+      }
+      
+      // If we detected multiple questions, truncate to just the first one
+      if (hasMultipleQuestions) {
+        console.log("Detected multiple questions in AI response - truncating to first question only");
+        
+        // Split by question marks and take only the first question
+        const firstQuestionEnd = responseText.indexOf('?') + 1;
+        let fixedResponse = responseText.substring(0, firstQuestionEnd);
+        
+        // Add a simple closer if the response seems too abrupt
+        if (fixedResponse.length < 100) {
+          fixedResponse += "\n\nPlease answer this question first before we continue with the next steps.";
+        }
+        
+        responseText = fixedResponse;
+      }
+
       // Format the response as expected by the client
       const formattedResponse = {
         choices: [
           {
             message: {
               role: "assistant",
-              content: response.content[0].text
+              content: responseText
             }
           }
         ]

@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -24,6 +25,7 @@ interface MysteryChatProps {
     isLoadingHistory?: boolean;
     systemInstruction?: string;
     skipForm?: boolean;
+    preventDuplicateMessages?: boolean;
 }
 
 const MysteryChat = ({
@@ -38,7 +40,8 @@ const MysteryChat = ({
     initialMessages = [],
     isLoadingHistory = false,
     systemInstruction = "",
-    skipForm = false
+    skipForm = false,
+    preventDuplicateMessages = false
 }: MysteryChatProps) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
@@ -63,33 +66,55 @@ const MysteryChat = ({
         initialMessagesCount: initialMessages.length,
         isLoadingHistory,
         hasSystemInstruction: !!systemInstruction,
-        skipForm
+        skipForm,
+        preventDuplicateMessages
     });
 
     // Create a strong system message function that emphasizes not asking about already provided info
     const createSystemMessage = () => {
         let systemMsg = "This is a murder mystery creation conversation. ";
-        systemMsg += "The user has ALREADY selected the following preferences, so DO NOT ask about these again: ";
         
-        if (initialTheme) {
-            systemMsg += `Theme: ${initialTheme}. `;
-        }
+        // Only add information about what's already been provided if we actually have that information
         if (initialPlayerCount) {
-            systemMsg += `Player count: ${initialPlayerCount}. `;
+            systemMsg += "The user has ALREADY selected the following preferences, so DO NOT ask about these again: ";
+            
+            if (initialTheme) {
+                systemMsg += `Theme: ${initialTheme}. `;
+            }
+            if (initialPlayerCount) {
+                systemMsg += `Player count: ${initialPlayerCount}. `;
+            }
+            if (initialHasAccomplice !== undefined) {
+                systemMsg += `Accomplice: ${initialHasAccomplice ? "Yes" : "No"}. `;
+            }
+            if (initialScriptType) {
+                systemMsg += `Script type: ${initialScriptType}. `;
+            }
+            if (initialAdditionalDetails) {
+                systemMsg += `Additional details: ${initialAdditionalDetails}. `;
+            }
+            
+            systemMsg += "Please start directly with creating a suitable murder mystery based on these preferences without asking clarifying questions about these specified parameters.";
+        } else {
+            // If we don't have player count, force the AI to ask for it
+            systemMsg += "The user wants to create a murder mystery. ";
+            if (initialTheme) {
+                systemMsg += `They've chosen a ${initialTheme} theme. `;
+            }
+            systemMsg += "You MUST first ask how many players they need for their mystery. This information is REQUIRED before discussing any other aspects of the mystery.";
         }
-        if (initialHasAccomplice !== undefined) {
-            systemMsg += `Accomplice: ${initialHasAccomplice ? "Yes" : "No"}. `;
-        }
-        if (initialScriptType) {
-            systemMsg += `Script type: ${initialScriptType}. `;
-        }
-        if (initialAdditionalDetails) {
-            systemMsg += `Additional details: ${initialAdditionalDetails}. `;
-        }
-        
-        systemMsg += "Please start directly with creating a suitable murder mystery based on these preferences without asking clarifying questions about these specified parameters. You may ask about other aspects of the mystery if needed.";
         
         return systemMsg;
+    };
+
+    // Function to check if we already have a message with similar content
+    const isDuplicateMessage = (content: string, isAi: boolean): boolean => {
+        if (!preventDuplicateMessages) return false;
+        
+        return messages.some(msg => 
+            msg.is_ai === isAi && 
+            msg.content.toLowerCase() === content.toLowerCase()
+        );
     };
 
     useEffect(() => {
@@ -209,7 +234,7 @@ const MysteryChat = ({
             initialFormPromptSaved.current = hasInitialFormPrompt;
             initialFormPromptSent.current = hasInitialFormPrompt;
         }
-    }, [initialMessages]);
+    }, [initialMessages, preventDuplicateMessages]);
 
     // Separate effect to handle triggering AI response for last user message
     useEffect(() => {
@@ -253,11 +278,8 @@ const MysteryChat = ({
             
             let initialChatMessage = `Let's create a murder mystery`;
             if (initialTheme) initialChatMessage += ` with a ${initialTheme} theme`;
-            if (initialPlayerCount) initialChatMessage += ` for ${initialPlayerCount} players`;
-            if (initialHasAccomplice !== undefined) initialChatMessage += initialHasAccomplice ? `, including an accomplice` : `, without an accomplice`;
-            if (initialScriptType) initialChatMessage += ` with ${initialScriptType} scripts`;
-            if (initialAdditionalDetails) initialChatMessage += `. Additional details: ${initialAdditionalDetails}`;
-            initialChatMessage += ".";
+            // Don't include player count and other details, to force AI to ask
+            initialChatMessage += ". Please guide me through creating this mystery step by step.";
             
             console.log("DEBUG: Initial chat message:", initialChatMessage);
 
@@ -306,11 +328,8 @@ const MysteryChat = ({
                 // Create the initial form prompt
                 let initialChatMessage = `Let's create a murder mystery`;
                 if (initialTheme) initialChatMessage += ` with a ${initialTheme} theme`;
-                if (initialPlayerCount) initialChatMessage += ` for ${initialPlayerCount} players`;
-                if (initialHasAccomplice !== undefined) initialChatMessage += initialHasAccomplice ? `, including an accomplice` : `, without an accomplice`;
-                if (initialScriptType) initialChatMessage += ` with ${initialScriptType} scripts`;
-                if (initialAdditionalDetails) initialChatMessage += `. Additional details: ${initialAdditionalDetails}`;
-                initialChatMessage += ".";
+                // Don't include player count to force AI to ask
+                initialChatMessage += ". Please guide me through creating this mystery step by step.";
                 
                 const initialMessage: Message = {
                     id: Date.now().toString(),
@@ -319,20 +338,25 @@ const MysteryChat = ({
                     timestamp: new Date(Date.now() - 1000000), // Set timestamp to earlier than other messages
                 };
                 
-                // Save to database
-                if (onSave) {
-                    console.log("DEBUG: Saving missing initial form prompt to database");
-                    onSave(initialMessage);
+                // Make sure this isn't a duplicate message
+                if (!isDuplicateMessage(initialMessage.content, initialMessage.is_ai)) {
+                    // Save to database
+                    if (onSave) {
+                        console.log("DEBUG: Saving missing initial form prompt to database");
+                        onSave(initialMessage);
+                    }
+                    
+                    // Add to messages at the beginning
+                    setMessages(prev => [initialMessage, ...prev]);
+                } else {
+                    console.log("DEBUG: Initial form prompt appears to be a duplicate, not adding");
                 }
-                
-                // Add to messages at the beginning
-                setMessages(prev => [initialMessage, ...prev]);
                 initialFormPromptSaved.current = true;
             } else {
                 initialFormPromptSaved.current = true;
             }
         }
-    }, [messages, isLoadingHistory, initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails, onSave, skipForm]);
+    }, [messages, isLoadingHistory, initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails, onSave, skipForm, preventDuplicateMessages]);
 
     const scrollToBottom = () => {
         console.log("DEBUG: Scrolling to bottom of messages");
@@ -357,6 +381,13 @@ const MysteryChat = ({
             is_ai: false,
             timestamp: new Date(),
         };
+
+        // Check for duplicate message
+        if (isDuplicateMessage(userMessage.content, userMessage.is_ai)) {
+            console.log("DEBUG: Detected duplicate user message, not sending:", userMessage.content);
+            toast.error("This message appears to be a duplicate. Please try a different message.");
+            return;
+        }
 
         console.log("DEBUG: Creating user message:", userMessage);
         const updatedMessages = [...messages, userMessage];
@@ -527,7 +558,10 @@ const MysteryChat = ({
               
               let finalResponse = response;
               
-              if (askingAboutPlayerCount || askingAboutTheme || askingAboutAccomplice) {
+              // Only modify the response if we have player count and the AI is asking for it
+              if ((askingAboutPlayerCount && initialPlayerCount) || 
+                  (askingAboutTheme && initialTheme) || 
+                  (askingAboutAccomplice && initialHasAccomplice !== undefined)) {
                 console.log("AI asking about already provided info, creating corrected response");
                 // Create a modified response that acknowledges the preferences
                 finalResponse = `I'll create a murder mystery based on your specifications: ${initialTheme} theme${initialPlayerCount ? `, ${initialPlayerCount} players` : ''}${initialHasAccomplice !== undefined ? (initialHasAccomplice ? ', with an accomplice' : ', without an accomplice') : ''}${initialScriptType ? `, with ${initialScriptType} scripts` : ''}.
@@ -541,6 +575,14 @@ ${responseText.split('\n\n').slice(1).join('\n\n')}`;
                 is_ai: true,
                 timestamp: new Date(),
               };
+
+              // Check for duplicate AI message
+              if (isDuplicateMessage(aiMessage.content, aiMessage.is_ai)) {
+                console.log("DEBUG: Detected duplicate AI response, not adding:", aiMessage.content.substring(0, 50) + "...");
+                setLoading(false);
+                aiHasRespondedRef.current = true; // Keep this true to prevent further attempts
+                return;
+              }
 
               setMessages(prev => {
                 const updatedMessages = [...prev, aiMessage];
@@ -584,16 +626,19 @@ ${responseText.split('\n\n').slice(1).join('\n\n')}`;
                 timestamp: new Date(),
               };
 
-              setMessages(prev => {
-                const updatedMessages = [...prev, fallbackMessage];
+              // Check for duplicate fallback message
+              if (!isDuplicateMessage(fallbackMessage.content, fallbackMessage.is_ai)) {
+                setMessages(prev => {
+                  const updatedMessages = [...prev, fallbackMessage];
 
-                if (onSave) {
-                  console.log("Calling onSave with fallback message");
-                  onSave(fallbackMessage);
-                }
+                  if (onSave) {
+                    console.log("Calling onSave with fallback message");
+                    onSave(fallbackMessage);
+                  }
 
-                return updatedMessages;
-              });
+                  return updatedMessages;
+                });
+              }
             }
         } catch (error) {
           console.error("Error getting AI response:", error);
@@ -673,16 +718,7 @@ ${responseText.split('\n\n').slice(1).join('\n\n')}`;
                 variant="outline"
                 size="sm"
                 className="mt-2 text-xs"
-                onClick={() => {
-                  // Find the last user message and retry sending it
-                  const lastUserMessageIndex = [...messages].reverse().findIndex(m => !m.is_ai);
-                  if (lastUserMessageIndex >= 0) {
-                    const lastUserMessage = [...messages].reverse()[lastUserMessageIndex];
-                    // Reset AI response flag to allow retry
-                    aiHasRespondedRef.current = false;
-                    handleAIResponse(lastUserMessage.content, true);
-                  }
-                }}
+                onClick={retryLastMessage}
               >
                 Try Again
               </Button>
@@ -754,13 +790,7 @@ ${responseText.split('\n\n').slice(1).join('\n\n')}`;
               placeholder="Ask the AI..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' && !event.shiftKey) {
-                  console.log("DEBUG: Enter key pressed (without shift), submitting form");
-                  event.preventDefault();
-                  handleSubmit(event as unknown as React.FormEvent);
-                }
-              }}
+              onKeyDown={handleKeyDown}
               className="flex-1 resize-none"
               rows={isMobile ? 2 : 3}
             />
@@ -777,14 +807,7 @@ ${responseText.split('\n\n').slice(1).join('\n\n')}`;
         {messages.length > 1 && !loading && (
           <div className={cn("border-t", isMobile ? "p-2" : "p-4")}>
             <Button 
-              onClick={() => {
-                if (onGenerateFinal) {
-                  console.log("DEBUG: Generate Final button clicked, sending all messages");
-                  onGenerateFinal(messages);
-                } else {
-                  toast.error("Final generation callback not provided.");
-                }
-              }} 
+              onClick={handleGenerateFinalClick} 
               variant="destructive" 
               size={isMobile ? "sm" : "default"}
             >
