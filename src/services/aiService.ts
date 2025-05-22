@@ -1,3 +1,4 @@
+
 import { supabase } from "@/lib/supabase";
 
 interface ApiMessage {
@@ -44,15 +45,27 @@ export const getAIResponse = async (
       throw new Error("No valid messages to send to AI service");
     }
 
-    // First try the Next.js API proxy since it's more reliable for CORS
+    // Create a simplified request payload for all attempts
+    const requestPayload = {
+      messages: standardMessages,
+      system: systemInstruction,
+      promptVersion,
+      requireFormatValidation: promptVersion === 'free',
+      testMode
+    };
+
+    // Track attempts for better error messages
+    let attemptCount = 0;
+    let lastError = null;
+
+    // Attempt 1: Next.js API proxy (most reliable for CORS)
     try {
-      console.log("Attempting to use Next.js API proxy first for better reliability");
+      attemptCount++;
+      console.log("Attempt 1: Using Next.js API proxy");
       
       const response = await fetch('/api/proxy-anthropic-cors', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           url: `https://mhfikaomkmqcndqfohbp.supabase.co/functions/v1/mystery-ai`,
           method: 'POST',
@@ -60,35 +73,39 @@ export const getAIResponse = async (
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token || ''}`,
           },
-          data: {
-            messages: standardMessages,
-            system: systemInstruction,
-            promptVersion,
-            requireFormatValidation: promptVersion === 'free',
-            chunkSize: testMode ? 800 : 1000,
-            testMode
-          }
+          data: requestPayload
         })
       });
 
       if (!response.ok) {
-        throw new Error(`Next.js API proxy returned status ${response.status}`);
+        console.warn(`Next.js proxy returned status ${response.status}`);
+        throw new Error(`Next.js proxy returned status ${response.status}`);
       }
 
       const data = await response.json();
+      
+      // Check for error in the response data
+      if (data.error) {
+        console.warn("Next.js proxy returned error:", data.error);
+        throw new Error(data.error);
+      }
+      
       if (!data.choices?.[0]?.message?.content) {
-        throw new Error("Invalid response format from Next.js API proxy");
+        console.warn("Invalid response format from Next.js proxy:", data);
+        throw new Error("Invalid response format from Next.js proxy");
       }
 
+      console.log("Successfully got response from Next.js proxy");
       return data.choices[0].message.content;
 
     } catch (proxyError) {
       console.error("Next.js proxy error:", proxyError);
-      console.log("Falling back to Supabase function approaches");
+      lastError = proxyError;
       
-      // Second attempt - try using supabase cors-proxy
+      // Attempt 2: Supabase cors-proxy
       try {
-        console.log("Attempting to use Supabase cors-proxy function");
+        attemptCount++;
+        console.log("Attempt 2: Using Supabase cors-proxy function");
         
         const { data: proxyData, error: proxyError } = await supabase.functions.invoke('cors-proxy', {
           body: {
@@ -98,49 +115,63 @@ export const getAIResponse = async (
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token || ''}`,
             },
-            body: {
-              messages: standardMessages,
-              system: systemInstruction,
-              promptVersion,
-              requireFormatValidation: promptVersion === 'free',
-              chunkSize: testMode ? 800 : 1000,
-              testMode
-            }
+            body: requestPayload
           }
         });
         
         if (proxyError) {
+          console.warn("cors-proxy returned error:", proxyError);
           throw proxyError;
         }
         
+        // Check for error in the response data
+        if (proxyData?.error) {
+          console.warn("cors-proxy response contains error:", proxyData.error);
+          throw new Error(proxyData.error);
+        }
+        
         if (!proxyData?.choices?.[0]?.message?.content) {
+          console.warn("Invalid response format from cors-proxy:", proxyData);
           throw new Error("Invalid response format from cors-proxy");
         }
         
+        console.log("Successfully got response from cors-proxy");
         return proxyData.choices[0].message.content;
         
       } catch (corsProxyError) {
         console.error("Error with Supabase cors-proxy:", corsProxyError);
+        lastError = corsProxyError;
         
-        // Last resort - try direct invocation with lower expectations
+        // Attempt 3: Direct invocation with minimal request
         try {
-          console.log("Final attempt - direct function invocation with simplified request");
+          attemptCount++;
+          console.log("Attempt 3: Direct function invocation with simplified request");
           
-          // Use a very minimal request to minimize CORS issues
+          // Use a very minimal request to minimize chance of issues
+          const simplifiedPayload = {
+            messages: standardMessages.slice(-2), // Only use the last two messages
+            system: systemInstruction || "You are a helpful assistant creating a murder mystery.",
+            promptVersion: 'free',
+            testMode: true // Force test mode for faster response
+          };
+          
           const { data: directData, error: directError } = await supabase.functions.invoke('mystery-ai', {
-            body: {
-              messages: standardMessages.slice(-2), // Only use the last two messages to keep it simple
-              system: "You are a helpful assistant creating a murder mystery.",
-              promptVersion: 'free',
-              testMode: true // Force test mode for faster response
-            }
+            body: simplifiedPayload
           });
           
           if (directError) {
+            console.warn("Direct invocation returned error:", directError);
             throw directError;
           }
           
+          // Check for error in the response data
+          if (directData?.error) {
+            console.warn("Direct invocation response contains error:", directData.error);
+            throw new Error(directData.error);
+          }
+          
           if (directData?.choices?.[0]?.message?.content) {
+            console.log("Successfully got response from direct invocation");
             return directData.choices[0].message.content;
           }
           
@@ -149,21 +180,27 @@ export const getAIResponse = async (
             // Look for any property that might contain the AI response
             for (const key of Object.keys(directData)) {
               if (typeof directData[key] === 'string' && directData[key].length > 50) {
+                console.log(`Found potential response in property "${key}"`);
                 return directData[key];
               }
               
               if (typeof directData[key] === 'object' && directData[key]?.content) {
+                console.log(`Found potential response object in property "${key}"`);
                 return directData[key].content;
               }
             }
           }
           
+          console.warn("Could not extract usable content from response:", directData);
           throw new Error("Could not extract usable content from response");
+          
         } catch (finalError) {
           console.error("All attempts failed:", finalError);
+          lastError = finalError;
           
-          // Generate a fallback response as last resort
-          return "I'm having trouble connecting to my AI service right now. Please try again in a moment. If this persists, you might want to try refreshing the page or contact support.";
+          // Final attempt: Return a fallback response
+          console.log("Using fallback response after all attempts failed");
+          return `I'm having trouble connecting to my AI system right now. Please try again in a moment. This could be due to your internet connection or high server load. (Attempted ${attemptCount} different connection methods)`;
         }
       }
     }

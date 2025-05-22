@@ -1,10 +1,11 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
+// Use more permissive CORS headers to avoid issues
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': '*', // Allow all headers for debugging
   'Access-Control-Max-Age': '86400',
 };
 
@@ -21,7 +22,9 @@ serve(async (req) => {
     let requestData;
     try {
       requestData = await req.json();
+      console.log("Request data:", JSON.stringify(requestData, null, 2).substring(0, 200) + "...");
     } catch (e) {
+      console.error("Error parsing JSON:", e.message);
       return new Response(
         JSON.stringify({ error: "Invalid JSON in request body" }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -54,7 +57,7 @@ serve(async (req) => {
     
     // Handle request body
     let requestBody = undefined;
-    if (body && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
+    if (body) {
       if (typeof body === 'object') {
         requestBody = JSON.stringify(body);
         
@@ -71,47 +74,64 @@ serve(async (req) => {
     console.log(`Fetch request: ${method} ${url}`);
     console.log(`Headers: ${[...safeHeaders.entries()].map(([k,v]) => `${k}: ${v}`).join(', ')}`);
 
+    // Set a timeout for the fetch operation
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
     const fetchOptions: RequestInit = {
       method,
       headers: safeHeaders,
       body: requestBody,
+      signal: controller.signal,
     };
 
-    const response = await fetch(url, fetchOptions);
-    
-    // Get response body
-    let responseBody;
-    const contentType = response.headers.get('content-type') || '';
-    
-    if (contentType.includes('application/json')) {
-      try {
-        responseBody = await response.json();
-        return new Response(
-          JSON.stringify(responseBody),
-          { 
-            status: response.status,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-          }
-        );
-      } catch (e) {
-        // If JSON parsing fails, fall back to text
-        responseBody = await response.text();
-      }
-    } else {
-      responseBody = await response.text();
-    }
-
-    // If we got here, return as text
-    return new Response(
-      typeof responseBody === 'string' ? responseBody : JSON.stringify(responseBody),
-      { 
-        status: response.status,
-        headers: { 
-          ...corsHeaders, 
-          'Content-Type': contentType || 'text/plain'
+    try {
+      const response = await fetch(url, fetchOptions);
+      clearTimeout(timeoutId); // Clear the timeout
+      
+      // Get response body
+      let responseBody;
+      const contentType = response.headers.get('content-type') || '';
+      
+      console.log(`Response status: ${response.status}, content type: ${contentType}`);
+      
+      if (contentType.includes('application/json')) {
+        try {
+          responseBody = await response.json();
+          console.log("Response JSON:", JSON.stringify(responseBody).substring(0, 100) + "...");
+          return new Response(
+            JSON.stringify(responseBody),
+            { 
+              status: response.status,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            }
+          );
+        } catch (e) {
+          // If JSON parsing fails, fall back to text
+          responseBody = await response.text();
+          console.log(`JSON parse error: ${e.message}. Falling back to text`);
         }
+      } else {
+        responseBody = await response.text();
+        console.log(`Response text length: ${responseBody.length}`);
       }
-    );
+
+      // If we got here, return as text
+      return new Response(
+        typeof responseBody === 'string' ? responseBody : JSON.stringify(responseBody),
+        { 
+          status: response.status,
+          headers: { 
+            ...corsHeaders, 
+            'Content-Type': contentType || 'text/plain'
+          }
+        }
+      );
+    } catch (fetchError) {
+      clearTimeout(timeoutId); // Clear the timeout
+      console.error(`Fetch error: ${fetchError.message}`);
+      throw new Error(`Fetch operation failed: ${fetchError.message}`);
+    }
   } catch (error) {
     console.error(`Error in cors-proxy: ${error.message}`);
     return new Response(

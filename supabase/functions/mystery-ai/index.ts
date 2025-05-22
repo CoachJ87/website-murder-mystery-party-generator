@@ -9,11 +9,11 @@ const anthropic = new Anthropic({
   apiKey: Deno.env.get('ANTHROPIC_API_KEY')!,
 });
 
-// Define CORS headers for cross-origin requests - using more permissive settings
+// Define CORS headers - making them more permissive to avoid CORS issues
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-  'Access-Control-Allow-Headers': '*', // Allow all headers
+  'Access-Control-Allow-Headers': '*', // Allow all headers for debugging
   'Access-Control-Max-Age': '86400',
 };
 
@@ -35,6 +35,7 @@ serve(async (req) => {
     try {
       requestBody = await req.json();
       console.log("Successfully parsed request body");
+      console.log("Request body:", JSON.stringify(requestBody, null, 2).substring(0, 500) + "...");
     } catch (jsonError) {
       console.error("Failed to parse request JSON:", jsonError);
       return new Response(
@@ -71,24 +72,34 @@ serve(async (req) => {
     if (system) {
       console.log("Using provided system instruction");
       console.log(`System prompt length: ${system.length}`);
-      console.log(`System prompt preview: ${system.substring(0, 50)}...`);
+      console.log(`System prompt preview: ${system.substring(0, 100)}...`);
       systemMessage = system;
-      
-      // Add explicit instruction to answer one question at a time 
-      if (!systemMessage.includes("ANSWER ONE QUESTION AT A TIME")) {
-        systemMessage += "\n\nIMPORTANT: ANSWER ONE QUESTION AT A TIME. DO NOT BATCH OR COMBINE RESPONSES TO MULTIPLE QUESTIONS.";
-      }
     } else {
-      // Default system message if none provided
-      systemMessage = "You are a helpful mystery writer. Your job is to help the user create an exciting murder mystery game. ALWAYS answer ONE QUESTION AT A TIME. NEVER give multiple responses together.";
+      // Try to get the free prompt from environment variables
+      const freePrompt = Deno.env.get('MYSTERY_FREE_PROMPT');
       
-      if (promptVersion === 'free') {
-        systemMessage += " You should follow the OUTPUT FORMAT structure exactly.";
+      if (freePrompt) {
+        console.log("Using MYSTERY_FREE_PROMPT from environment variables");
+        console.log(`Free prompt length: ${freePrompt.length}`);
+        console.log(`Free prompt preview: ${freePrompt.substring(0, 100)}...`);
+        systemMessage = freePrompt;
+      } else {
+        // Default system message if none provided and no env variable
+        console.log("Using fallback default prompt");
+        systemMessage = "You are a helpful mystery writer. Your job is to help the user create an exciting murder mystery game. Follow the OUTPUT FORMAT structure exactly.";
       }
     }
-
+    
     // Add stronger instruction to prevent batching responses
     systemMessage += "\n\nVERY IMPORTANT INSTRUCTION: Never answer more than one user question in a single response. If the user asks multiple questions, just answer the first one. NEVER batch answers to multiple questions.";
+
+    // Add explicit instruction for consistent formatting
+    if (promptVersion === 'free' && !systemMessage.includes("OUTPUT FORMAT")) {
+      systemMessage += "\n\nOUTPUT FORMAT: Your responses should always follow this structure:\n1. Brief response to the user's request\n2. Questions or suggestions for the next step";
+    }
+
+    // Log the complete system message for debugging
+    console.log("Complete system message:", systemMessage);
 
     // Prepare the model and max tokens based on the prompt version and test mode
     let model = "claude-3-opus-20240229";
@@ -113,7 +124,8 @@ serve(async (req) => {
       }
     }).filter(msg => msg.content && msg.content.trim() !== '');
     
-    console.log("Standardized messages:", JSON.stringify(standardizedMessages.slice(0, 2))); // Log first few messages for debugging
+    console.log("First standardized message:", JSON.stringify(standardizedMessages[0]));
+    console.log("Total messages count:", standardizedMessages.length);
 
     // Make the API call to Anthropic with enhanced error handling
     try {
@@ -149,6 +161,7 @@ serve(async (req) => {
       
       console.log("Received response from Anthropic API");
       console.log(`Response length: ${response.content[0].text.length} characters`);
+      console.log(`Response preview: ${response.content[0].text.substring(0, 100)}...`);
 
       // Format the response as expected by the client
       const formattedResponse = {
@@ -174,6 +187,7 @@ serve(async (req) => {
       );
     } catch (apiError) {
       console.error(`Anthropic API error: ${apiError.message}`);
+      console.error(`Error details: ${JSON.stringify(apiError)}`);
       
       // Create a detailed error response
       let errorDetail = {
@@ -230,6 +244,7 @@ serve(async (req) => {
     // Log and handle general errors with more detailed information
     console.error(`Error in mystery-ai edge function: ${error.message}`);
     console.error(`Error type: ${error.constructor.name}`);
+    console.error(`Error stack: ${error.stack}`);
     
     // Return a generalized error response that includes helpful information
     return new Response(
