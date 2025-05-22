@@ -75,20 +75,36 @@ serve(async (req) => {
       console.log(`System prompt preview: ${system.substring(0, 100)}...`);
       systemMessage = system;
       
-      // Make the "one question at a time" instruction more prominent
+      // ENHANCED: Make the "one question at a time" instruction more prominent and clear
       const oneQuestionInstruction = "🚨 CRITICAL INSTRUCTION: Ask ONLY ONE QUESTION at a time. After each user response, address only that response before moving to the next question. NEVER batch multiple questions or proceed without user input. 🚨";
       
-      // Check if the system message already has this instruction
-      if (!systemMessage.includes("ONE QUESTION at a time")) {
+      // Enforce process instructions that require asking for player count first
+      const playerCountInstruction = "🚨 REQUIRED PROCESS: You MUST first ask the user how many players they want for their mystery game. Wait for their response before proceeding to the next step. DO NOT generate a complete mystery scenario without knowing the player count. 🚨";
+      
+      // Check if the system message already has these instructions
+      const hasOneQuestionInst = systemMessage.includes("ONE QUESTION at a time");
+      const hasPlayerCountInst = systemMessage.includes("how many players");
+      
+      // Add or reinforce instructions as needed
+      let updatedSystem = systemMessage;
+      
+      if (!hasOneQuestionInst) {
         console.log("Adding missing one-question-at-a-time instruction to system prompt");
-        systemMessage = oneQuestionInstruction + "\n\n" + systemMessage;
-      } else if (!systemMessage.startsWith("🚨")) {
+        updatedSystem = oneQuestionInstruction + "\n\n" + updatedSystem;
+      } else if (!updatedSystem.startsWith("🚨")) {
         // If it has the instruction but not at the top, re-emphasize it at the top
         console.log("Moving one-question-at-a-time instruction to the top of system prompt");
         // Remove existing instruction and add it at the top
-        systemMessage = systemMessage.replace(/🚨.*?🚨/gs, '');
-        systemMessage = oneQuestionInstruction + "\n\n" + systemMessage;
+        updatedSystem = updatedSystem.replace(/🚨.*?🚨/gs, '');
+        updatedSystem = oneQuestionInstruction + "\n\n" + updatedSystem;
       }
+      
+      if (!hasPlayerCountInst) {
+        console.log("Adding player count instruction to system prompt");
+        updatedSystem += "\n\n" + playerCountInstruction;
+      }
+      
+      systemMessage = updatedSystem;
     } else {
       // Try to get the free prompt from environment variables
       const freePrompt = Deno.env.get('MYSTERY_FREE_PROMPT');
@@ -106,18 +122,27 @@ serve(async (req) => {
 You are a helpful mystery writer. 
 Your job is to help the user create an exciting murder mystery game.
 
+First, ask the user how many players they want for their mystery. Wait for their response.
+Then, ask if they want an accomplice. Wait for their response.
+Only after these details are provided should you start creating character descriptions and the mystery scenario.
+
 Follow the OUTPUT FORMAT structure exactly.`;
       }
     }
     
-    // Add stronger instruction to prevent batching responses if not already there
+    // ENHANCED: Add stronger instruction to prevent batching responses if not already there
     if (!systemMessage.includes("NEVER batch answers")) {
       systemMessage += "\n\nVERY IMPORTANT INSTRUCTION: Never answer more than one user question in a single response. If the user asks multiple questions, just answer the first one. NEVER batch answers to multiple questions.";
     }
 
-    // Add explicit instruction for one-question-at-a-time approach if not already there
+    // ENHANCED: Add explicit instruction for one-question-at-a-time approach if not already there
     if (!systemMessage.includes("ONE QUESTION at a time")) {
       systemMessage += "\n\n🚨 CRITICAL INSTRUCTION: Ask ONLY ONE QUESTION at a time. After each user response, address only that response before moving to the next question. NEVER batch multiple questions or proceed without user input. 🚨";
+    }
+
+    // ENHANCED: Add specific instruction about player count if not already there
+    if (!systemMessage.includes("how many players")) {
+      systemMessage += "\n\n🚨 REQUIRED PROCESS: You MUST first ask the user how many players they want for their mystery game. Wait for their response before proceeding to the next step. DO NOT generate a complete mystery scenario without knowing the player count. 🚨";
     }
 
     // Add explicit instruction for consistent formatting

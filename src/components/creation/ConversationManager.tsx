@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
@@ -130,7 +131,7 @@ export const ConversationManager = ({
       systemMsg += `The user wants to create a murder mystery with theme: ${data.theme}. `;
     }
     
-    systemMsg += "Please proceed with creating a murder mystery based on this theme. IMPORTANT: Answer only ONE question at a time. Do not combine multiple responses. Wait for the user to respond before continuing to the next step. ";
+    systemMsg += "Please proceed with creating a murder mystery based on this theme. IMPORTANT: You must collect all necessary details from the user one step at a time. First, ask for the number of players needed. Then ask if an accomplice is needed. Only after collecting these details should you start developing characters and the mystery scenario. ";
     
     // Include the full output format directly in the system message
     systemMsg += `\n\nYou MUST follow this exact output format for ALL your responses:
@@ -156,6 +157,9 @@ Present your mystery preview in an engaging, dramatic format that will excite th
 
 [After presenting the mystery concept, ask if the concept works for them and explain that they can continue to make edits and that once they are done they can press the 'Generate Mystery' button where they can create a complete game package with detailed character guides, host instructions, and game materials if they choose to purchase.]`;
 
+    // Add stronger instruction that clarifies player count must be asked first
+    systemMsg += "\n\n🚨 IMPORTANT PROCESS: First, ask the user how many players they need for their mystery. Wait for their response. Next, ask if they want an accomplice. Wait for that response before proceeding with character development. DO NOT generate a full mystery without explicitly knowing the player count. 🚨";
+    
     // Repeat the one-question-at-a-time instruction at the end for emphasis
     systemMsg += "\n\n🚨 REMINDER: Ask ONLY ONE QUESTION at a time and wait for the user's response before proceeding. 🚨";
     

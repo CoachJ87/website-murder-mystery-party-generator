@@ -68,9 +68,9 @@ export default async function handler(req) {
       forwardHeaders.append('Content-Type', 'application/json');
     }
     
-    // Set a timeout for the request with longer duration - increased from 60s to 120s
+    // Set a timeout for the request with longer duration - increased from 60s to 180s
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 120000); // 120 second timeout (increased from 60s)
+    const timeoutId = setTimeout(() => controller.abort(), 180000); // 180 second timeout (increased from 60s)
     
     // Call the target URL
     try {
@@ -127,7 +127,7 @@ export default async function handler(req) {
       if (fetchError.name === 'AbortError') {
         return new Response(JSON.stringify({ 
           error: "Request timed out", 
-          timeoutMs: 120000  // Updated timeout value
+          timeoutMs: 180000  // Updated timeout value
         }), {
           status: 504, // Gateway Timeout
           headers: {
