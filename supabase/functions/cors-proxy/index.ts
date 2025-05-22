@@ -30,10 +30,15 @@ serve(async (req) => {
 
     console.log(`Proxying request to: ${url} with method: ${method}`);
 
+    // Create a safe headers object without CORS headers that might interfere
+    const safeHeaders = { ...headers };
+    delete safeHeaders['access-control-allow-origin'];
+    delete safeHeaders['Access-Control-Allow-Origin'];
+    
     const fetchOptions: RequestInit = {
       method,
       headers: {
-        ...headers,
+        ...safeHeaders,
         'User-Agent': 'CorsProxy/1.0',
       },
     };

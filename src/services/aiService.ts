@@ -44,7 +44,7 @@ export const getAIResponse = async (
     if (standardMessages.length === 0) {
       throw new Error("No valid messages to send to AI service");
     }
-    
+
     console.log("Calling mystery-ai Edge Function");
 
     let attempts = 0;
@@ -86,18 +86,18 @@ export const getAIResponse = async (
           
         console.log(`Using chunk size: ${adjustedChunkSize} with streaming: ${useStreaming || isLargeRequest}`);
         
-        // Use streaming if explicitly requested or for large requests
-        // Note: We're no longer using the 'signal' property as it's not supported
+        // First attempt: try direct Edge Function call
         try {
+          // Direct approach - use the Edge Function
           const { data: functionData, error: functionError } = await supabase.functions.invoke('mystery-ai', {
             body: {
               messages: standardMessages,
               system: systemInstruction,
               promptVersion,
-              requireFormatValidation: promptVersion === 'free', // Only enforce strict validation for free prompts
+              requireFormatValidation: promptVersion === 'free', 
               chunkSize: adjustedChunkSize,
-              stream: useStreaming || isLargeRequest, // Enable streaming when requested or for large requests
-              testMode // Pass test mode flag to the edge function
+              stream: useStreaming || isLargeRequest,
+              testMode
             }
           });
           
@@ -109,6 +109,11 @@ export const getAIResponse = async (
             if (functionError.message?.includes('aborted') || functionError.message?.includes('timeout')) {
               console.error("Edge Function timeout:", functionError);
               throw new Error(`Edge Function timeout. This may indicate the response is too large.`);
+            }
+            
+            if (functionError.message?.includes('CORS') || functionError.message?.includes('blocked by CORS policy')) {
+              console.error("CORS error detected, will try cors-proxy fallback:", functionError);
+              throw new Error("CORS policy error");
             }
             
             throw new Error(`Edge Function error: ${functionError.message}`);
@@ -154,11 +159,47 @@ export const getAIResponse = async (
             });
           }
         } catch (functionError) {
+          // If we get a CORS error, try using the cors-proxy Edge Function
           if (functionError.message?.includes('CORS') || functionError.message?.includes('blocked by CORS policy')) {
-            console.error("CORS error detected:", functionError);
-            throw new Error("CORS policy error when connecting to edge function. This is a server configuration issue.");
+            console.log("Using cors-proxy as fallback due to CORS issues");
+            
+            const { data: proxyData, error: proxyError } = await supabase.functions.invoke('cors-proxy', {
+              body: {
+                url: `https://mhfikaomkmqcndqfohbp.supabase.co/functions/v1/mystery-ai`,
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token || ''}`
+                },
+                body: {
+                  messages: standardMessages,
+                  system: systemInstruction,
+                  promptVersion,
+                  requireFormatValidation: promptVersion === 'free',
+                  chunkSize: adjustedChunkSize,
+                  testMode
+                }
+              }
+            });
+            
+            if (proxyError) {
+              console.error("Proxy error:", proxyError);
+              throw proxyError;
+            }
+            
+            if (!proxyData.choices?.[0]?.message?.content) {
+              console.error("Invalid response format from proxy:", proxyData);
+              throw new Error("Invalid response format from proxy");
+            }
+            
+            responseContent = proxyData.choices[0].message.content;
+            console.log(`Received proxy response (length: ${responseContent.length})`);
+            
+            return responseContent;
+          } else {
+            // Re-throw other errors
+            throw functionError;
           }
-          throw functionError; // Re-throw other errors
         }
       } catch (error) {
         // For timeouts, we might want to break the request into smaller chunks
@@ -167,20 +208,28 @@ export const getAIResponse = async (
           
           // Try one last attempt with a smaller scope
           try {
-            const { data: fallbackData } = await supabase.functions.invoke('mystery-ai', {
+            const { data: fallbackData } = await supabase.functions.invoke('cors-proxy', {
               body: {
-                messages: [
-                  ...standardMessages.slice(0, Math.min(5, standardMessages.length)), // Take just the first few messages
-                  {
-                    role: "user",
-                    content: "Please provide a condensed version of the mystery package. Focus only on the most essential elements."
-                  }
-                ],
-                system: systemInstruction,
-                promptVersion,
-                requireFormatValidation: false,
-                chunkSize: 800, // Use a very small chunk size for last resort
-                testMode: true // Force test mode for fallback
+                url: `https://mhfikaomkmqcndqfohbp.supabase.co/functions/v1/mystery-ai`,
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token || ''}`
+                },
+                body: {
+                  messages: [
+                    ...standardMessages.slice(0, Math.min(5, standardMessages.length)), // Take just the first few messages
+                    {
+                      role: "user",
+                      content: "Please provide a condensed version of the mystery package. Focus only on the most essential elements."
+                    }
+                  ],
+                  system: systemInstruction,
+                  promptVersion,
+                  requireFormatValidation: false,
+                  chunkSize: 800, // Use a very small chunk size for last resort
+                  testMode: true // Force test mode for fallback
+                }
               }
             });
             
@@ -191,9 +240,6 @@ export const getAIResponse = async (
           } catch (fallbackError) {
             console.error("Even fallback request failed:", fallbackError);
           }
-        } else if (error.message?.includes('CORS') || error.message?.includes('blocked by CORS policy')) {
-          console.error("CORS error detected:", error);
-          throw new Error("CORS policy error when connecting to edge function. Server configuration needs to be updated.");
         }
         
         if (attempts >= maxAttempts) {
