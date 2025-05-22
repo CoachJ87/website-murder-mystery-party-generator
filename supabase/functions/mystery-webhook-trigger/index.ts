@@ -82,59 +82,13 @@ serve(async (req) => {
     console.log(`Sending payload to webhook: ${webhookUrl}`);
     console.log(`Payload size: ${JSON.stringify(webhookPayload).length} characters`);
 
-    if (webhookUrl) {
-      // Send data to webhook
-      const webhookResponse = await fetch(webhookUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(webhookPayload),
-      });
-
-      if (!webhookResponse.ok) {
-        const errorText = await webhookResponse.text();
-        console.error(`Webhook returned error: ${webhookResponse.status}`, errorText);
-        throw new Error(`Webhook request failed with status ${webhookResponse.status}: ${errorText}`);
-      }
-
-      const responseData = await webhookResponse.json();
-      console.log("Webhook response:", responseData);
-
-      // Update conversation to mark it as processed
-      const { error: updateError } = await supabase
-        .from("conversations")
-        .update({
-          webhook_sent: true,
-          webhook_sent_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", conversationId);
-
-      if (updateError) {
-        console.error("Error updating conversation:", updateError);
-      }
-
-      return new Response(
-        JSON.stringify({ 
-          success: true, 
-          message: "Webhook successfully triggered",
-          webhookResponse: responseData
-        }),
-        { 
-          headers: { 
-            ...corsHeaders, 
-            "Content-Type": "application/json" 
-          } 
-        }
-      );
-    } else {
-      console.warn("No webhook URL configured. Skipping webhook call.");
-      
+    // Check if webhook URL is configured
+    if (!webhookUrl) {
+      console.warn("No webhook URL configured in the environment. Cannot send webhook.");
       return new Response(
         JSON.stringify({ 
           success: false, 
-          message: "No webhook URL configured"
+          message: "No webhook URL configured in the environment"
         }),
         { 
           headers: { 
@@ -145,6 +99,67 @@ serve(async (req) => {
         }
       );
     }
+
+    // Send data to webhook with detailed logging
+    console.log("About to send request to webhook URL");
+    const webhookResponse = await fetch(webhookUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(webhookPayload),
+    });
+
+    // Log webhook response status
+    console.log(`Webhook response status: ${webhookResponse.status}`);
+
+    if (!webhookResponse.ok) {
+      const errorText = await webhookResponse.text();
+      console.error(`Webhook returned error: ${webhookResponse.status}`, errorText);
+      throw new Error(`Webhook request failed with status ${webhookResponse.status}: ${errorText}`);
+    }
+
+    // Parse webhook response data
+    let responseData;
+    try {
+      responseData = await webhookResponse.json();
+      console.log("Webhook response data:", responseData);
+    } catch (jsonError) {
+      console.warn("Could not parse webhook response as JSON:", jsonError);
+      const textResponse = await webhookResponse.text();
+      console.log("Webhook text response:", textResponse);
+      responseData = { rawResponse: textResponse };
+    }
+
+    // Update conversation to mark it as processed
+    const { error: updateError } = await supabase
+      .from("conversations")
+      .update({
+        webhook_sent: true,
+        webhook_sent_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", conversationId);
+
+    if (updateError) {
+      console.error("Error updating conversation:", updateError);
+    } else {
+      console.log("Successfully marked conversation as processed");
+    }
+
+    return new Response(
+      JSON.stringify({ 
+        success: true, 
+        message: "Webhook successfully triggered",
+        webhookResponse: responseData
+      }),
+      { 
+        headers: { 
+          ...corsHeaders, 
+          "Content-Type": "application/json" 
+        } 
+      }
+    );
   } catch (error) {
     console.error("Error processing webhook:", error);
     

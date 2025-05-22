@@ -157,7 +157,7 @@ Follow these steps in strict order, asking only ONE question at a time:
 
     // Prepare the model and max tokens based on the prompt version and test mode
     let model = "claude-3-opus-20240229";
-    let maxTokens = testMode ? 1000 : 2000;
+    let maxTokens = testMode ? 1000 : 3000; // Increased max tokens
     
     // Log the model and max tokens
     console.log(`Using model: ${model} with max tokens: ${maxTokens}`);
@@ -202,7 +202,7 @@ Follow these steps in strict order, asking only ONE question at a time:
       }));
       
       // Set a reasonable timeout for the API call
-      const timeoutMs = 45000; // 45 seconds
+      const timeoutMs = 60000; // 60 seconds (increased from 45)
       const timeoutPromise = new Promise((_, reject) => {
         setTimeout(() => reject(new Error("Anthropic API request timed out")), timeoutMs);
       });
@@ -254,6 +254,22 @@ Follow these steps in strict order, asking only ONE question at a time:
         responseText = `Thanks for starting this murder mystery creation process! To begin crafting your mystery, I need to understand the basics.
 
 How many players do you want for your murder mystery game?`;
+      }
+      
+      // For non-first messages, check if it's a numeric response and the AI is asking again about player count
+      const isNumericResponse = standardizedMessages[standardizedMessages.length - 1].role === "user" && 
+                             /^\d+$/.test(standardizedMessages[standardizedMessages.length - 1].content.trim());
+                             
+      if (isNumericResponse && isAskingForPlayerCount && standardizedMessages.length > 2) {
+        console.log("Detected AI asking for player count after user already provided a numeric answer");
+        
+        // Check if we can extract the player count from previous messages
+        const playerCount = standardizedMessages[standardizedMessages.length - 1].content.trim();
+        
+        // Craft a response that acknowledges the player count and moves on
+        responseText = `Great! I'll create a murder mystery for ${playerCount} players. 
+
+Let's continue building your mystery. Would you like your mystery to include an accomplice who helps the murderer, or should there be just one culprit?`;
       }
       
       // If we detected multiple questions, truncate to just the first one

@@ -120,17 +120,17 @@ export const ConversationManager = ({
   };
 
   const handleSaveMessage = (message: Message) => {
-    if (onSaveMessages) {
+    if (onSave) {
       return onSaveMessages(message);
     }
     return Promise.resolve();
   };
 
   const createSystemMessage = (data: FormValues) => {
-    // Start with a clear directive: One question at a time and MUST ask for player count first
+    // Start with a clear directive about one question at a time and MUST ask for player count first
     let systemMsg = "🚨 CRITICAL INSTRUCTION: You MUST ask ONLY ONE QUESTION at a time. After each user response, address only that response before moving to the next question. NEVER batch multiple questions or proceed without user input. 🚨\n\n";
     
-    // Make player count request the absolute priority
+    // Make player count request the absolute priority for first message
     systemMsg += "🚨 FIRST QUESTION REQUIRED: Your VERY FIRST question must be to ask how many players the user needs for their murder mystery. This is mandatory before proceeding with ANY other questions or content generation. 🚨\n\n";
     
     systemMsg += "This is a murder mystery creation conversation. ";
@@ -188,7 +188,7 @@ Present your mystery preview in an engaging, dramatic format that will excite th
         initialMessages={messages}
         isLoadingHistory={isLoadingHistory}
         systemInstruction={createSystemMessage(formData || {})}
-        preventDuplicateMessages={true}
+        preventDuplicateMessages={false}
       />
     </div>
   );

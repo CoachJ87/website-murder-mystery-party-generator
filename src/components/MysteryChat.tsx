@@ -55,6 +55,7 @@ const MysteryChat = ({
     const initialFormPromptSaved = useRef(false);
     const initialFormPromptSent = useRef(false);
     const isMobile = useIsMobile();
+    const ignoreNextDuplicate = useRef(false);
 
     console.log("DEBUG: MysteryChat rendering with props:", {
         initialTheme,
@@ -70,46 +71,29 @@ const MysteryChat = ({
         preventDuplicateMessages
     });
 
-    // Create a strong system message function that emphasizes not asking about already provided info
-    const createSystemMessage = () => {
-        let systemMsg = "This is a murder mystery creation conversation. ";
-        
-        // Only add information about what's already been provided if we actually have that information
-        if (initialPlayerCount) {
-            systemMsg += "The user has ALREADY selected the following preferences, so DO NOT ask about these again: ";
-            
-            if (initialTheme) {
-                systemMsg += `Theme: ${initialTheme}. `;
-            }
-            if (initialPlayerCount) {
-                systemMsg += `Player count: ${initialPlayerCount}. `;
-            }
-            if (initialHasAccomplice !== undefined) {
-                systemMsg += `Accomplice: ${initialHasAccomplice ? "Yes" : "No"}. `;
-            }
-            if (initialScriptType) {
-                systemMsg += `Script type: ${initialScriptType}. `;
-            }
-            if (initialAdditionalDetails) {
-                systemMsg += `Additional details: ${initialAdditionalDetails}. `;
-            }
-            
-            systemMsg += "Please start directly with creating a suitable murder mystery based on these preferences without asking clarifying questions about these specified parameters.";
-        } else {
-            // If we don't have player count, force the AI to ask for it
-            systemMsg += "The user wants to create a murder mystery. ";
-            if (initialTheme) {
-                systemMsg += `They've chosen a ${initialTheme} theme. `;
-            }
-            systemMsg += "You MUST first ask how many players they need for their mystery. This information is REQUIRED before discussing any other aspects of the mystery.";
-        }
-        
-        return systemMsg;
-    };
-
     // Function to check if we already have a message with similar content
-    const isDuplicateMessage = (content: string, isAi: boolean): boolean => {
+    // Modified to be more intelligent about numeric responses
+    const isDuplicateMessage = (content: string, isAi: boolean, isNumericResponse = false): boolean => {
         if (!preventDuplicateMessages) return false;
+        
+        // Special handling for numeric responses, which might be legitimate duplicates
+        // when answering questions about player count
+        if (!isAi && isNumericResponse) {
+            if (ignoreNextDuplicate.current) {
+                ignoreNextDuplicate.current = false;
+                return false;
+            }
+            
+            // Check the context - if the last AI message asked about player count
+            const lastAiMessage = [...messages].reverse().find(msg => msg.is_ai);
+            if (lastAiMessage && (
+                lastAiMessage.content.toLowerCase().includes("how many players") ||
+                lastAiMessage.content.toLowerCase().includes("number of players")
+            )) {
+                // Don't treat as duplicate if AI was asking about player count
+                return false;
+            }
+        }
         
         return messages.some(msg => 
             msg.is_ai === isAi && 
@@ -382,11 +366,26 @@ const MysteryChat = ({
             timestamp: new Date(),
         };
 
-        // Check for duplicate message
-        if (isDuplicateMessage(userMessage.content, userMessage.is_ai)) {
+        // Check if this is a numeric response (likely player count)
+        const isNumericResponse = /^\d+$/.test(userMessage.content);
+
+        // Check for duplicate message with context awareness
+        if (isDuplicateMessage(userMessage.content, userMessage.is_ai, isNumericResponse)) {
             console.log("DEBUG: Detected duplicate user message, not sending:", userMessage.content);
-            toast.error("This message appears to be a duplicate. Please try a different message.");
-            return;
+            
+            // If this is a numeric response to a player count question, we might want to
+            // make an exception and allow it through
+            const lastAiMessage = [...messages].reverse().find(msg => msg.is_ai);
+            if (isNumericResponse && lastAiMessage && (
+                lastAiMessage.content.toLowerCase().includes("how many players") ||
+                lastAiMessage.content.toLowerCase().includes("number of players")
+            )) {
+                // Set flag to ignore this as duplicate since it's likely a legitimate answer
+                ignoreNextDuplicate.current = true;
+            } else {
+                toast.error("This message appears to be a duplicate. Please try a different message.");
+                return;
+            }
         }
 
         console.log("DEBUG: Creating user message:", userMessage);
@@ -505,8 +504,8 @@ const MysteryChat = ({
               contentPreview: m.content.substring(0, 30) + '...'
             })), null, 2));
 
-            // Create a custom system instruction that emphasizes not to ask about already-provided preferences
-            const customSystemInstruction = systemInstruction || createSystemMessage();
+            // Use the system instruction provided by the parent component
+            const customSystemInstruction = systemInstruction;
             console.log("System instruction exists:", !!customSystemInstruction);
             console.log("System instruction (first 100 chars):", customSystemInstruction.substring(0, 100) + "...");
 
@@ -576,12 +575,12 @@ ${responseText.split('\n\n').slice(1).join('\n\n')}`;
                 timestamp: new Date(),
               };
 
-              // Check for duplicate AI message
+              // Check for duplicate AI message - with special handling
               if (isDuplicateMessage(aiMessage.content, aiMessage.is_ai)) {
-                console.log("DEBUG: Detected duplicate AI response, not adding:", aiMessage.content.substring(0, 50) + "...");
-                setLoading(false);
-                aiHasRespondedRef.current = true; // Keep this true to prevent further attempts
-                return;
+                console.log("DEBUG: Detected duplicate AI response, modifying to avoid duplicate:", aiMessage.content.substring(0, 50) + "...");
+                
+                // Instead of skipping, let's modify the message slightly
+                aiMessage.content = aiMessage.content + "\n\n(I've provided this information before, but I'll help you continue building your mystery.)";
               }
 
               setMessages(prev => {
