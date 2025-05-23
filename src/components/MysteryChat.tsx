@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardContent, CardDescription } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Send, Loader2, RefreshCw, Copy, CheckCircle } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -31,7 +31,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
-import { useCompletion } from 'ai/react';
 import { Message } from "@/components/types";
 
 interface MysteryChatProps {
@@ -42,6 +41,7 @@ interface MysteryChatProps {
   initialAdditionalDetails?: string;
   savedMysteryId?: string;
   onSave: (message: Message) => Promise<void>;
+  onGenerateFinal?: (messages: Message[]) => Promise<void>;
   initialMessages?: Message[];
   isLoadingHistory?: boolean;
   systemInstruction?: string;
@@ -73,6 +73,7 @@ export default function MysteryChat({
   initialAdditionalDetails,
   savedMysteryId,
   onSave,
+  onGenerateFinal,
   initialMessages = [],
   isLoadingHistory = false,
   systemInstruction,
@@ -594,6 +595,18 @@ export default function MysteryChat({
           </div>
         </div>
       </div>
+      
+      {onGenerateFinal && messages.length > 0 && (
+        <div className="mt-2">
+          <Button
+            onClick={() => onGenerateFinal(messages)}
+            variant="default"
+            className="w-full"
+          >
+            Generate Final Mystery
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
