@@ -1,773 +1,599 @@
-
-// We need to modify the Message interface to include a flag for auto-generated messages
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
-import { getAIResponse } from "@/services/aiService";
-import ReactMarkdown from 'react-markdown';
-import rehypeRaw from 'rehype-raw';
-import { Message } from "@/components/types";
-import { Loader2, AlertCircle, Send, Wand2 } from "lucide-react";
+import { Send, Loader2, RefreshCw, Copy, CheckCircle } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Separator } from "@/components/ui/separator";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/AuthContext";
+import { useCompletion } from 'ai/react';
+import { Message } from "@/components/types";
 
 interface MysteryChatProps {
-    initialTheme?: string;
-    savedMysteryId?: string;
-    onSave?: (message: Message) => void;
-    onGenerateFinal?: (messages: Message[]) => void;
-    initialPlayerCount?: number;
-    initialHasAccomplice?: boolean;
-    initialScriptType?: "full" | "pointForm";
-    initialAdditionalDetails?: string;
-    initialMessages?: Message[];
-    isLoadingHistory?: boolean;
-    systemInstruction?: string;
-    skipForm?: boolean;
-    preventDuplicateMessages?: boolean;
+  initialTheme?: string;
+  initialPlayerCount?: number;
+  initialHasAccomplice?: boolean;
+  initialScriptType?: 'full' | 'pointForm';
+  initialAdditionalDetails?: string;
+  savedMysteryId?: string;
+  onSave: (message: Message) => Promise<void>;
+  initialMessages?: Message[];
+  isLoadingHistory?: boolean;
+  systemInstruction?: string;
+  preventDuplicateMessages?: boolean;
+  skipForm?: boolean;
 }
 
-const MysteryChat = ({
-    initialTheme = "",
-    savedMysteryId,
-    onSave,
-    onGenerateFinal,
-    initialPlayerCount,
-    initialHasAccomplice,
-    initialScriptType,
-    initialAdditionalDetails,
-    initialMessages = [],
-    isLoadingHistory = false,
-    systemInstruction = "",
-    skipForm = false,
-    preventDuplicateMessages = true
-}: MysteryChatProps) => {
-    const [messages, setMessages] = useState<Message[]>([]);
-    const [input, setInput] = useState("");
-    const [loading, setLoading] = useState(false);
-    const messagesEndRef = useRef<HTMLDivElement>(null);
-    const messagesInitialized = useRef(false);
-    const aiHasRespondedRef = useRef(false);
-    const [error, setError] = useState<string | null>(null);
-    const isEditModeRef = useRef(!!savedMysteryId);
-    const [hasUserEditedInSession, setHasUserEditedInSession] = useState(false);
-    const initialFormPromptSaved = useRef(false);
-    const initialFormPromptSent = useRef(false);
-    const isMobile = useIsMobile();
-    const ignoreNextDuplicate = useRef(false);
-    const formPromptProcessed = useRef(false);
+const formSchema = z.object({
+  theme: z.string().min(2, {
+    message: "Theme must be at least 2 characters.",
+  }).max(50, {
+    message: "Theme must not be longer than 50 characters.",
+  }),
+  playerCount: z.number().min(2, {
+    message: "Must have at least 2 players"
+  }).max(20, {
+    message: "Must not have more than 20 players"
+  }),
+  hasAccomplice: z.boolean().default(false),
+  scriptType: z.enum(['full', 'pointForm']).default('full'),
+  additionalDetails: z.string().max(500).optional(),
+});
 
-    // Improved duplicate message detection
-    const isDuplicateMessage = (content: string, isAi: boolean, isNumericResponse = false): boolean => {
-        if (!preventDuplicateMessages) return false;
+export default function MysteryChat({
+  initialTheme,
+  initialPlayerCount,
+  initialHasAccomplice,
+  initialScriptType,
+  initialAdditionalDetails,
+  savedMysteryId,
+  onSave,
+  initialMessages = [],
+  isLoadingHistory = false,
+  systemInstruction,
+  preventDuplicateMessages = false,
+  skipForm = false
+}: MysteryChatProps) {
+  const [input, setInput] = useState('');
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const [isAiTyping, setIsAiTyping] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const [currentTheme, setCurrentTheme] = useState(initialTheme || '');
+  const [currentPlayerCount, setCurrentPlayerCount] = useState(initialPlayerCount || 4);
+  const [currentHasAccomplice, setCurrentHasAccomplice] = useState(initialHasAccomplice || false);
+  const [currentScriptType, setCurrentScriptType] = useState(initialScriptType || 'full');
+  const [currentAdditionalDetails, setCurrentAdditionalDetails] = useState(initialAdditionalDetails || '');
+  const [isCopied, setIsCopied] = useState(false);
+  const [temperature, setTemperature] = useState(0.5);
+  const { isAuthenticated } = useAuth();
+  const isMobile = useIsMobile();
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      theme: initialTheme || "",
+      playerCount: initialPlayerCount || 4,
+      hasAccomplice: initialHasAccomplice || false,
+      // scriptType: initialScriptType || 'full', // Default value for scriptType
+      additionalDetails: initialAdditionalDetails || "",
+    },
+    mode: "onChange"
+  });
+
+  useEffect(() => {
+    if (initialTheme) {
+      form.setValue("theme", initialTheme);
+      setCurrentTheme(initialTheme);
+    }
+    if (initialPlayerCount) {
+      form.setValue("playerCount", initialPlayerCount);
+      setCurrentPlayerCount(initialPlayerCount);
+    }
+    if (initialHasAccomplice) {
+      form.setValue("hasAccomplice", initialHasAccomplice);
+      setCurrentHasAccomplice(initialHasAccomplice);
+    }
+    if (initialScriptType) {
+      // form.setValue("scriptType", initialScriptType);
+      setCurrentScriptType(initialScriptType);
+    }
+    if (initialAdditionalDetails) {
+      form.setValue("additionalDetails", initialAdditionalDetails);
+      setCurrentAdditionalDetails(initialAdditionalDetails);
+    }
+  }, [initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails, form]);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isAiTyping]);
+
+  // Improved duplicate detection that's context-aware
+  const isDuplicateMessage = (newContent: string, existingMessages: Message[]) => {
+    if (!preventDuplicateMessages) return false;
+    
+    const trimmedContent = newContent.trim();
+    if (trimmedContent.length === 0) return false;
+    
+    // Get the last few user messages for context
+    const recentUserMessages = existingMessages
+      .filter(msg => !msg.is_ai)
+      .slice(-3) // Look at last 3 user messages
+      .map(msg => msg.content.trim());
+    
+    // If this is a simple numeric answer, check if the last AI message was asking for different info
+    if (/^\d+$/.test(trimmedContent)) {
+      const lastAiMessage = [...existingMessages].reverse().find(msg => msg.is_ai);
+      if (lastAiMessage) {
+        const lastAiContent = lastAiMessage.content.toLowerCase();
         
-        // Special handling for numeric responses, which might be legitimate duplicates
-        // when answering questions about player count
-        if (!isAi && isNumericResponse) {
-            if (ignoreNextDuplicate.current) {
-                ignoreNextDuplicate.current = false;
-                return false;
-            }
-            
-            // Check the context - if the last AI message asked about player count
-            const lastAiMessage = [...messages].reverse().find(msg => msg.is_ai);
-            if (lastAiMessage && (
-                lastAiMessage.content.toLowerCase().includes("how many players") ||
-                lastAiMessage.content.toLowerCase().includes("number of players")
-            )) {
-                // Don't treat as duplicate if AI was asking about player count
-                return false;
-            }
+        // Allow duplicate numbers if AI is asking for different things
+        const isAskingForPlayers = lastAiContent.includes('players') || lastAiContent.includes('player count');
+        const isAskingForTitle = lastAiContent.includes('title') || lastAiContent.includes('choose') || lastAiContent.includes('option');
+        
+        // If the AI is asking for title choice (like "3" for option 3), allow it even if user previously entered "3" for player count
+        if (isAskingForTitle) {
+          return false;
         }
         
-        // Simple exact match for now - could be improved with fuzzy matching
-        return messages.some(msg => 
-            msg.is_ai === isAi && 
-            msg.content.toLowerCase() === content.toLowerCase()
-        );
+        // For player count, check if this exact question was asked before
+        if (isAskingForPlayers) {
+          const hasAnsweredPlayersBefore = recentUserMessages.some((msg, index) => {
+            if (msg === trimmedContent) {
+              // Check if the previous AI message before this user message was also asking for players
+              const userMessageIndex = existingMessages.findIndex(m => !m.is_ai && m.content.trim() === msg);
+              if (userMessageIndex > 0) {
+                const previousAiMessage = existingMessages[userMessageIndex - 1];
+                if (previousAiMessage && previousAiMessage.is_ai) {
+                  const prevContent = previousAiMessage.content.toLowerCase();
+                  return prevContent.includes('players') || prevContent.includes('player count');
+                }
+              }
+            }
+            return false;
+          });
+          
+          return hasAnsweredPlayersBefore;
+        }
+      }
+      return false;
+    }
+    
+    // For non-numeric messages, check for exact duplicates in recent messages
+    const hasExactDuplicate = recentUserMessages.includes(trimmedContent);
+    
+    // But allow if the last AI response suggests the message wasn't understood or needs clarification
+    if (hasExactDuplicate) {
+      const lastAiMessage = [...existingMessages].reverse().find(msg => msg.is_ai);
+      if (lastAiMessage) {
+        const lastAiContent = lastAiMessage.content.toLowerCase();
+        const isAskingForClarification = lastAiContent.includes('sorry') || 
+                                      lastAiContent.includes('clarify') || 
+                                      lastAiContent.includes('understand') ||
+                                      lastAiContent.includes('could you') ||
+                                      lastAiContent.includes('please');
+        if (isAskingForClarification) return false;
+      }
+    }
+    
+    return hasExactDuplicate;
+  };
+
+  const handleThemeChange = (value: string) => {
+    setCurrentTheme(value);
+  };
+
+  const handlePlayerCountChange = (value: number) => {
+    setCurrentPlayerCount(value);
+  };
+
+  const handleHasAccompliceChange = (value: boolean) => {
+    setCurrentHasAccomplice(value);
+  };
+
+  const handleScriptTypeChange = (value: 'full' | 'pointForm') => {
+    setCurrentScriptType(value);
+  };
+
+  const handleAdditionalDetailsChange = (value: string) => {
+    setCurrentAdditionalDetails(value);
+  };
+
+  const handleCopyClick = async () => {
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(messages, null, 2));
+      setIsCopied(true);
+      toast.success("Messages copied to clipboard!");
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+      toast.error("Failed to copy messages to clipboard.");
+    }
+  };
+
+  const handleResetClick = () => {
+    setMessages([]);
+    toast.success("Chat has been reset!");
+  };
+
+  const createSystemMessage = (data: any) => {
+    let systemMsg = "You are a helpful mystery writer. Your job is to help the user create an exciting murder mystery game.";
+    systemMsg += `\nThe user wants to create a murder mystery with theme: ${data.theme}. `;
+    systemMsg += `The user wants to create a murder mystery with ${data.playerCount} players. `;
+    systemMsg += `The user wants to create a murder mystery with ${data.hasAccomplice ? 'an' : 'no'} accomplice. `;
+    systemMsg += `The user wants to create a murder mystery with a ${data.scriptType} script. `;
+    if (data.additionalDetails) {
+      systemMsg += `The user wants to create a murder mystery with the following additional details: ${data.additionalDetails}. `;
+    }
+    return systemMsg;
+  };
+
+  const handleSendMessage = async (content: string) => {
+    if (!content.trim()) return;
+    
+    // Check for context-aware duplicates
+    if (isDuplicateMessage(content, messages)) {
+      toast.error("You've already sent this message recently. Please try a different response.");
+      return;
+    }
+
+    setIsTyping(false);
+    setInput('');
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      content: content.trim(),
+      is_ai: false,
+      timestamp: new Date(),
+      isAutoGenerated: false
     };
 
-    // Enhanced message initialization with better auto-detection
-    useEffect(() => {
-        console.log("DEBUG: Initializing messages effect", {
-            initialMessagesLength: initialMessages.length,
-            messagesInitialized: messagesInitialized.current,
-            currentMessagesLength: messages.length,
-            skipForm
-        });
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
 
-        if (initialMessages.length > 0 && !messagesInitialized.current) {
-            // Add message content analysis to detect incorrect is_ai flags
-            console.log("DEBUG: Analyzing message contents for correct is_ai flags");
-            
-            let userMessageCount = 0;
-            let aiMessageCount = 0;
-            
-            // First pass - count current message types
-            initialMessages.forEach(msg => {
-                if (msg.is_ai) {
-                    aiMessageCount++;
-                } else {
-                    userMessageCount++;
-                }
-            });
-            
-            console.log(`DEBUG: Initial analysis - User: ${userMessageCount}, AI: ${aiMessageCount}`);
-            
-            // If almost all messages are marked as user, something is wrong
-            const needsDeepAnalysis = userMessageCount > 1 && aiMessageCount === 0;
-            
-            const correctedMessages = initialMessages.map((msg, index) => {
-                // Enhanced heuristic to detect AI messages
-                const looksLikeAI = 
-                    // Contains markdown headings
-                    msg.content.includes("# ") || 
-                    msg.content.includes("## ") || 
-                    // Contains typical AI phrasings
-                    msg.content.includes("Thank you for sharing") ||
-                    msg.content.includes("I'd be happy to") ||
-                    msg.content.includes("Here's a murder mystery") ||
-                    // Content has structural elements typical of AI responses
-                    (msg.content.includes("CHARACTER") && msg.content.includes("LIST")) ||
-                    msg.content.includes("PREMISE") ||
-                    msg.content.includes("VICTIM") ||
-                    // Content is long and formatted
-                    (msg.content.length > 200 && 
-                     (msg.content.includes("**") || // Bold markdown
-                      (msg.content.match(/\d\./g) || []).length > 2)); // Numbered lists
-                
-                // Apply more aggressive correction if we detected an issue with all messages
-                const shouldCorrect = needsDeepAnalysis ? 
-                    // In deep analysis mode, assume even-indexed messages in conversation are from AI
-                    // after the first message (which is typically the user's initial prompt)
-                    (index > 0 && index % 2 === 1) || looksLikeAI : 
-                    // Normal mode - just check content heuristics
-                    looksLikeAI;
-                
-                if (!msg.is_ai && shouldCorrect) {
-                    console.warn(`DEBUG: Message ${index} is marked as user but looks like AI content - correcting flag`);
-                    // Return a new message object with corrected flag
-                    return { ...msg, is_ai: true };
-                }
-                
-                // If needsDeepAnalysis is true and it's an even index message after the first,
-                // make sure it's marked as user message
-                if (needsDeepAnalysis && msg.is_ai && index > 0 && index % 2 === 0) {
-                    console.warn(`DEBUG: Message ${index} is marked as AI but should be user content - correcting flag`);
-                    return { ...msg, is_ai: false };
-                }
-                
-                // Add isAutoGenerated flag if message looks like initial prompt
-                const isAutoGenerated = !msg.is_ai && msg.content.includes("Let's create a murder mystery");
-                return { ...msg, isAutoGenerated: isAutoGenerated || !!msg.isAutoGenerated };
-            });
+    try {
+      await onSave(userMessage);
+    } catch (error) {
+      console.error("Error saving user message:", error);
+    }
 
-            console.log("DEBUG: Setting initial messages from props");
+    setIsAiTyping(true);
 
-            // Sort messages by timestamp to ensure correct order
-            const sortedMessages = [...correctedMessages].sort((a, b) => {
-                const timeA = a.timestamp instanceof Date ? a.timestamp.getTime() : new Date(a.timestamp).getTime();
-                const timeB = b.timestamp instanceof Date ? b.timestamp.getTime() : new Date(b.timestamp).getTime();
-                return timeA - timeB;
-            });
+    try {
+      console.log("=== Starting AI Request ===");
+      console.log("User message:", content);
+      console.log("Current conversation length:", newMessages.length);
+      
+      const systemPrompt = systemInstruction || createSystemMessage({
+        theme: currentTheme,
+        playerCount: currentPlayerCount,
+        hasAccomplice: currentHasAccomplice,
+        scriptType: currentScriptType,
+        additionalDetails: currentAdditionalDetails
+      });
 
-            console.log("DEBUG: Sorted messages by timestamp");
-            
-            // Find auto-generated form prompts and mark them
-            sortedMessages.forEach(msg => {
-                if (!msg.is_ai && msg.content.includes("Let's create a murder mystery")) {
-                    formPromptProcessed.current = true;
-                    // No need to set the flag again, just mark that we've seen such a prompt
-                    console.log("DEBUG: Found auto-generated form prompt in messages");
-                }
-            });
-            
-            setMessages(sortedMessages);
+      console.log("System prompt being sent:", systemPrompt.substring(0, 200) + "...");
 
-            if (sortedMessages.length > 0) {
-                const lastMessage = sortedMessages[sortedMessages.length - 1];
-                aiHasRespondedRef.current = !!lastMessage.is_ai;
-                console.log("DEBUG: Last message is from AI:", !!lastMessage.is_ai);
-            }
+      const response = await fetch('/api/proxy-anthropic-cors', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          url: 'https://mhfikaomkmqcndqfohbp.supabase.co/functions/v1/mystery-ai',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1oZmlrYW9ta21xY25kcWZvaGJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM2MTc5MTIsImV4cCI6MjA1OTE5MzkxMn0.xrGd-6SlR2UNOf_1HQJWIsKNe-rNOtPuOsYE8VrRI6w'}`
+          },
+          body: JSON.stringify({
+            messages: newMessages.map(msg => ({
+              role: msg.is_ai ? "assistant" : "user",
+              content: msg.content,
+              isAutoGenerated: msg.isAutoGenerated || false
+            })),
+            system: systemPrompt,
+            promptVersion: 'free',
+            requireFormatValidation: true,
+            stream: false
+          })
+        })
+      });
 
-            messagesInitialized.current = true;
-            
-            // Check if we already have the initial form prompt
-            const hasInitialFormPrompt = sortedMessages.some(msg => 
-                !msg.is_ai && msg.content.includes(`Let's create a murder mystery`)
-            );
-            initialFormPromptSaved.current = hasInitialFormPrompt;
-            initialFormPromptSent.current = hasInitialFormPrompt;
-        }
-    }, [initialMessages, preventDuplicateMessages]);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-    // Separate effect to handle triggering AI response for last user message
-    useEffect(() => {
-        if (messagesInitialized.current && messages.length > 0 && !isLoadingHistory) {
-            const lastMessage = messages[messages.length - 1];
-            
-            // Only trigger AI response if the last message is from the user and AI hasn't responded yet
-            if (!lastMessage.is_ai && !aiHasRespondedRef.current) {
-                console.log("DEBUG: Last message is from user, triggering AI response");
-                handleAIResponse(lastMessage.content, false, !!lastMessage.isAutoGenerated); // Pass user-initiated flag and auto-generated flag
-            }
-        }
-    }, [messages, isLoadingHistory]);
+      const data = await response.json();
+      console.log("=== AI Response Received ===");
+      console.log("Response data:", data);
 
-    // Initial prompt creation effect (with improved flag handling)
-    useEffect(() => {
-        console.log("DEBUG: Initial prompt creation effect", {
-            messagesLength: messages.length,
-            messagesInitialized: messagesInitialized.current,
-            isLoadingHistory,
-            theme: initialTheme,
-            aiHasResponded: aiHasRespondedRef.current,
-            initialMessagesLength: initialMessages.length,
-            initialFormPromptSaved: initialFormPromptSaved.current,
-            initialFormPromptSent: initialFormPromptSent.current,
-            skipForm,
-            formPromptProcessed: formPromptProcessed.current
-        });
+      if (data.choices && data.choices[0] && data.choices[0].message) {
+        const aiResponse = data.choices[0].message.content;
+        console.log("AI response content:", aiResponse);
 
-        // Skip form prompt creation if skipForm is true or if we already processed a form prompt
-        if (skipForm || formPromptProcessed.current) {
-            console.log("DEBUG: Skipping form prompt creation because skipForm is true or form prompt already processed");
-            return;
-        }
-
-        if (messages.length > 0 || initialFormPromptSent.current || messagesInitialized.current || isLoadingHistory) {
-            console.log("DEBUG: Skipping initial message creation - condition failed");
-            return;
-        }
-
-        if (initialTheme && initialMessages.length === 0 && !isLoadingHistory && !initialFormPromptSent.current) {
-            console.log("DEBUG: Creating initial message with theme:", initialTheme);
-            
-            let initialChatMessage = `Let's create a murder mystery`;
-            if (initialTheme) initialChatMessage += ` with a ${initialTheme} theme`;
-            // Don't include player count and other details, to force AI to ask
-            initialChatMessage += ". Please guide me through creating this mystery step by step.";
-            
-            console.log("DEBUG: Initial chat message:", initialChatMessage);
-
-            const initialMessage: Message = {
-                id: Date.now().toString(),
-                content: initialChatMessage,
-                is_ai: false,
-                timestamp: new Date(),
-                isAutoGenerated: true // Mark this as auto-generated
-            };
-
-            console.log("DEBUG: Setting initial user message:", initialMessage);
-            setMessages([initialMessage]);
-            messagesInitialized.current = true;
-            initialFormPromptSent.current = true;
-            formPromptProcessed.current = true;
-            
-            // Save the initial form prompt message to the database
-            if (onSave && !initialFormPromptSaved.current) {
-                console.log("DEBUG: Saving initial form prompt to database");
-                onSave(initialMessage);
-                initialFormPromptSaved.current = true;
-            }
-        } else if (initialMessages.length > 0 && !messagesInitialized.current) {
-            console.log("DEBUG: Initial messages were provided, skipping initial prompt creation for theme");
-        }
-    }, [initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails, messages.length, isLoadingHistory, initialMessages, onSave, skipForm]);
-
-    const scrollToBottom = () => {
-        console.log("DEBUG: Scrolling to bottom of messages");
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    };
-
-    useEffect(() => {
-        scrollToBottom();
-    }, [messages]);
-
-    // Enhanced submit handler with isAutoGenerated flag
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        console.log("DEBUG: handleSubmit called with input:", input);
-        if (!input.trim()) {
-            console.log("DEBUG: Empty input, returning early from handleSubmit");
-            return;
-        }
-
-        const userMessage: Message = {
-            id: Date.now().toString(),
-            content: input.trim(),
-            is_ai: false,
-            timestamp: new Date(),
-            isAutoGenerated: false // Explicitly mark as user-generated
+        const aiMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          content: aiResponse,
+          is_ai: true,
+          timestamp: new Date(),
+          isAutoGenerated: false
         };
 
-        // Check if this is a numeric response (likely player count)
-        const isNumericResponse = /^\d+$/.test(userMessage.content);
-
-        // Check for duplicate message with context awareness
-        if (isDuplicateMessage(userMessage.content, userMessage.is_ai, isNumericResponse)) {
-            console.log("DEBUG: Detected duplicate user message, not sending:", userMessage.content);
-            
-            // If this is a numeric response to a player count question, we might want to
-            // make an exception and allow it through
-            const lastAiMessage = [...messages].reverse().find(msg => msg.is_ai);
-            if (isNumericResponse && lastAiMessage && (
-                lastAiMessage.content.toLowerCase().includes("how many players") ||
-                lastAiMessage.content.toLowerCase().includes("number of players")
-            )) {
-                // Set flag to ignore this as duplicate since it's likely a legitimate answer
-                ignoreNextDuplicate.current = true;
-            } else {
-                toast.error("This message appears to be a duplicate. Please try a different message.");
-                return;
-            }
-        }
-
-        console.log("DEBUG: Creating user message:", userMessage);
-        const updatedMessages = [...messages, userMessage];
+        const updatedMessages = [...newMessages, aiMessage];
         setMessages(updatedMessages);
-        setInput("");
-        setError(null);
-        setHasUserEditedInSession(true); // Mark that the user has submitted a new message in this session
 
-        if (onSave) {
-            console.log("DEBUG: Calling onSave with updated messages");
-            onSave(userMessage);
-        }
-
-        console.log("DEBUG: About to call handleAIResponse from handleSubmit");
-        await handleAIResponse(userMessage.content, true, false); // Pass true for user-initiated, false for auto-generated
-        console.log("DEBUG: handleAIResponse call finished in handleSubmit");
-    };
-
-    const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if (event.key === 'Enter' && !event.shiftKey) {
-            console.log("DEBUG: Enter key pressed (without shift), submitting form");
-            event.preventDefault();
-            handleSubmit(event as unknown as React.FormEvent);
-        }
-    };
-
-    // Enhanced AI response handler with isAutoGenerated flag
-    const handleAIResponse = async (userMessage: string, isUserInitiated: boolean = false, isAutoGenerated: boolean = false) => {
-        console.log("handleAIResponse called with:", userMessage, "isUserInitiated:", isUserInitiated, "isAutoGenerated:", isAutoGenerated);
         try {
-            setLoading(true);
-            setError(null);
-            toast.info("AI is thinking...");
-            
-            // Mark that AI is responding to prevent duplicate calls
-            aiHasRespondedRef.current = true;
-
-            let anthropicMessages;
-            
-            // Use different context strategies based on whether this is a user-initiated message
-            // in edit mode, and whether the user has edited in this session
-            if (isEditModeRef.current && isUserInitiated) {
-              console.log("Edit mode with user-initiated message, limiting conversation context");
-              
-              const lastAiMessageIndex = [...messages].reverse().findIndex(m => m.is_ai);
-              
-              if (lastAiMessageIndex >= 0) {
-                const lastAiMessage = [...messages].reverse()[lastAiMessageIndex];
-                // Include the form data summary as context at the start of each new user message
-                anthropicMessages = [
-                  {
-                    role: "assistant",
-                    content: lastAiMessage.content
-                  },
-                  {
-                    role: "user",
-                    content: userMessage,
-                    isAutoGenerated: isAutoGenerated // Include auto-generated flag
-                  }
-                ];
-                console.log("Using last AI response + new user message for context");
-              } else {
-                anthropicMessages = [
-                  {
-                    role: "user",
-                    content: "Let's continue our murder mystery planning. " + userMessage,
-                    isAutoGenerated: isAutoGenerated // Include auto-generated flag
-                  }
-                ];
-                console.log("No AI messages found, using single message with context hint");
-              }
-            } else if (isEditModeRef.current && !isUserInitiated) {
-              console.log("Edit mode with auto-triggered response, using last few messages for context");
-              
-              // For initial load in edit mode, only take the last 3-4 messages to avoid context overload
-              const contextSize = 4; // Take the last 4 messages for context
-              const recentMessages = messages.slice(-contextSize);
-              
-              anthropicMessages = recentMessages.map(m => ({
-                role: m.is_ai ? "assistant" : "user",
-                content: m.content,
-                isAutoGenerated: m.isAutoGenerated // Include auto-generated flag
-              }));
-              
-              // Ensure the current user message is included if not already
-              if (anthropicMessages.length === 0 || 
-                  (anthropicMessages.length > 0 && 
-                   anthropicMessages[anthropicMessages.length - 1].content !== userMessage)) {
-                anthropicMessages.push({
-                  role: "user",
-                  content: userMessage,
-                  isAutoGenerated: isAutoGenerated // Include auto-generated flag
-                });
-              }
-              
-              console.log("Using last few messages for context in initial edit mode response");
-            } else {
-              // Standard approach for new mysteries - include full history
-              anthropicMessages = messages.map(m => ({
-                role: m.is_ai ? "assistant" : "user",
-                content: m.content,
-                isAutoGenerated: m.isAutoGenerated // Include auto-generated flag
-              }));
-
-              const currentUserMessage = {
-                role: "user",
-                content: userMessage,
-                isAutoGenerated: isAutoGenerated // Include auto-generated flag
-              };
-
-              if (anthropicMessages.length === 0 || 
-                  (anthropicMessages.length > 0 && 
-                  anthropicMessages[anthropicMessages.length - 1].content !== userMessage)) {
-                anthropicMessages.push(currentUserMessage);
-              }
-              console.log("Using full conversation context for new mystery");
-            }
-
-            console.log("anthropicMessages being sent:", JSON.stringify(anthropicMessages.map((m, i) => ({
-              index: i,
-              role: m.role,
-              isAutoGenerated: m.isAutoGenerated,
-              contentPreview: m.content.substring(0, 30) + '...'
-            })), null, 2));
-
-            // Use the system instruction provided by the parent component
-            const customSystemInstruction = systemInstruction;
-            console.log("System instruction exists:", !!customSystemInstruction);
-            console.log("System instruction (first 100 chars):", customSystemInstruction.substring(0, 100) + "...");
-
-            try {
-              console.log("Calling getAIResponse with", {
-                messageCount: anthropicMessages.length,
-                promptVersion: 'free'
-              });
-
-              // Add timeout for the AI request
-              const abortController = new AbortController();
-              const timeoutId = setTimeout(() => abortController.abort(), 120000); // 2 minute timeout
-
-              // Create a promise that will be resolved when the AI response is received or rejected on error
-              const responsePromise = getAIResponse(
-                anthropicMessages,
-                'free',
-                customSystemInstruction
-              );
-
-              // Race the AI response promise against a timeout
-              let response;
-              try {
-                response = await responsePromise;
-                clearTimeout(timeoutId);
-              } catch (timeoutError) {
-                console.error("AI response timed out:", timeoutError);
-                throw new Error("The AI service took too long to respond. Please try again.");
-              }
-
-              console.log("Received AI response:", response ? response.substring(0, 50) + "..." : "null");
-
-              if (!response) {
-                throw new Error("Failed to get a response from AI");
-              }
-
-              if (response.includes("There was an error")) {
-                throw new Error(response);
-              }
-
-              // Check if the response is asking about already-provided information
-              const responseText = response;
-              const askingAboutPlayerCount = responseText.toLowerCase().includes("how many players") || 
-                                            (responseText.toLowerCase().includes("player count") && responseText.includes("?"));
-              const askingAboutTheme = (responseText.toLowerCase().includes("theme") || 
-                                        responseText.toLowerCase().includes("setting")) && 
-                                        responseText.includes("?") && responseText.toLowerCase().includes("prefer");
-              const askingAboutAccomplice = responseText.toLowerCase().includes("accomplice") && responseText.includes("?");
-              
-              let finalResponse = response;
-              
-              // Only modify the response if we have player count and the AI is asking for it
-              if ((askingAboutPlayerCount && initialPlayerCount) || 
-                  (askingAboutTheme && initialTheme) || 
-                  (askingAboutAccomplice && initialHasAccomplice !== undefined)) {
-                console.log("AI asking about already provided info, creating corrected response");
-                // Create a modified response that acknowledges the preferences
-                finalResponse = `I'll create a murder mystery based on your specifications: ${initialTheme} theme${initialPlayerCount ? `, ${initialPlayerCount} players` : ''}${initialHasAccomplice !== undefined ? (initialHasAccomplice ? ', with an accomplice' : ', without an accomplice') : ''}${initialScriptType ? `, with ${initialScriptType} scripts` : ''}.
-
-${responseText.split('\n\n').slice(1).join('\n\n')}`;
-              }
-
-              const aiMessage: Message = {
-                id: Date.now().toString(),
-                content: finalResponse,
-                is_ai: true,
-                timestamp: new Date(),
-                isAutoGenerated: false
-              };
-
-              // Check for duplicate AI message - with special handling
-              if (isDuplicateMessage(aiMessage.content, aiMessage.is_ai)) {
-                console.log("DEBUG: Detected duplicate AI response, modifying to avoid duplicate:", aiMessage.content.substring(0, 50) + "...");
-                
-                // Instead of skipping, let's modify the message slightly
-                aiMessage.content = aiMessage.content + "\n\n(I've provided this information before, but I'll help you continue building your mystery.)";
-              }
-
-              setMessages(prev => {
-                const updatedMessages = [...prev, aiMessage];
-
-                if (onSave) {
-                  console.log("Calling onSave with AI message added");
-                  onSave(aiMessage);
-                }
-
-                return updatedMessages;
-              });
-
-              toast.success("AI response received!");
-            } catch (error) {
-              console.error("Error in getAIResponse:", error);
-              
-              let errorMessage = "Failed to get AI response. Please try again.";
-              
-              if (error.message) {
-                if (error.message.includes("Edge Function error")) {
-                  errorMessage = "Error connecting to AI service: Edge Function error: Failed to send a request to the Edge Function";
-                } else if (error.message.includes("timeout") || error.message.includes("aborted")) {
-                  errorMessage = "The AI service took too long to respond. Please try again.";
-                } else if (error.message.includes("network") || error.message.includes("connection")) {
-                  errorMessage = "Network error when connecting to AI service. Please check your internet connection and try again.";
-                } else {
-                  errorMessage = `Error: ${error.message}`;
-                }
-              }
-              
-              setError(errorMessage);
-              toast.error(errorMessage);
-              
-              // Reset the aiHasRespondedRef so user can retry
-              aiHasRespondedRef.current = false;
-
-              const fallbackMessage: Message = {
-                id: Date.now().toString(),
-                content: "I'm having trouble connecting to my AI service right now. Please try again in a moment.",
-                is_ai: true,
-                timestamp: new Date(),
-                isAutoGenerated: false
-              };
-
-              // Check for duplicate fallback message
-              if (!isDuplicateMessage(fallbackMessage.content, fallbackMessage.is_ai)) {
-                setMessages(prev => {
-                  const updatedMessages = [...prev, fallbackMessage];
-
-                  if (onSave) {
-                    console.log("Calling onSave with fallback message");
-                    onSave(fallbackMessage);
-                  }
-
-                  return updatedMessages;
-                });
-              }
-            }
+          await onSave(aiMessage);
         } catch (error) {
-          console.error("Error getting AI response:", error);
-          
-          let errorMessage = "Failed to get AI response. Please try again.";
-          
-          if (error.message) {
-            errorMessage = `${error.message}`;
-          }
-          
-          setError(errorMessage);
-          toast.error(errorMessage);
-          
-          // Reset the aiHasRespondedRef so user can retry
-          aiHasRespondedRef.current = false;
-        } finally {
-          setLoading(false);
+          console.error("Error saving AI message:", error);
         }
-        console.log("handleAIResponse finished");
-    };
-
-    const retryLastMessage = () => {
-      console.log("Retry button clicked");
-      // Reset error state
-      setError(null);
-      
-      // Reset AI response flag to allow retry
-      aiHasRespondedRef.current = false;
-      
-      const lastUserMessageIndex = [...messages].reverse().findIndex(m => !m.is_ai);
-      if (lastUserMessageIndex >= 0) {
-        console.log("Found last user message, retrying...");
-        const lastUserMessage = [...messages].reverse()[lastUserMessageIndex];
-        
-        // If the last message in the array is an AI error message, remove it before retrying
-        const lastMessage = messages[messages.length - 1];
-        if (lastMessage && lastMessage.is_ai && lastMessage.content.includes("trouble connecting")) {
-          setMessages(prevMessages => prevMessages.slice(0, -1));
-        }
-        
-        // Retry with the last user message
-        handleAIResponse(lastUserMessage.content, true, lastUserMessage.isAutoGenerated || false); // Treat retry as user-initiated
       } else {
-        console.log("No user message found to retry");
-        toast.error("No message to retry. Please enter a new message.");
+        throw new Error('Invalid response format from AI service');
       }
-    };
-
-    const handleGenerateFinalClick = () => {
-      console.log("DEBUG: Generate Final button clicked, sending all messages");
-      if (onGenerateFinal) {
-        onGenerateFinal(messages);
-      } else {
-        toast.error("Final generation callback not provided.");
-      }
-    };
-
-    useEffect(() => {
-      console.log("DEBUG: MysteryChat component mounted");
-      return () => {
-        console.log("DEBUG: MysteryChat component unmounted");
+    } catch (error) {
+      console.error('Error calling AI service:', error);
+      toast.error("Failed to get AI response. Please try again.");
+      
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: "I apologize, but I'm having trouble responding right now. Please try again in a moment.",
+        is_ai: true,
+        timestamp: new Date(),
+        isAutoGenerated: false
       };
-    }, []);
 
-    return (
-      <div data-testid="mystery-chat" className={cn(
-        "flex flex-col h-full", 
-        isMobile && "h-[calc(100vh-90px)]"
-      )}>
-        {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 mb-4 flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
-            <div>
-              <h4 className="text-sm font-medium text-red-800 dark:text-red-300">Error connecting to AI service</h4>
-              <p className="text-sm text-red-700 dark:text-red-400 mt-1">{error}</p>
-              <Button
-                variant="outline"
-                size="sm"
-                className="mt-2 text-xs"
-                onClick={retryLastMessage}
-              >
-                Try Again
-              </Button>
-            </div>
-          </div>
-        )}
+      setMessages([...newMessages, errorMessage]);
+    } finally {
+      setIsAiTyping(false);
+    }
+  };
 
-        <div 
-          className={cn(
-            "flex-1 overflow-y-auto mb-4 space-y-4 p-4 border rounded-lg bg-background/50",
-            isMobile ? "min-h-[70vh] max-h-none border-0 p-2 -mx-2 mobile-full-height" : "min-h-[400px] max-h-[500px]"
-          )}
-        >
-          {isLoadingHistory ? (
-            <div className="flex flex-col items-center justify-center h-full">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              <p className="mt-2 text-muted-foreground">Loading conversation history...</p>
-            </div>
-          ) : messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
-              <p>Start creating your murder mystery by sending your first message.</p>
-            </div>
-          ) : (
-            messages.map((message) => (
-              <Card
-                key={message.id}
-                className={cn(
-                  "max-w-[80%]",
-                  message.is_ai ? "ml-0" : "ml-auto",
-                  message.is_ai ? "bg-background" : "bg-primary text-primary-foreground",
-                  message.isAutoGenerated && !message.is_ai ? "bg-blue-500 text-white" : "",
-                  isMobile && "shadow-none border-0"
-                )}
-              >
-                <CardContent className={cn("p-4", isMobile && "p-3")}>
-                  {message.isAutoGenerated && !message.is_ai && (
-                    <div className="text-xs mb-1 font-medium opacity-70">Auto-generated</div>
+  return (
+    <div className="flex flex-col h-full">
+      {!skipForm && (
+        <Card className="mb-4">
+          <CardHeader>
+            <FormLabel className="text-lg">Mystery Settings</FormLabel>
+            <CardDescription>
+              Configure the basic settings for your murder mystery.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="theme"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Theme</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="e.g. Roaring 20s, Space Station"
+                          {...field}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            handleThemeChange(e.target.value);
+                          }}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        The overall theme or setting for your mystery.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
                   )}
-                  <div className={`prose prose-sm ${message.is_ai ? 'prose-stone dark:prose-invert' : 'text-primary-foreground prose-invert'} max-w-none`}>
-                    {message.content && typeof message.content === 'string' ? (
-                      <ReactMarkdown
-                        rehypePlugins={[rehypeRaw]}
-                        components={{
-                          h1: ({ node, ...props }) => <h1 className="text-xl font-bold my-2" {...props} />,
-                          h2: ({ node, ...props }) => <h2 className="text-lg font-bold my-2" {...props} />,
-                          h3: ({ node, ...props }) => <h3 className="text-md font-bold my-1" {...props} />,
-                          ul: ({ node, ...props }) => <ul className="list-disc ml-4 my-2" {...props} />,
-                          ol: ({ node, ...props }) => <ol className="list-decimal ml-4 my-2" {...props} />,
-                          li: ({ node, ...props }) => <li className="my-1" {...props} />,
-                          p: ({ node, ...props }) => <p className="my-2" {...props} />,
-                          a: ({ node, ...props }) => <a className="text-blue-500 underline" {...props} />,
-                          em: ({ node, ...props }) => <em className="italic" {...props} />,
-                          strong: ({ node, ...props }) => <strong className="font-bold" {...props} />,
-                          code: ({ node, ...props }) => <code className="bg-gray-200 dark:bg-gray-700 px-1 py-0.5 rounded" {...props} />
+                />
+
+                <FormField
+                  control={form.control}
+                  name="playerCount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Player Count</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="4"
+                          {...field}
+                          onChange={(e) => {
+                            const value = parseInt(e.target.value);
+                            if (!isNaN(value)) {
+                              field.onChange(value);
+                              handlePlayerCountChange(value);
+                            }
+                          }}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        The number of players that will be participating in the
+                        mystery.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="hasAccomplice"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel>Accomplice</FormLabel>
+                        <FormDescription>
+                          Should the murderer have an accomplice?
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={(checked) => {
+                            field.onChange(checked);
+                            handleHasAccompliceChange(checked);
+                          }}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                {/* <FormField
+                  control={form.control}
+                  name="scriptType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Script Type</FormLabel>
+                      <Select
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          handleScriptTypeChange(value as 'full' | 'pointForm');
                         }}
+                        defaultValue={field.value}
                       >
-                        {message.content}
-                      </ReactMarkdown>
-                    ) : (
-                      <p>Unable to display message</p>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a script type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="full">Full Script</SelectItem>
+                          <SelectItem value="pointForm">Point Form</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormDescription>
+                        Choose between a full script or a point form script.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                /> */}
+
+                <FormField
+                  control={form.control}
+                  name="additionalDetails"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Additional Details</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Any additional details you want to include?"
+                          className="resize-none"
+                          {...field}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            handleAdditionalDetailsChange(e.target.value);
+                          }}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Any additional details you want to include?
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      )}
+
+      <div className="flex flex-col flex-grow overflow-hidden">
+        <div className="flex-grow overflow-y-auto px-4 py-2">
+          {isLoadingHistory && (
+            <div className="text-center text-gray-500">
+              <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" />
+              Loading previous messages...
+            </div>
           )}
-          <div ref={messagesEndRef} />
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={cn(
+                "mb-2 rounded-lg px-3 py-2 w-fit max-w-[80%]",
+                message.is_ai
+                  ? "bg-secondary text-foreground ml-auto"
+                  : "bg-primary text-primary-foreground mr-auto"
+              )}
+            >
+              <p className="text-sm whitespace-pre-line">{message.content}</p>
+              <div className="text-xs text-gray-500 mt-1">
+                {message.timestamp.toLocaleTimeString()}
+              </div>
+            </div>
+          ))}
+          {isAiTyping && (
+            <div className="ml-auto mb-2 rounded-lg px-3 py-2 w-fit max-w-[80%] bg-secondary text-foreground">
+              <div className="flex space-x-2">
+                <div className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                <div className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                <div className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
+              </div>
+            </div>
+          )}
+          <div ref={bottomRef} />
         </div>
 
-        <form onSubmit={handleSubmit} className={cn("border-t", isMobile ? "p-2" : "p-4")}>
-          <div className={cn("flex items-center", isMobile ? "space-x-2" : "space-x-4")}>
-            <Textarea
-              placeholder="Ask the AI..."
+        <div className="border-t border-muted bg-secondary/50 p-4">
+          <div className="flex items-center space-x-2">
+            <Input
+              type="text"
+              placeholder="Type your message..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="flex-1 resize-none"
-              rows={isMobile ? 2 : 3}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendMessage(input);
+                }
+              }}
+              disabled={isAiTyping}
+              className="flex-grow"
             />
-            <Button type="submit" disabled={loading} className="ml-2" size={isMobile ? "sm" : "default"}>
-              {loading ? (
-                <Loader2 className={cn("animate-spin", isMobile ? "h-3 w-3" : "h-4 w-4")} />
-              ) : (
-                <Send className={cn(isMobile ? "h-3 w-3" : "h-4 w-4")} />
-              )}
+            <Button type="submit" onClick={() => handleSendMessage(input)} disabled={isAiTyping}>
+              {isAiTyping ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
+              Send
             </Button>
           </div>
-        </form>
-
-        {messages.length > 1 && !loading && (
-          <div className={cn("border-t", isMobile ? "p-2" : "p-4")}>
-            <Button 
-              onClick={handleGenerateFinalClick} 
-              variant="destructive" 
-              size={isMobile ? "sm" : "default"}
-            >
-              <Wand2 className={cn("mr-2", isMobile ? "h-3 w-3" : "h-4 w-4")} /> 
-              Generate Final Mystery
+          <div className="flex items-center justify-between mt-2">
+            <Button variant="ghost" size="sm" onClick={handleCopyClick} disabled={messages.length === 0}>
+              {isCopied ? <CheckCircle className="mr-2 h-4 w-4" /> : <Copy className="mr-2 h-4 w-4" />}
+              {isCopied ? "Copied!" : "Copy Messages"}
+            </Button>
+            <Button variant="ghost" size="sm" onClick={handleResetClick} disabled={messages.length === 0}>
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Reset Chat
             </Button>
           </div>
-        )}
+        </div>
       </div>
-    );
-};
-
-export default MysteryChat;
+    </div>
+  );
+}

@@ -1,4 +1,3 @@
-
 // Import required modules from Deno standard library and external packages
 import "https://deno.land/x/xhr@0.1.0/mod.ts"; // Polyfill for XMLHttpRequest
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
@@ -66,7 +65,7 @@ serve(async (req) => {
       );
     }
 
-    // STRENGTHENED: Prepare the system message with EXTREMELY clear instructions
+    // ENHANCED: Prepare the system message with EXTREMELY clear instructions
     let systemMessage;
     
     if (system) {
@@ -110,6 +109,8 @@ serve(async (req) => {
       updatedSystem += "2. Your FIRST question MUST be about player count\n"; 
       updatedSystem += "3. Wait for user responses before continuing\n";
       updatedSystem += "4. NEVER provide multiple questions in one response\n";
+      updatedSystem += "5. Once you have player count, ask ONE follow-up question about accomplices\n";
+      updatedSystem += "6. After collecting basic info, generate the COMPLETE mystery in the specified format\n";
       
       systemMessage = updatedSystem;
     } else {
@@ -146,13 +147,30 @@ Follow these steps in strict order, asking only ONE question at a time:
     
     console.log("Complete system message:", systemMessage);
 
-    // Check if this is the first user message and force the right first question from the AI
+    // Enhanced logic to detect conversation state and prevent repeated questions
     const isFirstUserMessageCheck = messages.length === 1 && !("is_ai" in messages[0] && messages[0].is_ai === true) && 
       !("role" in messages[0] && messages[0].role === "assistant");
+    
+    // Check if user has already provided player count
+    const userMessages = standardizedMessages.filter(msg => msg.role === "user");
+    const aiMessages = standardizedMessages.filter(msg => msg.role === "assistant");
+    
+    const hasProvidedPlayerCount = userMessages.some(msg => {
+      const content = msg.content.trim();
+      return /^\d+$/.test(content) && parseInt(content) >= 2 && parseInt(content) <= 20;
+    });
+    
+    const aiAlreadyAskedPlayerCount = aiMessages.some(msg => {
+      const content = msg.content.toLowerCase();
+      return content.includes('how many players') || content.includes('player count');
+    });
     
     if (isFirstUserMessageCheck) {
       console.log("This appears to be the first message. Ensuring first response asks about player count.");
       systemMessage = `${systemMessage}\n\n🚨 THIS IS THE FIRST USER MESSAGE. YOU MUST RESPOND BY ASKING HOW MANY PLAYERS THEY WANT. DO NOT PROVIDE ANY MYSTERY DETAILS YET. 🚨`;
+    } else if (hasProvidedPlayerCount && aiAlreadyAskedPlayerCount) {
+      console.log("User has provided player count. AI should move to next question or generate mystery.");
+      systemMessage = `${systemMessage}\n\n🚨 THE USER HAS ALREADY PROVIDED THE PLAYER COUNT. DO NOT ASK FOR PLAYER COUNT AGAIN. Move to the next logical step (ask about accomplices, or if you have enough info, generate the complete mystery). 🚨`;
     }
 
     // Prepare the model and max tokens based on the prompt version and test mode
@@ -202,7 +220,7 @@ Follow these steps in strict order, asking only ONE question at a time:
       }));
       
       // Set a reasonable timeout for the API call
-      const timeoutMs = 60000; // 60 seconds (increased from 45)
+      const timeoutMs = 60000; // 60 seconds
       const timeoutPromise = new Promise((_, reject) => {
         setTimeout(() => reject(new Error("Anthropic API request timed out")), timeoutMs);
       });
@@ -217,75 +235,47 @@ Follow these steps in strict order, asking only ONE question at a time:
       console.log(`Response length: ${response.content[0].text.length} characters`);
       console.log(`Response preview: ${response.content[0].text.substring(0, 100)}...`);
 
-      // ENHANCED: Process the response to enforce one-question-at-a-time policy
+      // ENHANCED: Process the response to enforce correct flow and prevent repeated questions
       let responseText = response.content[0].text;
       
-      // Check if the response has multiple questions
-      const questionMarkCount = (responseText.match(/\?/g) || []).length;
-      const paragraphs = responseText.split('\n\n').filter(p => p.trim().length > 0);
-      
-      // Look for patterns indicating multiple questions
-      let hasMultipleQuestions = false;
-      if (questionMarkCount >= 2) {
-        // Check for numbered questions like "1. Question?" or bullet points "• Question?"
-        const numberedQuestionPattern = /(?:^|\n)[\d*•-]+\s*.*?\?/g;
-        const numberedQuestions = responseText.match(numberedQuestionPattern) || [];
-        
-        // Check for multiple question sentences in different paragraphs
-        let questionParagraphs = 0;
-        for (const paragraph of paragraphs) {
-          if (paragraph.includes('?')) questionParagraphs++;
-        }
-        
-        // If we find evidence of multiple questions, flag it
-        hasMultipleQuestions = numberedQuestions.length > 1 || questionParagraphs > 1;
-      }
-      
-      // If this is the first message and doesn't ask about player count, correct it
+      // Check if AI is incorrectly asking for player count again
       const isAskingForPlayerCount = 
         responseText.toLowerCase().includes("how many players") || 
         responseText.toLowerCase().includes("player count") || 
         responseText.toLowerCase().includes("number of players");
+      
+      // Check if user already provided a numeric answer that should be player count
+      const lastUserMessage = standardizedMessages[standardizedMessages.length - 1];
+      const isNumericResponse = lastUserMessage && lastUserMessage.role === "user" && 
+                               /^\d+$/.test(lastUserMessage.content.trim());
+      
+      // If AI is asking for player count but user already provided it, correct the response
+      if (isAskingForPlayerCount && hasProvidedPlayerCount && standardizedMessages.length > 2) {
+        console.log("Detected AI incorrectly asking for player count again - correcting response");
         
-      if (isFirstUserMessageCheck && !isAskingForPlayerCount) {
-        console.log("First AI response doesn't ask about player count - correcting it");
+        const playerCount = userMessages.find(msg => /^\d+$/.test(msg.content.trim()))?.content.trim();
         
-        // Craft a response that properly asks for player count
-        responseText = `Thanks for starting this murder mystery creation process! To begin crafting your mystery, I need to understand the basics.
+        responseText = `Perfect! I'll create a murder mystery for ${playerCount} players.
 
-How many players do you want for your murder mystery game?`;
+Would you like your mystery to include an accomplice who helps the murderer, or should there be just one culprit?`;
       }
       
-      // For non-first messages, check if it's a numeric response and the AI is asking again about player count
-      const isNumericResponse = standardizedMessages[standardizedMessages.length - 1].role === "user" && 
-                             /^\d+$/.test(standardizedMessages[standardizedMessages.length - 1].content.trim());
-                             
-      if (isNumericResponse && isAskingForPlayerCount && standardizedMessages.length > 2) {
-        console.log("Detected AI asking for player count after user already provided a numeric answer");
+      // If user just provided a number and we have enough info, generate the mystery
+      if (isNumericResponse && hasProvidedPlayerCount && standardizedMessages.length >= 4) {
+        console.log("User has provided enough info - should generate complete mystery");
         
-        // Check if we can extract the player count from previous messages
-        const playerCount = standardizedMessages[standardizedMessages.length - 1].content.trim();
-        
-        // Craft a response that acknowledges the player count and moves on
-        responseText = `Great! I'll create a murder mystery for ${playerCount} players. 
-
-Let's continue building your mystery. Would you like your mystery to include an accomplice who helps the murderer, or should there be just one culprit?`;
-      }
-      
-      // If we detected multiple questions, truncate to just the first one
-      if (hasMultipleQuestions) {
-        console.log("Detected multiple questions in AI response - truncating to first question only");
-        
-        // Split by question marks and take only the first question
-        const firstQuestionEnd = responseText.indexOf('?') + 1;
-        let fixedResponse = responseText.substring(0, firstQuestionEnd);
-        
-        // Add a simple closer if the response seems too abrupt
-        if (fixedResponse.length < 100) {
-          fixedResponse += "\n\nPlease answer this question first before we continue with the next steps.";
+        // Don't generate mystery here, let AI handle it naturally but guide it
+        if (!responseText.includes("# ") && !responseText.includes("PREMISE") && !responseText.includes("VICTIM")) {
+          responseText = responseText; // Keep the AI's response but ensure it moves forward
         }
-        
-        responseText = fixedResponse;
+      }
+      
+      // Check if the response has multiple questions and truncate appropriately
+      const questionMarkCount = (responseText.match(/\?/g) || []).length;
+      if (questionMarkCount >= 2) {
+        console.log("Detected multiple questions in AI response - truncating to first question only");
+        const firstQuestionEnd = responseText.indexOf('?') + 1;
+        responseText = responseText.substring(0, firstQuestionEnd);
       }
 
       // Format the response as expected by the client

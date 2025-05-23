@@ -8,7 +8,6 @@ import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import { Mystery } from "@/interfaces/mystery";
 import { Search, ArrowDown } from "lucide-react";
-import { MysteryFilterTabs } from "./MysteryFilterTabs";
 import { HomeMysteryCard } from "./HomeMysteryCard";
 
 interface HomeDashboardProps {
@@ -21,23 +20,15 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
   const [mysteries, setMysteries] = useState<Mystery[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeTab, setActiveTab] = useState("all");
   const [page, setPage] = useState(1);
   const [hasMorePages, setHasMorePages] = useState(true);
-  const [counts, setCounts] = useState({
-    all: 0,
-    draft: 0,
-    purchased: 0,
-    archived: 0
-  });
   const pageSize = 6;
 
   useEffect(() => {
     if (user?.id) {
       fetchMysteries(1, true);
-      fetchMysteryCounts();
     }
-  }, [user?.id, activeTab, searchTerm]);
+  }, [user?.id, searchTerm]);
 
   const extractTitleFromMessages = (messages: any[]) => {
     if (!messages || messages.length === 0) return null;
@@ -88,45 +79,6 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
       .join(' ');
   };
 
-  const fetchMysteryCounts = async () => {
-    if (!user?.id) return;
-
-    try {
-      const { count: allCount } = await supabase
-        .from("conversations")
-        .select("id", { count: 'exact', head: true })
-        .eq("user_id", user.id);
-
-      const { count: draftCount } = await supabase
-        .from("conversations")
-        .select("id", { count: 'exact', head: true })
-        .eq("user_id", user.id)
-        .eq("is_paid", false)
-        .eq("display_status", "draft");
-
-      const { count: purchasedCount } = await supabase
-        .from("conversations")
-        .select("id", { count: 'exact', head: true })
-        .eq("user_id", user.id)
-        .or("is_paid.eq.true,display_status.eq.purchased");
-
-      const { count: archivedCount } = await supabase
-        .from("conversations")
-        .select("id", { count: 'exact', head: true })
-        .eq("user_id", user.id)
-        .eq("display_status", "archived");
-
-      setCounts({
-        all: allCount || 0,
-        draft: draftCount || 0,
-        purchased: purchasedCount || 0,
-        archived: archivedCount || 0
-      });
-    } catch (error) {
-      console.error("Error fetching mystery counts:", error);
-    }
-  };
-
   const fetchMysteries = async (pageNumber: number, reset: boolean = false) => {
     try {
       setLoading(true);
@@ -136,15 +88,6 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
         .from("conversations")
         .select("id, title, created_at, updated_at, mystery_data, display_status, is_paid, purchase_date")
         .eq("user_id", user.id);
-
-      // Apply filters based on active tab
-      if (activeTab === "draft") {
-        query = query.eq("is_paid", false).eq("display_status", "draft");
-      } else if (activeTab === "purchased") {
-        query = query.or("is_paid.eq.true,display_status.eq.purchased");
-      } else if (activeTab === "archived") {
-        query = query.eq("display_status", "archived");
-      }
 
       // Apply search filter if provided
       if (searchTerm.trim()) {
@@ -208,7 +151,7 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
         })
       );
 
-      // If resetting (e.g., new filter/tab), replace mysteries completely
+      // If resetting (e.g., new search), replace mysteries completely
       if (reset) {
         setMysteries(mysteriesWithMessages);
         setPage(pageNumber);
@@ -243,15 +186,10 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
 
   const handleMysteryUpdated = () => {
     fetchMysteries(1, true);
-    fetchMysteryCounts();
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
-  };
-
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
   };
 
   return (
@@ -271,12 +209,6 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
               />
             </div>
           </div>
-          
-          <MysteryFilterTabs 
-            activeTab={activeTab} 
-            onTabChange={handleTabChange} 
-            counts={counts} 
-          />
         </div>
 
         {loading && mysteries.length === 0 ? (

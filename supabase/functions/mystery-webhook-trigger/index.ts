@@ -58,28 +58,21 @@ serve(async (req) => {
     }
 
     // Format all messages into a concatenated string for easier parsing
-    const messageContents = conversation.messages
+    const conversationContent = conversation.messages
       ? conversation.messages.map((msg: any) => {
           const role = msg.role === "assistant" ? "AI" : "User";
           return `${role}: ${msg.content}`;
         }).join("\n\n---\n\n")
       : "";
 
-    // Structure the payload with clear fields
+    // Simplified payload with only essential data
     const webhookPayload = {
       userId,
       conversationId,
-      conversationTitle: conversation.title || "Untitled Mystery",
-      createdAt: conversation.created_at,
-      updatedAt: conversation.updated_at,
-      // Send the full concatenated message string for easier parsing
-      conversationContent: messageContents,
-      // Also include raw messages for more detailed processing if needed
-      rawMessages: conversation.messages,
-      testMode
+      conversationContent
     };
 
-    console.log(`Sending payload to webhook: ${webhookUrl}`);
+    console.log(`Sending simplified payload to webhook: ${webhookUrl}`);
     console.log(`Payload size: ${JSON.stringify(webhookPayload).length} characters`);
 
     // Check if webhook URL is configured
