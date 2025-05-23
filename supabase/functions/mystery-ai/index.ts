@@ -32,36 +32,19 @@ serve(async (req) => {
     console.log(`First standardized message: ${JSON.stringify(standardMessages[0])}`);
     console.log(`Total messages count: ${standardMessages.length}`);
     
-    // Determine if we should generate complete mystery or ask questions
-    const shouldGenerateComplete = shouldGenerateCompleteMystery(standardMessages);
-    console.log(`Should generate complete mystery: ${shouldGenerateComplete}`);
-    
     let systemPrompt = system;
     
-    // If no custom system provided, create one based on conversation state
+    // If no custom system provided, create a simple one
     if (!systemPrompt) {
-      systemPrompt = createSystemPrompt(standardMessages, shouldGenerateComplete);
-    } else if (shouldGenerateComplete) {
-      // Enhance existing system prompt for complete generation
-      systemPrompt += `\n\n🚨 CRITICALLY IMPORTANT 🚨
-The user has provided sufficient information. Generate a COMPLETE murder mystery with all sections:
-1. Title and theme
-2. Premise (setting and context)
-3. Victim details
-4. Character list with descriptions
-5. Murder method and clues
-
-DO NOT truncate or split your response. Provide the ENTIRE mystery in a single, complete response.`;
-      console.log("Using complete mystery generation mode");
+      systemPrompt = createSystemPrompt(standardMessages);
     }
     
     console.log(`System prompt length: ${systemPrompt.length}`);
     console.log(`System prompt preview: ${systemPrompt.substring(0, 100)}...`);
-    console.log(`Complete system message: ${systemPrompt}`);
     
-    // Configure model and tokens based on prompt version and content type
-    const model = promptVersion === 'paid' ? 'claude-3-opus-20240229' : 'claude-3-opus-20240229';
-    const maxTokens = shouldGenerateComplete ? 4000 : 2000;
+    // Use consistent model and tokens
+    const model = 'claude-3-opus-20240229';
+    const maxTokens = 2000;
     
     console.log(`Using model: ${model} with max tokens: ${maxTokens}`);
     
@@ -71,13 +54,6 @@ DO NOT truncate or split your response. Provide the ENTIRE mystery in a single, 
     }
     
     console.log("Starting Anthropic API call");
-    console.log(`Calling Anthropic API with options: ${JSON.stringify({
-      model,
-      max_tokens: maxTokens,
-      system_length: systemPrompt.length,
-      messages_count: standardMessages.length,
-      temperature: 0.7
-    })}`);
     
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -141,61 +117,21 @@ DO NOT truncate or split your response. Provide the ENTIRE mystery in a single, 
   }
 });
 
-function shouldGenerateCompleteMystery(messages: any[]): boolean {
-  // If there are enough messages and we have key information, generate complete mystery
-  if (messages.length < 3) return false;
-  
-  // Look for player count in the conversation
-  const hasPlayerCount = messages.some(msg => 
-    !msg.role || msg.role === 'user' && /\b\d+\b/.test(msg.content)
-  );
-  
-  // Look for accomplice decision
-  const hasAccompliceDecision = messages.some(msg => 
-    !msg.role || msg.role === 'user' && /(yes|no|accomplice)/i.test(msg.content)
-  );
-  
-  return hasPlayerCount && hasAccompliceDecision;
-}
+function createSystemPrompt(messages: any[]): string {
+  // For the very first message, always ask for player count
+  if (messages.length <= 1) {
+    return `You are a helpful murder mystery creator. Your first question should be: "How many players do you want for your murder mystery?"
 
-function createSystemPrompt(messages: any[], shouldGenerateComplete: boolean): string {
-  if (shouldGenerateComplete) {
-    return `You are a murder mystery creator. The user has provided enough information to create a complete mystery. Generate a full, detailed murder mystery following this exact format:
-
-# "[CREATIVE TITLE]" - A [THEME] MURDER MYSTERY
-
-## PREMISE
-[2-3 paragraphs setting the scene, describing the event where the murder takes place, and creating dramatic tension]
-
-## VICTIM
-**[Victim Name]** - [Vivid description of the victim, their role in the story, personality traits, and why they might have made enemies]
-
-## CHARACTER LIST ([PLAYER COUNT] PLAYERS)
-1. **[Character 1 Name]** - [Engaging one-sentence description including profession and connection to victim]
-2. **[Character 2 Name]** - [Engaging one-sentence description including profession and connection to victim]
-[Continue for all characters]
-
-## MURDER METHOD
-[Paragraph describing how the murder was committed, interesting details about the method, and what clues might be found]
-
-After presenting the mystery, ask if the concept works for them and explain that they can continue to make edits and that once they are done they can press the 'Generate Mystery' button.`;
+Be conversational and ask only this question first.`;
   }
   
-  // For initial conversation, focus on getting player count first
-  if (messages.length <= 2) {
-    return `You are a helpful murder mystery creator. Your first question should always be to ask how many players the user wants for their murder mystery. Ask this question clearly and directly: "How many players do you want for your murder mystery?"
+  // For subsequent messages, continue with mystery creation
+  return `You are a helpful murder mystery creator. Continue gathering the necessary information from the user one question at a time.
 
-Only after getting the player count should you ask about other details like whether they want an accomplice.
+If you haven't asked yet, ask about:
+- Number of players (if not already known)
+- Whether they want an accomplice
+- Any specific preferences they have
 
-Be conversational and helpful, asking one question at a time.`;
-  }
-  
-  // For middle conversation, continue gathering info
-  return `You are a helpful murder mystery creator. Continue gathering the necessary information from the user one question at a time. 
-
-Ask about:
-- Whether they want an accomplice (if not already asked)
-- Any specific requirements or preferences they have
-
-Once you have the theme, player count, and accomplice preference, generate the complete mystery format.`;
+Once you have enough information, you can generate a complete mystery preview.`;
 }
