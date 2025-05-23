@@ -20,7 +20,10 @@ const supabaseAdmin = createClient(
 export default async function handler(req) {
   // Simple response for GET requests to verify the endpoint exists
   if (req.method === 'GET') {
-    return new Response(JSON.stringify({ status: 'Webhook endpoint is active' }), {
+    return new Response(JSON.stringify({ 
+      status: 'Webhook endpoint is active',
+      version: '1.1.0' // Add versioning for debugging
+    }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });
@@ -56,7 +59,7 @@ export default async function handler(req) {
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
 
-      // Extract mysteryId from metadata
+      // Extract mysteryId and userId from metadata
       const mysteryId = session.metadata?.mysteryId;
       const userId = session.metadata?.userId;
 
@@ -85,7 +88,10 @@ export default async function handler(req) {
             .update({ 
               is_paid: true,
               display_status: "purchased",
-              purchase_date: new Date().toISOString() 
+              purchase_date: new Date().toISOString(),
+              payment_intent_id: session.payment_intent || null,
+              payment_amount: session.amount_total || null,
+              payment_currency: session.currency || null
             })
             .eq('id', mysteryId);
 
@@ -95,8 +101,36 @@ export default async function handler(req) {
             console.log('Conversation updated successfully for mystery ID:', mysteryId);
           }
 
+          // Add event to a webhook_events table for audit purposes
+          const { error: eventLogError } = await supabaseAdmin
+            .from('webhook_events')
+            .insert({
+              event_type: event.type,
+              payment_intent_id: session.payment_intent || null,
+              mystery_id: mysteryId,
+              user_id: userId,
+              amount: session.amount_total || null,
+              currency: session.currency || null,
+              event_data: JSON.stringify({
+                checkout_session_id: session.id,
+                payment_status: session.payment_status,
+                customer: session.customer,
+                metadata: session.metadata
+              })
+            });
+
+          if (eventLogError) {
+            console.error('Error logging webhook event:', eventLogError);
+          } else {
+            console.log('Webhook event logged successfully');
+          }
+
           console.log("Database updates complete for mystery ID:", mysteryId);
-          return new Response(JSON.stringify({ success: true }), { 
+          return new Response(JSON.stringify({ 
+            success: true,
+            mysteryId,
+            userId
+          }), { 
             status: 200,
             headers: { 'Content-Type': 'application/json' }
           });
