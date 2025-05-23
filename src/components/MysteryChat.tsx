@@ -8,6 +8,8 @@ import { Card, CardHeader, CardContent, CardDescription } from "@/components/ui/
 import { toast } from "sonner";
 import { Send, Loader2, Zap } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
 import {
   Form,
   FormControl,
@@ -179,9 +181,32 @@ export default function MysteryChat({
     systemMsg += `The user wants to create a murder mystery with ${data.playerCount} players. `;
     systemMsg += `The user wants to create a murder mystery with ${data.hasAccomplice ? 'an' : 'no'} accomplice. `;
     systemMsg += `The user wants to create a murder mystery with a ${data.scriptType} script. `;
+    
+    // Add explicit instructions for complete mystery format
+    systemMsg += `\n\nImportant: When you have gathered enough information (at minimum theme and player count), provide a complete mystery in this exact format:
+    
+# "[CREATIVE TITLE]" - A MURDER MYSTERY
+
+## PREMISE
+[2-3 paragraphs setting the scene, describing where the murder takes place]
+
+## VICTIM
+**[Victim Name]** - [Description of the victim including their role and why they might have enemies]
+
+## CHARACTER LIST (${data.playerCount} PLAYERS)
+[List all ${data.playerCount} characters with descriptions]
+
+## MURDER METHOD
+[Describe how the murder was committed and what clues might be found]
+`;
+    
     if (data.additionalDetails) {
-      systemMsg += `The user wants to create a murder mystery with the following additional details: ${data.additionalDetails}. `;
+      systemMsg += `\nAdditional details: ${data.additionalDetails}. `;
     }
+    
+    // Disable the question limit in the mystery-ai edge function
+    systemMsg += "\n\nNOTE: Do not truncate responses. If asked to generate the full mystery format, always provide the complete structure with all sections.";
+    
     return systemMsg;
   };
 
@@ -210,7 +235,8 @@ export default function MysteryChat({
             content: msg.content
           })),
           system: systemPrompt,
-          promptVersion: 'free'
+          promptVersion: 'free',
+          preventTruncation: true  // New flag to prevent truncation of mystery format responses
         }
       });
 
@@ -314,7 +340,8 @@ export default function MysteryChat({
             content: msg.content
           })),
           system: systemPrompt,
-          promptVersion: 'free'
+          promptVersion: 'free',
+          preventTruncation: true  // New flag to prevent truncation of mystery format responses
         }
       });
 
@@ -370,6 +397,20 @@ export default function MysteryChat({
     } finally {
       setIsAiTyping(false);
     }
+  };
+
+  // Styles for markdown content
+  const markdownStyles = {
+    h1: "text-2xl font-bold mt-4 mb-2",
+    h2: "text-xl font-semibold mt-3 mb-2",
+    h3: "text-lg font-medium mt-2 mb-1",
+    p: "my-1",
+    ul: "list-disc pl-6 my-2",
+    ol: "list-decimal pl-6 my-2",
+    li: "my-1",
+    strong: "font-bold",
+    em: "italic",
+    blockquote: "pl-4 border-l-4 border-gray-300 italic my-2"
   };
 
   return (
@@ -515,11 +556,34 @@ export default function MysteryChat({
                 className={cn(
                   "max-w-[80%] rounded-lg px-4 py-2",
                   message.is_ai
-                    ? "bg-muted border"
+                    ? "bg-muted border overflow-auto"
                     : "bg-primary text-primary-foreground"
                 )}
               >
-                <p className="text-sm whitespace-pre-line">{message.content}</p>
+                {message.is_ai ? (
+                  <div className="prose prose-sm dark:prose-invert max-w-none">
+                    <ReactMarkdown 
+                      className="text-sm whitespace-pre-line"
+                      rehypePlugins={[rehypeRaw]}
+                      components={{
+                        h1: ({node, ...props}) => <h1 className={markdownStyles.h1} {...props} />,
+                        h2: ({node, ...props}) => <h2 className={markdownStyles.h2} {...props} />,
+                        h3: ({node, ...props}) => <h3 className={markdownStyles.h3} {...props} />,
+                        p: ({node, ...props}) => <p className={markdownStyles.p} {...props} />,
+                        ul: ({node, ...props}) => <ul className={markdownStyles.ul} {...props} />,
+                        ol: ({node, ...props}) => <ol className={markdownStyles.ol} {...props} />,
+                        li: ({node, ...props}) => <li className={markdownStyles.li} {...props} />,
+                        strong: ({node, ...props}) => <strong className={markdownStyles.strong} {...props} />,
+                        em: ({node, ...props}) => <em className={markdownStyles.em} {...props} />,
+                        blockquote: ({node, ...props}) => <blockquote className={markdownStyles.blockquote} {...props} />
+                      }}
+                    >
+                      {message.content}
+                    </ReactMarkdown>
+                  </div>
+                ) : (
+                  <p className="text-sm whitespace-pre-line">{message.content}</p>
+                )}
               </div>
             </div>
           ))}

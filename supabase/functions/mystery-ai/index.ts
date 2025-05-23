@@ -50,6 +50,7 @@ serve(async (req) => {
       system = null,
       promptVersion = 'free',
       requireFormatValidation = false,
+      preventTruncation = false, // New flag to prevent truncation
       chunkSize = 1000,
       stream = false,
       testMode = false
@@ -75,45 +76,60 @@ serve(async (req) => {
       console.log(`System prompt preview: ${system.substring(0, 100)}...`);
       systemMessage = system;
       
-      // Make the "one question at a time" instruction unmistakable
-      const oneQuestionInstruction = "🚨 CRITICAL INSTRUCTION: Ask ONLY ONE QUESTION at a time. Wait for the user's response before proceeding to the next step. NEVER EVER ask multiple questions in the same response. 🚨";
-      
-      // Ensure the player count is asked first with absolute clarity
-      const playerCountInstruction = "🚨 REQUIRED FIRST QUESTION: Your VERY FIRST question must be 'How many players do you want for your murder mystery?' Ask NOTHING else until you get this answer. 🚨";
-      
-      // Check if the system message already has these instructions
-      const hasOneQuestionInst = systemMessage.includes("ONE QUESTION at a time");
-      const hasPlayerCountInst = systemMessage.includes("players") && systemMessage.includes("first question");
-      
-      // Add or reinforce instructions as needed
-      let updatedSystem = systemMessage;
-      
-      if (!hasOneQuestionInst) {
-        console.log("Adding missing one-question-at-a-time instruction to system prompt");
-        updatedSystem = oneQuestionInstruction + "\n\n" + updatedSystem;
-      } else if (!updatedSystem.startsWith("🚨")) {
-        // If it has the instruction but not at the top, re-emphasize it at the top
-        console.log("Moving one-question-at-a-time instruction to the top of system prompt");
-        // Remove existing instruction and add it at the top
-        updatedSystem = updatedSystem.replace(/🚨.*?ONE QUESTION at a time.*?🚨/gs, '');
-        updatedSystem = oneQuestionInstruction + "\n\n" + updatedSystem;
+      // Make the "one question at a time" instruction unmistakable, but only if not generating full mystery
+      if (!preventTruncation) {
+        const oneQuestionInstruction = "🚨 CRITICAL INSTRUCTION: Ask ONLY ONE QUESTION at a time. Wait for the user's response before proceeding to the next step. NEVER EVER ask multiple questions in the same response. 🚨";
+        
+        // Ensure the player count is asked first with absolute clarity
+        const playerCountInstruction = "🚨 REQUIRED FIRST QUESTION: Your VERY FIRST question must be 'How many players do you want for your murder mystery?' Ask NOTHING else until you get this answer. 🚨";
+        
+        // Check if the system message already has these instructions
+        const hasOneQuestionInst = systemMessage.includes("ONE QUESTION at a time");
+        const hasPlayerCountInst = systemMessage.includes("players") && systemMessage.includes("first question");
+        
+        // Add or reinforce instructions as needed
+        let updatedSystem = systemMessage;
+        
+        if (!hasOneQuestionInst) {
+          console.log("Adding missing one-question-at-a-time instruction to system prompt");
+          updatedSystem = oneQuestionInstruction + "\n\n" + updatedSystem;
+        } else if (!updatedSystem.startsWith("🚨")) {
+          // If it has the instruction but not at the top, re-emphasize it at the top
+          console.log("Moving one-question-at-a-time instruction to the top of system prompt");
+          // Remove existing instruction and add it at the top
+          updatedSystem = updatedSystem.replace(/🚨.*?ONE QUESTION at a time.*?🚨/gs, '');
+          updatedSystem = oneQuestionInstruction + "\n\n" + updatedSystem;
+        }
+        
+        if (!hasPlayerCountInst) {
+          console.log("Adding player count instruction to system prompt");
+          updatedSystem = updatedSystem + "\n\n" + playerCountInstruction;
+        }
+        
+        // Add a final section with BOLD formatting and emojis for emphasis
+        updatedSystem += "\n\n⚠️ FINAL INSTRUCTIONS ⚠️\n\n";
+        updatedSystem += "1. Ask EXACTLY ONE question at a time\n";
+        updatedSystem += "2. Your FIRST question MUST be about player count\n"; 
+        updatedSystem += "3. Wait for user responses before continuing\n";
+        updatedSystem += "4. NEVER provide multiple questions in one response\n";
+        updatedSystem += "5. Once you have player count, ask ONE follow-up question about accomplices\n";
+        updatedSystem += "6. After collecting basic info, generate the COMPLETE mystery in the specified format\n";
+        
+        systemMessage = updatedSystem;
+      } else {
+        // If we're in full mystery generation mode, replace the system message with instructions for complete output
+        console.log("Using complete mystery generation mode");
+        
+        // Add instructions for complete mystery format
+        systemMessage += "\n\n🚨 CRITICALLY IMPORTANT 🚨\n";
+        systemMessage += "The user has provided sufficient information. Generate a COMPLETE murder mystery with all sections:\n";
+        systemMessage += "1. Title and theme\n";
+        systemMessage += "2. Premise (setting and context)\n";
+        systemMessage += "3. Victim details\n";
+        systemMessage += "4. Character list with descriptions\n";
+        systemMessage += "5. Murder method and clues\n\n";
+        systemMessage += "DO NOT truncate or split your response. Provide the ENTIRE mystery in a single, complete response.";
       }
-      
-      if (!hasPlayerCountInst) {
-        console.log("Adding player count instruction to system prompt");
-        updatedSystem = updatedSystem + "\n\n" + playerCountInstruction;
-      }
-      
-      // Add a final section with BOLD formatting and emojis for emphasis
-      updatedSystem += "\n\n⚠️ FINAL INSTRUCTIONS ⚠️\n\n";
-      updatedSystem += "1. Ask EXACTLY ONE question at a time\n";
-      updatedSystem += "2. Your FIRST question MUST be about player count\n"; 
-      updatedSystem += "3. Wait for user responses before continuing\n";
-      updatedSystem += "4. NEVER provide multiple questions in one response\n";
-      updatedSystem += "5. Once you have player count, ask ONE follow-up question about accomplices\n";
-      updatedSystem += "6. After collecting basic info, generate the COMPLETE mystery in the specified format\n";
-      
-      systemMessage = updatedSystem;
     } else {
       // Try to get the free prompt from environment variables
       const freePrompt = Deno.env.get('MYSTERY_FREE_PROMPT');
@@ -182,17 +198,20 @@ Follow these steps in strict order, asking only ONE question at a time:
       return content.includes('how many players') || content.includes('player count');
     });
     
-    if (isFirstUserMessageCheck) {
-      console.log("This appears to be the first message. Ensuring first response asks about player count.");
-      systemMessage = `${systemMessage}\n\n🚨 THIS IS THE FIRST USER MESSAGE. YOU MUST RESPOND BY ASKING HOW MANY PLAYERS THEY WANT. DO NOT PROVIDE ANY MYSTERY DETAILS YET. 🚨`;
-    } else if (hasProvidedPlayerCount && aiAlreadyAskedPlayerCount) {
-      console.log("User has provided player count. AI should move to next question or generate mystery.");
-      systemMessage = `${systemMessage}\n\n🚨 THE USER HAS ALREADY PROVIDED THE PLAYER COUNT. DO NOT ASK FOR PLAYER COUNT AGAIN. Move to the next logical step (ask about accomplices, or if you have enough info, generate the complete mystery). 🚨`;
+    // Only apply these conditions if not in full mystery generation mode
+    if (!preventTruncation) {
+      if (isFirstUserMessageCheck) {
+        console.log("This appears to be the first message. Ensuring first response asks about player count.");
+        systemMessage = `${systemMessage}\n\n🚨 THIS IS THE FIRST USER MESSAGE. YOU MUST RESPOND BY ASKING HOW MANY PLAYERS THEY WANT. DO NOT PROVIDE ANY MYSTERY DETAILS YET. 🚨`;
+      } else if (hasProvidedPlayerCount && aiAlreadyAskedPlayerCount) {
+        console.log("User has provided player count. AI should move to next question or generate mystery.");
+        systemMessage = `${systemMessage}\n\n🚨 THE USER HAS ALREADY PROVIDED THE PLAYER COUNT. DO NOT ASK FOR PLAYER COUNT AGAIN. Move to the next logical step (ask about accomplices, or if you have enough info, generate the complete mystery). 🚨`;
+      }
     }
 
     // Prepare the model and max tokens based on the prompt version and test mode
     let model = "claude-3-opus-20240229";
-    let maxTokens = testMode ? 1000 : 3000; // Increased max tokens
+    let maxTokens = testMode ? 1000 : 4000; // Increased max tokens to allow for full mystery generation
     
     // Log the model and max tokens
     console.log(`Using model: ${model} with max tokens: ${maxTokens}`);
@@ -239,44 +258,47 @@ Follow these steps in strict order, asking only ONE question at a time:
       // Process the response to enforce correct flow and prevent repeated questions
       let responseText = response.content[0].text;
       
-      // Check if AI is incorrectly asking for player count again
-      const isAskingForPlayerCount = 
-        responseText.toLowerCase().includes("how many players") || 
-        responseText.toLowerCase().includes("player count") || 
-        responseText.toLowerCase().includes("number of players");
-      
-      // Check if user already provided a numeric answer that should be player count
-      const lastUserMessage = standardizedMessages[standardizedMessages.length - 1];
-      const isNumericResponse = lastUserMessage && lastUserMessage.role === "user" && 
-                               /^\d+$/.test(lastUserMessage.content.trim());
-      
-      // If AI is asking for player count but user already provided it, correct the response
-      if (isAskingForPlayerCount && hasProvidedPlayerCount && standardizedMessages.length > 2) {
-        console.log("Detected AI incorrectly asking for player count again - correcting response");
+      // Only process/truncate response if we're not in full mystery generation mode
+      if (!preventTruncation) {
+        // Check if AI is incorrectly asking for player count again
+        const isAskingForPlayerCount = 
+          responseText.toLowerCase().includes("how many players") || 
+          responseText.toLowerCase().includes("player count") || 
+          responseText.toLowerCase().includes("number of players");
         
-        const playerCount = userMessages.find(msg => /^\d+$/.test(msg.content.trim()))?.content.trim();
+        // Check if user already provided a numeric answer that should be player count
+        const lastUserMessage = standardizedMessages[standardizedMessages.length - 1];
+        const isNumericResponse = lastUserMessage && lastUserMessage.role === "user" && 
+                                 /^\d+$/.test(lastUserMessage.content.trim());
         
-        responseText = `Perfect! I'll create a murder mystery for ${playerCount} players.
+        // If AI is asking for player count but user already provided it, correct the response
+        if (isAskingForPlayerCount && hasProvidedPlayerCount && standardizedMessages.length > 2) {
+          console.log("Detected AI incorrectly asking for player count again - correcting response");
+          
+          const playerCount = userMessages.find(msg => /^\d+$/.test(msg.content.trim()))?.content.trim();
+          
+          responseText = `Perfect! I'll create a murder mystery for ${playerCount} players.
 
 Would you like your mystery to include an accomplice who helps the murderer, or should there be just one culprit?`;
-      }
-      
-      // If user just provided a number and we have enough info, generate the mystery
-      if (isNumericResponse && hasProvidedPlayerCount && standardizedMessages.length >= 4) {
-        console.log("User has provided enough info - should generate complete mystery");
-        
-        // Don't generate mystery here, let AI handle it naturally but guide it
-        if (!responseText.includes("# ") && !responseText.includes("PREMISE") && !responseText.includes("VICTIM")) {
-          responseText = responseText; // Keep the AI's response but ensure it moves forward
         }
-      }
-      
-      // Check if the response has multiple questions and truncate appropriately
-      const questionMarkCount = (responseText.match(/\?/g) || []).length;
-      if (questionMarkCount >= 2) {
-        console.log("Detected multiple questions in AI response - truncating to first question only");
-        const firstQuestionEnd = responseText.indexOf('?') + 1;
-        responseText = responseText.substring(0, firstQuestionEnd);
+        
+        // If user just provided a number and we have enough info, generate the mystery
+        if (isNumericResponse && hasProvidedPlayerCount && standardizedMessages.length >= 4) {
+          console.log("User has provided enough info - should generate complete mystery");
+          
+          // Don't generate mystery here, let AI handle it naturally but guide it
+          if (!responseText.includes("# ") && !responseText.includes("PREMISE") && !responseText.includes("VICTIM")) {
+            responseText = responseText; // Keep the AI's response but ensure it moves forward
+          }
+        }
+        
+        // Check if the response has multiple questions and truncate appropriately
+        const questionMarkCount = (responseText.match(/\?/g) || []).length;
+        if (questionMarkCount >= 2) {
+          console.log("Detected multiple questions in AI response - truncating to first question only");
+          const firstQuestionEnd = responseText.indexOf('?') + 1;
+          responseText = responseText.substring(0, firstQuestionEnd);
+        }
       }
 
       // Format the response as expected by the client
