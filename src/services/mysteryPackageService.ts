@@ -40,6 +40,22 @@ export interface GenerationStatus {
   };
 }
 
+// Validate environment variables
+const validateEnvironmentVars = () => {
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  
+  if (!supabaseUrl) {
+    throw new Error("VITE_SUPABASE_URL environment variable is not defined");
+  }
+  
+  if (!supabaseAnonKey) {
+    throw new Error("VITE_SUPABASE_ANON_KEY environment variable is not defined");
+  }
+  
+  return { supabaseUrl, supabaseAnonKey };
+};
+
 export async function generateCompletePackage(mysteryId: string, testMode = false): Promise<string> {
   try {
     console.log("Starting package generation for conversation ID:", mysteryId);
@@ -118,15 +134,24 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
     });
     
     try {
-      // Use environment variables
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      // Validate and get environment variables
+      let { supabaseUrl, supabaseAnonKey } = validateEnvironmentVars();
       
-      console.log("Calling webhook trigger with URL:", `${supabaseUrl}/functions/v1/mystery-webhook-trigger`);
+      if (!supabaseUrl.endsWith('/')) {
+        supabaseUrl = supabaseUrl + '/';
+      }
+      
+      const webhookUrl = `${supabaseUrl}functions/v1/mystery-webhook-trigger`;
+      
+      console.log("Calling webhook trigger with URL:", webhookUrl);
       console.log("Test mode:", testMode);
       
+      if (!webhookUrl || webhookUrl.includes('undefined')) {
+        throw new Error("Invalid webhook URL. Please check your environment variables.");
+      }
+      
       // Call the webhook trigger edge function
-      const response = await fetch(`${supabaseUrl}/functions/v1/mystery-webhook-trigger`, {
+      const response = await fetch(webhookUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -141,12 +166,17 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
       console.log("Webhook response status:", response.status);
       
       if (!response.ok) {
+        // Clone the response before reading it
+        const clonedResponse = response.clone();
+        
+        // Try to get error details as JSON first
         let errorText = "";
         try {
-          const errorData = await response.json();
+          const errorData = await clonedResponse.json();
           errorText = errorData.error || errorData.message || response.statusText;
           console.error("Webhook error response:", errorData);
         } catch (e) {
+          // If JSON parsing fails, read as text
           errorText = await response.text() || response.statusText;
           console.error("Webhook error text:", errorText);
         }
