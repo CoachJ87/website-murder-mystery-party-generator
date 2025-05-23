@@ -20,6 +20,7 @@ const MysteryCreation = () => {
     const [systemInstruction, setSystemInstruction] = useState<string | null>(null);
     const [conversationId, setConversationId] = useState<string | null>(null);
     const [theme, setTheme] = useState<string>("Murder Mystery");
+    const [shouldSkipForm, setShouldSkipForm] = useState(false);
     const navigate = useNavigate();
     const { id } = useParams();
     const isEditing = !!id;
@@ -94,8 +95,13 @@ const MysteryCreation = () => {
             
             if (data) {
                 setConversationId(data.id);
-                setMessages(data.messages as Message[] || []);
+                const loadedMessages = data.messages as Message[] || [];
+                setMessages(loadedMessages);
                 setSystemInstruction(data.system_instruction);
+
+                // Determine if we should skip the form based on existing messages
+                const hasMessages = loadedMessages.length > 0;
+                setShouldSkipForm(hasMessages);
 
                 // Extract theme from mystery_data
                 let extractedTheme = "Murder Mystery";
@@ -104,8 +110,8 @@ const MysteryCreation = () => {
                 }
                 setTheme(extractedTheme);
 
-                if (data.messages && data.messages.length > 0) {
-                    const aiTitle = extractTitleFromMessages(data.messages);
+                if (loadedMessages.length > 0) {
+                    const aiTitle = extractTitleFromMessages(loadedMessages);
                     if (aiTitle) {
                         await supabase
                             .from("conversations")
@@ -229,6 +235,7 @@ const MysteryCreation = () => {
                                 isLoadingHistory={isLoadingHistory}
                                 systemInstruction={systemInstruction}
                                 preventDuplicateMessages={true}
+                                skipForm={shouldSkipForm}
                             />
                         </CardContent>
                     </Card>
