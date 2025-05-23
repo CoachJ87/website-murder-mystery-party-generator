@@ -34,7 +34,7 @@ serve(async (req) => {
     
     let systemPrompt = system;
     
-    // If no custom system provided, create a simple one
+    // If no custom system provided, create a simple one that prioritizes player count
     if (!systemPrompt) {
       systemPrompt = createSystemPrompt(standardMessages);
     }
@@ -120,9 +120,9 @@ serve(async (req) => {
 function createSystemPrompt(messages: any[]): string {
   // For the very first message, always ask for player count
   if (messages.length <= 1) {
-    return `You are a helpful murder mystery creator. Your first question should be: "How many players do you want for your murder mystery?"
+    return `You are a helpful murder mystery creator. Your first question should ALWAYS be: "How many players do you want for your murder mystery?"
 
-Be conversational and ask only this question first.`;
+Be conversational and ask only this question first. Do not generate any mystery content until you know the player count.`;
   }
   
   // For subsequent messages, continue with mystery creation
