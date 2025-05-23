@@ -1,3 +1,4 @@
+
 // Import required modules from Deno standard library and external packages
 import "https://deno.land/x/xhr@0.1.0/mod.ts"; // Polyfill for XMLHttpRequest
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
@@ -65,7 +66,7 @@ serve(async (req) => {
       );
     }
 
-    // ENHANCED: Prepare the system message with EXTREMELY clear instructions
+    // Prepare the system message
     let systemMessage;
     
     if (system) {
@@ -74,10 +75,10 @@ serve(async (req) => {
       console.log(`System prompt preview: ${system.substring(0, 100)}...`);
       systemMessage = system;
       
-      // ENHANCED: Make the "one question at a time" instruction unmistakable
+      // Make the "one question at a time" instruction unmistakable
       const oneQuestionInstruction = "🚨 CRITICAL INSTRUCTION: Ask ONLY ONE QUESTION at a time. Wait for the user's response before proceeding to the next step. NEVER EVER ask multiple questions in the same response. 🚨";
       
-      // ENHANCED: Ensure the player count is asked first with absolute clarity
+      // Ensure the player count is asked first with absolute clarity
       const playerCountInstruction = "🚨 REQUIRED FIRST QUESTION: Your VERY FIRST question must be 'How many players do you want for your murder mystery?' Ask NOTHING else until you get this answer. 🚨";
       
       // Check if the system message already has these instructions
@@ -103,7 +104,7 @@ serve(async (req) => {
         updatedSystem = updatedSystem + "\n\n" + playerCountInstruction;
       }
       
-      // ENHANCED: Add a final section with BOLD formatting and emojis for emphasis
+      // Add a final section with BOLD formatting and emojis for emphasis
       updatedSystem += "\n\n⚠️ FINAL INSTRUCTIONS ⚠️\n\n";
       updatedSystem += "1. Ask EXACTLY ONE question at a time\n";
       updatedSystem += "2. Your FIRST question MUST be about player count\n"; 
@@ -147,6 +148,22 @@ Follow these steps in strict order, asking only ONE question at a time:
     
     console.log("Complete system message:", systemMessage);
 
+    // Clean and standardize messages for the API
+    const standardizedMessages = messages.map(msg => {
+      // Check if the message has is_ai flag or role
+      if (msg.is_ai !== undefined) {
+        return {
+          role: msg.is_ai ? "assistant" : "user",
+          content: msg.content || ''
+        };
+      } else {
+        return {
+          role: msg.role || 'user',
+          content: msg.content || ''
+        };
+      }
+    }).filter(msg => msg.content && msg.content.trim() !== '');
+
     // Enhanced logic to detect conversation state and prevent repeated questions
     const isFirstUserMessageCheck = messages.length === 1 && !("is_ai" in messages[0] && messages[0].is_ai === true) && 
       !("role" in messages[0] && messages[0].role === "assistant");
@@ -180,22 +197,6 @@ Follow these steps in strict order, asking only ONE question at a time:
     // Log the model and max tokens
     console.log(`Using model: ${model} with max tokens: ${maxTokens}`);
 
-    // Clean and standardize messages for the API
-    const standardizedMessages = messages.map(msg => {
-      // Check if the message has is_ai flag or role
-      if (msg.is_ai !== undefined) {
-        return {
-          role: msg.is_ai ? "assistant" : "user",
-          content: msg.content || ''
-        };
-      } else {
-        return {
-          role: msg.role || 'user',
-          content: msg.content || ''
-        };
-      }
-    }).filter(msg => msg.content && msg.content.trim() !== '');
-    
     console.log("First standardized message:", JSON.stringify(standardizedMessages[0]));
     console.log("Total messages count:", standardizedMessages.length);
 
@@ -235,7 +236,7 @@ Follow these steps in strict order, asking only ONE question at a time:
       console.log(`Response length: ${response.content[0].text.length} characters`);
       console.log(`Response preview: ${response.content[0].text.substring(0, 100)}...`);
 
-      // ENHANCED: Process the response to enforce correct flow and prevent repeated questions
+      // Process the response to enforce correct flow and prevent repeated questions
       let responseText = response.content[0].text;
       
       // Check if AI is incorrectly asking for player count again

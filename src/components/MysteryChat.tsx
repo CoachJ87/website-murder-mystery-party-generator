@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -207,7 +208,7 @@ export default function MysteryChat({
 
       console.log("System prompt being sent:", systemPrompt.substring(0, 200) + "...");
 
-      // Use the Supabase function directly instead of the non-existent proxy
+      // Use the Supabase function directly
       const { data, error } = await supabase.functions.invoke('mystery-ai', {
         body: {
           messages: newMessages.map(msg => ({
@@ -262,6 +263,13 @@ export default function MysteryChat({
       };
 
       setMessages([...newMessages, errorMessage]);
+      
+      // Still try to save the error message so conversation flow is maintained
+      try {
+        await onSave(errorMessage);
+      } catch (saveError) {
+        console.error("Error saving AI error message:", saveError);
+      }
     } finally {
       setIsAiTyping(false);
     }
