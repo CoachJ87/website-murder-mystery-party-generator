@@ -537,6 +537,7 @@ export default function MysteryChat({
       <div className="border rounded-lg bg-background">
         {/* Chat Messages Area */}
         <div className="h-96 overflow-y-auto p-4 space-y-3">
+          {/* Loading History */}
           {isLoadingHistory && (
             <div className="text-center text-muted-foreground">
               <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" />
@@ -563,7 +564,6 @@ export default function MysteryChat({
                 {message.is_ai ? (
                   <div className="prose prose-sm dark:prose-invert max-w-none">
                     <ReactMarkdown 
-                      className="text-sm whitespace-pre-line"
                       rehypePlugins={[rehypeRaw]}
                       components={{
                         h1: ({node, ...props}) => <h1 className={markdownStyles.h1} {...props} />,
@@ -588,6 +588,7 @@ export default function MysteryChat({
             </div>
           ))}
           
+          {/* AI Typing Indicator */}
           {isAiTyping && (
             <div className="flex justify-start">
               <div className="bg-muted border rounded-lg px-4 py-2 max-w-[80%]">
