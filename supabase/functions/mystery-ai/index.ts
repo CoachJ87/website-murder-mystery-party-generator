@@ -17,32 +17,29 @@ serve(async (req) => {
     
     const requestBody = await req.json();
     console.log("Successfully parsed request body");
-    console.log("Request body:", JSON.stringify(requestBody, null, 2));
     
-    const { messages, system, promptVersion = 'free', preventTruncation = false } = requestBody;
+    const { messages, system } = requestBody;
     
-    console.log(`Processing request with ${messages.length} messages and prompt version: ${promptVersion}`);
+    console.log(`Processing request with ${messages?.length || 0} messages`);
     
     // Standardize message format
-    const standardMessages = messages.map((msg: any) => ({
+    const standardMessages = (messages || []).map((msg: any) => ({
       role: msg.role || (msg.is_ai ? "assistant" : "user"),
       content: msg.content || ""
     })).filter((msg: any) => msg.content.trim() !== '');
     
-    console.log(`First standardized message: ${JSON.stringify(standardMessages[0])}`);
     console.log(`Total messages count: ${standardMessages.length}`);
     
+    // Create system prompt - always ask for player count first if it's the initial message
     let systemPrompt = system;
-    
-    // If no custom system provided, create a simple one that prioritizes player count
-    if (!systemPrompt) {
-      systemPrompt = createSystemPrompt(standardMessages);
+    if (!systemPrompt || standardMessages.length <= 1) {
+      systemPrompt = `You are a helpful murder mystery creator. Your first question should ALWAYS be: "How many players do you want for your murder mystery?"
+
+Be conversational and ask only this question first. Do not generate any mystery content until you know the player count.`;
     }
     
     console.log(`System prompt length: ${systemPrompt.length}`);
-    console.log(`System prompt preview: ${systemPrompt.substring(0, 100)}...`);
     
-    // Use consistent model and tokens
     const model = 'claude-3-opus-20240229';
     const maxTokens = 2000;
     
@@ -50,6 +47,7 @@ serve(async (req) => {
     
     const anthropicApiKey = Deno.env.get('ANTHROPIC_API_KEY');
     if (!anthropicApiKey) {
+      console.error('ANTHROPIC_API_KEY not found in environment variables');
       throw new Error('ANTHROPIC_API_KEY not found in environment variables');
     }
     
@@ -86,7 +84,6 @@ serve(async (req) => {
     }
     
     console.log(`Response length: ${assistantMessage.length} characters`);
-    console.log(`Response preview: ${assistantMessage.substring(0, 100)}...`);
     
     // Return in OpenAI-compatible format for consistency
     return new Response(JSON.stringify({
@@ -116,22 +113,3 @@ serve(async (req) => {
     });
   }
 });
-
-function createSystemPrompt(messages: any[]): string {
-  // For the very first message, always ask for player count
-  if (messages.length <= 1) {
-    return `You are a helpful murder mystery creator. Your first question should ALWAYS be: "How many players do you want for your murder mystery?"
-
-Be conversational and ask only this question first. Do not generate any mystery content until you know the player count.`;
-  }
-  
-  // For subsequent messages, continue with mystery creation
-  return `You are a helpful murder mystery creator. Continue gathering the necessary information from the user one question at a time.
-
-If you haven't asked yet, ask about:
-- Number of players (if not already known)
-- Whether they want an accomplice
-- Any specific preferences they have
-
-Once you have enough information, you can generate a complete mystery preview.`;
-}
