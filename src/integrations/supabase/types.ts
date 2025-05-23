@@ -236,27 +236,18 @@ export type Database = {
           created_at: string | null
           has_purchased: boolean | null
           id: string
-          is_subscribed: boolean | null
-          purchase_date: string | null
-          subscription_tier: string | null
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
           has_purchased?: boolean | null
           id: string
-          is_subscribed?: boolean | null
-          purchase_date?: string | null
-          subscription_tier?: string | null
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
           has_purchased?: boolean | null
           id?: string
-          is_subscribed?: boolean | null
-          purchase_date?: string | null
-          subscription_tier?: string | null
           updated_at?: string | null
         }
         Relationships: []

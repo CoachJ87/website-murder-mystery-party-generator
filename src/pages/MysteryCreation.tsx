@@ -229,7 +229,6 @@ const MysteryCreation = () => {
                                 isLoadingHistory={isLoadingHistory}
                                 systemInstruction={systemInstruction}
                                 preventDuplicateMessages={true}
-                                skipForm={isEditing}
                             />
                         </CardContent>
                     </Card>
