@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,7 +31,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
-import { useCompletion } from 'ai/react';
 import { Message } from "@/components/types";
 
 interface MysteryChatProps {
@@ -43,6 +41,7 @@ interface MysteryChatProps {
   initialAdditionalDetails?: string;
   savedMysteryId?: string;
   onSave: (message: Message) => Promise<void>;
+  onGenerateFinal?: (messages: Message[]) => Promise<void>;
   initialMessages?: Message[];
   isLoadingHistory?: boolean;
   systemInstruction?: string;
@@ -74,6 +73,7 @@ export default function MysteryChat({
   initialAdditionalDetails,
   savedMysteryId,
   onSave,
+  onGenerateFinal,
   initialMessages = [],
   isLoadingHistory = false,
   systemInstruction,
@@ -101,7 +101,6 @@ export default function MysteryChat({
       theme: initialTheme || "",
       playerCount: initialPlayerCount || 4,
       hasAccomplice: initialHasAccomplice || false,
-      // scriptType: initialScriptType || 'full', // Default value for scriptType
       additionalDetails: initialAdditionalDetails || "",
     },
     mode: "onChange"
@@ -121,7 +120,6 @@ export default function MysteryChat({
       setCurrentHasAccomplice(initialHasAccomplice);
     }
     if (initialScriptType) {
-      // form.setValue("scriptType", initialScriptType);
       setCurrentScriptType(initialScriptType);
     }
     if (initialAdditionalDetails) {
@@ -465,37 +463,6 @@ export default function MysteryChat({
                   )}
                 />
 
-                {/* <FormField
-                  control={form.control}
-                  name="scriptType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Script Type</FormLabel>
-                      <Select
-                        onValueChange={(value) => {
-                          field.onChange(value);
-                          handleScriptTypeChange(value as 'full' | 'pointForm');
-                        }}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a script type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="full">Full Script</SelectItem>
-                          <SelectItem value="pointForm">Point Form</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormDescription>
-                        Choose between a full script or a point form script.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                /> */}
-
                 <FormField
                   control={form.control}
                   name="additionalDetails"
@@ -546,7 +513,7 @@ export default function MysteryChat({
             >
               <p className="text-sm whitespace-pre-line">{message.content}</p>
               <div className="text-xs text-gray-500 mt-1">
-                {message.timestamp.toLocaleTimeString()}
+                {message.timestamp ? message.timestamp.toLocaleTimeString() : new Date().toLocaleTimeString()}
               </div>
             </div>
           ))}
