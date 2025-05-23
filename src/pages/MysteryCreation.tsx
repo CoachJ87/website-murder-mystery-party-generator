@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -99,9 +98,8 @@ const MysteryCreation = () => {
                 setMessages(loadedMessages);
                 setSystemInstruction(data.system_instruction);
 
-                // Determine if we should skip the form based on existing messages
-                const hasMessages = loadedMessages.length > 0;
-                setShouldSkipForm(hasMessages);
+                // Always skip form when editing an existing conversation
+                setShouldSkipForm(true);
 
                 // Extract theme from mystery_data
                 let extractedTheme = "Murder Mystery";
