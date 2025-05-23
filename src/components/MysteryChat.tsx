@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -408,7 +409,8 @@ export default function MysteryChat({
       {!skipForm && (
         <Card className="mb-4">
           <CardHeader>
-            <FormLabel className="text-lg">Mystery Settings</FormLabel>
+            {/* Fix: Replace FormLabel with Label outside of Form context */}
+            <Label className="text-lg">Mystery Settings</Label>
             <CardDescription>
               Configure the basic settings for your murder mystery.
             </CardDescription>
@@ -610,3 +612,4 @@ export default function MysteryChat({
     </div>
   );
 }
+
