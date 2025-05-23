@@ -40,7 +40,7 @@ Be conversational and ask only this question first. Do not generate any mystery 
     
     console.log(`System prompt length: ${systemPrompt.length}`);
     
-    const model = 'claude-3-opus-20240229';
+    const model = 'claude-3-5-sonnet-20241022';
     const maxTokens = 2000;
     
     console.log(`Using model: ${model} with max tokens: ${maxTokens}`);

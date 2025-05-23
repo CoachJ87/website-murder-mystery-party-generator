@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Send } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Link } from "react-router-dom";
+import { supabase } from "@/lib/supabase";
 
 type Message = {
   id: string;
@@ -19,7 +20,7 @@ const initialMessages: Message[] = [
   {
     id: "1",
     role: "assistant",
-    content: "Hello! I'm your AI development assistant. Let me help you create a murder mystery. What theme would you like for your mystery?",
+    content: "Hello! I'm your AI development assistant. Let me help you create a murder mystery. How many players do you want for your murder mystery?",
     timestamp: new Date(),
   },
 ];
@@ -56,31 +57,55 @@ const ChatDemo = () => {
     setInput("");
     setIsLoading(true);
 
-    // Simulate AI response after a delay
-    setTimeout(() => {
-      let response = "";
+    try {
+      console.log("Sending message to mystery-ai function...");
       
-      // Ensure the AI response asks a follow-up question
-      if (input.toLowerCase().includes("app") || input.toLowerCase().includes("website")) {
-        response = "I can help you build a murder mystery with that theme! Let's start by defining the setting. Would you prefer a modern-day setting or something historical?";
-      } else if (input.toLowerCase().includes("train") || input.toLowerCase().includes("train")) {
-        response = "A train murder mystery sounds thrilling! Would you like this set in the modern day, or perhaps on a vintage luxury train like the Orient Express?";
-      } else if (input.toLowerCase().includes("help") || input.toLowerCase().includes("how")) {
-        response = "To create your murder mystery, I'll guide you through the process step by step. First, what theme or setting interests you for your murder mystery?";
-      } else {
-        response = "That's an interesting idea for a murder mystery! Now, let's think about the victim. What kind of character would you like as the victim?";
+      // Call the mystery-ai edge function
+      const { data, error } = await supabase.functions.invoke('mystery-ai', {
+        body: {
+          messages: [...messages, userMessage].map(msg => ({
+            role: msg.role,
+            content: msg.content
+          }))
+        }
+      });
+
+      if (error) {
+        console.error("Error calling mystery-ai function:", error);
+        throw new Error(`Failed to get AI response: ${error.message}`);
+      }
+
+      console.log("Response from mystery-ai function:", data);
+
+      let responseContent = "I'm having trouble responding right now. Please try again.";
+      
+      if (data?.choices?.[0]?.message?.content) {
+        responseContent = data.choices[0].message.content;
       }
 
       const assistantMessage: Message = {
-        id: Date.now().toString(),
+        id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: response,
+        content: responseContent,
         timestamp: new Date(),
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
+    } catch (error) {
+      console.error("Error in handleSendMessage:", error);
+      
+      // Fallback response
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content: "I'm having trouble connecting right now. How many players do you want for your murder mystery?",
+        timestamp: new Date(),
+      };
+
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   return (
