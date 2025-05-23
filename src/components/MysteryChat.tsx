@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardHeader, CardContent, CardDescription } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Send, Loader2, RefreshCw, Copy, CheckCircle } from "lucide-react";
+import { Send, Loader2, RefreshCw, Copy, CheckCircle, Zap } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Form,
@@ -405,11 +405,10 @@ export default function MysteryChat({
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full space-y-6">
       {!skipForm && (
         <Card className="mb-4">
           <CardHeader>
-            {/* Fix: Replace FormLabel with Label outside of Form context */}
             <Label className="text-lg">Mystery Settings</Label>
             <CardDescription>
               Configure the basic settings for your murder mystery.
@@ -525,50 +524,58 @@ export default function MysteryChat({
         </Card>
       )}
 
-      <div className="flex flex-col flex-grow overflow-hidden">
-        <div className="flex-grow overflow-y-auto px-4 py-2">
+      {/* Chat Container with proper border styling */}
+      <div className="border border-gray-300 rounded-lg bg-white overflow-hidden">
+        {/* Chat Messages Area */}
+        <div className="h-96 overflow-y-auto p-4 space-y-3 bg-gray-50">
           {isLoadingHistory && (
             <div className="text-center text-gray-500">
               <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" />
               Loading previous messages...
             </div>
           )}
+          
           {messages.map((message) => (
             <div
               key={message.id}
               className={cn(
-                "mb-2 rounded-lg px-3 py-2 w-fit max-w-[80%]",
-                message.is_ai
-                  ? "bg-secondary text-foreground ml-auto"
-                  : "bg-primary text-primary-foreground mr-auto"
+                "flex",
+                message.is_ai ? "justify-start" : "justify-end"
               )}
             >
-              <p className="text-sm whitespace-pre-line">{message.content}</p>
-              <div className="text-xs text-gray-500 mt-1">
-                {message.timestamp && message.timestamp instanceof Date 
-                  ? message.timestamp.toLocaleTimeString()
-                  : new Date().toLocaleTimeString()
-                }
+              <div
+                className={cn(
+                  "max-w-[80%] rounded-lg px-4 py-3 border",
+                  message.is_ai
+                    ? "bg-orange-200 border-orange-300 text-gray-800"
+                    : "bg-gray-200 border-gray-300 text-gray-800"
+                )}
+              >
+                <p className="text-sm whitespace-pre-line leading-relaxed">{message.content}</p>
               </div>
             </div>
           ))}
+          
           {isAiTyping && (
-            <div className="ml-auto mb-2 rounded-lg px-3 py-2 w-fit max-w-[80%] bg-secondary text-foreground">
-              <div className="flex space-x-2">
-                <div className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                <div className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                <div className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
+            <div className="flex justify-start">
+              <div className="bg-orange-200 border border-orange-300 rounded-lg px-4 py-3 max-w-[80%]">
+                <div className="flex space-x-2">
+                  <div className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                  <div className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                  <div className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
+                </div>
               </div>
             </div>
           )}
           <div ref={bottomRef} />
         </div>
 
-        <div className="border-t border-muted bg-secondary/50 p-4">
-          <div className="flex items-center space-x-2">
+        {/* Chat Input Area */}
+        <div className="border-t border-gray-300 bg-white p-4">
+          <div className="flex items-center space-x-2 mb-3">
             <Input
               type="text"
-              placeholder="Type your message..."
+              placeholder="Ask the AI..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => {
@@ -578,38 +585,56 @@ export default function MysteryChat({
                 }
               }}
               disabled={isAiTyping}
-              className="flex-grow"
+              className="flex-grow border-gray-300"
             />
-            <Button type="submit" onClick={() => handleSendMessage(input)} disabled={isAiTyping}>
-              {isAiTyping ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
-              Send
+            <Button 
+              type="submit" 
+              onClick={() => handleSendMessage(input)} 
+              disabled={isAiTyping}
+              size="icon"
+              className="bg-orange-400 hover:bg-orange-500 border border-orange-500"
+            >
+              {isAiTyping ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
             </Button>
           </div>
-          <div className="flex items-center justify-between mt-2">
-            <Button variant="ghost" size="sm" onClick={handleCopyClick} disabled={messages.length === 0}>
-              {isCopied ? <CheckCircle className="mr-2 h-4 w-4" /> : <Copy className="mr-2 h-4 w-4" />}
+          
+          {/* Action Buttons */}
+          <div className="flex items-center justify-between">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleCopyClick} 
+              disabled={messages.length === 0}
+              className="text-xs"
+            >
+              {isCopied ? <CheckCircle className="mr-1 h-3 w-3" /> : <Copy className="mr-1 h-3 w-3" />}
               {isCopied ? "Copied!" : "Copy Messages"}
             </Button>
-            <Button variant="ghost" size="sm" onClick={handleResetClick} disabled={messages.length === 0}>
-              <RefreshCw className="mr-2 h-4 w-4" />
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleResetClick} 
+              disabled={messages.length === 0}
+              className="text-xs"
+            >
+              <RefreshCw className="mr-1 h-3 w-3" />
               Reset Chat
             </Button>
           </div>
         </div>
       </div>
       
+      {/* Generate Final Mystery Button */}
       {onGenerateFinal && messages.length > 0 && (
-        <div className="mt-2">
-          <Button
-            onClick={() => onGenerateFinal(messages)}
-            variant="default"
-            className="w-full"
-          >
-            Generate Final Mystery
-          </Button>
-        </div>
+        <Button
+          onClick={() => onGenerateFinal(messages)}
+          className="w-full bg-red-500 hover:bg-red-600 text-white py-3"
+          size="lg"
+        >
+          <Zap className="mr-2 h-5 w-5" />
+          Generate Final Mystery
+        </Button>
       )}
     </div>
   );
 }
-
