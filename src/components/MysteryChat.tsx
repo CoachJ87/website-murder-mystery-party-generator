@@ -408,7 +408,7 @@ export default function MysteryChat({
       {!skipForm && (
         <Card className="mb-4">
           <CardHeader>
-            <FormLabel className="text-lg">Mystery Settings</FormLabel>
+            <Label className="text-lg">Mystery Settings</Label>
             <CardDescription>
               Configure the basic settings for your murder mystery.
             </CardDescription>
