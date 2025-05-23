@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,6 +32,7 @@ import * as z from "zod";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
 import { Message } from "@/components/types";
+import { supabase } from "@/lib/supabase";
 
 interface MysteryChatProps {
   initialTheme?: string;
@@ -207,31 +207,27 @@ export default function MysteryChat({
 
       console.log("System prompt being sent:", systemPrompt.substring(0, 200) + "...");
 
-      const response = await fetch('/api/proxy-anthropic', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      // Use the Supabase function directly instead of the non-existent proxy
+      const { data, error } = await supabase.functions.invoke('mystery-ai', {
+        body: {
           messages: newMessages.map(msg => ({
             role: msg.is_ai ? "assistant" : "user",
             content: msg.content
           })),
           system: systemPrompt,
           promptVersion: 'free'
-        })
+        }
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (error) {
+        throw new Error(`Supabase function error: ${error.message}`);
       }
 
-      const data = await response.json();
       console.log("=== AI Response Received ===");
       console.log("Response data:", data);
 
-      if (data.content && data.content[0] && data.content[0].text) {
-        const aiResponse = data.content[0].text;
+      if (data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
+        const aiResponse = data.choices[0].message.content;
         console.log("AI response content:", aiResponse);
 
         const aiMessage: Message = {
@@ -391,7 +387,7 @@ export default function MysteryChat({
         </Card>
       )}
 
-      {/* Chat Container - Restored original design */}
+      {/* Chat Container */}
       <div className="border rounded-lg bg-background">
         {/* Chat Messages Area */}
         <div className="h-96 overflow-y-auto p-4 space-y-3">
