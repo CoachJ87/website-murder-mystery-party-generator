@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -94,6 +95,9 @@ export default function MysteryChat({
   const { isAuthenticated } = useAuth();
   const isMobile = useIsMobile();
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  // Determine if form should be shown - hide it if we have a savedMysteryId (editing existing) or if explicitly skipped
+  const shouldSkipForm = skipForm || !!savedMysteryId;
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -405,7 +409,7 @@ export default function MysteryChat({
 
   return (
     <div className="flex flex-col h-full">
-      {!skipForm && (
+      {!shouldSkipForm && (
         <Card className="mb-4">
           <CardHeader>
             <Label className="text-lg">Mystery Settings</Label>
@@ -562,7 +566,7 @@ export default function MysteryChat({
           <div ref={bottomRef} />
         </div>
 
-        <div className="border-t border-muted bg-secondary/50 p-4">
+        <div className="border-t border-muted bg-background p-4">
           <div className="flex items-center space-x-2">
             <Input
               type="text"

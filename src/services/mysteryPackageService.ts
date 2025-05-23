@@ -42,7 +42,7 @@ export interface GenerationStatus {
 
 export async function generateCompletePackage(mysteryId: string, testMode = false): Promise<string> {
   try {
-    console.log("Fetching content for conversation ID:", mysteryId);
+    console.log("Starting package generation for conversation ID:", mysteryId);
     
     // Create or update the mystery_packages record
     const { data: packageData, error: checkError } = await supabase
@@ -61,7 +61,7 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
     const initialStatus: GenerationStatus = {
       status: 'in_progress',
       progress: 10,
-      currentStep: 'Sending to external generation service...',
+      currentStep: 'Preparing to send to external generation service...',
       sections: {
         hostGuide: false,
         characters: false,
@@ -113,14 +113,17 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
     // Save the initial state to display immediately
     await saveGenerationState(mysteryId, {
       currentlyGenerating: 'webhook',
-      webhook: 'Sending to external generation service...',
+      webhook: 'Preparing to send to external generation service...',
       generationStatus: initialStatus
     });
     
     try {
-      // IMPORTANT: Use environment variables, not the supabase client properties
+      // Use environment variables
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      
+      console.log("Calling webhook trigger with URL:", `${supabaseUrl}/functions/v1/mystery-webhook-trigger`);
+      console.log("Test mode:", testMode);
       
       // Call the webhook trigger edge function
       const response = await fetch(`${supabaseUrl}/functions/v1/mystery-webhook-trigger`, {
@@ -129,24 +132,30 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${supabaseAnonKey}`
         },
-        body: JSON.stringify({ conversationId: mysteryId, testMode })
+        body: JSON.stringify({ 
+          conversationId: mysteryId, 
+          testMode: testMode 
+        })
       });
+      
+      console.log("Webhook response status:", response.status);
       
       if (!response.ok) {
         let errorText = "";
         try {
           const errorData = await response.json();
-          errorText = errorData.error || response.statusText;
+          errorText = errorData.error || errorData.message || response.statusText;
+          console.error("Webhook error response:", errorData);
         } catch (e) {
           errorText = await response.text() || response.statusText;
+          console.error("Webhook error text:", errorText);
         }
         
-        console.error("Webhook trigger error:", errorText);
         throw new Error(`Failed to trigger webhook: ${response.status} ${errorText}`);
       }
       
       const responseData = await response.json();
-      console.log("Webhook trigger response:", responseData);
+      console.log("Webhook trigger successful:", responseData);
       
       // Update status to "waiting for external processing"
       const waitingStatus: GenerationStatus = {
@@ -186,7 +195,7 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
         })
         .eq("id", mysteryId);
       
-      // The content will be filled by the external service
+      console.log("Package generation initiated successfully");
       return "Sent to external generation service";
       
     } catch (error) {
