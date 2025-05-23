@@ -96,7 +96,7 @@ const MysteryCreation = () => {
             
             if (data) {
                 setConversationId(data.id);
-                const loadedMessages = data.messages as Message[] || [];
+                const loadedMessages = data.messages as any[] || [];
                 
                 // Convert database messages to the correct format
                 const formattedMessages = loadedMessages.map(msg => ({
