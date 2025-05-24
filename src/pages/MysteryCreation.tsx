@@ -120,12 +120,19 @@ const MysteryCreation = () => {
                 }
                 setTheme(extractedTheme);
 
-                // Check if we have a user message but no AI response
+                // Check if we have a user message but no proper AI response
                 const hasUserMessage = formattedMessages.some(msg => !msg.is_ai);
-                const hasAIResponse = formattedMessages.some(msg => msg.is_ai);
+                const hasProperAIResponse = formattedMessages.some(msg => 
+                    msg.is_ai && 
+                    !msg.content.includes("I'm having trouble") &&
+                    !msg.content.includes("apologize")
+                );
                 
-                if (hasUserMessage && !hasAIResponse) {
-                    console.log("Found user message without AI response, triggering AI response");
+                console.log("Has user message:", hasUserMessage);
+                console.log("Has proper AI response:", hasProperAIResponse);
+                
+                if (hasUserMessage && !hasProperAIResponse) {
+                    console.log("Found user message without proper AI response, triggering AI response");
                     setNeedsInitialAIResponse(true);
                 }
 
