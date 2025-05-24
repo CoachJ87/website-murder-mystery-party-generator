@@ -58,7 +58,7 @@ const ChatDemo = () => {
     setIsLoading(true);
 
     try {
-      console.log("Sending message to mystery-ai function...");
+      console.log("Calling mystery-ai function with messages:", [...messages, userMessage]);
       
       // Call the mystery-ai edge function
       const { data, error } = await supabase.functions.invoke('mystery-ai', {
@@ -70,17 +70,20 @@ const ChatDemo = () => {
         }
       });
 
-      if (error) {
-        console.error("Error calling mystery-ai function:", error);
-        throw new Error(`Failed to get AI response: ${error.message}`);
-      }
+      console.log("Supabase function response:", { data, error });
 
-      console.log("Response from mystery-ai function:", data);
+      if (error) {
+        console.error("Supabase function error:", error);
+        throw new Error(`Function call failed: ${error.message}`);
+      }
 
       let responseContent = "I'm having trouble responding right now. Please try again.";
       
       if (data?.choices?.[0]?.message?.content) {
         responseContent = data.choices[0].message.content;
+      } else if (data?.error) {
+        console.error("API error in response:", data.error);
+        responseContent = "I'm experiencing some technical difficulties. How many players do you want for your murder mystery?";
       }
 
       const assistantMessage: Message = {

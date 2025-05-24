@@ -16,42 +16,55 @@ serve(async (req) => {
     console.log("Processing request with mystery-ai edge function");
     
     const requestBody = await req.json();
-    console.log("Successfully parsed request body");
+    console.log("Request body received:", JSON.stringify(requestBody, null, 2));
     
-    const { messages, system } = requestBody;
+    const { messages } = requestBody;
     
-    console.log(`Processing request with ${messages?.length || 0} messages`);
-    
-    // Standardize message format
-    const standardMessages = (messages || []).map((msg: any) => ({
-      role: msg.role || (msg.is_ai ? "assistant" : "user"),
-      content: msg.content || ""
-    })).filter((msg: any) => msg.content.trim() !== '');
-    
-    console.log(`Total messages count: ${standardMessages.length}`);
-    
-    // Create system prompt - always ask for player count first if it's the initial message
-    let systemPrompt = system;
-    if (!systemPrompt || standardMessages.length <= 1) {
-      systemPrompt = `You are a helpful murder mystery creator. Your first question should ALWAYS be: "How many players do you want for your murder mystery?"
-
-Be conversational and ask only this question first. Do not generate any mystery content until you know the player count.`;
+    if (!messages || !Array.isArray(messages)) {
+      throw new Error('Messages array is required');
     }
     
-    console.log(`System prompt length: ${systemPrompt.length}`);
+    console.log(`Processing request with ${messages.length} messages`);
     
-    const model = 'claude-3-5-sonnet-20241022';
-    const maxTokens = 2000;
-    
-    console.log(`Using model: ${model} with max tokens: ${maxTokens}`);
-    
+    // Get the Anthropic API key
     const anthropicApiKey = Deno.env.get('ANTHROPIC_API_KEY');
     if (!anthropicApiKey) {
       console.error('ANTHROPIC_API_KEY not found in environment variables');
-      throw new Error('ANTHROPIC_API_KEY not found in environment variables');
+      throw new Error('ANTHROPIC_API_KEY not configured');
     }
     
-    console.log("Starting Anthropic API call");
+    // Create system prompt that always asks for player count first
+    let systemPrompt = `You are a helpful murder mystery creator. Your first question should ALWAYS be: "How many players do you want for your murder mystery?"
+
+Be conversational and ask only this question first. Do not generate any mystery content until you know the player count.
+
+After getting the player count, proceed to ask about theme, then other details one at a time before creating the full mystery.`;
+    
+    // If this is not the first message, check if we have player count info
+    if (messages.length > 1) {
+      const hasPlayerCount = messages.some(msg => 
+        msg.content && (
+          msg.content.includes('player') || 
+          msg.content.match(/\d+/) || 
+          msg.content.includes('people') || 
+          msg.content.includes('guests')
+        )
+      );
+      
+      if (hasPlayerCount) {
+        systemPrompt = `You are a murder mystery creator. Help the user create an engaging murder mystery step by step. Ask for details one at a time: theme, setting, victim details, etc. Once you have enough information, create a complete mystery outline.`;
+      }
+    }
+    
+    console.log("System prompt:", systemPrompt);
+    
+    // Format messages for Anthropic API
+    const anthropicMessages = messages.map(msg => ({
+      role: msg.role === 'assistant' ? 'assistant' : 'user',
+      content: msg.content || ''
+    })).filter(msg => msg.content.trim() !== '');
+    
+    console.log("Formatted messages for Anthropic:", anthropicMessages);
     
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -61,10 +74,10 @@ Be conversational and ask only this question first. Do not generate any mystery 
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model,
-        max_tokens: maxTokens,
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 2000,
         system: systemPrompt,
-        messages: standardMessages,
+        messages: anthropicMessages,
         temperature: 0.7
       })
     });
@@ -76,7 +89,7 @@ Be conversational and ask only this question first. Do not generate any mystery 
     }
     
     const data = await response.json();
-    console.log("Received response from Anthropic API");
+    console.log("Anthropic API response:", data);
     
     const assistantMessage = data.content?.[0]?.text;
     if (!assistantMessage) {
@@ -85,7 +98,7 @@ Be conversational and ask only this question first. Do not generate any mystery 
     
     console.log(`Response length: ${assistantMessage.length} characters`);
     
-    // Return in OpenAI-compatible format for consistency
+    // Return in the format expected by the frontend
     return new Response(JSON.stringify({
       choices: [{
         message: {
@@ -99,6 +112,8 @@ Be conversational and ask only this question first. Do not generate any mystery 
     
   } catch (error) {
     console.error('Error in mystery-ai function:', error);
+    
+    // Return a proper error response that the frontend can handle
     return new Response(JSON.stringify({ 
       error: error.message,
       choices: [{
@@ -108,7 +123,7 @@ Be conversational and ask only this question first. Do not generate any mystery 
         }
       }]
     }), {
-      status: 500,
+      status: 200, // Return 200 so the frontend doesn't treat it as a failed request
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
   }
