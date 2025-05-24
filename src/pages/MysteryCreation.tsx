@@ -108,7 +108,12 @@ const MysteryCreation = () => {
                 }));
                 
                 setMessages(formattedMessages);
-                setSystemInstruction(data.system_instruction);
+                
+                // For existing conversations with system instructions, use them
+                // This preserves the behavior for conversations that have progressed past initial setup
+                if (data.system_instruction) {
+                    setSystemInstruction(data.system_instruction);
+                }
 
                 // Always skip form when editing an existing conversation
                 setShouldSkipForm(true);

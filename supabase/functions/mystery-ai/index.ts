@@ -1,4 +1,5 @@
 
+
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -46,6 +47,7 @@ serve(async (req) => {
     }
     
     console.log(`Processing request with ${messages.length} messages`);
+    console.log("Custom system prompt provided:", !!system);
     
     // Get the Anthropic API key
     const anthropicApiKey = Deno.env.get('ANTHROPIC_API_KEY');
@@ -54,30 +56,56 @@ serve(async (req) => {
       throw new Error('ANTHROPIC_API_KEY not configured');
     }
     
-    // Use provided system instruction or create default
-    let systemPrompt = system || `You are a helpful murder mystery creator. Your first question should ALWAYS be: "How many players do you want for your murder mystery?"
+    // Determine system prompt based on conversation state
+    let systemPrompt = system;
+    
+    if (!systemPrompt) {
+      // Default behavior for new conversations without custom system prompt
+      console.log("No custom system prompt - using default player count question");
+      
+      // Check if this looks like a brand new conversation (1 message, likely asking for mystery creation)
+      if (messages.length === 1) {
+        const userMessage = messages[0].content || '';
+        const looksLikeInitialRequest = userMessage.toLowerCase().includes('mystery') || 
+                                       userMessage.toLowerCase().includes('murder') ||
+                                       userMessage.toLowerCase().includes('design') ||
+                                       userMessage.toLowerCase().includes('create') ||
+                                       userMessage.toLowerCase().includes('craft');
+        
+        if (looksLikeInitialRequest) {
+          console.log("Detected initial mystery creation request - asking for player count");
+          systemPrompt = `You are a helpful murder mystery creator. Your first question should ALWAYS be: "How many players do you want for your murder mystery?"
 
 Be conversational and ask only this question first. Do not generate any mystery content until you know the player count.
 
 After getting the player count, proceed to ask about theme, then other details one at a time before creating the full mystery.`;
-    
-    // If this is not the first message, check if we have player count info
-    if (messages.length > 1) {
-      const hasPlayerCount = messages.some(msg => 
-        msg.content && (
-          msg.content.includes('player') || 
-          msg.content.match(/\d+/) || 
-          msg.content.includes('people') || 
-          msg.content.includes('guests')
-        )
-      );
+        }
+      }
       
-      if (hasPlayerCount && !system) {
-        systemPrompt = `You are a murder mystery creator. Help the user create an engaging murder mystery step by step. Ask for details one at a time: theme, setting, victim details, etc. Once you have enough information, create a complete mystery outline.`;
+      // If still no system prompt, check if conversation has progressed enough
+      if (!systemPrompt) {
+        const hasPlayerCount = messages.some(msg => 
+          msg.content && (
+            msg.content.includes('player') || 
+            msg.content.match(/\d+/) || 
+            msg.content.includes('people') || 
+            msg.content.includes('guests')
+          )
+        );
+        
+        if (hasPlayerCount) {
+          console.log("Detected player count in conversation - using creation mode");
+          systemPrompt = `You are a murder mystery creator. Help the user create an engaging murder mystery step by step. Ask for details one at a time: theme, setting, victim details, etc. Once you have enough information, create a complete mystery outline.`;
+        } else {
+          console.log("No player count detected - asking for it");
+          systemPrompt = `You are a helpful murder mystery creator. Your first question should ALWAYS be: "How many players do you want for your murder mystery?"
+
+Be conversational and ask only this question first. Do not generate any mystery content until you know the player count.`;
+        }
       }
     }
     
-    console.log("System prompt being used:", systemPrompt.substring(0, 200) + "...");
+    console.log("Final system prompt being used:", systemPrompt.substring(0, 200) + "...");
     
     // Format messages for Anthropic API
     const anthropicMessages = messages.map(msg => ({
@@ -155,3 +183,4 @@ After getting the player count, proceed to ask about theme, then other details o
     return errorResponse;
   }
 });
+

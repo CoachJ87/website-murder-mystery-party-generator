@@ -149,6 +149,25 @@ export default function MysteryChat({
     }
   }, [needsInitialAIResponse, hasTriggeredInitialResponse, messages, isLoadingHistory]);
 
+  // Helper function to detect if conversation has progressed past initial setup
+  const hasPlayerCountInfo = () => {
+    // Check if we have explicit player count from props
+    if (initialPlayerCount && initialPlayerCount > 0) return true;
+    
+    // Check if any message mentions player count
+    return messages.some(msg => {
+      const content = msg.content.toLowerCase();
+      return content.includes('player') || 
+             content.match(/\d+\s*(people|guests|characters)/i) ||
+             content.match(/\b\d+\b/) && (content.includes('murder') || content.includes('mystery'));
+    });
+  };
+
+  // Helper function to detect if we have theme information
+  const hasThemeInfo = () => {
+    return currentTheme && currentTheme.trim() !== '' && currentTheme !== 'Murder Mystery';
+  };
+
   useEffect(() => {
     if (initialTheme) {
       form.setValue("theme", initialTheme);
@@ -176,9 +195,24 @@ export default function MysteryChat({
   }, [messages, isAiTyping]);
 
   const createSystemMessage = (data: any) => {
+    // For brand new conversations without player count, don't send detailed system prompt
+    // Let the edge function handle the initial "ask for player count" behavior
+    if (!hasPlayerCountInfo() && messages.length <= 1) {
+      console.log("New conversation without player count - letting edge function handle initial prompt");
+      return null;
+    }
+
+    // Only create detailed system prompt if we have progressed past initial setup
     let systemMsg = "You are a helpful mystery writer. Your job is to help the user create an exciting murder mystery game.";
-    systemMsg += `\nThe user wants to create a murder mystery with theme: ${data.theme}. `;
-    systemMsg += `The user wants to create a murder mystery with ${data.playerCount} players. `;
+    
+    if (hasThemeInfo()) {
+      systemMsg += `\nThe user wants to create a murder mystery with theme: ${currentTheme}. `;
+    }
+    
+    if (hasPlayerCountInfo()) {
+      systemMsg += `The user wants to create a murder mystery with ${data.playerCount || currentPlayerCount} players. `;
+    }
+    
     systemMsg += `The user wants to create a murder mystery with ${data.hasAccomplice ? 'an' : 'no'} accomplice. `;
     systemMsg += `The user wants to create a murder mystery with a ${data.scriptType} script. `;
     
@@ -193,8 +227,8 @@ export default function MysteryChat({
 ## VICTIM
 **[Victim Name]** - [Description of the victim including their role and why they might have enemies]
 
-## CHARACTER LIST (${data.playerCount} PLAYERS)
-[List all ${data.playerCount} characters with descriptions]
+## CHARACTER LIST (${data.playerCount || currentPlayerCount} PLAYERS)
+[List all ${data.playerCount || currentPlayerCount} characters with descriptions]
 
 ## MURDER METHOD
 [Describe how the murder was committed and what clues might be found]
@@ -211,21 +245,31 @@ export default function MysteryChat({
   };
 
   // Enhanced AI response function with retry logic
-  const callAIWithRetry = async (messages: any[], systemPrompt: string, retryCount = 0): Promise<any> => {
+  const callAIWithRetry = async (messages: any[], systemPrompt: string | null, retryCount = 0): Promise<any> => {
     const maxRetries = 3;
     
     try {
       console.log(`Attempt ${retryCount + 1} - Calling mystery-ai function`);
       console.log("Messages being sent:", messages);
-      console.log("System prompt:", systemPrompt.substring(0, 200) + "...");
+      if (systemPrompt) {
+        console.log("System prompt:", systemPrompt.substring(0, 200) + "...");
+      } else {
+        console.log("No custom system prompt - using edge function default");
+      }
       
+      const requestBody: any = {
+        messages: messages,
+        promptVersion: 'free',
+        preventTruncation: true
+      };
+
+      // Only add system prompt if we have one
+      if (systemPrompt) {
+        requestBody.system = systemPrompt;
+      }
+
       const { data, error } = await supabase.functions.invoke('mystery-ai', {
-        body: {
-          messages: messages,
-          system: systemPrompt,
-          promptVersion: 'free',
-          preventTruncation: true
-        }
+        body: requestBody
       });
 
       console.log("Supabase function response:", { data, error });
@@ -261,14 +305,26 @@ export default function MysteryChat({
       console.log("=== Starting AI Request for Initial Response ===");
       console.log("User message:", userContent);
       console.log("Current conversation length:", messages.length);
+      console.log("Has player count info:", hasPlayerCountInfo());
+      console.log("Has theme info:", hasThemeInfo());
       
-      const systemPrompt = systemInstruction || createSystemMessage({
-        theme: currentTheme,
-        playerCount: currentPlayerCount,
-        hasAccomplice: currentHasAccomplice,
-        scriptType: currentScriptType,
-        additionalDetails: currentAdditionalDetails
-      });
+      // Determine system prompt based on conversation state
+      let systemPrompt = null;
+      
+      if (systemInstruction) {
+        // Use provided system instruction (for editing existing conversations)
+        systemPrompt = systemInstruction;
+      } else if (hasPlayerCountInfo() && hasThemeInfo()) {
+        // Create detailed system prompt only if we have collected basic info
+        systemPrompt = createSystemMessage({
+          theme: currentTheme,
+          playerCount: currentPlayerCount,
+          hasAccomplice: currentHasAccomplice,
+          scriptType: currentScriptType,
+          additionalDetails: currentAdditionalDetails
+        });
+      }
+      // If no conditions met, systemPrompt remains null and edge function will use default
 
       const messagesToSend = messages.map(msg => ({
         role: msg.is_ai ? "assistant" : "user",
@@ -346,14 +402,26 @@ export default function MysteryChat({
       console.log("=== Starting AI Request ===");
       console.log("User message:", content);
       console.log("Current conversation length:", newMessages.length);
+      console.log("Has player count info:", hasPlayerCountInfo());
+      console.log("Has theme info:", hasThemeInfo());
       
-      const systemPrompt = systemInstruction || createSystemMessage({
-        theme: currentTheme,
-        playerCount: currentPlayerCount,
-        hasAccomplice: currentHasAccomplice,
-        scriptType: currentScriptType,
-        additionalDetails: currentAdditionalDetails
-      });
+      // Determine system prompt based on conversation state
+      let systemPrompt = null;
+      
+      if (systemInstruction) {
+        // Use provided system instruction (for editing existing conversations)
+        systemPrompt = systemInstruction;
+      } else if (hasPlayerCountInfo() && hasThemeInfo()) {
+        // Create detailed system prompt only if we have collected basic info
+        systemPrompt = createSystemMessage({
+          theme: currentTheme,
+          playerCount: currentPlayerCount,
+          hasAccomplice: currentHasAccomplice,
+          scriptType: currentScriptType,
+          additionalDetails: currentAdditionalDetails
+        });
+      }
+      // If no conditions met, systemPrompt remains null and edge function will use default
 
       const messagesToSend = newMessages.map(msg => ({
         role: msg.is_ai ? "assistant" : "user",
@@ -570,16 +638,16 @@ export default function MysteryChat({
                     <ReactMarkdown 
                       rehypePlugins={[rehypeRaw]}
                       components={{
-                        h1: ({node, ...props}) => <h1 className={markdownStyles.h1} {...props} />,
-                        h2: ({node, ...props}) => <h2 className={markdownStyles.h2} {...props} />,
-                        h3: ({node, ...props}) => <h3 className={markdownStyles.h3} {...props} />,
-                        p: ({node, ...props}) => <p className={markdownStyles.p} {...props} />,
-                        ul: ({node, ...props}) => <ul className={markdownStyles.ul} {...props} />,
-                        ol: ({node, ...props}) => <ol className={markdownStyles.ol} {...props} />,
-                        li: ({node, ...props}) => <li className={markdownStyles.li} {...props} />,
-                        strong: ({node, ...props}) => <strong className={markdownStyles.strong} {...props} />,
-                        em: ({node, ...props}) => <em className={markdownStyles.em} {...props} />,
-                        blockquote: ({node, ...props}) => <blockquote className={markdownStyles.blockquote} {...props} />
+                        h1: ({node, ...props}) => <h1 className="text-2xl font-bold mt-4 mb-2" {...props} />,
+                        h2: ({node, ...props}) => <h2 className="text-xl font-semibold mt-3 mb-2" {...props} />,
+                        h3: ({node, ...props}) => <h3 className="text-lg font-medium mt-2 mb-1" {...props} />,
+                        p: ({node, ...props}) => <p className="my-1" {...props} />,
+                        ul: ({node, ...props}) => <ul className="list-disc pl-6 my-2" {...props} />,
+                        ol: ({node, ...props}) => <ol className="list-decimal pl-6 my-2" {...props} />,
+                        li: ({node, ...props}) => <li className="my-1" {...props} />,
+                        strong: ({node, ...props}) => <strong className="font-bold" {...props} />,
+                        em: ({node, ...props}) => <em className="italic" {...props} />,
+                        blockquote: ({node, ...props}) => <blockquote className="pl-4 border-l-4 border-gray-300 italic my-2" {...props} />
                       }}
                     >
                       {message.content}
