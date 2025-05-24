@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -89,7 +90,8 @@ export default function MysteryChat({
   const [messages, setMessages] = useState<Message[]>([]);
   const [isAiTyping, setIsAiTyping] = useState(false);
   const [currentTheme, setCurrentTheme] = useState(initialTheme || '');
-  const [currentPlayerCount, setCurrentPlayerCount] = useState(initialPlayerCount || 4);
+  // CRITICAL FIX: Use null as default instead of 4 to properly detect when player count is missing
+  const [currentPlayerCount, setCurrentPlayerCount] = useState<number | null>(initialPlayerCount || null);
   const [currentHasAccomplice, setCurrentHasAccomplice] = useState(initialHasAccomplice || false);
   const [currentScriptType, setCurrentScriptType] = useState(initialScriptType || 'full');
   const [currentAdditionalDetails, setCurrentAdditionalDetails] = useState(initialAdditionalDetails || '');
@@ -149,23 +151,31 @@ export default function MysteryChat({
     }
   }, [needsInitialAIResponse, hasTriggeredInitialResponse, messages, isLoadingHistory]);
 
-  // Helper function to detect if conversation has progressed past initial setup
+  // CRITICAL FIX: Updated function to properly detect if we have player count
   const hasPlayerCountInfo = () => {
-    // Check if we have explicit player count from props
-    if (initialPlayerCount && initialPlayerCount > 0) return true;
+    // Check if we have explicit player count from props AND it's not a default value
+    if (initialPlayerCount && initialPlayerCount > 0 && currentPlayerCount && currentPlayerCount > 0) return true;
     
-    // Check if any message mentions player count
-    return messages.some(msg => {
+    // Check if any message mentions player count (but not default assumptions)
+    const hasPlayerCountInMessages = messages.some(msg => {
       const content = msg.content.toLowerCase();
-      return content.includes('player') || 
-             content.match(/\d+\s*(people|guests|characters)/i) ||
-             content.match(/\b\d+\b/) && (content.includes('murder') || content.includes('mystery'));
+      // Look for explicit player count mentions, not just any number
+      return (content.includes('player') && content.match(/\d+/)) || 
+             content.match(/\d+\s*(people|guests|characters|participants)/i) ||
+             (content.includes('how many') && (content.includes('player') || content.includes('people')));
     });
+    
+    return hasPlayerCountInMessages;
   };
 
   // Helper function to detect if we have theme information
   const hasThemeInfo = () => {
     return currentTheme && currentTheme.trim() !== '' && currentTheme !== 'Murder Mystery';
+  };
+
+  // CRITICAL FIX: Detect if this is a truly new conversation
+  const isNewConversation = () => {
+    return messages.length <= 1 && !systemInstruction && !hasPlayerCountInfo();
   };
 
   useEffect(() => {
@@ -196,8 +206,8 @@ export default function MysteryChat({
 
   const createSystemMessage = (data: any) => {
     // CRITICAL: For new conversations without player count, return null to let edge function handle the flow
-    if (!hasPlayerCountInfo()) {
-      console.log("No player count info - returning null to let edge function ask for player count");
+    if (isNewConversation()) {
+      console.log("New conversation detected - returning null to let edge function ask for player count");
       return null;
     }
 
@@ -306,16 +316,17 @@ export default function MysteryChat({
       console.log("Current conversation length:", messages.length);
       console.log("Has player count info:", hasPlayerCountInfo());
       console.log("Has theme info:", hasThemeInfo());
+      console.log("Is new conversation:", isNewConversation());
       
-      // CRITICAL FIX: Only create system prompt if we have BOTH player count AND existing system instruction
+      // CRITICAL FIX: Only create system prompt in specific scenarios
       let systemPrompt = null;
       
-      if (systemInstruction) {
+      if (systemInstruction && !isNewConversation()) {
         // Use provided system instruction (for editing existing conversations)
         systemPrompt = systemInstruction;
-        console.log("Using provided systemInstruction");
-      } else if (hasPlayerCountInfo()) {
-        // Only create detailed system prompt if we have player count
+        console.log("Using provided systemInstruction for existing conversation");
+      } else if (hasPlayerCountInfo() && !isNewConversation()) {
+        // Only create detailed system prompt if we have player count and it's not a new conversation
         systemPrompt = createSystemMessage({
           theme: currentTheme,
           playerCount: currentPlayerCount,
@@ -325,7 +336,7 @@ export default function MysteryChat({
         });
         console.log("Created system prompt because we have player count");
       } else {
-        console.log("No system prompt - letting edge function handle player count question");
+        console.log("No system prompt - letting edge function handle player count question for new conversation");
       }
 
       const messagesToSend = messages.map(msg => ({
@@ -406,16 +417,17 @@ export default function MysteryChat({
       console.log("Current conversation length:", newMessages.length);
       console.log("Has player count info:", hasPlayerCountInfo());
       console.log("Has theme info:", hasThemeInfo());
+      console.log("Is new conversation:", isNewConversation());
       
-      // CRITICAL FIX: Only create system prompt if we have BOTH player count AND existing system instruction  
+      // CRITICAL FIX: Only create system prompt in specific scenarios
       let systemPrompt = null;
       
-      if (systemInstruction) {
+      if (systemInstruction && !isNewConversation()) {
         // Use provided system instruction (for editing existing conversations)
         systemPrompt = systemInstruction;
-        console.log("Using provided systemInstruction");
-      } else if (hasPlayerCountInfo()) {
-        // Only create detailed system prompt if we have player count
+        console.log("Using provided systemInstruction for existing conversation");
+      } else if (hasPlayerCountInfo() && !isNewConversation()) {
+        // Only create detailed system prompt if we have player count and it's not a new conversation
         systemPrompt = createSystemMessage({
           theme: currentTheme,
           playerCount: currentPlayerCount,
@@ -425,7 +437,7 @@ export default function MysteryChat({
         });
         console.log("Created system prompt because we have player count");
       } else {
-        console.log("No system prompt - letting edge function handle player count question");
+        console.log("No system prompt - letting edge function handle player count question for new conversation");
       }
 
       const messagesToSend = newMessages.map(msg => ({
