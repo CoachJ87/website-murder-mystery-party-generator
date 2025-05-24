@@ -43,6 +43,20 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
   try {
     console.log("Fetching content for conversation ID:", mysteryId);
     
+    // First, get the conversation data with messages
+    const { data: conversation, error: conversationError } = await supabase
+      .from("conversations")
+      .select("*, messages(*), user_id")
+      .eq("id", mysteryId)
+      .single();
+
+    if (conversationError || !conversation) {
+      console.error("Error fetching conversation:", conversationError);
+      throw new Error("Failed to fetch conversation data");
+    }
+
+    console.log(`Found conversation with ${conversation.messages?.length || 0} messages`);
+
     // Create or update the mystery_packages record
     const { data: packageData, error: checkError } = await supabase
       .from("mystery_packages")
@@ -118,35 +132,51 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
     });
     
     try {
-      // Use hardcoded values instead of environment variables
-      const supabaseUrl = "https://mhfikaomkmqcndqfohbp.supabase.co";
-      const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1oZmlrYW9ta21xY25kcWZvaGJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM2MTc5MTIsImV4cCI6MjA1OTE5MzkxMn0.xrGd-6SlR2UNOf_1HQJWIsKNe-rNOtPuOsYE8VrRI6w";
+      // Format all messages into a concatenated string for easier parsing
+      const conversationContent = conversation.messages
+        ? conversation.messages.map((msg: any) => {
+            const role = msg.role === "assistant" ? "AI" : "User";
+            return `${role}: ${msg.content}`;
+          }).join("\n\n---\n\n")
+        : "";
+
+      // Prepare the payload for your Make.com webhook
+      const webhookPayload = {
+        userId: conversation.user_id,
+        conversationId: mysteryId,
+        content: conversationContent
+      };
+
+      console.log("Sending payload to Make.com webhook:", {
+        userId: webhookPayload.userId,
+        conversationId: webhookPayload.conversationId,
+        contentLength: webhookPayload.content.length
+      });
       
-      // Call the webhook trigger edge function
-      const response = await fetch(`${supabaseUrl}/functions/v1/mystery-webhook-trigger`, {
+      // Call your Make.com webhook directly
+      const response = await fetch("https://hook.eu2.make.com/uannnuc9hc79vorh1iyxwb9t5lp484n3", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabaseAnonKey}`
         },
-        body: JSON.stringify({ conversationId: mysteryId, testMode })
+        body: JSON.stringify(webhookPayload)
       });
       
       if (!response.ok) {
-        let errorText = "";
-        try {
-          const errorData = await response.json();
-          errorText = errorData.error || response.statusText;
-        } catch (e) {
-          errorText = await response.text() || response.statusText;
-        }
-        
-        console.error("Webhook trigger error:", errorText);
-        throw new Error(`Failed to trigger webhook: ${response.status} ${errorText}`);
+        const errorText = await response.text();
+        console.error("Make.com webhook error:", response.status, errorText);
+        throw new Error(`Webhook failed: ${response.status} ${errorText}`);
       }
       
-      const responseData = await response.json();
-      console.log("Webhook trigger response:", responseData);
+      let responseData;
+      try {
+        responseData = await response.json();
+        console.log("Make.com webhook response:", responseData);
+      } catch (e) {
+        // If response isn't JSON, that's okay for webhooks
+        console.log("Webhook responded with non-JSON (this is normal for many webhooks)");
+        responseData = { success: true };
+      }
       
       // Update status to "waiting for external processing"
       const waitingStatus: GenerationStatus = {
@@ -186,7 +216,7 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
         })
         .eq("id", mysteryId);
       
-      // The content will be filled by the external service
+      console.log("Successfully sent data to Make.com webhook");
       return "Sent to external generation service";
       
     } catch (error) {
