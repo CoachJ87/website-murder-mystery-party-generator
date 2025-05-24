@@ -1,4 +1,3 @@
-
 import { supabase } from "@/lib/supabase";
 import { getAIResponse, saveGenerationState, getGenerationState, clearGenerationState } from "@/services/aiService";
 import { toast } from "sonner";
@@ -51,8 +50,9 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
       .eq("conversation_id", mysteryId)
       .maybeSingle();
     
-    if (checkError) {
+    if (checkError && checkError.code !== 'PGRST116') { // PGRST116 is "no rows returned"
       console.error("Error checking for existing package:", checkError);
+      throw new Error("Failed to check existing package");
     }
     
     let packageId: string;
@@ -118,9 +118,9 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
     });
     
     try {
-      // IMPORTANT: Use environment variables, not the supabase client properties
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      // Use hardcoded values instead of environment variables
+      const supabaseUrl = "https://mhfikaomkmqcndqfohbp.supabase.co";
+      const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1oZmlrYW9ta21xY25kcWZvaGJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM2MTc5MTIsImV4cCI6MjA1OTE5MzkxMn0.xrGd-6SlR2UNOf_1HQJWIsKNe-rNOtPuOsYE8VrRI6w";
       
       // Call the webhook trigger edge function
       const response = await fetch(`${supabaseUrl}/functions/v1/mystery-webhook-trigger`, {
