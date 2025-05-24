@@ -195,10 +195,9 @@ export default function MysteryChat({
   }, [messages, isAiTyping]);
 
   const createSystemMessage = (data: any) => {
-    // For brand new conversations without player count, don't send detailed system prompt
-    // Let the edge function handle the initial "ask for player count" behavior
-    if (!hasPlayerCountInfo() && messages.length <= 1) {
-      console.log("New conversation without player count - letting edge function handle initial prompt");
+    // CRITICAL: For new conversations without player count, return null to let edge function handle the flow
+    if (!hasPlayerCountInfo()) {
+      console.log("No player count info - returning null to let edge function ask for player count");
       return null;
     }
 
@@ -308,14 +307,15 @@ export default function MysteryChat({
       console.log("Has player count info:", hasPlayerCountInfo());
       console.log("Has theme info:", hasThemeInfo());
       
-      // Determine system prompt based on conversation state
+      // CRITICAL FIX: Only create system prompt if we have BOTH player count AND existing system instruction
       let systemPrompt = null;
       
       if (systemInstruction) {
         // Use provided system instruction (for editing existing conversations)
         systemPrompt = systemInstruction;
-      } else if (hasPlayerCountInfo() && hasThemeInfo()) {
-        // Create detailed system prompt only if we have collected basic info
+        console.log("Using provided systemInstruction");
+      } else if (hasPlayerCountInfo()) {
+        // Only create detailed system prompt if we have player count
         systemPrompt = createSystemMessage({
           theme: currentTheme,
           playerCount: currentPlayerCount,
@@ -323,8 +323,10 @@ export default function MysteryChat({
           scriptType: currentScriptType,
           additionalDetails: currentAdditionalDetails
         });
+        console.log("Created system prompt because we have player count");
+      } else {
+        console.log("No system prompt - letting edge function handle player count question");
       }
-      // If no conditions met, systemPrompt remains null and edge function will use default
 
       const messagesToSend = messages.map(msg => ({
         role: msg.is_ai ? "assistant" : "user",
@@ -405,14 +407,15 @@ export default function MysteryChat({
       console.log("Has player count info:", hasPlayerCountInfo());
       console.log("Has theme info:", hasThemeInfo());
       
-      // Determine system prompt based on conversation state
+      // CRITICAL FIX: Only create system prompt if we have BOTH player count AND existing system instruction  
       let systemPrompt = null;
       
       if (systemInstruction) {
         // Use provided system instruction (for editing existing conversations)
         systemPrompt = systemInstruction;
-      } else if (hasPlayerCountInfo() && hasThemeInfo()) {
-        // Create detailed system prompt only if we have collected basic info
+        console.log("Using provided systemInstruction");
+      } else if (hasPlayerCountInfo()) {
+        // Only create detailed system prompt if we have player count
         systemPrompt = createSystemMessage({
           theme: currentTheme,
           playerCount: currentPlayerCount,
@@ -420,8 +423,10 @@ export default function MysteryChat({
           scriptType: currentScriptType,
           additionalDetails: currentAdditionalDetails
         });
+        console.log("Created system prompt because we have player count");
+      } else {
+        console.log("No system prompt - letting edge function handle player count question");
       }
-      // If no conditions met, systemPrompt remains null and edge function will use default
 
       const messagesToSend = newMessages.map(msg => ({
         role: msg.is_ai ? "assistant" : "user",
