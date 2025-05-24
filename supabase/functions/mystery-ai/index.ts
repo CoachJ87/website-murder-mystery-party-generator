@@ -5,9 +5,11 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -18,7 +20,7 @@ serve(async (req) => {
     const requestBody = await req.json();
     console.log("Request body received:", JSON.stringify(requestBody, null, 2));
     
-    const { messages } = requestBody;
+    const { messages, system, promptVersion } = requestBody;
     
     if (!messages || !Array.isArray(messages)) {
       throw new Error('Messages array is required');
@@ -33,8 +35,8 @@ serve(async (req) => {
       throw new Error('ANTHROPIC_API_KEY not configured');
     }
     
-    // Create system prompt that always asks for player count first
-    let systemPrompt = `You are a helpful murder mystery creator. Your first question should ALWAYS be: "How many players do you want for your murder mystery?"
+    // Use provided system instruction or create default
+    let systemPrompt = system || `You are a helpful murder mystery creator. Your first question should ALWAYS be: "How many players do you want for your murder mystery?"
 
 Be conversational and ask only this question first. Do not generate any mystery content until you know the player count.
 
@@ -51,12 +53,12 @@ After getting the player count, proceed to ask about theme, then other details o
         )
       );
       
-      if (hasPlayerCount) {
+      if (hasPlayerCount && !system) {
         systemPrompt = `You are a murder mystery creator. Help the user create an engaging murder mystery step by step. Ask for details one at a time: theme, setting, victim details, etc. Once you have enough information, create a complete mystery outline.`;
       }
     }
     
-    console.log("System prompt:", systemPrompt);
+    console.log("System prompt being used:", systemPrompt.substring(0, 200) + "...");
     
     // Format messages for Anthropic API
     const anthropicMessages = messages.map(msg => ({
@@ -64,9 +66,9 @@ After getting the player count, proceed to ask about theme, then other details o
       content: msg.content || ''
     })).filter(msg => msg.content.trim() !== '');
     
-    console.log("Formatted messages for Anthropic:", anthropicMessages);
+    console.log("Formatted messages for Anthropic:", anthropicMessages.length, "messages");
     
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const anthropicResponse = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -82,21 +84,21 @@ After getting the player count, proceed to ask about theme, then other details o
       })
     });
     
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`Anthropic API error: ${response.status} ${errorText}`);
-      throw new Error(`Anthropic API error: ${response.status} ${errorText}`);
+    if (!anthropicResponse.ok) {
+      const errorText = await anthropicResponse.text();
+      console.error(`Anthropic API error: ${anthropicResponse.status} ${errorText}`);
+      throw new Error(`Anthropic API error: ${anthropicResponse.status} ${errorText}`);
     }
     
-    const data = await response.json();
-    console.log("Anthropic API response:", data);
+    const data = await anthropicResponse.json();
+    console.log("Anthropic API response received, content length:", data.content?.[0]?.text?.length || 0);
     
     const assistantMessage = data.content?.[0]?.text;
     if (!assistantMessage) {
       throw new Error('No content in response from Anthropic API');
     }
     
-    console.log(`Response length: ${assistantMessage.length} characters`);
+    console.log("Returning successful response");
     
     // Return in the format expected by the frontend
     return new Response(JSON.stringify({
