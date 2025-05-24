@@ -1,23 +1,37 @@
 
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
+// Comprehensive CORS headers to handle all possible browser requests
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-requested-with, accept, origin, referer, user-agent',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS, GET, PUT, DELETE',
+  'Access-Control-Allow-Headers': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS, GET, PUT, DELETE, PATCH',
   'Access-Control-Max-Age': '86400',
+  'Access-Control-Allow-Credentials': 'false',
+  'Vary': 'Origin, Access-Control-Request-Method, Access-Control-Request-Headers'
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
+  // Log all incoming requests for debugging
+  console.log("=== Incoming Request ===");
+  console.log("Method:", req.method);
+  console.log("URL:", req.url);
+  console.log("Headers:", Object.fromEntries(req.headers.entries()));
+  
+  // Handle CORS preflight requests with comprehensive logging
   if (req.method === 'OPTIONS') {
-    return new Response(null, { 
+    console.log("CORS preflight request received");
+    const response = new Response(null, { 
       status: 200,
       headers: corsHeaders 
     });
+    console.log("CORS preflight response headers:", Object.fromEntries(response.headers.entries()));
+    return response;
   }
+
+  // Add CORS headers to all responses
+  const responseHeaders = { ...corsHeaders, 'Content-Type': 'application/json' };
 
   try {
     console.log("Processing request with mystery-ai edge function");
@@ -106,7 +120,7 @@ After getting the player count, proceed to ask about theme, then other details o
     console.log("Returning successful response");
     
     // Return in the format expected by the frontend
-    return new Response(JSON.stringify({
+    const successResponse = new Response(JSON.stringify({
       choices: [{
         message: {
           content: assistantMessage,
@@ -114,14 +128,17 @@ After getting the player count, proceed to ask about theme, then other details o
         }
       }]
     }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      headers: responseHeaders
     });
+    
+    console.log("Success response headers:", Object.fromEntries(successResponse.headers.entries()));
+    return successResponse;
     
   } catch (error) {
     console.error('Error in mystery-ai function:', error);
     
     // Return a proper error response that the frontend can handle
-    return new Response(JSON.stringify({ 
+    const errorResponse = new Response(JSON.stringify({ 
       error: error.message,
       choices: [{
         message: {
@@ -131,8 +148,10 @@ After getting the player count, proceed to ask about theme, then other details o
       }]
     }), {
       status: 200, // Return 200 so the frontend doesn't treat it as a failed request
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      headers: responseHeaders
     });
+    
+    console.log("Error response headers:", Object.fromEntries(errorResponse.headers.entries()));
+    return errorResponse;
   }
 });
-
