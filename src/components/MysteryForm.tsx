@@ -12,14 +12,12 @@ import { Label } from "@/components/ui/label";
 // Define the schema validation (REMOVED hasAccomplice):
 const formSchema = z.object({
   userRequest: z.string().optional(),
-  theme: z.string().min(2, {
-    message: "Theme is required"
-  }),
-  playerCount: z.coerce.number().int().min(4, {
-    message: "Minimum 4 players required"
-  }).max(32, {
-    message: "Maximum 32 players allowed"
-  }),
+  theme: z.string().optional(),
+  playerCount: z.coerce
+    .number()
+    .int()
+    .min(4, { message: "Minimum 4 players required" })
+    .max(32, { message: "Maximum 32 players allowed" }),
   scriptType: z.enum(["full", "pointForm"], {
     required_error: "Please select a script type"
   }),
