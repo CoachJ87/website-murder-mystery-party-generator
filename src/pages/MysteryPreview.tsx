@@ -23,7 +23,6 @@ const MysteryPreview = () => {
     const [loading, setLoading] = useState(true);
     const [title, setTitle] = useState("");
     const [mysteryPreview, setMysteryPreview] = useState("");
-    const [isPremiumUser, setIsPremiumUser] = useState(false);
     const [generating, setGenerating] = useState(false);
     const navigate = useNavigate();
     const { id } = useParams();
@@ -53,32 +52,8 @@ const MysteryPreview = () => {
     const setupStreamingConnection = useRef<any>(null);
 
     useEffect(() => {
-        const checkPurchaseStatus = async () => {
-            if (!id || !user) return;
-            
-            try {
-                const { data: conversation, error } = await supabase
-                    .from("conversations")
-                    .select("is_paid, display_status")
-                    .eq("id", id)
-                    .single();
-                
-                if (error) throw error;
-                
-                if (!conversation.is_paid && conversation.display_status !== "purchased") {
-                    toast.error("Please purchase this mystery to generate content");
-                    navigate(`/mystery/purchase/${id}`);
-                    return;
-                }
-            } catch (error) {
-                console.error("Error checking purchase status:", error);
-                toast.error("Failed to verify purchase status");
-            }
-        };
-
-        checkPurchaseStatus();
         viewReady.current = true;
-    }, [id, user, navigate]);
+    }, []);
 
     useEffect(() => {
         if (!id) return;
