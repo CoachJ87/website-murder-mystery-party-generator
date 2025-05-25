@@ -102,18 +102,6 @@ const MysteryPreview = () => {
             try {
                 setLoading(true);
                 
-                if (user) {
-                    const { data: profile } = await supabase
-                        .from("profiles")
-                        .select("is_subscribed, subscription_tier")
-                        .eq("id", user.id)
-                        .single();
-                        
-                    if (profile) {
-                        setIsPremiumUser(profile.is_subscribed || profile.subscription_tier === 'premium');
-                    }
-                }
-                
                 const { data: mystery, error: mysteryError } = await supabase
                     .from("conversations")
                     .select("*, messages(*)")
