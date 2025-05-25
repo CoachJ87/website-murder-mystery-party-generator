@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -16,17 +16,33 @@ const MysteryCreation = () => {
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState(null);
     const navigate = useNavigate();
+    const location = useLocation();
     const { id } = useParams();
     const isEditing = !!id;
     const { isAuthenticated, user } = useAuth();
     const isMobile = useIsMobile();
 
-    // Load existing data if editing
+    // Load existing data if editing, or extract theme from URL if creating new
     useEffect(() => {
         if (isEditing && id) {
             loadExistingMystery(id);
+        } else {
+            // Check for theme in URL parameters
+            const urlParams = new URLSearchParams(location.search);
+            const themeFromUrl = urlParams.get('theme');
+            
+            if (themeFromUrl) {
+                console.log("Pre-populating theme from URL:", themeFromUrl);
+                setFormData({
+                    theme: themeFromUrl,
+                    playerCount: 6,
+                    hasAccomplice: false,
+                    scriptType: "full",
+                    additionalDetails: ""
+                });
+            }
         }
-    }, [id]);
+    }, [id, location.search, isEditing]);
 
     const loadExistingMystery = async (mysteryId: string) => {
         try {
