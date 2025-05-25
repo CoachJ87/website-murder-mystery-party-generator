@@ -59,7 +59,7 @@ const MysteryCreation = () => {
 
         setLoading(true);
         try {
-            // Create system instruction for AI
+            // Create system instruction for AI using your template format
             const systemInstruction = `You are creating a murder mystery with these details:
 - Theme: ${data.theme}
 - Players: ${data.playerCount}
@@ -67,7 +67,25 @@ const MysteryCreation = () => {
 - Has Accomplice: ${data.hasAccomplice}
 ${data.additionalDetails ? `- Additional Details: ${data.additionalDetails}` : ''}
 
-Create a complete mystery following the exact format from your training.`;
+You MUST follow this exact output format:
+
+# "[CREATIVE TITLE]" - A MURDER MYSTERY
+
+## PREMISE
+[2-3 paragraphs setting the scene, describing the event where the murder takes place, and creating dramatic tension]
+
+## VICTIM
+**[Victim Name]** - [Vivid description of the victim, their role in the story, personality traits, and why they might have made enemies]
+
+## CHARACTER LIST (${data.playerCount} PLAYERS)
+1. **[Character 1 Name]** - [Engaging one-sentence description including profession and connection to victim]
+2. **[Character 2 Name]** - [Engaging one-sentence description including profession and connection to victim]
+[Continue for all ${data.playerCount} characters]
+
+## MURDER METHOD
+[Paragraph describing how the murder was committed, interesting details about the method, and what clues might be found]
+
+After presenting the mystery concept, ask if the concept works for them and explain that they can continue to make edits and that once they are done they can press the 'Generate Mystery' button to create a complete game package.`;
 
             // Create the initial user message
             const initialMessage = `Create a ${data.theme} murder mystery for ${data.playerCount} players with ${data.scriptType} scripts${data.hasAccomplice ? ' including an accomplice mechanism' : ''}.${data.additionalDetails ? ` Additional requirements: ${data.additionalDetails}` : ''}`;
@@ -75,7 +93,7 @@ Create a complete mystery following the exact format from your training.`;
             let conversationId = id;
 
             if (!isEditing) {
-                // Create new conversation
+                // Create new conversation - matching your exact schema
                 const { data: conversation, error: convError } = await supabase
                     .from("conversations")
                     .insert({
@@ -83,22 +101,28 @@ Create a complete mystery following the exact format from your training.`;
                         title: `${data.theme} Mystery`,
                         mystery_data: data,
                         system_instruction: systemInstruction,
+                        display_status: "draft",
                         is_completed: false,
-                        is_paid: false
+                        is_paid: false,
+                        prompt_version: "free",
+                        has_complete_package: false,
+                        needs_package_generation: false
                     })
                     .select()
                     .single();
 
                 if (convError) {
+                    console.error("Error creating conversation:", convError);
                     throw convError;
                 }
                 conversationId = conversation.id;
 
-                // Save initial user message
+                // Save initial user message - matching your schema
                 await supabase.from("messages").insert({
                     conversation_id: conversationId,
                     content: initialMessage,
-                    role: "user"
+                    role: "user",
+                    is_ai: false
                 });
             } else {
                 // Update existing conversation
@@ -120,17 +144,19 @@ Create a complete mystery following the exact format from your training.`;
                     systemInstruction
                 );
 
-                // Save AI response
+                // Save AI response - matching your schema
                 await supabase.from("messages").insert({
                     conversation_id: conversationId,
                     content: aiResponse,
-                    role: "assistant"
+                    role: "assistant",
+                    is_ai: true
                 });
 
                 toast.success("Mystery generated successfully!");
                 navigate(`/mystery/preview/${conversationId}`);
             } catch (aiError) {
                 console.error("AI generation error:", aiError);
+                // Even if AI fails, still navigate to preview
                 toast.success("Mystery saved! Generating preview...");
                 navigate(`/mystery/preview/${conversationId}`);
             }
