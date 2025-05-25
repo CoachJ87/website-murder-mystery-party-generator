@@ -1,7 +1,7 @@
 
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 // Comprehensive CORS headers to handle all possible browser requests
 const corsHeaders = {
@@ -55,6 +55,32 @@ serve(async (req) => {
       console.error('ANTHROPIC_API_KEY not found in environment variables');
       throw new Error('ANTHROPIC_API_KEY not configured');
     }
+
+    // Initialize Supabase client to fetch prompt from database
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    let supabase = null;
+    let databasePrompt = null;
+
+    if (supabaseUrl && supabaseServiceKey) {
+      try {
+        supabase = createClient(supabaseUrl, supabaseServiceKey);
+        const { data: promptData, error: promptError } = await supabase
+          .from('prompts')
+          .select('content')
+          .eq('name', 'MYSTERY_FREE_PROMPT')
+          .single();
+
+        if (!promptError && promptData) {
+          databasePrompt = promptData.content;
+          console.log("Retrieved database prompt successfully");
+        } else {
+          console.log("No database prompt found, using fallback logic");
+        }
+      } catch (error) {
+        console.error("Error fetching database prompt:", error);
+      }
+    }
     
     // Determine system prompt based on conversation state
     let systemPrompt = system;
@@ -90,15 +116,14 @@ After getting the player count, proceed to ask about script preferences, then ot
       
       // If still no system prompt, check conversation progress
       if (!systemPrompt) {
-        // Check if we have a player count but it's invalid
-        const hasInvalidPlayerCount = conversationText.match(/\b([0-9]+)\b/) && (
-          conversationText.includes('1 ') || conversationText.includes('2 ') || conversationText.includes('3 ') ||
-          conversationText.match(/\b(3[3-9]|[4-9][0-9]|[1-9][0-9]{2,})\b/) // Numbers > 32
-        );
+        // FIXED: Better player count detection - look for standalone numbers
+        const playerCountNumbers = lastUserMessage.match(/\b(\d+)\b/g) || conversationText.match(/\b(\d+)\b/g) || [];
+        const lastNumber = playerCountNumbers.length > 0 ? parseInt(playerCountNumbers[playerCountNumbers.length - 1]) : null;
         
-        if (hasInvalidPlayerCount) {
-          console.log("Detected invalid player count - asking for correction");
-          systemPrompt = `The user has provided an invalid player count. You must ask them to choose a number between 4 and 32 players. Be polite but clear about the requirement.
+        // Check if we have an invalid player count (including 3 which was mentioned)
+        if (lastNumber !== null && (lastNumber < 4 || lastNumber > 32)) {
+          console.log(`Detected invalid player count: ${lastNumber} - asking for correction`);
+          systemPrompt = `The user provided ${lastNumber} players, which is outside the valid range. You must ask them to choose a number between 4 and 32 players. Be polite but clear about the requirement.
 
 Say something like: "I need between 4 and 32 players for a murder mystery. Could you please choose a number in that range?"`;
         }
@@ -107,11 +132,12 @@ Say something like: "I need between 4 and 32 players for a murder mystery. Could
         const hasValidPlayerCount = conversationText.match(/\b([4-9]|[12][0-9]|3[0-2])\b/) && 
                                    (conversationText.includes('player') || conversationText.includes('people') || conversationText.includes('guest'));
         
-        const hasScriptPreference = conversationText.includes('script') || conversationText.includes('full') || 
-                                   conversationText.includes('point') || conversationText.includes('summary') || 
-                                   conversationText.includes('summaries') || conversationText.includes('both') ||
+        // FIXED: More specific script preference detection
+        const hasScriptPreference = conversationText.includes('full script') || conversationText.includes('point form') || 
+                                   conversationText.includes('summaries') || conversationText.includes('both formats') ||
                                    lastUserMessage.includes('full') || lastUserMessage.includes('point') ||
-                                   lastUserMessage.includes('script') || lastUserMessage.includes('summary');
+                                   lastUserMessage.includes('script') || lastUserMessage.includes('summary') ||
+                                   lastUserMessage.includes('both');
         
         if (hasValidPlayerCount && !hasScriptPreference) {
           console.log("Has valid player count but no script preference - asking for script preference");
@@ -120,22 +146,29 @@ Say something like: "I need between 4 and 32 players for a murder mystery. Could
 Only ask this question and wait for their response before proceeding.`;
         }
         
-        // If we have both player count and script preference, proceed to detailed creation
+        // If we have both player count and script preference, use database prompt or create mystery
         if (hasValidPlayerCount && hasScriptPreference) {
           console.log("Has both player count and script preference - proceeding to mystery creation");
           
-          // Extract theme from conversation if available
-          let theme = "murder mystery";
-          const themeMatch = conversationText.match(/(?:theme|setting|style).*?([a-z\s]+)/i);
-          if (themeMatch) {
-            theme = themeMatch[1].trim();
-          }
-          
-          // Extract player count
-          const playerCountMatch = conversationText.match(/\b([4-9]|[12][0-9]|3[0-2])\b/);
-          const playerCount = playerCountMatch ? playerCountMatch[1] : "6";
-          
-          systemPrompt = `You are a murder mystery creator. The user has provided the necessary information. Create a complete mystery with this format:
+          if (databasePrompt) {
+            console.log("Using database prompt for mystery creation");
+            systemPrompt = databasePrompt;
+          } else {
+            // Fallback to inline prompt with proper confirmation message
+            console.log("Using fallback prompt for mystery creation");
+            
+            // Extract theme from conversation if available
+            let theme = "murder mystery";
+            const themeMatch = conversationText.match(/(?:theme|setting|style).*?([a-z\s]+)/i);
+            if (themeMatch) {
+              theme = themeMatch[1].trim();
+            }
+            
+            // Extract player count
+            const playerCountMatch = conversationText.match(/\b([4-9]|[12][0-9]|3[0-2])\b/);
+            const playerCount = playerCountMatch ? playerCountMatch[1] : "6";
+            
+            systemPrompt = `You are a murder mystery creator. The user has provided the necessary information. Create a complete mystery with this format:
 
 # "[CREATIVE TITLE]" - A MURDER MYSTERY
 
@@ -154,6 +187,7 @@ Only ask this question and wait for their response before proceeding.`;
 [Paragraph describing how the murder was committed, interesting details about the method, and what clues might be found]
 
 IMPORTANT: Always end your response with: "Does this ${theme} concept work for you? We can adjust any elements you'd like to change. Once you're satisfied with the concept, you can generate the complete mystery package with detailed character guides, host instructions, and game materials."`;
+          }
         }
         
         // Fallback: ask for player count
@@ -244,4 +278,3 @@ Be conversational and ask only this question first. Do not generate any mystery 
     return errorResponse;
   }
 });
-
