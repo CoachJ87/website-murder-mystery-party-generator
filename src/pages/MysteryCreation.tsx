@@ -23,39 +23,38 @@ const MysteryCreation = () => {
     const isMobile = useIsMobile();
 
     // Load existing data if editing, or extract theme from URL if creating new
-    useEffect(() => {
-        console.log("MysteryCreation useEffect triggered");
-        console.log("isEditing:", isEditing);
-        console.log("id:", id);
-        console.log("location.search:", location.search);
+useEffect(() => {
+    console.log("=== MysteryCreation Debug ===");
+    console.log("Current URL:", window.location.href);
+    console.log("location.search:", location.search);
+    console.log("isEditing:", isEditing);
+    console.log("formData current state:", formData);
+    
+    if (isEditing && id) {
+        console.log("Loading existing mystery");
+        loadExistingMystery(id);
+    } else {
+        const urlParams = new URLSearchParams(location.search);
+        const themeFromUrl = urlParams.get('theme');
+        console.log("Theme extracted from URL:", themeFromUrl);
         
-        if (isEditing && id) {
-            console.log("Loading existing mystery");
-            loadExistingMystery(id);
+        if (themeFromUrl) {
+            console.log("Setting formData with theme:", themeFromUrl);
+            const newFormData = {
+                theme: themeFromUrl,
+                playerCount: 6,
+                hasAccomplice: false,
+                scriptType: "full",
+                additionalDetails: ""
+            };
+            console.log("New formData object:", newFormData);
+            setFormData(newFormData);
         } else {
-            // Check for theme in URL parameters
-            const urlParams = new URLSearchParams(location.search);
-            const themeFromUrl = urlParams.get('theme');
-
-            console.log("themeFromUrl:", themeFromUrl);
-
-            if (themeFromUrl) {
-                console.log("Pre-populating theme from URL:", themeFromUrl);
-                setFormData({
-                    theme: themeFromUrl,
-                    playerCount: 6,
-                    hasAccomplice: false,
-                    scriptType: "full",
-                    additionalDetails: ""
-                }
-                console.log("Setting formData to:", prePopulatedData);
-                setFormData(prePopulatedData);
-            } else {
-                console.log("No theme found in URL");
-            }
+            console.log("No theme found in URL");
         }
-    }, [id, location.search, isEditing]);
-
+    }
+}, [id, location.search, isEditing, formData]);
+    
     const loadExistingMystery = async (mysteryId: string) => {
         try {
             const { data, error } = await supabase
