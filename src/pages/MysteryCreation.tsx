@@ -35,22 +35,22 @@ const MysteryCreation = () => {
             loadExistingMystery(id);
         } else {
             const urlParams = new URLSearchParams(location.search);
-            const themeFromUrl = urlParams.get('theme');
-            console.log("Theme extracted from URL:", themeFromUrl);
+            const fullInput = urlParams.get('input');
+            console.log("Full input from URL:", fullInput);
             
-            if (themeFromUrl) {
-                console.log("Setting formData with theme:", themeFromUrl);
+            if (fullInput) {
+                console.log("Setting formData with full input:", fullInput);
                 const newFormData = {
-                    theme: themeFromUrl,
+                    userRequest: fullInput,
+                    theme: "",
                     playerCount: 6,
-                    hasAccomplice: false,
                     scriptType: "full",
                     additionalDetails: ""
                 };
                 console.log("New formData object:", newFormData);
                 setFormData(newFormData);
             } else {
-                console.log("No theme found in URL");
+                console.log("No input found in URL");
             }
         }
     }, [id, location.search, isEditing]);
