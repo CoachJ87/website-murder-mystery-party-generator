@@ -14,19 +14,18 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 
-// Define the schema validation:
+// Define the schema validation (REMOVED hasAccomplice):
 const formSchema = z.object({
+    userRequest: z.string().optional(),
     theme: z.string().min(2, { message: "Theme is required" }),
     playerCount: z.coerce
         .number()
         .int()
         .min(4, { message: "Minimum 4 players required" })
         .max(32, { message: "Maximum 32 players allowed" }),
-    hasAccomplice: z.boolean().default(false),
     scriptType: z.enum(["full", "pointForm"], {
         required_error: "Please select a script type",
     }),
@@ -49,9 +48,9 @@ const MysteryForm = ({ onSave, isSaving = false, initialData }: MysteryFormProps
     const form = useForm<FormData>({
         resolver: zodResolver(formSchema),
         defaultValues: {
+            userRequest: initialData?.userRequest || "",
             theme: initialData?.theme || "",
             playerCount: initialData?.playerCount || 6,
-            hasAccomplice: initialData?.hasAccomplice || false,
             scriptType: initialData?.scriptType || "full",
             additionalDetails: initialData?.additionalDetails || "",
         },
@@ -66,9 +65,9 @@ const MysteryForm = ({ onSave, isSaving = false, initialData }: MysteryFormProps
         if (initialData) {
             console.log("Resetting form with initialData:", initialData);
             form.reset({
+                userRequest: initialData.userRequest || "",
                 theme: initialData.theme || "",
                 playerCount: initialData.playerCount || 6,
-                hasAccomplice: initialData.hasAccomplice || false,
                 scriptType: initialData.scriptType || "full",
                 additionalDetails: initialData.additionalDetails || "",
             });
@@ -83,20 +82,43 @@ const MysteryForm = ({ onSave, isSaving = false, initialData }: MysteryFormProps
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                {/* NEW: User's original request field - ONLY show if we have a userRequest */}
+                {initialData?.userRequest && (
+                    <FormField
+                        control={form.control}
+                        name="userRequest"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>What you want to create</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        {...field}
+                                        disabled
+                                        className="bg-muted"
+                                    />
+                                </FormControl>
+                                <FormDescription>
+                                    Your original request from the homepage
+                                </FormDescription>
+                            </FormItem>
+                        )}
+                    />
+                )}
+
                 <FormField
                     control={form.control}
                     name="theme"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Mystery Theme</FormLabel>
+                            <FormLabel>Theme/Setting</FormLabel>
                             <FormControl>
                                 <Input
-                                    placeholder="e.g., 1920s Speakeasy, Hollywood Murder, Castle Mystery"
+                                    placeholder="e.g., Poker Tournament, 1920s Speakeasy, Haunted Mansion"
                                     {...field}
                                 />
                             </FormControl>
                             <FormDescription>
-                                Choose a setting or theme for your murder mystery
+                                Choose a specific theme or setting for your murder mystery
                             </FormDescription>
                             <FormMessage />
                         </FormItem>
@@ -150,29 +172,6 @@ const MysteryForm = ({ onSave, isSaving = false, initialData }: MysteryFormProps
                                 </RadioGroup>
                             </FormControl>
                             <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="hasAccomplice"
-                    render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                            <div className="space-y-0.5">
-                                <FormLabel className="text-base">
-                                    Include Accomplice Mechanism
-                                </FormLabel>
-                                <FormDescription>
-                                    Add a secondary character who helps the murderer
-                                </FormDescription>
-                            </div>
-                            <FormControl>
-                                <Switch
-                                    checked={field.value}
-                                    onCheckedChange={field.onChange}
-                                />
-                            </FormControl>
                         </FormItem>
                     )}
                 />
