@@ -1,4 +1,3 @@
-
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -7,7 +6,6 @@ import SignInPrompt from "@/components/SignInPrompt";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { supabase } from "@/lib/supabase";
 
 // Define all possible mystery themes with their corresponding prompts
 const MYSTERY_THEMES = [
@@ -105,109 +103,6 @@ const Hero = () => {
     return "Murder Mystery";
   };
 
-  const createSystemInstruction = (prompt: string, theme: string) => {
-    let systemMsg = "This is a murder mystery creation conversation. ";
-    systemMsg += `The user wants to create a murder mystery with theme: ${theme}. `;
-    systemMsg += "Please proceed with creating a murder mystery based on this theme. ";
-    systemMsg += "IMPORTANT: Answer only ONE question at a time. Do not combine multiple responses. ";
-    systemMsg += "Wait for the user to respond before continuing to the next step. ";
-    
-    // Important change: Include the full output format guidance
-    systemMsg += `\n\nYou MUST follow this exact output format for ALL your responses:
-
-## OUTPUT FORMAT
-Present your mystery preview in an engaging, dramatic format that will excite the user. Include:
-
-# "[CREATIVE TITLE]" - A [THEME] MURDER MYSTERY
-
-## PREMISE
-[2-3 paragraphs setting the scene, describing the event where the murder takes place, and creating dramatic tension]
-
-## VICTIM
-**[Victim Name]** - [Vivid description of the victim, their role in the story, personality traits, and why they might have made enemies]
-
-## CHARACTER LIST ([PLAYER COUNT] PLAYERS)
-1. **[Character 1 Name]** - [Engaging one-sentence description including profession and connection to victim]
-2. **[Character 2 Name]** - [Engaging one-sentence description including profession and connection to victim]
-[Continue for all characters]
-
-## MURDER METHOD
-[Paragraph describing how the murder was committed, interesting details about the method, and what clues might be found]
-
-[After presenting the mystery concept, ask if the concept works for them and explain that they can continue to make edits and that once they are done they can press the 'Generate Mystery' button where they can create a complete game package with detailed character guides, host instructions, and game materials if they choose to purchase.]`;
-
-    return systemMsg;
-  };
-
-  const createNewConversation = async (prompt: string) => {
-    if (!user?.id) return;
-    
-    setIsCreating(true);
-    
-    try {
-      // Extract theme from prompt
-      const theme = extractThemeFromPrompt(prompt);
-      
-      // Create system instruction with explicit instruction to answer one question at a time
-      const systemInstruction = createSystemInstruction(prompt, theme);
-      
-      // Create mystery data
-      const mysteryData = {
-        theme: theme,
-        prompt: prompt,
-      };
-      
-      console.log("Creating new conversation with theme:", theme);
-      
-      // Create a new conversation in the database
-      const { data: conversation, error: conversationError } = await supabase
-        .from("conversations")
-        .insert({
-          user_id: user.id,
-          title: `${theme} Mystery`,
-          mystery_data: mysteryData,
-          system_instruction: systemInstruction
-        })
-        .select()
-        .single();
-
-      if (conversationError) {
-        toast.error("Failed to create new conversation");
-        console.error(conversationError);
-        return;
-      }
-
-      if (!conversation?.id) {
-        toast.error("Failed to get conversation ID");
-        return;
-      }
-      
-      // Add the initial message to the conversation
-      const { error: messageError } = await supabase
-        .from("messages")
-        .insert({
-          conversation_id: conversation.id,
-          content: prompt,
-          role: "user"
-        });
-
-      if (messageError) {
-        toast.error("Failed to create initial message");
-        console.error(messageError);
-        return;
-      }
-
-      // Navigate directly to the mystery creation page with the conversation ID
-      navigate(`/mystery/edit/${conversation.id}`);
-      
-    } catch (error) {
-      console.error("Error creating conversation:", error);
-      toast.error("Something went wrong. Please try again.");
-    } finally {
-      setIsCreating(false);
-    }
-  };
-
   const handleSubmit = (value: string) => {
     if (!value.trim()) {
       toast.error("Please enter a description for your mystery");
@@ -215,7 +110,23 @@ Present your mystery preview in an engaging, dramatic format that will excite th
     }
     
     if (isAuthenticated) {
-      createNewConversation(value);
+      setIsCreating(true);
+      
+      try {
+        // Extract theme from user input
+        const theme = extractThemeFromPrompt(value);
+        
+        console.log("Navigating to create page with theme:", theme);
+        
+        // Navigate to mystery creation with theme as URL parameter
+        navigate(`/mystery/create?theme=${encodeURIComponent(theme)}`);
+        
+      } catch (error) {
+        console.error("Error:", error);
+        toast.error("Something went wrong. Please try again.");
+      } finally {
+        setIsCreating(false);
+      }
     } else {
       setShowSignInPrompt(true);
     }
