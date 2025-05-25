@@ -1,4 +1,5 @@
 
+
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -64,6 +65,7 @@ serve(async (req) => {
       
       // Analyze the conversation to determine what step we're at
       const conversationText = messages.map(msg => msg.content || '').join(' ').toLowerCase();
+      const lastUserMessage = messages.filter(msg => msg.role === 'user').pop()?.content?.toLowerCase() || '';
       
       // Check if this looks like a brand new conversation (1 message, likely asking for mystery creation)
       if (messages.length === 1) {
@@ -106,7 +108,10 @@ Say something like: "I need between 4 and 32 players for a murder mystery. Could
                                    (conversationText.includes('player') || conversationText.includes('people') || conversationText.includes('guest'));
         
         const hasScriptPreference = conversationText.includes('script') || conversationText.includes('full') || 
-                                   conversationText.includes('point') || conversationText.includes('summary') || conversationText.includes('summaries');
+                                   conversationText.includes('point') || conversationText.includes('summary') || 
+                                   conversationText.includes('summaries') || conversationText.includes('both') ||
+                                   lastUserMessage.includes('full') || lastUserMessage.includes('point') ||
+                                   lastUserMessage.includes('script') || lastUserMessage.includes('summary');
         
         if (hasValidPlayerCount && !hasScriptPreference) {
           console.log("Has valid player count but no script preference - asking for script preference");
@@ -118,7 +123,37 @@ Only ask this question and wait for their response before proceeding.`;
         // If we have both player count and script preference, proceed to detailed creation
         if (hasValidPlayerCount && hasScriptPreference) {
           console.log("Has both player count and script preference - proceeding to mystery creation");
-          systemPrompt = `You are a murder mystery creator. The user has provided the necessary information. Help them create an engaging murder mystery step by step. Ask for additional details if needed, then create a complete mystery outline when you have enough information.`;
+          
+          // Extract theme from conversation if available
+          let theme = "murder mystery";
+          const themeMatch = conversationText.match(/(?:theme|setting|style).*?([a-z\s]+)/i);
+          if (themeMatch) {
+            theme = themeMatch[1].trim();
+          }
+          
+          // Extract player count
+          const playerCountMatch = conversationText.match(/\b([4-9]|[12][0-9]|3[0-2])\b/);
+          const playerCount = playerCountMatch ? playerCountMatch[1] : "6";
+          
+          systemPrompt = `You are a murder mystery creator. The user has provided the necessary information. Create a complete mystery with this format:
+
+# "[CREATIVE TITLE]" - A MURDER MYSTERY
+
+## PREMISE
+[2-3 paragraphs setting the scene, describing the event where the murder takes place, and creating dramatic tension]
+
+## VICTIM
+**[Victim Name]** - [Vivid description of the victim, their role in the story, personality traits, and why they might have made enemies]
+
+## CHARACTER LIST (${playerCount} PLAYERS)
+1. **[Character 1 Name]** - [Engaging one-sentence description including profession and connection to victim]
+2. **[Character 2 Name]** - [Engaging one-sentence description including profession and connection to victim]
+[Continue for all ${playerCount} characters]
+
+## MURDER METHOD
+[Paragraph describing how the murder was committed, interesting details about the method, and what clues might be found]
+
+IMPORTANT: Always end your response with: "Does this ${theme} concept work for you? We can adjust any elements you'd like to change. Once you're satisfied with the concept, you can generate the complete mystery package with detailed character guides, host instructions, and game materials."`;
         }
         
         // Fallback: ask for player count
@@ -209,3 +244,4 @@ Be conversational and ask only this question first. Do not generate any mystery 
     return errorResponse;
   }
 });
+
