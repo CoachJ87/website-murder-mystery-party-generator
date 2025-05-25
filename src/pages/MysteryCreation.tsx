@@ -24,13 +24,21 @@ const MysteryCreation = () => {
 
     // Load existing data if editing, or extract theme from URL if creating new
     useEffect(() => {
+        console.log("MysteryCreation useEffect triggered");
+        console.log("isEditing:", isEditing);
+        console.log("id:", id);
+        console.log("location.search:", location.search);
+        
         if (isEditing && id) {
+            console.log("Loading existing mystery");
             loadExistingMystery(id);
         } else {
             // Check for theme in URL parameters
             const urlParams = new URLSearchParams(location.search);
             const themeFromUrl = urlParams.get('theme');
-            
+
+            console.log("themeFromUrl:", themeFromUrl);
+
             if (themeFromUrl) {
                 console.log("Pre-populating theme from URL:", themeFromUrl);
                 setFormData({
@@ -39,7 +47,11 @@ const MysteryCreation = () => {
                     hasAccomplice: false,
                     scriptType: "full",
                     additionalDetails: ""
-                });
+                }
+                console.log("Setting formData to:", prePopulatedData);
+                setFormData(prePopulatedData);
+            } else {
+                console.log("No theme found in URL");
             }
         }
     }, [id, location.search, isEditing]);
