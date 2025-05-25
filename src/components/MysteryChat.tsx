@@ -59,10 +59,10 @@ const formSchema = z.object({
   }).max(50, {
     message: "Theme must not be longer than 50 characters.",
   }),
-  playerCount: z.number().min(2, {
-    message: "Must have at least 2 players"
-  }).max(20, {
-    message: "Must not have more than 20 players"
+  playerCount: z.number().min(4, {
+    message: "Must have at least 4 players"
+  }).max(32, {
+    message: "Must not have more than 32 players"
   }),
   hasAccomplice: z.boolean().default(false),
   scriptType: z.enum(['full', 'pointForm']).default('full'),
@@ -152,22 +152,22 @@ export default function MysteryChat({
   // FIXED: Enhanced function to properly detect if we have player count info
   const hasPlayerCountInfo = () => {
     // Don't consider initialPlayerCount as "having info" unless it's explicitly set and not a default
-    if (initialPlayerCount && initialPlayerCount !== 4 && currentPlayerCount && currentPlayerCount !== 4) {
-      console.log("Has explicit player count from props:", initialPlayerCount);
+    if (initialPlayerCount && initialPlayerCount >= 4 && initialPlayerCount <= 32 && currentPlayerCount && currentPlayerCount >= 4 && currentPlayerCount <= 32) {
+      console.log("Has explicit valid player count from props:", initialPlayerCount);
       return true;
     }
     
-    // Check if any message explicitly mentions specific player count
+    // Check if any message explicitly mentions valid player count
     const hasPlayerCountInMessages = messages.some(msg => {
       const content = msg.content.toLowerCase();
-      // Look for explicit player count mentions with numbers
-      const hasExplicitCount = content.match(/(\d+)\s*(player|people|guest|character|participant)/i) ||
-                               (content.includes('player') && content.match(/\b(\d+)\b/)) ||
-                               content.match(/for\s+(\d+)/i);
-      
-      if (hasExplicitCount) {
-        console.log("Found player count in message:", content.substring(0, 100));
-        return true;
+      // Look for explicit player count mentions with numbers in valid range
+      const playerCountMatch = content.match(/(\d+)\s*(player|people|guest|character|participant)/i);
+      if (playerCountMatch) {
+        const count = parseInt(playerCountMatch[1]);
+        if (count >= 4 && count <= 32) {
+          console.log("Found valid player count in message:", content.substring(0, 100));
+          return true;
+        }
       }
       return false;
     });
@@ -239,7 +239,6 @@ export default function MysteryChat({
       systemMsg += `The user wants to create a murder mystery with ${data.playerCount || currentPlayerCount} players. `;
     }
     
-    systemMsg += `The user wants to create a murder mystery with ${data.hasAccomplice ? 'an' : 'no'} accomplice. `;
     systemMsg += `The user wants to create a murder mystery with a ${data.scriptType} script. `;
     
     // Add explicit instructions for complete mystery format
@@ -566,11 +565,13 @@ export default function MysteryChat({
                   name="playerCount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Player Count</FormLabel>
+                      <FormLabel>Player Count (4-32)</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
                           placeholder="4"
+                          min={4}
+                          max={32}
                           {...field}
                           onChange={(e) => {
                             const value = parseInt(e.target.value);
@@ -583,7 +584,7 @@ export default function MysteryChat({
                       </FormControl>
                       <FormDescription>
                         The number of players that will be participating in the
-                        mystery.
+                        mystery (between 4 and 32 players).
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -697,7 +698,7 @@ export default function MysteryChat({
                 )}
               </div>
             </div>
-          ))}
+          )}
           
           {/* AI Typing Indicator */}
           {isAiTyping && (

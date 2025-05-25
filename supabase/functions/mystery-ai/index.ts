@@ -1,5 +1,4 @@
 
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -61,7 +60,10 @@ serve(async (req) => {
     
     if (!systemPrompt) {
       // Default behavior for new conversations without custom system prompt
-      console.log("No custom system prompt - using default player count question");
+      console.log("No custom system prompt - analyzing conversation for next step");
+      
+      // Analyze the conversation to determine what step we're at
+      const conversationText = messages.map(msg => msg.content || '').join(' ').toLowerCase();
       
       // Check if this looks like a brand new conversation (1 message, likely asking for mystery creation)
       if (messages.length === 1) {
@@ -70,35 +72,59 @@ serve(async (req) => {
                                        userMessage.toLowerCase().includes('murder') ||
                                        userMessage.toLowerCase().includes('design') ||
                                        userMessage.toLowerCase().includes('create') ||
-                                       userMessage.toLowerCase().includes('craft');
+                                       userMessage.toLowerCase().includes('craft') ||
+                                       userMessage.toLowerCase().includes('gallery') ||
+                                       userMessage.toLowerCase().includes('theme');
         
         if (looksLikeInitialRequest) {
           console.log("Detected initial mystery creation request - asking for player count");
-          systemPrompt = `You are a helpful murder mystery creator. Your first question should ALWAYS be: "How many players do you want for your murder mystery?"
+          systemPrompt = `You are a helpful murder mystery creator. Your first question should ALWAYS be: "How many players do you want for your murder mystery? (Choose between 4 and 32 players)"
 
 Be conversational and ask only this question first. Do not generate any mystery content until you know the player count.
 
-After getting the player count, proceed to ask about theme, then other details one at a time before creating the full mystery.`;
+After getting the player count, proceed to ask about script preferences, then other details one at a time before creating the full mystery.`;
         }
       }
       
-      // If still no system prompt, check if conversation has progressed enough
+      // If still no system prompt, check conversation progress
       if (!systemPrompt) {
-        const hasPlayerCount = messages.some(msg => 
-          msg.content && (
-            msg.content.includes('player') || 
-            msg.content.match(/\d+/) || 
-            msg.content.includes('people') || 
-            msg.content.includes('guests')
-          )
+        // Check if we have a player count but it's invalid
+        const hasInvalidPlayerCount = conversationText.match(/\b([0-9]+)\b/) && (
+          conversationText.includes('1 ') || conversationText.includes('2 ') || conversationText.includes('3 ') ||
+          conversationText.match(/\b(3[3-9]|[4-9][0-9]|[1-9][0-9]{2,})\b/) // Numbers > 32
         );
         
-        if (hasPlayerCount) {
-          console.log("Detected player count in conversation - using creation mode");
-          systemPrompt = `You are a murder mystery creator. Help the user create an engaging murder mystery step by step. Ask for details one at a time: theme, setting, victim details, etc. Once you have enough information, create a complete mystery outline.`;
-        } else {
-          console.log("No player count detected - asking for it");
-          systemPrompt = `You are a helpful murder mystery creator. Your first question should ALWAYS be: "How many players do you want for your murder mystery?"
+        if (hasInvalidPlayerCount) {
+          console.log("Detected invalid player count - asking for correction");
+          systemPrompt = `The user has provided an invalid player count. You must ask them to choose a number between 4 and 32 players. Be polite but clear about the requirement.
+
+Say something like: "I need between 4 and 32 players for a murder mystery. Could you please choose a number in that range?"`;
+        }
+        
+        // Check if we have a valid player count but no script preference
+        const hasValidPlayerCount = conversationText.match(/\b([4-9]|[12][0-9]|3[0-2])\b/) && 
+                                   (conversationText.includes('player') || conversationText.includes('people') || conversationText.includes('guest'));
+        
+        const hasScriptPreference = conversationText.includes('script') || conversationText.includes('full') || 
+                                   conversationText.includes('point') || conversationText.includes('summary') || conversationText.includes('summaries');
+        
+        if (hasValidPlayerCount && !hasScriptPreference) {
+          console.log("Has valid player count but no script preference - asking for script preference");
+          systemPrompt = `Great! Now I need to know about character guidance format. Ask: "Would you prefer full scripts or point form summaries for character guidance? (You can also choose both if you'd like both formats)"
+
+Only ask this question and wait for their response before proceeding.`;
+        }
+        
+        // If we have both player count and script preference, proceed to detailed creation
+        if (hasValidPlayerCount && hasScriptPreference) {
+          console.log("Has both player count and script preference - proceeding to mystery creation");
+          systemPrompt = `You are a murder mystery creator. The user has provided the necessary information. Help them create an engaging murder mystery step by step. Ask for additional details if needed, then create a complete mystery outline when you have enough information.`;
+        }
+        
+        // Fallback: ask for player count
+        if (!systemPrompt) {
+          console.log("Fallback - asking for player count");
+          systemPrompt = `You are a helpful murder mystery creator. Your first question should ALWAYS be: "How many players do you want for your murder mystery? (Choose between 4 and 32 players)"
 
 Be conversational and ask only this question first. Do not generate any mystery content until you know the player count.`;
         }
@@ -183,4 +209,3 @@ Be conversational and ask only this question first. Do not generate any mystery 
     return errorResponse;
   }
 });
-
