@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -698,7 +699,7 @@ export default function MysteryChat({
                 )}
               </div>
             </div>
-          )}
+          ))}
           
           {/* AI Typing Indicator */}
           {isAiTyping && (
