@@ -91,7 +91,7 @@ const MysteryForm = ({
       }) => <FormItem>
                             <FormLabel>Theme/Setting Details (Optional)</FormLabel>
                             <FormControl>
-                                <Input placeholder="e.g., Poker Tournament, 1920s Speakeasy, Haunted Mansion" {...field} />
+                                <Input placeholder="e.g., time period, setting specifics, must-have's, etc." {...field} />
                             </FormControl>
                             <FormDescription>
                                 Choose a specific theme or setting for your murder mystery
