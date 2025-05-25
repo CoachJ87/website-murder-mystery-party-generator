@@ -23,37 +23,37 @@ const MysteryCreation = () => {
     const isMobile = useIsMobile();
 
     // Load existing data if editing, or extract theme from URL if creating new
-useEffect(() => {
-    console.log("=== MysteryCreation Debug ===");
-    console.log("Current URL:", window.location.href);
-    console.log("location.search:", location.search);
-    console.log("isEditing:", isEditing);
-    console.log("formData current state:", formData);
-    
-    if (isEditing && id) {
-        console.log("Loading existing mystery");
-        loadExistingMystery(id);
-    } else {
-        const urlParams = new URLSearchParams(location.search);
-        const themeFromUrl = urlParams.get('theme');
-        console.log("Theme extracted from URL:", themeFromUrl);
+    useEffect(() => {
+        console.log("=== MysteryCreation Debug ===");
+        console.log("Current URL:", window.location.href);
+        console.log("location.search:", location.search);
+        console.log("isEditing:", isEditing);
+        console.log("formData current state:", formData);
         
-        if (themeFromUrl) {
-            console.log("Setting formData with theme:", themeFromUrl);
-            const newFormData = {
-                theme: themeFromUrl,
-                playerCount: 6,
-                hasAccomplice: false,
-                scriptType: "full",
-                additionalDetails: ""
-            };
-            console.log("New formData object:", newFormData);
-            setFormData(newFormData);
+        if (isEditing && id) {
+            console.log("Loading existing mystery");
+            loadExistingMystery(id);
         } else {
-            console.log("No theme found in URL");
+            const urlParams = new URLSearchParams(location.search);
+            const themeFromUrl = urlParams.get('theme');
+            console.log("Theme extracted from URL:", themeFromUrl);
+            
+            if (themeFromUrl) {
+                console.log("Setting formData with theme:", themeFromUrl);
+                const newFormData = {
+                    theme: themeFromUrl,
+                    playerCount: 6,
+                    hasAccomplice: false,
+                    scriptType: "full",
+                    additionalDetails: ""
+                };
+                console.log("New formData object:", newFormData);
+                setFormData(newFormData);
+            } else {
+                console.log("No theme found in URL");
+            }
         }
-    }
-}, [id, location.search, isEditing, formData]);
+    }, [id, location.search, isEditing]);
     
     const loadExistingMystery = async (mysteryId: string) => {
         try {
@@ -91,6 +91,7 @@ useEffect(() => {
     
         console.log("Starting mystery creation process...");
         setLoading(true);
+        
         try {
             // Create system instruction for AI using your template format
             const systemInstruction = `You are creating a murder mystery with these details:
@@ -126,7 +127,7 @@ After presenting the mystery concept, ask if the concept works for them and expl
             let conversationId = id;
 
             if (!isEditing) {
-                // Create new conversation - matching your exact schema
+                // Create new conversation - REMOVED subscription/payment fields
                 const { data: conversation, error: convError } = await supabase
                     .from("conversations")
                     .insert({
@@ -135,11 +136,7 @@ After presenting the mystery concept, ask if the concept works for them and expl
                         mystery_data: data,
                         system_instruction: systemInstruction,
                         display_status: "draft",
-                        is_completed: false,
-                        is_paid: false,
-                        prompt_version: "free",
-                        has_complete_package: false,
-                        needs_package_generation: false
+                        is_completed: false
                     })
                     .select()
                     .single();
@@ -150,7 +147,7 @@ After presenting the mystery concept, ask if the concept works for them and expl
                 }
                 conversationId = conversation.id;
 
-                // Save initial user message - matching your schema
+                // Save initial user message
                 await supabase.from("messages").insert({
                     conversation_id: conversationId,
                     content: initialMessage,
@@ -177,7 +174,7 @@ After presenting the mystery concept, ask if the concept works for them and expl
                     systemInstruction
                 );
 
-                // Save AI response - matching your schema
+                // Save AI response
                 await supabase.from("messages").insert({
                     conversation_id: conversationId,
                     content: aiResponse,
