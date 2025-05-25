@@ -95,11 +95,11 @@ const MysteryCreation = () => {
         try {
             // Create system instruction for AI using your template format
             const systemInstruction = `You are creating a murder mystery with these details:
-- Theme: ${data.theme}
-- Players: ${data.playerCount}
-- Script Type: ${data.scriptType}
-- Has Accomplice: ${data.hasAccomplice}
-${data.additionalDetails ? `- Additional Details: ${data.additionalDetails}` : ''}
+                - Theme: ${data.theme}
+                - Players: ${data.playerCount}
+                - Script Type: ${data.scriptType}
+                ${data.userRequest ? `- Original Request: ${data.userRequest}` : ''}
+                ${data.additionalDetails ? `- Additional Details: ${data.additionalDetails}` : ''}
 
 You MUST follow this exact output format:
 
@@ -122,7 +122,7 @@ You MUST follow this exact output format:
 After presenting the mystery concept, ask if the concept works for them and explain that they can continue to make edits and that once they are done they can press the 'Generate Mystery' button to create a complete game package.`;
 
             // Create the initial user message
-            const initialMessage = `Create a ${data.theme} murder mystery for ${data.playerCount} players with ${data.scriptType} scripts${data.hasAccomplice ? ' including an accomplice mechanism' : ''}.${data.additionalDetails ? ` Additional requirements: ${data.additionalDetails}` : ''}`;
+            const initialMessage = `Create a ${data.theme} murder mystery for ${data.playerCount} players with ${data.scriptType} scripts.${data.userRequest ? ` Original request: ${data.userRequest}` : ''}${data.additionalDetails ? ` Additional requirements: ${data.additionalDetails}` : ''}`;
 
             let conversationId = id;
 
