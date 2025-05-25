@@ -1,5 +1,8 @@
 // Update the schema validation:
 const formSchema = z.object({
+    console.log("=== MysteryForm Debug ===");
+    console.log("initialData received:", initialData);
+    console.log("Current theme value:", theme);
     theme: z.string().min(2, { message: "Theme is required" }),
     playerCount: z.coerce
         .number()
