@@ -80,11 +80,17 @@ const MysteryCreation = () => {
     };
 
     const handleSave = async (data: any) => {
+        console.log("handleSave called with data:", data);
+        console.log("isAuthenticated:", isAuthenticated);
+        console.log("user:", user);
+        
         if (!isAuthenticated || !user) {
+            console.log("User not authenticated");
             toast.error("Please sign in to save your mystery");
             return;
         }
-
+    
+        console.log("Starting mystery creation process...");
         setLoading(true);
         try {
             // Create system instruction for AI using your template format
