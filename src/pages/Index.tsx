@@ -14,6 +14,10 @@ const Index = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
 
+  const handleCreateNew = () => {
+    navigate("/mystery/new");
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -27,7 +31,7 @@ const Index = () => {
       <Header />
       <main className="flex-1">
         {isAuthenticated ? (
-          <HomeDashboard />
+          <HomeDashboard onCreateNew={handleCreateNew} />
         ) : (
           <div className={cn("container mx-auto", isMobile ? "px-4 py-8" : "px-4 py-12")}>
             <Hero />
