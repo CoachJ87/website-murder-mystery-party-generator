@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -79,24 +78,46 @@ const MysteryCreation = () => {
         }
     };
 
+    const createFormattedInitialMessage = (data: any) => {
+        let message = "";
+        
+        // Start with original request if available
+        if (data.userRequest) {
+            message = data.userRequest;
+        } else {
+            message = "I want to create a murder mystery";
+        }
+        
+        // Add theme/setting if provided
+        if (data.theme && data.theme.trim() !== "") {
+            message += `. The theme/setting should be ${data.theme} for ${data.playerCount} players with ${data.scriptType} scripts`;
+        } else {
+            message += `. This is for ${data.playerCount} players with ${data.scriptType} scripts`;
+        }
+        
+        // Add additional details if provided
+        if (data.additionalDetails && data.additionalDetails.trim() !== "") {
+            message += `. Additional details include: ${data.additionalDetails}`;
+        }
+        
+        message += ".";
+        return message;
+    };
+
     const handleSave = async (data: any) => {
         console.log("handleSave called with data:", data);
-        console.log("isAuthenticated:", isAuthenticated);
-        console.log("user:", user);
         
         if (!isAuthenticated || !user) {
-            console.log("User not authenticated");
             toast.error("Please sign in to save your mystery");
             return;
         }
     
-        console.log("Starting mystery creation process...");
         setLoading(true);
         
         try {
-            // Create system instruction for AI using your template format
+            // Create system instruction for AI
             const systemInstruction = `You are creating a murder mystery with these details:
-                - Theme: ${data.theme}
+                - Theme: ${data.theme || 'General murder mystery'}
                 - Players: ${data.playerCount}
                 - Script Type: ${data.scriptType}
                 ${data.userRequest ? `- Original Request: ${data.userRequest}` : ''}
@@ -120,10 +141,10 @@ You MUST follow this exact output format:
 ## MURDER METHOD
 [Paragraph describing how the murder was committed, interesting details about the method, and what clues might be found]
 
-After presenting the mystery concept, ask if the concept works for them and explain that they can continue to make edits and that once they are done they can press the 'Generate Complete Package' button to create a complete game package.`;
+After presenting the mystery concept, ask if the concept works for them and explain that they can continue to make edits and that once they are done they can go to the preview page to purchase the complete game package.`;
 
-            // Create the initial user message
-            const initialMessage = `Create a ${data.theme} murder mystery for ${data.playerCount} players with ${data.scriptType} scripts.${data.userRequest ? ` Original request: ${data.userRequest}` : ''}${data.additionalDetails ? ` Additional requirements: ${data.additionalDetails}` : ''}`;
+            // Create the formatted initial message
+            const initialMessage = createFormattedInitialMessage(data);
 
             let conversationId = id;
 
@@ -133,7 +154,7 @@ After presenting the mystery concept, ask if the concept works for them and expl
                     .from("conversations")
                     .insert({
                         user_id: user.id,
-                        title: `${data.theme} Mystery`,
+                        title: `${data.theme || 'Mystery'} - ${data.playerCount} Players`,
                         mystery_data: data,
                         system_instruction: systemInstruction,
                         display_status: "draft",
@@ -167,30 +188,9 @@ After presenting the mystery concept, ask if the concept works for them and expl
                     .eq("id", conversationId);
             }
 
-            // Generate AI response
-            try {
-                const aiResponse = await getAIResponse(
-                    [{ role: "user", content: initialMessage }],
-                    'free',
-                    systemInstruction
-                );
-
-                // Save AI response
-                await supabase.from("messages").insert({
-                    conversation_id: conversationId,
-                    content: aiResponse,
-                    role: "assistant",
-                    is_ai: true
-                });
-
-                toast.success("Mystery generated successfully!");
-                navigate(`/mystery/chat/${conversationId}`);
-            } catch (aiError) {
-                console.error("AI generation error:", aiError);
-                // Even if AI fails, still navigate to chat
-                toast.success("Mystery saved! Opening chat interface...");
-                navigate(`/mystery/chat/${conversationId}`);
-            }
+            toast.success("Mystery setup complete! Starting chat...");
+            // Navigate immediately to chat with needsInitialAIResponse flag
+            navigate(`/mystery/chat/${conversationId}?initial=true`);
 
         } catch (error) {
             console.error("Error saving mystery:", error);
