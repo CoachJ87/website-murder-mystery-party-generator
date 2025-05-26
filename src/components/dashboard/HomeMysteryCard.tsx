@@ -1,221 +1,97 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Edit, Eye, CheckCircle2, MoreVertical, Archive, Trash2 } from "lucide-react";
-import { Mystery } from "@/interfaces/mystery";
-import { formatRelativeTime } from "@/utils/formatDate";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
-import { useState } from "react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle
-} from "@/components/ui/alert-dialog";
-import { toast } from "sonner";
-import { supabase } from "@/lib/supabase";
+import { Badge } from "@/components/ui/badge";
+import { Eye, MessageSquare, Edit, Users, Calendar } from "lucide-react";
+import { formatDate } from "@/utils/formatDate";
 
 interface HomeMysteryCardProps {
-  mystery: Mystery;
-  onViewMystery: (id: string) => void;
-  onMysteryUpdated?: () => void;
+  mystery: {
+    id: string;
+    title: string;
+    mystery_data: any;
+    display_status: string;
+    created_at: string;
+    is_completed: boolean;
+  };
+  onView: (id: string) => void;
+  onEdit: (id: string) => void;
 }
 
-export function HomeMysteryCard({ mystery, onViewMystery, onMysteryUpdated }: HomeMysteryCardProps) {
-  const isPurchased = mystery.status === "purchased" || mystery.is_purchased === true;
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Truncate title if longer than 40 characters
-  const displayTitle = mystery.title && mystery.title.length > 40 
-    ? `${mystery.title.substring(0, 40)}...` 
-    : mystery.title;
-
-  const handleArchiveMystery = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsLoading(true);
-    
-    try {
-      const { error } = await supabase
-        .from("conversations")
-        .update({
-          display_status: "archived",
-          updated_at: new Date().toISOString()
-        })
-        .eq("id", mystery.id);
-
-      if (error) {
-        throw error;
-      }
-
-      toast.success("Mystery archived successfully");
-      if (onMysteryUpdated) {
-        onMysteryUpdated();
-      }
-    } catch (error) {
-      console.error("Error archiving mystery:", error);
-      toast.error("Failed to archive mystery");
-    } finally {
-      setIsLoading(false);
+export default function HomeMysteryCard({ mystery, onView, onEdit }: HomeMysteryCardProps) {
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'completed': return 'bg-green-100 text-green-800';
+      case 'draft': return 'bg-yellow-100 text-yellow-800';
+      case 'purchased': return 'bg-blue-100 text-blue-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
-  
-  const handleDeleteMystery = async () => {
-    setIsLoading(true);
-    
-    try {
-      // First delete all messages associated with the conversation
-      const { error: messagesError } = await supabase
-        .from("messages")
-        .delete()
-        .eq("conversation_id", mystery.id);
 
-      if (messagesError) {
-        throw messagesError;
-      }
-
-      // Then delete the conversation itself
-      const { error: conversationError } = await supabase
-        .from("conversations")
-        .delete()
-        .eq("id", mystery.id);
-
-      if (conversationError) {
-        throw conversationError;
-      }
-
-      toast.success("Mystery deleted successfully");
-      if (onMysteryUpdated) {
-        onMysteryUpdated();
-      }
-    } catch (error) {
-      console.error("Error deleting mystery:", error);
-      toast.error("Failed to delete mystery");
-    } finally {
-      setIsLoading(false);
-      setShowDeleteDialog(false);
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'completed': return 'Completed';
+      case 'draft': return 'Draft';
+      case 'purchased': return 'Purchased';
+      default: return 'Unknown';
     }
   };
-  
+
   return (
-    <>
-      <Card 
-        className={`${isPurchased ? "border-primary border-2" : ""} cursor-pointer hover:shadow-md transition-shadow`}
-        onClick={() => onViewMystery(mystery.id)}
-      >
-        <CardHeader className="pb-2">
-          <div className="flex items-start justify-between gap-2">
-            <div>
-              {isPurchased ? (
-                <span className="text-xs px-2 py-1 bg-primary text-primary-foreground rounded-full inline-flex items-center whitespace-nowrap">
-                  <CheckCircle2 className="h-3 w-3 mr-1" />
-                  Purchased
-                </span>
-              ) : (
-                <span className="text-xs px-2 py-1 bg-secondary text-secondary-foreground rounded-full inline-flex items-center whitespace-nowrap">
-                  Draft
-                </span>
-              )}
-            </div>
-            <div className="shrink-0">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleArchiveMystery(e);
-                    }}
-                    disabled={isLoading}
-                  >
-                    <Archive className="mr-2 h-4 w-4" />
-                    Archive
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowDeleteDialog(true);
-                    }}
-                    className="text-destructive focus:text-destructive"
-                    disabled={isLoading}
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Delete
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
-          <CardTitle className="mt-2">
-            {displayTitle}
+    <Card className="hover:shadow-md transition-shadow">
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between">
+          <CardTitle className="text-lg font-semibold line-clamp-2">
+            {mystery.title}
           </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground mb-4">
-            Edited {formatRelativeTime(mystery.updated_at)}
+          <Badge className={getStatusColor(mystery.display_status)}>
+            {getStatusText(mystery.display_status)}
+          </Badge>
+        </div>
+      </CardHeader>
+      
+      <CardContent className="space-y-4">
+        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+          {mystery.mystery_data?.playerCount && (
+            <div className="flex items-center gap-1">
+              <Users className="h-4 w-4" />
+              <span>{mystery.mystery_data.playerCount} players</span>
+            </div>
+          )}
+          <div className="flex items-center gap-1">
+            <Calendar className="h-4 w-4" />
+            <span>{formatDate(mystery.created_at)}</span>
+          </div>
+        </div>
+        
+        {mystery.mystery_data?.theme && (
+          <p className="text-sm text-muted-foreground line-clamp-2">
+            Theme: {mystery.mystery_data.theme}
           </p>
-          
-          <Button 
-            size="sm" 
-            variant={isPurchased ? "default" : "secondary"}
-            className="w-full"
-            onClick={(e) => {
-              e.stopPropagation();
-              onViewMystery(mystery.id);
-            }}
+        )}
+        
+        <div className="flex gap-2 pt-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onView(mystery.id)}
+            className="flex-1"
           >
-            {isPurchased ? (
-              <>
-                <Eye className="h-4 w-4 mr-2" />
-                View Mystery
-              </>
-            ) : (
-              <>
-                <Edit className="h-4 w-4 mr-2" />
-                Edit Mystery
-              </>
-            )}
+            <Eye className="h-4 w-4 mr-2" />
+            View
           </Button>
-        </CardContent>
-      </Card>
-
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete this mystery and all associated data.
-              This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={(e) => {
-                e.preventDefault();
-                handleDeleteMystery();
-              }}
-              disabled={isLoading}
-              className="bg-destructive hover:bg-destructive/90"
-            >
-              {isLoading ? "Deleting..." : "Delete"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onEdit(mystery.id)}
+            className="flex-1"
+          >
+            <MessageSquare className="h-4 w-4 mr-2" />
+            Chat
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

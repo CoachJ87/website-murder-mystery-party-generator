@@ -113,9 +113,12 @@ const Hero = () => {
       setIsCreating(true);
       
       try {
-        console.log("Navigating to create page with input:", value);
+        // Extract theme from user input
+        const theme = extractThemeFromPrompt(value);
         
-        // Navigate to mystery creation with input as URL parameter
+        console.log("Navigating to create page with theme:", theme);
+        
+        // Navigate to mystery creation with theme as URL parameter
         navigate(`/mystery/create?input=${encodeURIComponent(value)}`);
         
       } catch (error) {
