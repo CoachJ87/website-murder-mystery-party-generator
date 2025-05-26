@@ -141,13 +141,6 @@ const MysteryChatPage = () => {
     navigate(`/mystery/preview/${id}`);
   };
 
-  // Helper function to convert scriptType to the expected format
-  const getScriptType = (scriptType: string | undefined): 'full' | 'pointForm' => {
-    if (scriptType === 'summary') return 'pointForm';
-    if (scriptType === 'full') return 'full';
-    return 'full'; // default
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -198,7 +191,7 @@ const MysteryChatPage = () => {
                     initialTheme={conversation.mystery_data?.theme}
                     initialPlayerCount={conversation.mystery_data?.playerCount}
                     initialHasAccomplice={conversation.mystery_data?.hasAccomplice}
-                    initialScriptType={getScriptType(conversation.mystery_data?.scriptType)}
+                    initialScriptType={conversation.mystery_data?.scriptType}
                     initialAdditionalDetails={conversation.mystery_data?.additionalDetails}
                     savedMysteryId={conversation.id}
                     onSave={handleSaveMessage}
