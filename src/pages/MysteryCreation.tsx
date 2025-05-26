@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -119,7 +120,7 @@ You MUST follow this exact output format:
 ## MURDER METHOD
 [Paragraph describing how the murder was committed, interesting details about the method, and what clues might be found]
 
-After presenting the mystery concept, ask if the concept works for them and explain that they can continue to make edits and that once they are done they can press the 'Generate Mystery' button to create a complete game package.`;
+After presenting the mystery concept, ask if the concept works for them and explain that they can continue to make edits and that once they are done they can press the 'Generate Complete Package' button to create a complete game package.`;
 
             // Create the initial user message
             const initialMessage = `Create a ${data.theme} murder mystery for ${data.playerCount} players with ${data.scriptType} scripts.${data.userRequest ? ` Original request: ${data.userRequest}` : ''}${data.additionalDetails ? ` Additional requirements: ${data.additionalDetails}` : ''}`;
@@ -127,7 +128,7 @@ After presenting the mystery concept, ask if the concept works for them and expl
             let conversationId = id;
 
             if (!isEditing) {
-                // Create new conversation - REMOVED subscription/payment fields
+                // Create new conversation
                 const { data: conversation, error: convError } = await supabase
                     .from("conversations")
                     .insert({
@@ -183,12 +184,12 @@ After presenting the mystery concept, ask if the concept works for them and expl
                 });
 
                 toast.success("Mystery generated successfully!");
-                navigate(`/mystery/preview/${conversationId}`);
+                navigate(`/mystery/chat/${conversationId}`);
             } catch (aiError) {
                 console.error("AI generation error:", aiError);
-                // Even if AI fails, still navigate to preview
-                toast.success("Mystery saved! Generating preview...");
-                navigate(`/mystery/preview/${conversationId}`);
+                // Even if AI fails, still navigate to chat
+                toast.success("Mystery saved! Opening chat interface...");
+                navigate(`/mystery/chat/${conversationId}`);
             }
 
         } catch (error) {

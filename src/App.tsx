@@ -14,6 +14,7 @@ import ResetPassword from "./pages/ResetPassword";
 import CheckEmail from "./pages/CheckEmail";
 import AccountSettings from "./pages/AccountSettings";
 import MysteryCreation from "./pages/MysteryCreation";
+import MysteryChatPage from "./pages/MysteryChat";
 import MysteryPreview from "./pages/MysteryPreview";
 import MysteryPurchase from "./pages/MysteryPurchase";
 import MysteryView from "./pages/MysteryView";
@@ -101,6 +102,14 @@ const AppRoutes = () => (
     <Route 
       path="/mystery/edit/:id" 
       element={<MysteryCreation />} 
+    />
+    <Route 
+      path="/mystery/chat/:id" 
+      element={
+        <ProtectedRoute>
+          <MysteryChatPage />
+        </ProtectedRoute>
+      } 
     />
     <Route 
       path="/mystery/preview/:id" 
