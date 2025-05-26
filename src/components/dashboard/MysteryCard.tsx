@@ -1,107 +1,226 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Eye, MessageSquare, Edit, Trash2, Users, Calendar } from "lucide-react";
-import { formatDate } from "@/utils/formatDate";
+import { Button } from "@/components/ui/button";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Calendar, Clock, Edit, Archive, Trash, Eye, CheckCircle2 } from "lucide-react";
+import { Mystery } from "@/interfaces/mystery";
+import { toast } from "sonner";
 
 interface MysteryCardProps {
-  mystery: {
-    id: string;
-    title: string;
-    mystery_data: any;
-    display_status: string;
-    created_at: string;
-    is_completed: boolean;
-  };
-  onView: (id: string) => void;
-  onEdit: (id: string) => void;
+  mystery: Mystery;
   onDelete: (id: string) => void;
+  onEdit: (id: string) => void;
 }
 
-export default function MysteryCard({ mystery, onView, onEdit, onDelete }: MysteryCardProps) {
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed': return 'bg-green-100 text-green-800';
-      case 'draft': return 'bg-yellow-100 text-yellow-800';
-      case 'purchased': return 'bg-blue-100 text-blue-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
+export const MysteryCard = ({ mystery, onDelete, onEdit }: MysteryCardProps) => {
+  // Check multiple status indicators for purchase status
+  const isPurchased = mystery.status === "purchased" || 
+                      mystery.is_purchased === true;
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'completed': return 'Completed';
-      case 'draft': return 'Draft';
-      case 'purchased': return 'Purchased';
-      default: return 'Unknown';
-    }
-  };
+  // Truncate title if longer than 40 characters
+  const displayTitle = mystery.title && mystery.title.length > 40 
+    ? `${mystery.title.substring(0, 40)}...` 
+    : mystery.title;
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <CardTitle className="text-lg font-semibold line-clamp-2">
-            {mystery.title}
-          </CardTitle>
-          <Badge className={getStatusColor(mystery.display_status)}>
-            {getStatusText(mystery.display_status)}
-          </Badge>
-        </div>
-      </CardHeader>
-      
-      <CardContent className="space-y-4">
-        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-          {mystery.mystery_data?.playerCount && (
-            <div className="flex items-center gap-1">
-              <Users className="h-4 w-4" />
-              <span>{mystery.mystery_data.playerCount} players</span>
-            </div>
-          )}
-          <div className="flex items-center gap-1">
-            <Calendar className="h-4 w-4" />
-            <span>{formatDate(mystery.created_at)}</span>
+    <Card className={`${isPurchased ? "border-primary border-2" : ""}`}>
+      <CardHeader>
+        <div className="flex justify-between items-start gap-2">
+          <div>
+            {isPurchased ? (
+              <Badge variant="default" className="bg-primary font-semibold">
+                <CheckCircle2 className="h-3 w-3 mr-1" />
+                Purchased
+              </Badge>
+            ) : mystery.status === "archived" ? (
+              <Badge variant="outline">Archived</Badge>
+            ) : (
+              <Badge variant="secondary">Draft</Badge>
+            )}
           </div>
         </div>
-        
-        {mystery.mystery_data?.theme && (
-          <p className="text-sm text-muted-foreground line-clamp-2">
-            Theme: {mystery.mystery_data.theme}
+        <CardTitle className="mt-2">
+          {displayTitle}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        <p className="text-sm text-muted-foreground">
+          <Calendar className="inline-block h-4 w-4 mr-1" />
+          Created: {new Date(mystery.created_at).toLocaleDateString()}
+        </p>
+        <p className="text-sm text-muted-foreground">
+          <Clock className="inline-block h-4 w-4 mr-1" />
+          Updated: {new Date(mystery.updated_at).toLocaleDateString()}
+        </p>
+        {mystery.theme && (
+          <p className="text-sm text-muted-foreground truncate">
+            Theme: {mystery.theme}
+          </p>
+        )}
+        {mystery.guests && (
+          <p className="text-sm text-muted-foreground">
+            Guests: {mystery.guests}
+          </p>
+        )}
+        {mystery.purchase_date && (
+          <p className="text-sm text-primary-foreground font-medium">
+            <CheckCircle2 className="inline-block h-4 w-4 mr-1 text-primary" />
+            Purchased: {new Date(mystery.purchase_date).toLocaleDateString()}
           </p>
         )}
         
-        <div className="flex gap-2 pt-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onView(mystery.id)}
-            className="flex-1"
-          >
-            <Eye className="h-4 w-4 mr-2" />
-            View
-          </Button>
-          
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onEdit(mystery.id)}
-            className="flex-1"
-          >
-            <MessageSquare className="h-4 w-4 mr-2" />
-            Chat
-          </Button>
-          
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onDelete(mystery.id)}
-            className="text-red-600 hover:text-red-700"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+        <div className="flex flex-wrap justify-end gap-2 pt-2">
+          {/* For purchased mysteries */}
+          {isPurchased ? (
+            <>
+              {/* Delete button on left */}
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button 
+                    size="sm" 
+                    variant="destructive"
+                    className="flex-1 min-w-[80px]"
+                  >
+                    <Trash className="h-4 w-4 mr-2" />
+                    Delete
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete your mystery from our servers.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => onDelete(mystery.id)}>
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+              
+              {/* Archive button on right */}
+              <Button
+                size="sm"
+                variant="outline"
+                className="flex-1 min-w-[80px]"
+                onClick={() => toast.info("Archive feature coming soon")}
+              >
+                <Archive className="h-4 w-4 mr-2" />
+                Archive
+              </Button>
+              
+              {/* View Mystery button at the bottom (full width) */}
+              <Button
+                size="sm"
+                variant="default"
+                onClick={() => onEdit(mystery.id)}
+                className="w-full"
+              >
+                <Eye className="h-4 w-4 mr-2" />
+                View Mystery
+              </Button>
+            </>
+          ) : mystery.status === "archived" ? (
+            <>
+              {/* For archived mysteries - delete on left, unarchive on right */}
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button 
+                    size="sm" 
+                    variant="destructive"
+                    className="flex-1 min-w-[80px]"
+                  >
+                    <Trash className="h-4 w-4 mr-2" />
+                    Delete
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete your mystery from our servers.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => onDelete(mystery.id)}>
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+              
+              {/* Unarchive button on right */}
+              <Button
+                size="sm"
+                variant="outline"
+                className="flex-1 min-w-[80px]"
+                onClick={() => toast.info("Unarchive feature coming soon")}
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                Unarchive
+              </Button>
+            </>
+          ) : (
+            <>
+              {/* For draft mysteries */}
+              {/* Delete button on left */}
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button 
+                    size="sm" 
+                    variant="destructive"
+                    className="flex-1 min-w-[80px]"
+                  >
+                    <Trash className="h-4 w-4 mr-2" />
+                    Delete
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete your mystery from our servers.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => onDelete(mystery.id)}>
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+              
+              {/* Archive button on right */}
+              <Button
+                size="sm"
+                variant="outline"
+                className="flex-1 min-w-[80px]"
+                onClick={() => toast.info("Archive feature coming soon")}
+              >
+                <Archive className="h-4 w-4 mr-2" />
+                Archive
+              </Button>
+              
+              {/* Edit button at the bottom (full width) */}
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => onEdit(mystery.id)}
+                className="w-full"
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                Edit
+              </Button>
+            </>
+          )}
         </div>
       </CardContent>
     </Card>
   );
-}
+};

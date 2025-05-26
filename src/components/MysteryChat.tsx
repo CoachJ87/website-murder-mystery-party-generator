@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardHeader, CardContent, CardDescription } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Send, Loader2 } from "lucide-react";
+import { Send, Loader2, Zap } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
@@ -135,14 +136,11 @@ export default function MysteryChat({
     setMessages(processedMessages);
   }, [initialMessages]);
 
-  // Enhanced effect to handle initial AI response
+  // New effect to handle initial AI response
   useEffect(() => {
     if (needsInitialAIResponse && !hasTriggeredInitialResponse && messages.length > 0 && !isLoadingHistory) {
-      console.log("Triggering initial AI response for new conversation");
+      console.log("Triggering initial AI response for user message");
       setHasTriggeredInitialResponse(true);
-      
-      // Start AI typing immediately
-      setIsAiTyping(true);
       
       // Find the last user message to respond to
       const lastUserMessage = messages.filter(msg => !msg.is_ai).pop();
@@ -200,18 +198,22 @@ export default function MysteryChat({
 
   useEffect(() => {
     if (initialTheme) {
+      form.setValue("theme", initialTheme);
       setCurrentTheme(initialTheme);
     }
     if (initialPlayerCount) {
+      form.setValue("playerCount", initialPlayerCount);
       setCurrentPlayerCount(initialPlayerCount);
     }
     if (initialHasAccomplice) {
+      form.setValue("hasAccomplice", initialHasAccomplice);
       setCurrentHasAccomplice(initialHasAccomplice);
     }
     if (initialScriptType) {
       setCurrentScriptType(initialScriptType);
     }
     if (initialAdditionalDetails) {
+      form.setValue("additionalDetails", initialAdditionalDetails);
       setCurrentAdditionalDetails(initialAdditionalDetails);
     }
   }, [initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails, form]);
@@ -221,26 +223,49 @@ export default function MysteryChat({
   }, [messages, isAiTyping]);
 
   const createSystemMessage = (data: any) => {
-    // Use provided system instruction if available
-    if (systemInstruction) {
-      return systemInstruction;
+    // For new conversations without player count, return null to let edge function handle the flow
+    if (isNewConversation()) {
+      console.log("New conversation detected - returning null to let edge function ask for player count");
+      return null;
     }
 
+    // Only create detailed system prompt if we have progressed past initial setup
     let systemMsg = "You are a helpful mystery writer. Your job is to help the user create an exciting murder mystery game.";
     
-    if (currentTheme) {
+    if (hasThemeInfo()) {
       systemMsg += `\nThe user wants to create a murder mystery with theme: ${currentTheme}. `;
     }
     
-    if (currentPlayerCount) {
-      systemMsg += `The user wants to create a murder mystery with ${currentPlayerCount} players. `;
+    if (hasPlayerCountInfo()) {
+      systemMsg += `The user wants to create a murder mystery with ${data.playerCount || currentPlayerCount} players. `;
     }
     
-    systemMsg += `The user wants to create a murder mystery with a ${currentScriptType} script. `;
+    systemMsg += `The user wants to create a murder mystery with a ${data.scriptType} script. `;
     
-    if (currentAdditionalDetails) {
-      systemMsg += `\nAdditional details: ${currentAdditionalDetails}. `;
+    // Add explicit instructions for complete mystery format
+    systemMsg += `\n\nImportant: When you have gathered enough information (at minimum theme and player count), provide a complete mystery in this exact format:
+    
+# "[CREATIVE TITLE]" - A MURDER MYSTERY
+
+## PREMISE
+[2-3 paragraphs setting the scene, describing where the murder takes place]
+
+## VICTIM
+**[Victim Name]** - [Description of the victim including their role and why they might have enemies]
+
+## CHARACTER LIST (${data.playerCount || currentPlayerCount} PLAYERS)
+[List all ${data.playerCount || currentPlayerCount} characters with descriptions]
+
+## MURDER METHOD
+[Describe how the murder was committed and what clues might be found]
+`;
+    
+    if (data.additionalDetails) {
+      systemMsg += `\nAdditional details: ${data.additionalDetails}. `;
     }
+    
+    // Disable the question limit in the mystery-ai edge function
+    systemMsg += "\n\nNOTE: Do not truncate responses. If asked to generate the full mystery format, always provide the complete structure with all sections.";
     
     return systemMsg;
   };
@@ -251,6 +276,12 @@ export default function MysteryChat({
     
     try {
       console.log(`Attempt ${retryCount + 1} - Calling mystery-ai function`);
+      console.log("Messages being sent:", messages);
+      if (systemPrompt) {
+        console.log("System prompt:", systemPrompt.substring(0, 200) + "...");
+      } else {
+        console.log("No custom system prompt - using edge function default");
+      }
       
       const requestBody: any = {
         messages: messages,
@@ -266,6 +297,8 @@ export default function MysteryChat({
       const { data, error } = await supabase.functions.invoke('mystery-ai', {
         body: requestBody
       });
+
+      console.log("Supabase function response:", { data, error });
 
       if (error) {
         throw new Error(`Supabase function error: ${error.message}`);
@@ -292,16 +325,39 @@ export default function MysteryChat({
   };
 
   const triggerAIResponse = async (userContent: string) => {
+    setIsAiTyping(true);
+
     try {
       console.log("=== Starting AI Request for Initial Response ===");
+      console.log("User message:", userContent);
+      console.log("Current conversation length:", messages.length);
+      console.log("Has player count info:", hasPlayerCountInfo());
+      console.log("Has theme info:", hasThemeInfo());
+      console.log("Is new conversation:", isNewConversation());
       
-      const systemPrompt = createSystemMessage({
-        theme: currentTheme,
-        playerCount: currentPlayerCount,
-        hasAccomplice: currentHasAccomplice,
-        scriptType: currentScriptType,
-        additionalDetails: currentAdditionalDetails
-      });
+      // FIXED: Improved system prompt logic
+      let systemPrompt = null;
+      
+      // For new conversations without player count, ignore any provided systemInstruction
+      // and let the edge function ask for player count
+      if (isNewConversation()) {
+        console.log("New conversation without player count - no system prompt to let edge function ask for player count");
+        systemPrompt = null;
+      } else if (hasPlayerCountInfo()) {
+        // Only create detailed system prompt if we have player count
+        systemPrompt = createSystemMessage({
+          theme: currentTheme,
+          playerCount: currentPlayerCount,
+          hasAccomplice: currentHasAccomplice,
+          scriptType: currentScriptType,
+          additionalDetails: currentAdditionalDetails
+        });
+        console.log("Created system prompt because we have player count");
+      } else if (systemInstruction) {
+        // Use provided system instruction only if it's not a new conversation
+        systemPrompt = systemInstruction;
+        console.log("Using provided systemInstruction for existing conversation");
+      }
 
       const messagesToSend = messages.map(msg => ({
         role: msg.is_ai ? "assistant" : "user",
@@ -376,13 +432,35 @@ export default function MysteryChat({
     setIsAiTyping(true);
 
     try {
-      const systemPrompt = createSystemMessage({
-        theme: currentTheme,
-        playerCount: currentPlayerCount,
-        hasAccomplice: currentHasAccomplice,
-        scriptType: currentScriptType,
-        additionalDetails: currentAdditionalDetails
-      });
+      console.log("=== Starting AI Request ===");
+      console.log("User message:", content);
+      console.log("Current conversation length:", newMessages.length);
+      console.log("Has player count info:", hasPlayerCountInfo());
+      console.log("Has theme info:", hasThemeInfo());
+      console.log("Is new conversation:", isNewConversation());
+      
+      // FIXED: Same improved system prompt logic as triggerAIResponse
+      let systemPrompt = null;
+      
+      // For new conversations without player count, ignore any provided systemInstruction
+      if (isNewConversation()) {
+        console.log("New conversation without player count - no system prompt to let edge function ask for player count");
+        systemPrompt = null;
+      } else if (hasPlayerCountInfo()) {
+        // Only create detailed system prompt if we have player count
+        systemPrompt = createSystemMessage({
+          theme: currentTheme,
+          playerCount: currentPlayerCount,
+          hasAccomplice: currentHasAccomplice,
+          scriptType: currentScriptType,
+          additionalDetails: currentAdditionalDetails
+        });
+        console.log("Created system prompt because we have player count");
+      } else if (systemInstruction) {
+        // Use provided system instruction only if it's not a new conversation
+        systemPrompt = systemInstruction;
+        console.log("Using provided systemInstruction for existing conversation");
+      }
 
       const messagesToSend = newMessages.map(msg => ({
         role: msg.is_ai ? "assistant" : "user",
@@ -390,6 +468,7 @@ export default function MysteryChat({
       }));
 
       const aiResponse = await callAIWithRetry(messagesToSend, systemPrompt);
+      console.log("AI response content:", aiResponse);
 
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -431,8 +510,142 @@ export default function MysteryChat({
     }
   };
 
+  // Styles for markdown content
+  const markdownStyles = {
+    h1: "text-2xl font-bold mt-4 mb-2",
+    h2: "text-xl font-semibold mt-3 mb-2",
+    h3: "text-lg font-medium mt-2 mb-1",
+    p: "my-1",
+    ul: "list-disc pl-6 my-2",
+    ol: "list-decimal pl-6 my-2",
+    li: "my-1",
+    strong: "font-bold",
+    em: "italic",
+    blockquote: "pl-4 border-l-4 border-gray-300 italic my-2"
+  };
+
   return (
     <div className="flex flex-col h-full space-y-6">
+      {!skipForm && (
+        <Card className="mb-4">
+          <CardHeader>
+            <Label className="text-lg">Mystery Settings</Label>
+            <CardDescription>
+              Configure the basic settings for your murder mystery.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="theme"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Theme</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="e.g. Roaring 20s, Space Station"
+                          {...field}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            setCurrentTheme(e.target.value);
+                          }}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        The overall theme or setting for your mystery.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="playerCount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Player Count (4-32)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="4"
+                          min={4}
+                          max={32}
+                          {...field}
+                          onChange={(e) => {
+                            const value = parseInt(e.target.value);
+                            if (!isNaN(value)) {
+                              field.onChange(value);
+                              setCurrentPlayerCount(value);
+                            }
+                          }}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        The number of players that will be participating in the
+                        mystery (between 4 and 32 players).
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="hasAccomplice"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel>Accomplice</FormLabel>
+                        <FormDescription>
+                          Should the murderer have an accomplice?
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={(checked) => {
+                            field.onChange(checked);
+                            setCurrentHasAccomplice(checked);
+                          }}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="additionalDetails"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Additional Details</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Any additional details you want to include?"
+                          className="resize-none"
+                          {...field}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            setCurrentAdditionalDetails(e.target.value);
+                          }}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Any additional details you want to include?
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Chat Container */}
       <div className="border rounded-lg bg-background">
         {/* Chat Messages Area */}
@@ -531,6 +744,18 @@ export default function MysteryChat({
           </div>
         </div>
       </div>
+      
+      {/* Generate Final Mystery Button */}
+      {onGenerateFinal && messages.length > 0 && (
+        <Button
+          onClick={() => onGenerateFinal(messages)}
+          className="w-full bg-red-600 hover:bg-red-700"
+          size="lg"
+        >
+          <Zap className="mr-2 h-5 w-5" />
+          Generate Final Mystery
+        </Button>
+      )}
     </div>
   );
 }

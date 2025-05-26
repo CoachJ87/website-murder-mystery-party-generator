@@ -1,204 +1,245 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { supabase } from "@/lib/supabase";
-import MysteryForm from "@/components/MysteryForm";
+import MysteryChat from "@/components/MysteryChat";
 import { useAuth } from "@/context/AuthContext";
+import { Message, FormValues } from "@/components/types";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
-import { getAIResponse } from "@/services/aiService";
 
 const MysteryCreation = () => {
-    const [loading, setLoading] = useState(false);
-    const [formData, setFormData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+    const [systemInstruction, setSystemInstruction] = useState<string | null>(null);
+    const [conversationId, setConversationId] = useState<string | null>(null);
+    const [theme, setTheme] = useState<string>("Murder Mystery");
+    const [shouldSkipForm, setShouldSkipForm] = useState(false);
+    const [needsInitialAIResponse, setNeedsInitialAIResponse] = useState(false);
     const navigate = useNavigate();
-    const location = useLocation();
     const { id } = useParams();
     const isEditing = !!id;
     const { isAuthenticated, user } = useAuth();
     const isMobile = useIsMobile();
 
-    // Load existing data if editing, or extract theme from URL if creating new
     useEffect(() => {
-        console.log("=== MysteryCreation Debug ===");
-        console.log("Current URL:", window.location.href);
-        console.log("location.search:", location.search);
-        console.log("isEditing:", isEditing);
-        console.log("formData current state:", formData);
-        
         if (isEditing && id) {
-            console.log("Loading existing mystery");
-            loadExistingMystery(id);
+            loadExistingConversation(id);
         } else {
-            const urlParams = new URLSearchParams(location.search);
-            const fullInput = urlParams.get('input');
-            console.log("Full input from URL:", fullInput);
-            
-            if (fullInput) {
-                console.log("Setting formData with full input:", fullInput);
-                const newFormData = {
-                    userRequest: fullInput,
-                    theme: "",
-                    playerCount: 6,
-                    scriptType: "full",
-                    additionalDetails: ""
-                };
-                console.log("New formData object:", newFormData);
-                setFormData(newFormData);
-            } else {
-                console.log("No input found in URL");
+            setLoading(false);
+        }
+    }, [id]);
+
+    const extractTitleFromMessages = (messages: any[]) => {
+        if (!messages || messages.length === 0) return null;
+        const aiMessages = messages.filter(msg => {
+            if (msg.role) return msg.role === 'assistant';
+            return msg.is_ai === true;
+        });
+        
+        if (aiMessages.length === 0) return null;
+        const titlePatterns = [
+            /"([^"]+)"\s*(?:-\s*A\s+MURDER\s+MYSTERY)?/i,
+            /#\s*["']([^"']+)["']/i,
+            /#\s*([A-Z][A-Z\s]+[A-Z])/,
+            /title:\s*["']?([^"'\n]+)["']?/i,
+        ];
+        for (const message of aiMessages) {
+            const content = message.content || '';
+            if (content.includes("# Questions") || content.includes("## Questions") || content.toLowerCase().includes("clarification")) {
+                continue;
+            }
+            for (const pattern of titlePatterns) {
+                const match = content.match(pattern);
+                if (match && match[1]) {
+                    return formatTitle(match[1]);
+                }
             }
         }
-    }, [id, location.search, isEditing]);
-    
-    const loadExistingMystery = async (mysteryId: string) => {
+        return null;
+    };
+
+    const formatTitle = (title: string) => {
+        let cleanTitle = title.trim().replace(/^["']|["']$/g, '');
+        if (cleanTitle === cleanTitle.toUpperCase() && cleanTitle.length > 3) {
+            cleanTitle = cleanTitle.toLowerCase();
+        }
+        return cleanTitle
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join(' ');
+    };
+
+    const loadExistingConversation = async (conversationId: string) => {
         try {
+            setIsLoadingHistory(true);
+            console.log("Loading conversation with ID:", conversationId);
             const { data, error } = await supabase
                 .from("conversations")
-                .select("mystery_data, title")
-                .eq("id", mysteryId)
-                .single();
+                .select("*, messages(*), system_instruction, mystery_data")
+                .eq("id", conversationId)
+                .maybeSingle();
 
             if (error) {
-                console.error("Error loading mystery:", error);
-                toast.error("Failed to load mystery");
+                console.error("Error loading conversation:", error);
+                toast.error("Failed to load conversation data");
                 return;
             }
 
-            if (data?.mystery_data) {
-                setFormData(data.mystery_data);
+            console.log("Conversation data loaded:", data);
+            
+            if (data) {
+                setConversationId(data.id);
+                const loadedMessages = data.messages as any[] || [];
+                
+                // Convert database messages to the correct format
+                const formattedMessages = loadedMessages.map(msg => ({
+                    id: msg.id || Date.now().toString(),
+                    content: msg.content,
+                    is_ai: msg.role === "assistant",
+                    timestamp: new Date(msg.created_at || Date.now()),
+                    isAutoGenerated: false
+                }));
+                
+                setMessages(formattedMessages);
+                
+                // For existing conversations with system instructions, use them
+                // This preserves the behavior for conversations that have progressed past initial setup
+                if (data.system_instruction) {
+                    setSystemInstruction(data.system_instruction);
+                }
+
+                // Always skip form when editing an existing conversation
+                setShouldSkipForm(true);
+
+                // Extract theme from mystery_data
+                let extractedTheme = "Murder Mystery";
+                if (data.mystery_data && typeof data.mystery_data === 'object') {
+                    extractedTheme = data.mystery_data.theme || extractedTheme;
+                }
+                setTheme(extractedTheme);
+
+                // Check if we have a user message but no proper AI response
+                const hasUserMessage = formattedMessages.some(msg => !msg.is_ai);
+                const hasProperAIResponse = formattedMessages.some(msg => 
+                    msg.is_ai && 
+                    !msg.content.includes("I'm having trouble") &&
+                    !msg.content.includes("apologize")
+                );
+                
+                console.log("Has user message:", hasUserMessage);
+                console.log("Has proper AI response:", hasProperAIResponse);
+                
+                if (hasUserMessage && !hasProperAIResponse) {
+                    console.log("Found user message without proper AI response, triggering AI response");
+                    setNeedsInitialAIResponse(true);
+                }
+
+                if (loadedMessages.length > 0) {
+                    const aiTitle = extractTitleFromMessages(loadedMessages);
+                    if (aiTitle) {
+                        await supabase
+                            .from("conversations")
+                            .update({
+                                title: aiTitle,
+                                updated_at: new Date().toISOString()
+                            })
+                            .eq("id", conversationId);
+                    }
+                }
+            } else {
+                console.log("No conversation data found");
+                toast.error("This mystery doesn't exist or was deleted");
+                navigate('/mystery/create', { replace: true });
             }
         } catch (error) {
             console.error("Error:", error);
-            toast.error("Failed to load mystery");
+            toast.error("Failed to load conversation");
+        } finally {
+            setIsLoadingHistory(false);
+            setLoading(false);
         }
     };
 
-    const createFormattedInitialMessage = (data: any) => {
-        let message = "";
-        
-        // Start with original request if available
-        if (data.userRequest) {
-            message = data.userRequest;
-        } else {
-            message = "I want to create a murder mystery";
-        }
-        
-        // Add theme/setting if provided
-        if (data.theme && data.theme.trim() !== "") {
-            message += `. The theme/setting should be ${data.theme} for ${data.playerCount} players with ${data.scriptType} scripts`;
-        } else {
-            message += `. This is for ${data.playerCount} players with ${data.scriptType} scripts`;
-        }
-        
-        // Add additional details if provided
-        if (data.additionalDetails && data.additionalDetails.trim() !== "") {
-            message += `. Additional details include: ${data.additionalDetails}`;
-        }
-        
-        message += ".";
-        return message;
-    };
-
-    const handleSave = async (data: any) => {
-        console.log("handleSave called with data:", data);
-        
-        if (!isAuthenticated || !user) {
-            toast.error("Please sign in to save your mystery");
+    const saveMessage = async (message: Message) => {
+        if (!isAuthenticated || !user || !conversationId) {
+            console.log("Cannot save message: missing auth or conversation ID");
             return;
         }
-    
-        setLoading(true);
-        
+
         try {
-            // Create system instruction for AI
-            const systemInstruction = `You are creating a murder mystery with these details:
-                - Theme: ${data.theme || 'General murder mystery'}
-                - Players: ${data.playerCount}
-                - Script Type: ${data.scriptType}
-                ${data.userRequest ? `- Original Request: ${data.userRequest}` : ''}
-                ${data.additionalDetails ? `- Additional Details: ${data.additionalDetails}` : ''}
-
-You MUST follow this exact output format:
-
-# "[CREATIVE TITLE]" - A MURDER MYSTERY
-
-## PREMISE
-[2-3 paragraphs setting the scene, describing the event where the murder takes place, and creating dramatic tension]
-
-## VICTIM
-**[Victim Name]** - [Vivid description of the victim, their role in the story, personality traits, and why they might have made enemies]
-
-## CHARACTER LIST (${data.playerCount} PLAYERS)
-1. **[Character 1 Name]** - [Engaging one-sentence description including profession and connection to victim]
-2. **[Character 2 Name]** - [Engaging one-sentence description including profession and connection to victim]
-[Continue for all ${data.playerCount} characters]
-
-## MURDER METHOD
-[Paragraph describing how the murder was committed, interesting details about the method, and what clues might be found]
-
-After presenting the mystery concept, ask if the concept works for them and explain that they can continue to make edits and that once they are done they can go to the preview page to purchase the complete game package.`;
-
-            // Create the formatted initial message
-            const initialMessage = createFormattedInitialMessage(data);
-
-            let conversationId = id;
-
-            if (!isEditing) {
-                // Create new conversation
-                const { data: conversation, error: convError } = await supabase
-                    .from("conversations")
-                    .insert({
-                        user_id: user.id,
-                        title: `${data.theme || 'Mystery'} - ${data.playerCount} Players`,
-                        mystery_data: data,
-                        system_instruction: systemInstruction,
-                        display_status: "draft",
-                        is_completed: false
-                    })
-                    .select()
-                    .single();
-
-                if (convError) {
-                    console.error("Error creating conversation:", convError);
-                    throw convError;
-                }
-                conversationId = conversation.id;
-
-                // Save initial user message
-                await supabase.from("messages").insert({
+            console.log("Saving message to database:", message);
+            const { error } = await supabase
+                .from("messages")
+                .insert({
                     conversation_id: conversationId,
-                    content: initialMessage,
-                    role: "user",
-                    is_ai: false
+                    content: message.content,
+                    role: message.is_ai ? "assistant" : "user",
                 });
+
+            if (error) {
+                console.error("Error saving message:", error);
+                toast.error("Failed to save message");
             } else {
-                // Update existing conversation
+                console.log("Message saved to database:", message);
+            }
+        } catch (error) {
+            console.error("Error saving message:", error);
+        }
+    };
+
+    const handleSaveMessages = async (newMessage: Message) => {
+        if (conversationId) {
+            await saveMessage(newMessage);
+            setMessages(prevMessages => [...prevMessages, newMessage]);
+
+            const updatedMessages = [...messages, newMessage];
+            const aiMessages = updatedMessages.filter(m => m.is_ai === true);
+            const aiTitle = extractTitleFromMessages(aiMessages);
+            if (aiTitle) {
+                console.log("Found AI title:", aiTitle);
                 await supabase
                     .from("conversations")
                     .update({
-                        mystery_data: data,
-                        system_instruction: systemInstruction,
+                        title: aiTitle,
                         updated_at: new Date().toISOString()
                     })
                     .eq("id", conversationId);
             }
-
-            toast.success("Mystery setup complete! Starting chat...");
-            // Navigate immediately to chat with needsInitialAIResponse flag
-            navigate(`/mystery/chat/${conversationId}?initial=true`);
-
-        } catch (error) {
-            console.error("Error saving mystery:", error);
-            toast.error("Failed to save mystery");
-        } finally {
-            setLoading(false);
+        } else {
+            toast.error("Conversation ID not found, cannot save message.");
         }
     };
+
+    const handleGenerateMystery = async (messages: Message[]) => {
+        console.log("conversationId when Generate Final Mystery clicked:", conversationId);
+        if (conversationId) {
+            navigate(`/mystery/preview/${conversationId}`);
+        } else {
+            toast.error("Please save your mystery first");
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex flex-col">
+                <Header />
+                <main className="flex-1 flex items-center justify-center">
+                    <div className="animate-pulse flex flex-col items-center">
+                        <div className="h-8 w-64 bg-secondary rounded mb-4"></div>
+                        <div className="h-4 w-48 bg-muted rounded"></div>
+                    </div>
+                </main>
+                <Footer />
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen flex flex-col">
@@ -210,16 +251,23 @@ After presenting the mystery concept, ask if the concept works for them and expl
                             {isEditing ? "Edit Mystery" : "Create New Mystery"}
                         </h1>
                         <p className="text-muted-foreground">
-                            Fill out the form below to generate your custom murder mystery
+                            Chat with our AI to refine your murder mystery
                         </p>
                     </div>
 
                     <Card className={isMobile ? "border-0 shadow-none bg-transparent" : ""}>
                         <CardContent className={cn("p-6", isMobile && "p-0")}>
-                            <MysteryForm
-                                onSave={handleSave}
-                                isSaving={loading}
-                                initialData={formData}
+                            <MysteryChat
+                                initialTheme={theme}
+                                savedMysteryId={id}
+                                onSave={handleSaveMessages}
+                                onGenerateFinal={handleGenerateMystery}
+                                initialMessages={messages}
+                                isLoadingHistory={isLoadingHistory}
+                                systemInstruction={systemInstruction}
+                                preventDuplicateMessages={true}
+                                skipForm={shouldSkipForm}
+                                needsInitialAIResponse={needsInitialAIResponse}
                             />
                         </CardContent>
                     </Card>

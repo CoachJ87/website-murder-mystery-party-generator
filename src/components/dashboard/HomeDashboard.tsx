@@ -8,7 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import { Mystery } from "@/interfaces/mystery";
 import { Search, ArrowDown } from "lucide-react";
-import HomeMysteryCard from "./HomeMysteryCard";
+import { HomeMysteryCard } from "./HomeMysteryCard";
 
 interface HomeDashboardProps {
   onCreateNew: () => void;
