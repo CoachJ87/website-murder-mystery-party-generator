@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -146,7 +145,7 @@ const MysteryForm = ({
                         </FormItem>} />
 
                 <Button type="submit" disabled={isSaving} className="w-full">
-                    {isSaving ? "Starting Chat..." : "Start AI Chat"}
+                    {isSaving ? "Generating Mystery..." : "Generate Mystery"}
                 </Button>
             </form>
         </Form>;
