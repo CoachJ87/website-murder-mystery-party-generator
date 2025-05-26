@@ -1,240 +1,154 @@
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import { Zap } from "lucide-react";
-import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 
+// Define the schema validation (REMOVED hasAccomplice):
 const formSchema = z.object({
-    theme: z.string().min(2, { message: "Theme is required" }),
-    playerCount: z.coerce
-        .number()
-        .int()
-        .min(2, { message: "Minimum 2 players required" })
-        .max(40, { message: "Maximum 40 players allowed" }),
-    hasAccomplice: z.boolean().default(false),
-    scriptType: z.enum(["full", "pointForm"], {
-        required_error: "Please select a script type",
-    }),
-    additionalDetails: z.string().optional(),
+  userRequest: z.string().optional(),
+  theme: z.string().optional(),
+  playerCount: z.coerce
+    .number()
+    .int()
+    .min(4, { message: "Minimum 4 players required" })
+    .max(32, { message: "Maximum 32 players allowed" }),
+  scriptType: z.enum(["full", "pointForm"], {
+    required_error: "Please select a script type"
+  }),
+  additionalDetails: z.string().optional()
 });
-
-type FormValues = z.infer<typeof formSchema>;
-
+type FormData = z.infer<typeof formSchema>;
 interface MysteryFormProps {
-    onSave: (data: FormValues) => void;
-    isSaving: boolean;
-    initialData?: Partial<FormValues>;
+  onSave: (data: FormData) => void;
+  isSaving?: boolean;
+  initialData?: Partial<FormData>;
 }
+const MysteryForm = ({
+  onSave,
+  isSaving = false,
+  initialData
+}: MysteryFormProps) => {
+  // Add debugging
+  console.log("=== MysteryForm Debug ===");
+  console.log("initialData received:", initialData);
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      userRequest: initialData?.userRequest || "",
+      theme: initialData?.theme || "",
+      playerCount: initialData?.playerCount || 6,
+      scriptType: initialData?.scriptType || "full",
+      additionalDetails: initialData?.additionalDetails || ""
+    }
+  });
 
-const themes = [
-    "1920s Speakeasy",
-    "Hollywood Murder",
-    "Castle Mystery",
-    "Sci-Fi Mystery",
-    "Art Gallery",
-    "Luxury Train",
-    "Mountain Resort",
-    "Haunted Mansion",
-    "Cruise Ship",
-    "Medieval Banquet",
-    "Wild West Saloon",
-];
+  // Watch the theme value for debugging
+  const currentTheme = form.watch("theme");
+  console.log("Current theme value:", currentTheme);
 
-const MysteryForm = ({ onSave, isSaving, initialData }: MysteryFormProps) => {
-    const form = useForm<FormValues>({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            theme: initialData?.theme || "",
-            playerCount: initialData?.playerCount || 8,
-            hasAccomplice: initialData?.hasAccomplice || false,
-            scriptType: initialData?.scriptType || "full",
-            additionalDetails: initialData?.additionalDetails || "",
-        },
-    });
+  // Reset form when initialData changes
+  useEffect(() => {
+    if (initialData) {
+      console.log("Resetting form with initialData:", initialData);
+      form.reset({
+        userRequest: initialData.userRequest || "",
+        theme: initialData.theme || "",
+        playerCount: initialData.playerCount || 6,
+        scriptType: initialData.scriptType || "full",
+        additionalDetails: initialData.additionalDetails || ""
+      });
+    }
+  }, [initialData, form]);
+  const onSubmit = (data: FormData) => {
+    console.log("Form submitted with data:", data);
+    onSave(data);
+  };
+  return <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                {/* NEW: User's original request field - ONLY show if we have a userRequest */}
+                {initialData?.userRequest && <FormField control={form.control} name="userRequest" render={({
+        field
+      }) => <FormItem>
+                                <FormLabel>What you want to create</FormLabel>
+                                <FormControl>
+                                    <Input {...field} disabled className="bg-muted" />
+                                </FormControl>
+                                <FormDescription>
+                                    Your original request from the homepage
+                                </FormDescription>
+                            </FormItem>} />}
 
-    const handleSubmit = (data: FormValues) => {
-        onSave(data);
-    };
-
-    return (
-        <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-                <FormField
-                    control={form.control}
-                    name="theme"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>
-                                What theme would you like for the murder mystery?
-                            </FormLabel>
-                            <div className="flex flex-wrap gap-2 mt-2">
-                                {themes.map((theme) => (
-                                    <Button
-                                        key={theme}
-                                        type="button"
-                                        variant={
-                                            field.value === theme
-                                                ? "default"
-                                                : "outline"
-                                        }
-                                        onClick={() => form.setValue("theme", theme)}
-                                        className="mb-1"
-                                    >
-                                        {theme}
-                                    </Button>
-                                ))}
-                            </div>
+                <FormField control={form.control} name="theme" render={({
+        field
+      }) => <FormItem>
+                            <FormLabel>Theme/Setting Details (Optional)</FormLabel>
                             <FormControl>
-                                <Input
-                                    placeholder="Or type your own theme..."
-                                    {...field}
-                                    className="mt-2"
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="playerCount"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>
-                                How many players will participate? (Max. 40)
-                            </FormLabel>
-                            <FormControl>
-                                <Input
-                                    type="number"
-                                    min={2}
-                                    max={40}
-                                    {...field}
-                                />
+                                <Input placeholder="e.g., time period, setting specifics, must-have's, etc." {...field} />
                             </FormControl>
                             <FormDescription>
-                                Enter a specific, whole number between 2 and 40.
+                                Choose a specific theme or setting for your murder mystery
                             </FormDescription>
                             <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                        </FormItem>} />
 
-                <FormField
-                    control={form.control}
-                    name="hasAccomplice"
-                    render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                            <div className="space-y-0.5">
-                                <FormLabel className="text-base">
-                                    Include an accomplice?
-                                </FormLabel>
-                                <FormDescription>
-                                    Would you like to include an accomplice
-                                    mechanism where two players work together as
-                                    the murderer and accomplice?
-                                </FormDescription>
-                            </div>
-                            <FormControl>
-                                <Switch
-                                    checked={field.value}
-                                    onCheckedChange={field.onChange}
-                                />
-                            </FormControl>
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="scriptType"
-                    render={({ field }) => (
-                        <FormItem className="space-y-3">
+                <FormField control={form.control} name="playerCount" render={({
+        field
+      }) => <FormItem>
                             <FormLabel>
-                                Would you prefer full scripts or point form
-                                for character guidance?
+                                How many players will participate? (4-32)
                             </FormLabel>
                             <FormControl>
-                                <RadioGroup
-                                    onValueChange={field.onChange}
-                                    defaultValue={field.value}
-                                    className="flex flex-col space-y-1"
-                                >
-                                    <FormItem className="flex items-center space-x-3 space-y-0">
-                                        <FormControl>
-                                            <RadioGroupItem value="full" />
-                                        </FormControl>
-                                        <FormLabel className="font-normal">
-                                            Full Scripts (Detailed character
-                                            dialogue and directions)
-                                        </FormLabel>
-                                    </FormItem>
-                                    <FormItem className="flex items-center space-x-3 space-y-0">
-                                        <FormControl>
-                                            <RadioGroupItem value="pointForm" />
-                                        </FormControl>
-                                        <FormLabel className="font-normal">
-                                            Point Form (Bullet points
-                                            with key information)
-                                        </FormLabel>
-                                    </FormItem>
+                                <Input type="number" min={4} max={32} {...field} />
+                            </FormControl>
+                            <FormDescription>
+                                Enter a specific, whole number between 4 and 32 players.
+                            </FormDescription>
+                            <FormMessage />
+                        </FormItem>} />
+
+                <FormField control={form.control} name="scriptType" render={({
+        field
+      }) => <FormItem className="space-y-3">
+                            <FormLabel>Script Detail Level</FormLabel>
+                            <FormControl>
+                                <RadioGroup onValueChange={field.onChange} value={field.value} className="flex flex-col space-y-2">
+                                    <div className="flex items-center space-x-2">
+                                        <RadioGroupItem value="full" id="full" />
+                                        <Label htmlFor="full">Full Scripts - Complete dialogue and detailed instructions</Label>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <RadioGroupItem value="pointForm" id="pointForm" />
+                                        <Label htmlFor="pointForm">Point Form - Key points and bullet summaries</Label>
+                                    </div>
                                 </RadioGroup>
                             </FormControl>
                             <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                        </FormItem>} />
 
-                <FormField
-                    control={form.control}
-                    name="additionalDetails"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>
-                                Any other details you'd like to add? (Optional)
-                            </FormLabel>
+                <FormField control={form.control} name="additionalDetails" render={({
+        field
+      }) => <FormItem>
+                            <FormLabel>Additional Details (Optional)</FormLabel>
                             <FormControl>
-                                <Textarea
-                                    placeholder="Enter any special requirements, character ideas, or plot elements..."
-                                    className="resize-none"
-                                    {...field}
-                                />
+                                <Textarea placeholder="Any specific requirements, special rules, or additional context for your mystery..." className="resize-none" {...field} />
                             </FormControl>
+                            <FormDescription>
+                                Provide any extra details or special requests for your mystery
+                            </FormDescription>
                             <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                        </FormItem>} />
 
-                <Button
-                    type="submit"
-                    disabled={isSaving}
-                    className="w-full"
-                >
-                    {isSaving ? (
-                        <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
-                    ) : (
-                        <Zap className="h-4 w-4 mr-2" />
-                    )}
-                    Generate Mystery
+                <Button type="submit" disabled={isSaving} className="w-full">
+                    {isSaving ? "Starting Chat..." : "Start AI Chat"}
                 </Button>
             </form>
-        </Form>
-    );
+        </Form>;
 };
-
 export default MysteryForm;
