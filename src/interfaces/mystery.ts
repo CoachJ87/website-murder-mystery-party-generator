@@ -59,6 +59,7 @@ export interface Mystery {
   };
   purchase_date?: string;
   has_complete_package?: boolean;
+  is_completed?: boolean; // Made optional
 }
 
 export interface MysteryCharacter {

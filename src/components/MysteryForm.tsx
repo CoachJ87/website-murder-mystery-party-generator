@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -9,9 +10,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 
-// Define the schema validation (REMOVED hasAccomplice):
+// Define the schema validation - userRequest is now required
 const formSchema = z.object({
-  userRequest: z.string().optional(),
+  userRequest: z.string().min(1, { message: "Please enter your original request" }),
   theme: z.string().optional(),
   playerCount: z.coerce
     .number()
@@ -23,20 +24,23 @@ const formSchema = z.object({
   }),
   additionalDetails: z.string().optional()
 });
+
 type FormData = z.infer<typeof formSchema>;
+
 interface MysteryFormProps {
   onSave: (data: FormData) => void;
   isSaving?: boolean;
   initialData?: Partial<FormData>;
 }
+
 const MysteryForm = ({
   onSave,
   isSaving = false,
   initialData
 }: MysteryFormProps) => {
-  // Add debugging
   console.log("=== MysteryForm Debug ===");
   console.log("initialData received:", initialData);
+  
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -47,10 +51,6 @@ const MysteryForm = ({
       additionalDetails: initialData?.additionalDetails || ""
     }
   });
-
-  // Watch the theme value for debugging
-  const currentTheme = form.watch("theme");
-  console.log("Current theme value:", currentTheme);
 
   // Reset form when initialData changes
   useEffect(() => {
@@ -65,89 +65,126 @@ const MysteryForm = ({
       });
     }
   }, [initialData, form]);
+
   const onSubmit = (data: FormData) => {
     console.log("Form submitted with data:", data);
     onSave(data);
   };
-  return <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                {/* NEW: User's original request field - ONLY show if we have a userRequest */}
-                {initialData?.userRequest && <FormField control={form.control} name="userRequest" render={({
-        field
-      }) => <FormItem>
-                                <FormLabel>What you want to create</FormLabel>
-                                <FormControl>
-                                    <Input {...field} disabled className="bg-muted" />
-                                </FormControl>
-                                <FormDescription>
-                                    Your original request from the homepage
-                                </FormDescription>
-                            </FormItem>} />}
 
-                <FormField control={form.control} name="theme" render={({
-        field
-      }) => <FormItem>
-                            <FormLabel>Theme/Setting Details (Optional)</FormLabel>
-                            <FormControl>
-                                <Input placeholder="e.g., time period, setting specifics, must-have's, etc." {...field} />
-                            </FormControl>
-                            <FormDescription>
-                                Choose a specific theme or setting for your murder mystery
-                            </FormDescription>
-                            <FormMessage />
-                        </FormItem>} />
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        {/* Original Request field - always visible and non-editable */}
+        <FormField
+          control={form.control}
+          name="userRequest"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Original Request</FormLabel>
+              <FormControl>
+                <Input {...field} disabled className="bg-muted" />
+              </FormControl>
+              <FormDescription>
+                Your original request from the homepage
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-                <FormField control={form.control} name="playerCount" render={({
-        field
-      }) => <FormItem>
-                            <FormLabel>
-                                How many players will participate? (4-32)
-                            </FormLabel>
-                            <FormControl>
-                                <Input type="number" min={4} max={32} {...field} />
-                            </FormControl>
-                            <FormDescription>
-                                Enter a specific, whole number between 4 and 32 players.
-                            </FormDescription>
-                            <FormMessage />
-                        </FormItem>} />
+        <FormField
+          control={form.control}
+          name="theme"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Theme/Setting Details (Optional)</FormLabel>
+              <FormControl>
+                <Input 
+                  placeholder="E.g. time period, specific location, must-have's, etc" 
+                  {...field} 
+                />
+              </FormControl>
+              <FormDescription>
+                Provide specific theme or setting details for your mystery
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-                <FormField control={form.control} name="scriptType" render={({
-        field
-      }) => <FormItem className="space-y-3">
-                            <FormLabel>Script Detail Level</FormLabel>
-                            <FormControl>
-                                <RadioGroup onValueChange={field.onChange} value={field.value} className="flex flex-col space-y-2">
-                                    <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value="full" id="full" />
-                                        <Label htmlFor="full">Full Scripts - Complete dialogue and detailed instructions</Label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value="pointForm" id="pointForm" />
-                                        <Label htmlFor="pointForm">Point Form - Key points and bullet summaries</Label>
-                                    </div>
-                                </RadioGroup>
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>} />
+        <FormField
+          control={form.control}
+          name="playerCount"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                How many players will participate? (4-32)
+              </FormLabel>
+              <FormControl>
+                <Input type="number" min={4} max={32} {...field} />
+              </FormControl>
+              <FormDescription>
+                Enter a specific, whole number between 4 and 32 players.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-                <FormField control={form.control} name="additionalDetails" render={({
-        field
-      }) => <FormItem>
-                            <FormLabel>Additional Details (Optional)</FormLabel>
-                            <FormControl>
-                                <Textarea placeholder="Any specific requirements, special rules, or additional context for your mystery..." className="resize-none" {...field} />
-                            </FormControl>
-                            <FormDescription>
-                                Provide any extra details or special requests for your mystery
-                            </FormDescription>
-                            <FormMessage />
-                        </FormItem>} />
+        <FormField
+          control={form.control}
+          name="scriptType"
+          render={({ field }) => (
+            <FormItem className="space-y-3">
+              <FormLabel>Script Detail Level</FormLabel>
+              <FormControl>
+                <RadioGroup 
+                  onValueChange={field.onChange} 
+                  value={field.value} 
+                  className="flex flex-col space-y-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="full" id="full" />
+                    <Label htmlFor="full">Full Scripts - Complete dialogue and detailed instructions</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="pointForm" id="pointForm" />
+                    <Label htmlFor="pointForm">Point Form - Key points and bullet summaries</Label>
+                  </div>
+                </RadioGroup>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-                <Button type="submit" disabled={isSaving} className="w-full">
-                    {isSaving ? "Generating Mystery..." : "Generate Mystery"}
-                </Button>
-            </form>
-        </Form>;
+        <FormField
+          control={form.control}
+          name="additionalDetails"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Additional Details (Optional)</FormLabel>
+              <FormControl>
+                <Textarea 
+                  placeholder="Any specific requirements, special rules, or additional context for your mystery..." 
+                  className="resize-none" 
+                  {...field} 
+                />
+              </FormControl>
+              <FormDescription>
+                Provide any extra details or special requests for your mystery
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <Button type="submit" disabled={isSaving} className="w-full">
+          {isSaving ? "Creating Mystery..." : "Generate Mystery"}
+        </Button>
+      </form>
+    </Form>
+  );
 };
+
 export default MysteryForm;
