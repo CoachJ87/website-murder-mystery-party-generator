@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -12,16 +12,15 @@ import { useAuth } from "@/context/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { Message } from "@/components/types";
-import { Loader2, ArrowLeft, Eye } from "lucide-react";
+import { Loader2, ArrowLeft } from "lucide-react";
 
 const MysteryChatPage = () => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [conversationData, setConversationData] = useState<any>(null);
     const [isLoadingHistory, setIsLoadingHistory] = useState(true);
+    const [isGeneratingPackage, setIsGeneratingPackage] = useState(false);
     const navigate = useNavigate();
     const { id } = useParams();
-    const [searchParams] = useSearchParams();
-    const isInitial = searchParams.get('initial') === 'true';
     const { isAuthenticated, user } = useAuth();
     const isMobile = useIsMobile();
 
@@ -86,8 +85,37 @@ const MysteryChatPage = () => {
         }
     };
 
-    const handleGoToPreview = () => {
-        navigate(`/mystery/preview/${id}`);
+    const handleGenerateCompletePackage = async () => {
+        if (!id || !conversationData) return;
+        
+        setIsGeneratingPackage(true);
+        
+        try {
+            // Trigger the webhook generation process
+            const { data, error } = await supabase.functions.invoke('mystery-webhook-trigger', {
+                body: {
+                    conversation_id: id,
+                    user_id: user?.id,
+                    mystery_data: conversationData.mystery_data
+                }
+            });
+
+            if (error) {
+                console.error("Error triggering generation:", error);
+                toast.error("Failed to start package generation");
+                return;
+            }
+
+            toast.success("Package generation started! You'll be redirected when complete.");
+            
+            // Navigate to the final mystery view
+            navigate(`/mystery/${id}`);
+        } catch (error) {
+            console.error("Error:", error);
+            toast.error("Failed to generate complete package");
+        } finally {
+            setIsGeneratingPackage(false);
+        }
     };
 
     if (isLoadingHistory) {
@@ -143,7 +171,6 @@ const MysteryChatPage = () => {
                                 isLoadingHistory={false}
                                 systemInstruction={conversationData?.system_instruction}
                                 skipForm={true}
-                                needsInitialAIResponse={isInitial}
                             />
                         </CardContent>
                     </Card>
@@ -151,18 +178,24 @@ const MysteryChatPage = () => {
                     <div className={cn("mt-8 flex flex-col gap-4", isMobile && "mt-4")}>
                         <div className="flex justify-center">
                             <Button
-                                onClick={handleGoToPreview}
-                                disabled={messages.length < 2}
+                                onClick={handleGenerateCompletePackage}
+                                disabled={isGeneratingPackage || messages.length < 2}
                                 size="lg"
-                                className="bg-blue-600 hover:bg-blue-700"
+                                className="bg-green-600 hover:bg-green-700"
                             >
-                                <Eye className="h-4 w-4 mr-2" />
-                                Go to Preview & Purchase
+                                {isGeneratingPackage ? (
+                                    <>
+                                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                        Generating Complete Package...
+                                    </>
+                                ) : (
+                                    "Generate Complete Package"
+                                )}
                             </Button>
                         </div>
                         
                         <p className="text-center text-sm text-muted-foreground">
-                            Ready to see your mystery preview? Click above to view and purchase the complete package.
+                            Ready to create your complete mystery package? This will generate detailed character guides, host instructions, and all game materials.
                         </p>
                     </div>
                 </div>
