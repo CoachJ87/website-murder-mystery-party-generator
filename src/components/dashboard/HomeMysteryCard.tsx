@@ -1,8 +1,10 @@
 
+import { useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Eye, Edit, MoreVertical, CheckCircle2, Archive, Trash2 } from "lucide-react";
 import { formatDate } from "@/utils/formatDate";
 
@@ -22,6 +24,7 @@ interface HomeMysteryCardProps {
 }
 
 export default function HomeMysteryCard({ mystery, onView, onEdit, onArchive, onDelete }: HomeMysteryCardProps) {
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const isPurchased = mystery.display_status === 'purchased';
   
   const truncateTitle = (title: string, maxLength: number = 80) => {
@@ -47,6 +50,7 @@ export default function HomeMysteryCard({ mystery, onView, onEdit, onArchive, on
     if (onDelete) {
       onDelete(mystery.id);
     }
+    setDeleteDialogOpen(false);
   };
 
   return (
@@ -73,7 +77,7 @@ export default function HomeMysteryCard({ mystery, onView, onEdit, onArchive, on
                 <Archive className="h-4 w-4 mr-2" />
                 Archive
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleDelete} className="text-red-600">
+              <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)} className="text-red-600">
                 <Trash2 className="h-4 w-4 mr-2" />
                 Delete
               </DropdownMenuItem>
@@ -115,6 +119,27 @@ export default function HomeMysteryCard({ mystery, onView, onEdit, onArchive, on
           </Button>
         </div>
       </CardContent>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Mystery</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this mystery? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 }
