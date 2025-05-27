@@ -36,6 +36,7 @@ export default function HomeMysteryCard({ mystery, onView, onEdit, onArchive, on
     if (isPurchased) {
       onView(mystery.id);
     } else {
+      // Navigate to chat interface for editing
       onEdit(mystery.id);
     }
   };

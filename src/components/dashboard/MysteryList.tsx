@@ -66,9 +66,9 @@ const MysteryList = ({ mysteries, isLoading, onRefresh }: MysteryListProps) => {
     }
   };
 
-  // Handle editing a mystery
+  // Handle editing a mystery - navigate to chat interface
   const handleEditMystery = (mysteryId: string) => {
-    navigate(`/mystery/${mysteryId}`);
+    navigate(`/mystery/chat/${mysteryId}`);
   };
 
   // Handle viewing a mystery
