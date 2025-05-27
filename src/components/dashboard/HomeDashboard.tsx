@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -87,7 +86,7 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
 
       let query = supabase
         .from("conversations")
-        .select("id, title, created_at, updated_at, mystery_data, display_status, is_paid, purchase_date")
+        .select("id, title, created_at, updated_at, mystery_data, display_status, is_paid, purchase_date, is_completed")
         .eq("user_id", user.id);
 
       // Apply search filter if provided
@@ -291,7 +290,7 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
                     mystery_data: mystery.mystery_data || {},
                     display_status: mystery.display_status || mystery.status,
                     created_at: mystery.created_at,
-                    is_completed: mystery.is_completed || false
+                    is_completed: Boolean(mystery.is_completed)
                   }}
                   onView={handleViewMystery}
                   onEdit={handleEditMystery}

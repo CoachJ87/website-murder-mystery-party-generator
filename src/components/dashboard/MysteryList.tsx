@@ -104,7 +104,7 @@ const MysteryList = ({ mysteries, isLoading, onRefresh }: MysteryListProps) => {
                 mystery_data: mystery.mystery_data || {},
                 display_status: mystery.display_status || mystery.status,
                 created_at: mystery.created_at,
-                is_completed: mystery.is_completed || false
+                is_completed: Boolean(mystery.is_completed)
               }}
               onView={() => handleViewMystery(mystery.id)}
               onEdit={() => handleEditMystery(mystery.id)}
