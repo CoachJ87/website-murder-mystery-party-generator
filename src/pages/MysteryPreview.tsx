@@ -12,7 +12,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, MessageCircle, Edit } from "lucide-react";
+import { ArrowLeft, Check, Users, Tag } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 
 const MysteryPreview = () => {
@@ -74,12 +74,12 @@ const MysteryPreview = () => {
         }
     };
 
-    const handleContinueChat = () => {
-        navigate(`/mystery/chat/${id}`);
+    const handleCompletePurchase = () => {
+        navigate(`/mystery/purchase/${id}`);
     };
 
-    const handleEdit = () => {
-        navigate(`/mystery/chat/${id}`);
+    const handleBackToDashboard = () => {
+        navigate("/dashboard");
     };
 
     if (loading) {
@@ -105,7 +105,7 @@ const MysteryPreview = () => {
                     <div className="text-center">
                         <h2 className="text-2xl font-bold mb-2">Mystery Not Found</h2>
                         <p className="text-muted-foreground mb-4">The mystery you're looking for doesn't exist.</p>
-                        <Button onClick={() => navigate("/dashboard")}>
+                        <Button onClick={handleBackToDashboard}>
                             Back to Dashboard
                         </Button>
                     </div>
@@ -115,118 +115,117 @@ const MysteryPreview = () => {
         );
     }
 
+    // Extract brief teaser from the last AI message
+    const briefTeaser = lastMessage.split('\n\n')[0] || lastMessage.substring(0, 200) + "...";
+
     return (
         <div className="min-h-screen flex flex-col">
             <Header />
-            <main className={cn("flex-1", isMobile ? "py-4 px-2" : "py-12 px-4")}>
-                <div className={cn("container mx-auto", isMobile ? "max-w-full" : "max-w-4xl")}>
-                    <div className={cn("mb-8", isMobile && "mb-4")}>
-                        <div className="flex items-center gap-4 mb-4">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => navigate("/dashboard")}
-                            >
-                                <ArrowLeft className="h-4 w-4 mr-2" />
-                                Back to Dashboard
-                            </Button>
-                        </div>
-                        
-                        <div className="flex justify-between items-start">
-                            <div>
-                                <h1 className={cn("text-3xl font-bold mb-2", isMobile && "text-2xl mb-1")}>
-                                    {mysteryData.title}
-                                </h1>
-                                <div className="flex items-center gap-2 mb-2">
-                                    <Badge variant="outline">
-                                        {mysteryData.display_status || "Draft"}
-                                    </Badge>
-                                    {mysteryData.mystery_data?.playerCount && (
-                                        <Badge variant="secondary">
-                                            {mysteryData.mystery_data.playerCount} Players
-                                        </Badge>
-                                    )}
-                                </div>
-                            </div>
-                            
-                            <div className="flex gap-2">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={handleEdit}
-                                >
-                                    <Edit className="h-4 w-4 mr-2" />
-                                    Edit
-                                </Button>
-                            </div>
-                        </div>
+            <main className={cn("flex-1", isMobile ? "py-4 px-4" : "py-12 px-4")}>
+                <div className={cn("container mx-auto", isMobile ? "max-w-full" : "max-w-6xl")}>
+                    {/* Back Button */}
+                    <div className="mb-6">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleBackToDashboard}
+                        >
+                            <ArrowLeft className="h-4 w-4 mr-2" />
+                            Back to Dashboard
+                        </Button>
                     </div>
 
-                    <div className="grid gap-6">
-                        {/* Mystery Settings */}
-                        {mysteryData.mystery_data && (
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Mystery Settings</CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    {mysteryData.mystery_data.theme && (
-                                        <div>
-                                            <h4 className="font-medium mb-1">Theme</h4>
-                                            <p className="text-muted-foreground">{mysteryData.mystery_data.theme}</p>
-                                        </div>
-                                    )}
-                                    
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <h4 className="font-medium mb-1">Players</h4>
-                                            <p className="text-muted-foreground">{mysteryData.mystery_data.playerCount}</p>
-                                        </div>
-                                        <div>
-                                            <h4 className="font-medium mb-1">Script Type</h4>
-                                            <p className="text-muted-foreground">
-                                                {mysteryData.mystery_data.scriptType === 'full' ? 'Full Scripts' : 'Point Form'}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    
-                                    {mysteryData.mystery_data.additionalDetails && (
-                                        <div>
-                                            <h4 className="font-medium mb-1">Additional Details</h4>
-                                            <p className="text-muted-foreground">{mysteryData.mystery_data.additionalDetails}</p>
-                                        </div>
-                                    )}
-                                </CardContent>
-                            </Card>
-                        )}
+                    {/* Page Header */}
+                    <div className="text-center mb-8">
+                        <h1 className={cn("text-4xl font-bold mb-2", isMobile && "text-3xl")}>
+                            Complete Your Purchase
+                        </h1>
+                        <p className="text-lg text-muted-foreground">
+                            Get full access to your murder mystery package
+                        </p>
+                    </div>
 
-                        {/* Latest AI Response */}
-                        {lastMessage && (
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Latest Mystery Concept</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="prose prose-sm dark:prose-invert max-w-none">
-                                        <ReactMarkdown>
-                                            {lastMessage}
-                                        </ReactMarkdown>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        )}
+                    {/* Responsive Grid Layout */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+                        {/* Mystery Preview Card */}
+                        <Card className="h-fit">
+                            <CardHeader>
+                                <CardTitle className="flex items-center justify-between">
+                                    {mysteryData.title}
+                                </CardTitle>
+                                <div className="flex items-center gap-2">
+                                    <Badge variant="outline" className="flex items-center gap-1">
+                                        <Tag className="h-3 w-3" />
+                                        {mysteryData.mystery_data?.theme || "Classic"}
+                                    </Badge>
+                                    <Badge variant="secondary" className="flex items-center gap-1">
+                                        <Users className="h-3 w-3" />
+                                        {mysteryData.mystery_data?.playerCount || "4-8"} Players
+                                    </Badge>
+                                </div>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                {/* Brief Teaser */}
+                                <div>
+                                    <h4 className="font-medium mb-2">Story Preview</h4>
+                                    <p className="text-sm text-muted-foreground leading-relaxed">
+                                        {briefTeaser}
+                                    </p>
+                                </div>
+                                
+                                {/* Purchase Note */}
+                                <div className="p-3 bg-muted rounded-lg">
+                                    <p className="text-sm font-medium text-center">
+                                        Purchase to unlock complete mystery package
+                                    </p>
+                                </div>
+                            </CardContent>
+                        </Card>
 
-                        {/* Action Buttons */}
-                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                            <Button
-                                onClick={handleContinueChat}
-                                size="lg"
-                                className="flex-1 sm:flex-none"
-                            >
-                                <MessageCircle className="h-4 w-4 mr-2" />
-                                Continue Chat
-                            </Button>
-                        </div>
+                        {/* Purchase Card */}
+                        <Card className="h-fit">
+                            <CardHeader className="text-center">
+                                <div className="text-5xl font-bold text-primary mb-2">$4.99</div>
+                                <p className="text-muted-foreground">One-time purchase, instant access</p>
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                                <Separator />
+                                
+                                {/* What's Included */}
+                                <div>
+                                    <h4 className="font-semibold mb-4">What's included:</h4>
+                                    <div className="space-y-3">
+                                        {[
+                                            "Character profiles",
+                                            "Host guide", 
+                                            "Printable sheets",
+                                            "Evidence cards",
+                                            "Timeline",
+                                            "Solution script",
+                                            "PDF downloads"
+                                        ].map((item, index) => (
+                                            <div key={index} className="flex items-center gap-3">
+                                                <div className="flex-shrink-0 w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
+                                                    <Check className="h-3 w-3 text-green-600" />
+                                                </div>
+                                                <span className="text-sm">{item}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <Separator />
+
+                                {/* Purchase Button */}
+                                <Button 
+                                    onClick={handleCompletePurchase}
+                                    size="lg"
+                                    className={cn("bg-primary hover:bg-primary/90", isMobile ? "w-full" : "w-full")}
+                                >
+                                    Complete Purchase
+                                </Button>
+                            </CardContent>
+                        </Card>
                     </div>
                 </div>
             </main>
