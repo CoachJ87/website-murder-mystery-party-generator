@@ -71,6 +71,11 @@ const MysteryList = ({ mysteries, isLoading, onRefresh }: MysteryListProps) => {
     navigate(`/mystery/${mysteryId}`);
   };
 
+  // Handle viewing a mystery
+  const handleViewMystery = (mysteryId: string) => {
+    navigate(`/mystery/${mysteryId}`);
+  };
+
   return (
     <div className="space-y-6">
       {/* Search */}
@@ -93,9 +98,13 @@ const MysteryList = ({ mysteries, isLoading, onRefresh }: MysteryListProps) => {
           {filteredMysteries.map((mystery) => (
             <MysteryCard
               key={mystery.id}
-              mystery={mystery}
-              onDelete={() => handleDeleteMystery(mystery.id)}
+              mystery={{
+                ...mystery,
+                is_completed: mystery.is_completed || false
+              }}
+              onView={() => handleViewMystery(mystery.id)}
               onEdit={() => handleEditMystery(mystery.id)}
+              onDelete={() => handleDeleteMystery(mystery.id)}
             />
           ))}
         </div>

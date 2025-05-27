@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -142,9 +143,12 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
             created_at: conversation.created_at,
             updated_at: conversation.updated_at || conversation.created_at,
             status: status,
+            display_status: status,
+            mystery_data: mysteryData,
             theme: theme,
             guests: mysteryData.playerCount || mysteryData.numberOfGuests || mysteryData.guests,
             is_purchased: conversation.is_paid === true || conversation.display_status === "purchased",
+            is_completed: conversation.is_completed || false,
             ai_title: aiTitle,
             purchase_date: conversation.purchase_date
           };
@@ -181,6 +185,48 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
       navigate(`/mystery/${mysteryId}`);
     } else {
       navigate(`/mystery/edit/${mysteryId}`);
+    }
+  };
+
+  const handleEditMystery = (mysteryId: string) => {
+    navigate(`/mystery/edit/${mysteryId}`);
+  };
+
+  const handleArchiveMystery = async (mysteryId: string) => {
+    try {
+      const { error } = await supabase
+        .from("conversations")
+        .update({ display_status: "archived" })
+        .eq("id", mysteryId);
+      
+      if (error) {
+        throw error;
+      }
+      
+      toast.success("Mystery archived");
+      fetchMysteries(1, true);
+    } catch (error) {
+      console.error("Error archiving mystery:", error);
+      toast.error("Failed to archive mystery");
+    }
+  };
+
+  const handleDeleteMystery = async (mysteryId: string) => {
+    try {
+      const { error } = await supabase
+        .from("conversations")
+        .delete()
+        .eq("id", mysteryId);
+      
+      if (error) {
+        throw error;
+      }
+      
+      toast.success("Mystery deleted");
+      fetchMysteries(1, true);
+    } catch (error) {
+      console.error("Error deleting mystery:", error);
+      toast.error("Failed to delete mystery");
     }
   };
 
@@ -240,8 +286,10 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
                 <HomeMysteryCard 
                   key={mystery.id} 
                   mystery={mystery}
-                  onViewMystery={handleViewMystery}
-                  onMysteryUpdated={handleMysteryUpdated}
+                  onView={handleViewMystery}
+                  onEdit={handleEditMystery}
+                  onArchive={handleArchiveMystery}
+                  onDelete={handleDeleteMystery}
                 />
               ))}
             </div>
