@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -14,29 +13,30 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { ArrowLeft, Check, Users, Tag } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
-
 const MysteryPreview = () => {
-    const [mysteryData, setMysteryData] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
-    const [lastMessage, setLastMessage] = useState<string>("");
-    const navigate = useNavigate();
-    const { id } = useParams();
-    const { isAuthenticated } = useAuth();
-    const isMobile = useIsMobile();
-
-    useEffect(() => {
-        if (id) {
-            loadMysteryData();
-        }
-    }, [id]);
-
-    const loadMysteryData = async () => {
-        try {
-            setLoading(true);
-            
-            const { data, error } = await supabase
-                .from("conversations")
-                .select(`
+  const [mysteryData, setMysteryData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [lastMessage, setLastMessage] = useState<string>("");
+  const navigate = useNavigate();
+  const {
+    id
+  } = useParams();
+  const {
+    isAuthenticated
+  } = useAuth();
+  const isMobile = useIsMobile();
+  useEffect(() => {
+    if (id) {
+      loadMysteryData();
+    }
+  }, [id]);
+  const loadMysteryData = async () => {
+    try {
+      setLoading(true);
+      const {
+        data,
+        error
+      } = await supabase.from("conversations").select(`
                     *,
                     messages (
                         id,
@@ -44,47 +44,36 @@ const MysteryPreview = () => {
                         role,
                         created_at
                     )
-                `)
-                .eq("id", id)
-                .single();
+                `).eq("id", id).single();
+      if (error) {
+        console.error("Error loading mystery data:", error);
+        toast.error("Failed to load mystery");
+        return;
+      }
+      if (data) {
+        setMysteryData(data);
 
-            if (error) {
-                console.error("Error loading mystery data:", error);
-                toast.error("Failed to load mystery");
-                return;
-            }
-
-            if (data) {
-                setMysteryData(data);
-                
-                // Get the last AI message to display as preview
-                const aiMessages = data.messages
-                    ?.filter((msg: any) => msg.role === "assistant")
-                    ?.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-                
-                if (aiMessages && aiMessages.length > 0) {
-                    setLastMessage(aiMessages[0].content);
-                }
-            }
-        } catch (error) {
-            console.error("Error:", error);
-            toast.error("Failed to load mystery");
-        } finally {
-            setLoading(false);
+        // Get the last AI message to display as preview
+        const aiMessages = data.messages?.filter((msg: any) => msg.role === "assistant")?.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        if (aiMessages && aiMessages.length > 0) {
+          setLastMessage(aiMessages[0].content);
         }
-    };
-
-    const handleCompletePurchase = () => {
-        navigate(`/mystery/purchase/${id}`);
-    };
-
-    const handleBackToDashboard = () => {
-        navigate("/dashboard");
-    };
-
-    if (loading) {
-        return (
-            <div className="min-h-screen flex flex-col">
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error("Failed to load mystery");
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleCompletePurchase = () => {
+    navigate(`/mystery/purchase/${id}`);
+  };
+  const handleBackToDashboard = () => {
+    navigate("/dashboard");
+  };
+  if (loading) {
+    return <div className="min-h-screen flex flex-col">
                 <Header />
                 <main className="flex-1 flex items-center justify-center">
                     <div className="text-center">
@@ -93,13 +82,10 @@ const MysteryPreview = () => {
                     </div>
                 </main>
                 <Footer />
-            </div>
-        );
-    }
-
-    if (!mysteryData) {
-        return (
-            <div className="min-h-screen flex flex-col">
+            </div>;
+  }
+  if (!mysteryData) {
+    return <div className="min-h-screen flex flex-col">
                 <Header />
                 <main className="flex-1 flex items-center justify-center">
                     <div className="text-center">
@@ -111,25 +97,18 @@ const MysteryPreview = () => {
                     </div>
                 </main>
                 <Footer />
-            </div>
-        );
-    }
+            </div>;
+  }
 
-    // Extract brief teaser from the last AI message
-    const briefTeaser = lastMessage.split('\n\n')[0] || lastMessage.substring(0, 200) + "...";
-
-    return (
-        <div className="min-h-screen flex flex-col">
+  // Extract brief teaser from the last AI message
+  const briefTeaser = lastMessage.split('\n\n')[0] || lastMessage.substring(0, 200) + "...";
+  return <div className="min-h-screen flex flex-col">
             <Header />
             <main className={cn("flex-1", isMobile ? "py-4 px-4" : "py-12 px-4")}>
                 <div className={cn("container mx-auto", isMobile ? "max-w-full" : "max-w-6xl")}>
                     {/* Back Button */}
                     <div className="mb-6">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={handleBackToDashboard}
-                        >
+                        <Button variant="outline" size="sm" onClick={handleBackToDashboard}>
                             <ArrowLeft className="h-4 w-4 mr-2" />
                             Back to Dashboard
                         </Button>
@@ -154,14 +133,8 @@ const MysteryPreview = () => {
                                     {mysteryData.title}
                                 </CardTitle>
                                 <div className="flex items-center gap-2">
-                                    <Badge variant="outline" className="flex items-center gap-1">
-                                        <Tag className="h-3 w-3" />
-                                        {mysteryData.mystery_data?.theme || "Classic"}
-                                    </Badge>
-                                    <Badge variant="secondary" className="flex items-center gap-1">
-                                        <Users className="h-3 w-3" />
-                                        {mysteryData.mystery_data?.playerCount || "4-8"} Players
-                                    </Badge>
+                                    
+                                    
                                 </div>
                             </CardHeader>
                             <CardContent className="space-y-4">
@@ -195,33 +168,19 @@ const MysteryPreview = () => {
                                 <div>
                                     <h4 className="font-semibold mb-4">What's included:</h4>
                                     <div className="space-y-3">
-                                        {[
-                                            "Character profiles",
-                                            "Host guide", 
-                                            "Printable sheets",
-                                            "Evidence cards",
-                                            "Timeline",
-                                            "Solution script",
-                                            "PDF downloads"
-                                        ].map((item, index) => (
-                                            <div key={index} className="flex items-center gap-3">
+                                        {["Character profiles", "Host guide", "Printable sheets", "Evidence cards", "Timeline", "Solution script", "PDF downloads"].map((item, index) => <div key={index} className="flex items-center gap-3">
                                                 <div className="flex-shrink-0 w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
                                                     <Check className="h-3 w-3 text-green-600" />
                                                 </div>
                                                 <span className="text-sm">{item}</span>
-                                            </div>
-                                        ))}
+                                            </div>)}
                                     </div>
                                 </div>
 
                                 <Separator />
 
                                 {/* Purchase Button */}
-                                <Button 
-                                    onClick={handleCompletePurchase}
-                                    size="lg"
-                                    className={cn("bg-primary hover:bg-primary/90", isMobile ? "w-full" : "w-full")}
-                                >
+                                <Button onClick={handleCompletePurchase} size="lg" className={cn("bg-primary hover:bg-primary/90", isMobile ? "w-full" : "w-full")}>
                                     Complete Purchase
                                 </Button>
                             </CardContent>
@@ -230,8 +189,6 @@ const MysteryPreview = () => {
                 </div>
             </main>
             <Footer />
-        </div>
-    );
+        </div>;
 };
-
 export default MysteryPreview;
