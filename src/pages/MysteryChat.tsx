@@ -12,7 +12,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { Message } from "@/components/types";
-import { Loader2, ArrowLeft, Eye } from "lucide-react";
+import { Loader2, ArrowLeft, Zap } from "lucide-react";
 
 const MysteryChatPage = () => {
     const [messages, setMessages] = useState<Message[]>([]);
@@ -86,9 +86,12 @@ const MysteryChatPage = () => {
         }
     };
 
-    const handleGoToPreview = () => {
+    const handleGenerateFullMystery = () => {
         navigate(`/mystery/preview/${id}`);
     };
+
+    // Check if AI has provided at least one response
+    const hasAIResponse = messages.some(msg => msg.is_ai);
 
     if (isLoadingHistory) {
         return (
@@ -121,13 +124,6 @@ const MysteryChatPage = () => {
                                 Back to Dashboard
                             </Button>
                         </div>
-                        
-                        <h1 className={cn("text-3xl font-bold mb-2", isMobile && "text-2xl mb-1")}>
-                            {conversationData?.title || "Mystery Chat"}
-                        </h1>
-                        <p className="text-muted-foreground">
-                            Chat with AI to refine your mystery concept
-                        </p>
                     </div>
 
                     <Card className={isMobile ? "border-0 shadow-none bg-transparent" : ""}>
@@ -151,13 +147,13 @@ const MysteryChatPage = () => {
                     <div className={cn("mt-8 flex flex-col gap-4", isMobile && "mt-4")}>
                         <div className="flex justify-center">
                             <Button
-                                onClick={handleGoToPreview}
-                                disabled={messages.length < 2}
+                                onClick={handleGenerateFullMystery}
+                                disabled={!hasAIResponse}
                                 size="lg"
                                 className="bg-blue-600 hover:bg-blue-700"
                             >
-                                <Eye className="h-4 w-4 mr-2" />
-                                Go to Preview & Purchase
+                                <Zap className="h-4 w-4 mr-2" />
+                                Generate Full Mystery
                             </Button>
                         </div>
                         
