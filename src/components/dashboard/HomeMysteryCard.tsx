@@ -1,8 +1,9 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Eye, MessageSquare, Edit, Users, Calendar } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Eye, Edit, MoreVertical, CheckCircle2, Archive, Trash2 } from "lucide-react";
 import { formatDate } from "@/utils/formatDate";
 
 interface HomeMysteryCardProps {
@@ -16,79 +17,101 @@ interface HomeMysteryCardProps {
   };
   onView: (id: string) => void;
   onEdit: (id: string) => void;
+  onArchive?: (id: string) => void;
+  onDelete?: (id: string) => void;
 }
 
-export default function HomeMysteryCard({ mystery, onView, onEdit }: HomeMysteryCardProps) {
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed': return 'bg-green-100 text-green-800';
-      case 'draft': return 'bg-yellow-100 text-yellow-800';
-      case 'purchased': return 'bg-blue-100 text-blue-800';
-      default: return 'bg-gray-100 text-gray-800';
+export default function HomeMysteryCard({ mystery, onView, onEdit, onArchive, onDelete }: HomeMysteryCardProps) {
+  const isPurchased = mystery.display_status === 'purchased';
+  
+  const truncateTitle = (title: string, maxLength: number = 80) => {
+    if (title.length <= maxLength) return title;
+    return title.substring(0, maxLength) + "...";
+  };
+
+  const handleAction = () => {
+    if (isPurchased) {
+      onView(mystery.id);
+    } else {
+      onEdit(mystery.id);
     }
   };
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'completed': return 'Completed';
-      case 'draft': return 'Draft';
-      case 'purchased': return 'Purchased';
-      default: return 'Unknown';
+  const handleArchive = () => {
+    if (onArchive) {
+      onArchive(mystery.id);
+    }
+  };
+
+  const handleDelete = () => {
+    if (onDelete) {
+      onDelete(mystery.id);
     }
   };
 
   return (
     <Card className="hover:shadow-md transition-shadow">
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <CardTitle className="text-lg font-semibold line-clamp-2">
-            {mystery.title}
-          </CardTitle>
-          <Badge className={getStatusColor(mystery.display_status)}>
-            {getStatusText(mystery.display_status)}
+      <CardHeader className="pb-4">
+        {/* Top Row: Status Badge and Three Dots Menu */}
+        <div className="flex items-center justify-between">
+          <Badge 
+            variant={isPurchased ? "default" : "secondary"}
+            className="flex items-center gap-1"
+          >
+            {isPurchased && <CheckCircle2 className="h-3 w-3" />}
+            {isPurchased ? "Purchased" : "Draft"}
           </Badge>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={handleArchive}>
+                <Archive className="h-4 w-4 mr-2" />
+                Archive
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleDelete} className="text-red-600">
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        
+        {/* Second Row: Mystery Title */}
+        <div className="mt-3">
+          <h3 className="text-lg font-semibold leading-tight">
+            {truncateTitle(mystery.title)}
+          </h3>
         </div>
       </CardHeader>
       
-      <CardContent className="space-y-4">
-        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-          {mystery.mystery_data?.playerCount && (
-            <div className="flex items-center gap-1">
-              <Users className="h-4 w-4" />
-              <span>{mystery.mystery_data.playerCount} players</span>
-            </div>
-          )}
-          <div className="flex items-center gap-1">
-            <Calendar className="h-4 w-4" />
-            <span>{formatDate(mystery.created_at)}</span>
-          </div>
-        </div>
-        
-        {mystery.mystery_data?.theme && (
-          <p className="text-sm text-muted-foreground line-clamp-2">
-            Theme: {mystery.mystery_data.theme}
+      <CardContent className="pt-0">
+        {/* Bottom Section */}
+        <div className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            Edited {formatDate(mystery.created_at)}
           </p>
-        )}
-        
-        <div className="flex gap-2 pt-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onView(mystery.id)}
-            className="flex-1"
-          >
-            <Eye className="h-4 w-4 mr-2" />
-            View
-          </Button>
           
           <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onEdit(mystery.id)}
-            className="flex-1"
+            onClick={handleAction}
+            className="w-full"
+            variant={isPurchased ? "default" : "outline"}
           >
-            <MessageSquare className="h-4 w-4 mr-2" />
-            Chat
+            {isPurchased ? (
+              <>
+                <Eye className="h-4 w-4 mr-2" />
+                View Mystery
+              </>
+            ) : (
+              <>
+                <Edit className="h-4 w-4 mr-2" />
+                Edit Mystery
+              </>
+            )}
           </Button>
         </div>
       </CardContent>
