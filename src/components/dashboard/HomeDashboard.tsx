@@ -285,7 +285,14 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
               {mysteries.map((mystery) => (
                 <HomeMysteryCard 
                   key={mystery.id} 
-                  mystery={mystery}
+                  mystery={{
+                    id: mystery.id,
+                    title: mystery.title,
+                    mystery_data: mystery.mystery_data || {},
+                    display_status: mystery.display_status || mystery.status,
+                    created_at: mystery.created_at,
+                    is_completed: mystery.is_completed || false
+                  }}
                   onView={handleViewMystery}
                   onEdit={handleEditMystery}
                   onArchive={handleArchiveMystery}
