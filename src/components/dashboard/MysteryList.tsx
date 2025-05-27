@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
@@ -66,9 +65,9 @@ const MysteryList = ({ mysteries, isLoading, onRefresh }: MysteryListProps) => {
     }
   };
 
-  // Handle editing a mystery - navigate to chat interface
+  // Handle editing a mystery - navigate directly to chat interface
   const handleEditMystery = (mysteryId: string) => {
-    navigate(`/mystery/chat/${mysteryId}`);
+    navigate(`/mystery/edit/${mysteryId}`);
   };
 
   // Handle viewing a mystery

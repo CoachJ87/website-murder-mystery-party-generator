@@ -101,7 +101,11 @@ const AppRoutes = () => (
     />
     <Route 
       path="/mystery/edit/:id" 
-      element={<MysteryCreation />} 
+      element={
+        <ProtectedRoute>
+          <MysteryChatPage />
+        </ProtectedRoute>
+      } 
     />
     <Route 
       path="/mystery/chat/:id" 
