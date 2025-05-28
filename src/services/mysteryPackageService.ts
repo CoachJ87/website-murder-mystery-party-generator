@@ -71,11 +71,11 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
     
     let packageId: string;
     
-    // Set initial status for display
+    // Set proper initial status - start at 0% progress
     const initialStatus: GenerationStatus = {
       status: 'in_progress',
-      progress: 10,
-      currentStep: 'Sending to external generation service...',
+      progress: 0,
+      currentStep: 'Starting generation...',
       sections: {
         hostGuide: false,
         characters: false,
@@ -126,62 +126,91 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
     
     // Save the initial state to display immediately
     await saveGenerationState(mysteryId, {
-      currentlyGenerating: 'webhook',
-      webhook: 'Sending to external generation service...',
+      currentlyGenerating: 'starting',
+      starting: 'Starting generation...',
       generationStatus: initialStatus
     });
     
     try {
-// Format all messages into a concatenated string for easier parsing
-const conversationContent = conversation.messages
-  ? conversation.messages.map((msg: any) => {
-      const role = msg.role === "assistant" ? "AI" : "User";
-      return `${role}: ${msg.content}`;
-    }).join("\n\n---\n\n")
-  : "";
+      // Format all messages into a concatenated string for easier parsing
+      const conversationContent = conversation.messages
+        ? conversation.messages.map((msg: any) => {
+            const role = msg.role === "assistant" ? "AI" : "User";
+            return `${role}: ${msg.content}`;
+          }).join("\n\n---\n\n")
+        : "";
 
-// Enhanced payload with all available data
-const webhookPayload = {
-  // Core identifiers
-  userId: conversation.user_id,
-  conversationId: mysteryId,
-  
-  // Enhanced structured data
-  mysteryData: conversation.mystery_data || {},
-  title: conversation.title || null,
-  systemInstruction: conversation.system_instruction || null,
-  
-  // Message breakdown for better parsing
-  messages: conversation.messages ? conversation.messages.map((msg: any) => ({
-    role: msg.role,
-    content: msg.content,
-    timestamp: msg.created_at,
-    is_ai: msg.is_ai || msg.role === "assistant"
-  })) : [],
-  
-  // Legacy concatenated content (keep for backward compatibility)
-  content: conversationContent,
-  
-  // Parsed requirements for easy access
-  playerCount: conversation.mystery_data?.playerCount || null,
-  theme: conversation.mystery_data?.theme || null,
-  scriptType: conversation.mystery_data?.scriptType || 'full',
-  additionalDetails: conversation.mystery_data?.additionalDetails || null,
-  hasAccomplice: conversation.mystery_data?.hasAccomplice || false,
-  
-  // Metadata
-  createdAt: conversation.created_at,
-  updatedAt: conversation.updated_at,
-  promptVersion: conversation.prompt_version || null,
-  
-  // Processing flags
-  testMode: testMode || false
-};
+      // Enhanced payload with all available data
+      const webhookPayload = {
+        // Core identifiers
+        userId: conversation.user_id,
+        conversationId: mysteryId,
+        
+        // Enhanced structured data
+        mysteryData: conversation.mystery_data || {},
+        title: conversation.title || null,
+        systemInstruction: conversation.system_instruction || null,
+        
+        // Message breakdown for better parsing
+        messages: conversation.messages ? conversation.messages.map((msg: any) => ({
+          role: msg.role,
+          content: msg.content,
+          timestamp: msg.created_at,
+          is_ai: msg.is_ai || msg.role === "assistant"
+        })) : [],
+        
+        // Legacy concatenated content (keep for backward compatibility)
+        content: conversationContent,
+        
+        // Parsed requirements for easy access
+        playerCount: conversation.mystery_data?.playerCount || null,
+        theme: conversation.mystery_data?.theme || null,
+        scriptType: conversation.mystery_data?.scriptType || 'full',
+        additionalDetails: conversation.mystery_data?.additionalDetails || null,
+        hasAccomplice: conversation.mystery_data?.hasAccomplice || false,
+        
+        // Metadata
+        createdAt: conversation.created_at,
+        updatedAt: conversation.updated_at,
+        promptVersion: conversation.prompt_version || null,
+        
+        // Processing flags
+        testMode: testMode || false
+      };
 
       console.log("Sending payload to Make.com webhook:", {
         userId: webhookPayload.userId,
         conversationId: webhookPayload.conversationId,
         contentLength: webhookPayload.content.length
+      });
+      
+      // Update to 10% before webhook call
+      const preparingStatus: GenerationStatus = {
+        status: 'in_progress',
+        progress: 10,
+        currentStep: 'Preparing to send to external service...',
+        sections: {
+          hostGuide: false,
+          characters: false,
+          clues: false,
+          inspectorScript: false,
+          characterMatrix: false,
+          solution: false
+        }
+      };
+      
+      await supabase
+        .from("mystery_packages")
+        .update({
+          generation_status: preparingStatus,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", packageId);
+      
+      await saveGenerationState(mysteryId, {
+        currentlyGenerating: 'preparing',
+        preparing: 'Preparing to send to external service...',
+        generationStatus: preparingStatus
       });
       
       // Call your Make.com webhook directly
@@ -209,10 +238,10 @@ const webhookPayload = {
         responseData = { success: true };
       }
       
-      // Update status to "waiting for external processing"
-      const waitingStatus: GenerationStatus = {
+      // Update status to "sent to external service" at 15%
+      const sentStatus: GenerationStatus = {
         status: 'in_progress',
-        progress: 20,
+        progress: 15,
         currentStep: 'Sent to external service. Processing will take 3-5 minutes...',
         sections: {
           hostGuide: false,
@@ -227,7 +256,7 @@ const webhookPayload = {
       await supabase
         .from("mystery_packages")
         .update({
-          generation_status: waitingStatus,
+          generation_status: sentStatus,
           updated_at: new Date().toISOString()
         })
         .eq("id", packageId);
@@ -235,7 +264,7 @@ const webhookPayload = {
       await saveGenerationState(mysteryId, {
         currentlyGenerating: 'externalProcessing',
         externalProcessing: 'Package generation sent to external service (3-5 minutes)...',
-        generationStatus: waitingStatus
+        generationStatus: sentStatus
       });
       
       // Update the conversation to mark that it needs package generation
@@ -290,12 +319,7 @@ export async function resumePackageGeneration(mysteryId: string): Promise<string
 
 export async function getPackageGenerationStatus(mysteryId: string): Promise<GenerationStatus> {
   try {
-    // Try to get cached status first
-    const cachedState = await getGenerationState(mysteryId);
-    if (cachedState && cachedState.generationStatus) {
-      return cachedState.generationStatus;
-    }
-    
+    // Always get fresh status from database to ensure accuracy
     const { data, error } = await supabase
       .from("mystery_packages")
       .select("generation_status")

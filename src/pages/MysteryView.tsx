@@ -47,42 +47,35 @@ const MysteryView = () => {
     }
   }, [statusCheckInterval]);
 
-  // Simplified auto-refresh every 30 seconds
+  // Fixed status polling - simpler and more reliable
   const startStatusPolling = useCallback(() => {
-    clearStatusPolling(); // Clear any existing interval first
+    if (!id) return;
     
-    // Only start polling if generation is actually in progress
-    if (generationStatus?.status === 'in_progress') {
-      const intervalId = window.setInterval(() => {
-        console.log("Auto-refreshing generation status...");
-        checkGenerationStatus();
-      }, 30000); // 30 seconds instead of 5
-      setStatusCheckInterval(intervalId);
-      console.log("Auto-refresh polling started (30 second intervals)");
-    }
-  }, [generationStatus?.status, clearStatusPolling]);
-
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (isPageVisible()) {
-        console.log("Tab is now visible, refreshing status");
-        checkGenerationStatus();
-        if (generationStatus?.status === 'in_progress') {
-          startStatusPolling();
+    clearStatusPolling(); // Clear any existing interval
+    
+    console.log("Starting status polling every 30 seconds");
+    
+    const intervalId = window.setInterval(async () => {
+      console.log("Auto-refreshing generation status...");
+      try {
+        const status = await getPackageGenerationStatus(id);
+        setGenerationStatus(status);
+        setLastUpdate(new Date());
+        
+        // Stop polling if complete or failed
+        if (status.status === 'completed' || status.status === 'failed') {
+          clearInterval(intervalId);
+          setStatusCheckInterval(null);
+          setGenerating(false);
+          console.log(`Polling stopped - status: ${status.status}`);
         }
-      } else {
-        // Clear polling when tab becomes inactive to save resources
-        clearStatusPolling();
+      } catch (error) {
+        console.error("Error in polling:", error);
       }
-    };
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-      clearStatusPolling();
-    };
-  }, [generationStatus?.status, startStatusPolling, clearStatusPolling]);
+    }, 30000); // 30 seconds
+    
+    setStatusCheckInterval(intervalId);
+  }, [id, clearStatusPolling]);
 
   const checkGenerationStatus = useCallback(async () => {
     if (!id) return;
@@ -92,65 +85,81 @@ const MysteryView = () => {
       setGenerationStatus(status);
       setLastUpdate(new Date());
       
-      // Stop polling if generation is complete or failed
-      if (status.status === 'completed' || status.status === 'failed') {
+      // Handle completion
+      if (status.status === 'completed') {
         clearStatusPolling();
         setGenerating(false);
         
-        if (status.status === 'completed') {
-          const { data: packageData } = await supabase
-            .from("mystery_packages")
-            .select("content")
-            .eq("conversation_id", id)
-            .single();
-            
-          if (packageData) {
-            setPackageContent(packageData.content);
-            
-            // Clear saved generation state
-            clearGenerationState(id);
-            
-            // Only show the notification if we haven't shown it before
-            if (!packageReadyNotified.current) {
-              toast.success("Your mystery package is ready!");
-              packageReadyNotified.current = true;
-            }
-            
-            await supabase
-              .from("conversations")
-              .update({
-                status: "purchased",
-                is_paid: true,
-                is_purchased: true,
-                display_status: "purchased"
-              })
-              .eq("id", id);
-            
-            if (window.location.pathname.includes('/preview/')) {
-              navigate(`/mystery/${id}`);
-            }
+        const { data: packageData } = await supabase
+          .from("mystery_packages")
+          .select("content")
+          .eq("conversation_id", id)
+          .single();
+          
+        if (packageData) {
+          setPackageContent(packageData.content);
+          
+          // Clear saved generation state
+          clearGenerationState(id);
+          
+          // Only show the notification if we haven't shown it before
+          if (!packageReadyNotified.current) {
+            toast.success("Your mystery package is ready!");
+            packageReadyNotified.current = true;
           }
-        } else if (status.status === 'failed') {
-          if (status.resumable) {
-            toast.error(
-              <div className="space-y-2">
-                <p>Generation encountered an error but can be resumed.</p>
-                <Button size="sm" variant="outline" onClick={handleResumeGeneration}>
-                  Resume Generation
-                </Button>
-              </div>,
-              { duration: 10000 }
-            );
-          } else {
-            toast.error("There was an issue generating your package");
+          
+          await supabase
+            .from("conversations")
+            .update({
+              status: "purchased",
+              is_paid: true,
+              is_purchased: true,
+              display_status: "purchased"
+            })
+            .eq("id", id);
+          
+          if (window.location.pathname.includes('/preview/')) {
+            navigate(`/mystery/${id}`);
           }
+        }
+      } else if (status.status === 'failed') {
+        clearStatusPolling();
+        setGenerating(false);
+        
+        if (status.resumable) {
+          toast.error(
+            <div className="space-y-2">
+              <p>Generation encountered an error but can be resumed.</p>
+              <Button size="sm" variant="outline" onClick={handleResumeGeneration}>
+                Resume Generation
+              </Button>
+            </div>,
+            { duration: 10000 }
+          );
+        } else {
+          toast.error("There was an issue generating your package");
         }
       }
     } catch (error) {
       console.error("Error checking generation status:", error);
-      clearStatusPolling(); // Stop polling on error
     }
   }, [id, navigate, clearStatusPolling]);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (isPageVisible()) {
+        console.log("Tab is now visible, refreshing status");
+        checkGenerationStatus();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      clearStatusPolling();
+    };
+  }, [checkGenerationStatus, clearStatusPolling]);
 
   // Clear polling when component unmounts
   useEffect(() => {
@@ -159,14 +168,14 @@ const MysteryView = () => {
     };
   }, [clearStatusPolling]);
 
-  // Control polling based on generation state
+  // Start or stop polling based on generation status
   useEffect(() => {
-    if (generating && generationStatus?.status === 'in_progress') {
+    if (generationStatus?.status === 'in_progress' && generating) {
       startStatusPolling();
     } else {
       clearStatusPolling();
     }
-  }, [generating, generationStatus?.status, startStatusPolling, clearStatusPolling]);
+  }, [generationStatus?.status, generating, startStatusPolling, clearStatusPolling]);
 
   useEffect(() => {
     const fetchMystery = async () => {
@@ -323,14 +332,11 @@ const MysteryView = () => {
       // Reset notification state on new generation start
       packageReadyNotified.current = false;
       
-      // Start the generation process and update UI
+      // Start the generation process (this will set initial status properly)
       generateCompletePackage(id)
         .then(content => {
-          setPackageContent(content);
-          setGenerating(false);
-          toast.success("Your complete mystery package is ready!");
-          packageReadyNotified.current = true;
-          clearGenerationState(id);
+          // This will only resolve when generation is truly complete
+          console.log("Generation completed successfully");
         })
         .catch(error => {
           console.error("Error in package generation:", error);
@@ -338,9 +344,12 @@ const MysteryView = () => {
           toast.error("There was an issue generating your package. Please try again.");
         });
       
-      // Get initial status and start polling
-      const initialStatus = await getPackageGenerationStatus(id);
-      setGenerationStatus(initialStatus);
+      // Get the updated status immediately after starting generation
+      setTimeout(async () => {
+        const status = await getPackageGenerationStatus(id);
+        setGenerationStatus(status);
+        console.log("Initial status after generation start:", status);
+      }, 1000);
       
     } catch (error: any) {
       console.error("Error starting package generation:", error);
