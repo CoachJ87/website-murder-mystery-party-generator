@@ -116,6 +116,9 @@ const MysteryPackageTabView = ({
 
   return (
     <div className="w-full">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-center">{mysteryTitle}</h1>
+        </div>
       {isGenerating && (
         <div className="mb-6">
           <div className="flex justify-between items-center mb-2">
@@ -174,9 +177,7 @@ const MysteryPackageTabView = ({
           </TabsList>
 
           <TabsContent value="overview" className="space-y-4">
-            <div className="prose prose-stone dark:prose-invert max-w-none">
-              <h2>{mysteryTitle}</h2>
-              
+            <div className="prose prose-stone dark:prose-invert max-w-none">              
               {isGenerating && !packageContent ? (
                 <div className="flex items-center space-x-2 text-muted-foreground">
                   <Loader2 className="h-4 w-4 animate-spin" />
