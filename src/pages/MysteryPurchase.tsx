@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -11,6 +10,7 @@ import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
 import type { Mystery } from "@/interfaces/mystery";
 import MysteryPreviewCard from "@/components/purchase/MysteryPreviewCard";
+import { extractTitleFromMessages } from "@/utils/titleExtraction";
 
 interface Character {
   name: string;
@@ -232,9 +232,12 @@ const MysteryPurchase = () => {
           return;
         }
 
+        // Extract title from messages before creating mysteryData
+        const extractedTitle = conversation.messages ? extractTitleFromMessages(conversation.messages) : null;
+
         const mysteryData: Mystery = {
           id: conversation.id,
-          title: conversation.title || "Custom Murder Mystery",
+          title: extractedTitle || conversation.title || "Custom Murder Mystery",
           created_at: conversation.created_at,
           updated_at: conversation.updated_at,
           status: conversation.is_paid ? "purchased" : (conversation.display_status || "draft"),
