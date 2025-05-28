@@ -1,3 +1,4 @@
+
 // src/interfaces/mystery.ts
 
 export interface MysteryData {
@@ -6,7 +7,7 @@ export interface MysteryData {
   playerCount?: number;
   scriptType?: 'full' | 'summary';
   additionalDetails?: string;
-  status?: "draft" | "purchased" | "archived";
+  status?: "draft" | "purchased" | "archived" | "generating";
   [key: string]: any;
 }
 
@@ -26,7 +27,7 @@ export interface Conversation {
   premise?: string;
   purchase_date?: string;
   is_purchased?: boolean;
-  display_status?: "draft" | "purchased" | "archived";
+  display_status?: "draft" | "purchased" | "archived" | "generating";
   has_complete_package?: boolean;
   needs_package_generation?: boolean;
   package_generated_at?: string;
@@ -37,8 +38,8 @@ export interface Mystery {
   title: string;
   created_at: string;
   updated_at: string;
-  status: "draft" | "purchased" | "archived";
-  display_status?: "draft" | "purchased" | "archived";
+  status: "draft" | "purchased" | "archived" | "generating";
+  display_status?: "draft" | "purchased" | "archived" | "generating";
   mystery_data?: MysteryData;
   is_paid?: boolean;
   messages?: any[];

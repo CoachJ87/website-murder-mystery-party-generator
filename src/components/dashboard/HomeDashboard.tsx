@@ -115,7 +115,7 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
               status = mysteryData.status || "draft";
             }
             
-            return {
+            const mystery: Mystery = {
               id: conversation.id,
               title: title,
               created_at: conversation.created_at,
@@ -131,15 +131,17 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
               purchase_date: conversation.purchase_date,
               needs_package_generation: conversation.needs_package_generation || false
             };
+            
+            return mystery;
           } catch (error) {
             console.error(`Error processing conversation ${conversation.id}:`, error);
             // Return a basic mystery object to prevent complete failure
-            return {
+            const mystery: Mystery = {
               id: conversation.id,
               title: conversation.title || "Mystery",
               created_at: conversation.created_at,
               updated_at: conversation.updated_at || conversation.created_at,
-              status: "draft" as const,
+              status: "draft",
               display_status: "draft",
               mystery_data: conversation.mystery_data || {},
               theme: "Mystery",
@@ -150,6 +152,8 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
               purchase_date: null,
               needs_package_generation: false
             };
+            
+            return mystery;
           }
         })
       );
