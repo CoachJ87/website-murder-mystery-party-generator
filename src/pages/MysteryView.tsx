@@ -480,7 +480,7 @@ const MysteryView = () => {
              (mystery && mystery.is_paid))) ? (
             <MysteryPackageTabView 
               packageContent={packageContent} 
-              mysteryTitle={mystery?.title || "Mystery Package"} 
+              mysteryTitle={mystery?.title || mystery?.mystery_data?.theme || "Mystery Package"}
               generationStatus={generationStatus || undefined}
               conversationId={id}
               onGenerateClick={handleGeneratePackage}
