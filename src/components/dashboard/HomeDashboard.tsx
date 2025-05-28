@@ -10,6 +10,7 @@ import { Mystery } from "@/interfaces/mystery";
 import { Search, ArrowDown } from "lucide-react";
 import HomeMysteryCard from "./HomeMysteryCard";
 import { extractTitleFromMessages } from "@/utils/titleExtraction";
+import { getPackageGenerationStatus } from "@/services/mysteryPackageService";
 
 interface HomeDashboardProps {
   onCreateNew: () => void;
@@ -38,7 +39,7 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
 
       let query = supabase
         .from("conversations")
-        .select("id, title, created_at, updated_at, mystery_data, display_status, is_paid, purchase_date, is_completed")
+        .select("id, title, created_at, updated_at, mystery_data, display_status, is_paid, purchase_date, is_completed, needs_package_generation")
         .eq("user_id", user.id);
 
       // Apply search filter if provided
@@ -52,7 +53,10 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
 
       const { data: conversationsData, error: conversationsError } = await query;
 
-      if (conversationsError) throw conversationsError;
+      if (conversationsError) {
+        console.error("Error fetching conversations:", conversationsError);
+        throw conversationsError;
+      }
 
       if (!conversationsData) {
         setMysteries([]);
@@ -65,59 +69,113 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
 
       const mysteriesWithMessages = await Promise.all(
         conversationsData.map(async (conversation: any) => {
-          const { data: messagesData } = await supabase
-            .from("messages")
-            .select("*")
-            .eq("conversation_id", conversation.id)
-            .order("created_at", { ascending: true });
-          
-          const aiTitle = extractTitleFromMessages(messagesData || []);
-          const mysteryData = conversation.mystery_data || {};
-          const theme = mysteryData.theme || 'Unknown';
-          
-          const title = aiTitle || conversation.title || `${theme} Mystery`;
-          
-          // Determine the true status
-          let status: "draft" | "purchased" | "archived";
-          
-          if (conversation.is_paid === true || conversation.display_status === "purchased") {
-            status = "purchased";
-          } else if (conversation.display_status === "archived") {
-            status = "archived";
-          } else {
-            status = mysteryData.status || "draft";
+          try {
+            // Fetch messages for this conversation
+            const { data: messagesData, error: messagesError } = await supabase
+              .from("messages")
+              .select("*")
+              .eq("conversation_id", conversation.id)
+              .order("created_at", { ascending: true });
+            
+            if (messagesError) {
+              console.error(`Error fetching messages for conversation ${conversation.id}:`, messagesError);
+              // Continue with empty messages array rather than failing completely
+            }
+            
+            const aiTitle = extractTitleFromMessages(messagesData || []);
+            const mysteryData = conversation.mystery_data || {};
+            const theme = mysteryData.theme || 'Mystery';
+            
+            const title = aiTitle || conversation.title || `${theme} Mystery`;
+            
+            // Determine the true status with generation state consideration
+            let status: "draft" | "purchased" | "archived" | "generating";
+            
+            if (conversation.needs_package_generation && conversation.is_paid) {
+              // Check if currently generating
+              try {
+                const generationStatus = await getPackageGenerationStatus(conversation.id);
+                if (generationStatus.status === 'in_progress') {
+                  status = "generating";
+                } else if (generationStatus.status === 'completed') {
+                  status = "purchased";
+                } else {
+                  status = "purchased"; // Default to purchased if paid but status unclear
+                }
+              } catch (error) {
+                console.error(`Error checking generation status for ${conversation.id}:`, error);
+                // Default to purchased if we can't check generation status
+                status = "purchased";
+              }
+            } else if (conversation.is_paid === true || conversation.display_status === "purchased") {
+              status = "purchased";
+            } else if (conversation.display_status === "archived") {
+              status = "archived";
+            } else {
+              status = mysteryData.status || "draft";
+            }
+            
+            return {
+              id: conversation.id,
+              title: title,
+              created_at: conversation.created_at,
+              updated_at: conversation.updated_at || conversation.created_at,
+              status: status,
+              display_status: status,
+              mystery_data: mysteryData,
+              theme: theme,
+              guests: mysteryData.playerCount || mysteryData.numberOfGuests || mysteryData.guests,
+              is_purchased: conversation.is_paid === true || conversation.display_status === "purchased",
+              is_completed: conversation.is_completed || false,
+              ai_title: aiTitle,
+              purchase_date: conversation.purchase_date,
+              needs_package_generation: conversation.needs_package_generation || false
+            };
+          } catch (error) {
+            console.error(`Error processing conversation ${conversation.id}:`, error);
+            // Return a basic mystery object to prevent complete failure
+            return {
+              id: conversation.id,
+              title: conversation.title || "Mystery",
+              created_at: conversation.created_at,
+              updated_at: conversation.updated_at || conversation.created_at,
+              status: "draft" as const,
+              display_status: "draft",
+              mystery_data: conversation.mystery_data || {},
+              theme: "Mystery",
+              guests: 6,
+              is_purchased: false,
+              is_completed: false,
+              ai_title: null,
+              purchase_date: null,
+              needs_package_generation: false
+            };
           }
-          
-          return {
-            id: conversation.id,
-            title: title,
-            created_at: conversation.created_at,
-            updated_at: conversation.updated_at || conversation.created_at,
-            status: status,
-            display_status: status,
-            mystery_data: mysteryData,
-            theme: theme,
-            guests: mysteryData.playerCount || mysteryData.numberOfGuests || mysteryData.guests,
-            is_purchased: conversation.is_paid === true || conversation.display_status === "purchased",
-            is_completed: conversation.is_completed || false,
-            ai_title: aiTitle,
-            purchase_date: conversation.purchase_date
-          };
         })
       );
 
+      // Filter out any null results and sort by status (generating first, then by update time)
+      const validMysteries = mysteriesWithMessages.filter(Boolean).sort((a, b) => {
+        // Prioritize generating mysteries
+        if (a.status === "generating" && b.status !== "generating") return -1;
+        if (b.status === "generating" && a.status !== "generating") return 1;
+        
+        // Then sort by updated date
+        return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+      });
+
       // If resetting (e.g., new search), replace mysteries completely
       if (reset) {
-        setMysteries(mysteriesWithMessages);
+        setMysteries(validMysteries);
         setPage(pageNumber);
       } else {
         // Otherwise append to existing list
-        setMysteries(prev => [...prev, ...mysteriesWithMessages]);
+        setMysteries(prev => [...prev, ...validMysteries]);
         setPage(pageNumber);
       }
     } catch (error) {
       console.error("Error fetching mysteries:", error);
-      toast.error("Failed to load your mysteries");
+      toast.error("Failed to load some mysteries. Please refresh the page.");
     } finally {
       setLoading(false);
     }
@@ -132,7 +190,7 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
   const handleViewMystery = (mysteryId: string) => {
     const mystery = mysteries.find(m => m.id === mysteryId);
     
-    if (mystery?.is_purchased || mystery?.status === "purchased") {
+    if (mystery?.is_purchased || mystery?.status === "purchased" || mystery?.status === "generating") {
       navigate(`/mystery/${mysteryId}`);
     } else {
       navigate(`/mystery/edit/${mysteryId}`);
@@ -240,7 +298,7 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
                     id: mystery.id,
                     title: mystery.title,
                     mystery_data: mystery.mystery_data || {},
-                    display_status: mystery.display_status || mystery.status,
+                    display_status: mystery.status, // Use the computed status
                     created_at: mystery.created_at,
                     is_completed: Boolean(mystery.is_completed)
                   }}
