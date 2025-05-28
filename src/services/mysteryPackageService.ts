@@ -132,20 +132,51 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
     });
     
     try {
-      // Format all messages into a concatenated string for easier parsing
-      const conversationContent = conversation.messages
-        ? conversation.messages.map((msg: any) => {
-            const role = msg.role === "assistant" ? "AI" : "User";
-            return `${role}: ${msg.content}`;
-          }).join("\n\n---\n\n")
-        : "";
+// Format all messages into a concatenated string for easier parsing
+const conversationContent = conversation.messages
+  ? conversation.messages.map((msg: any) => {
+      const role = msg.role === "assistant" ? "AI" : "User";
+      return `${role}: ${msg.content}`;
+    }).join("\n\n---\n\n")
+  : "";
 
-      // Prepare the payload for your Make.com webhook
-      const webhookPayload = {
-        userId: conversation.user_id,
-        conversationId: mysteryId,
-        content: conversationContent
-      };
+// Enhanced payload with all available data
+const webhookPayload = {
+  // Core identifiers
+  userId: conversation.user_id,
+  conversationId: mysteryId,
+  
+  // Enhanced structured data
+  mysteryData: conversation.mystery_data || {},
+  title: conversation.title || null,
+  systemInstruction: conversation.system_instruction || null,
+  
+  // Message breakdown for better parsing
+  messages: conversation.messages ? conversation.messages.map((msg: any) => ({
+    role: msg.role,
+    content: msg.content,
+    timestamp: msg.created_at,
+    is_ai: msg.is_ai || msg.role === "assistant"
+  })) : [],
+  
+  // Legacy concatenated content (keep for backward compatibility)
+  content: conversationContent,
+  
+  // Parsed requirements for easy access
+  playerCount: conversation.mystery_data?.playerCount || null,
+  theme: conversation.mystery_data?.theme || null,
+  scriptType: conversation.mystery_data?.scriptType || 'full',
+  additionalDetails: conversation.mystery_data?.additionalDetails || null,
+  hasAccomplice: conversation.mystery_data?.hasAccomplice || false,
+  
+  // Metadata
+  createdAt: conversation.created_at,
+  updatedAt: conversation.updated_at,
+  promptVersion: conversation.prompt_version || null,
+  
+  // Processing flags
+  testMode: testMode || false
+};
 
       console.log("Sending payload to Make.com webhook:", {
         userId: webhookPayload.userId,
