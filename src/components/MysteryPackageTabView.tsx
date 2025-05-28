@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -15,14 +14,6 @@ interface MysteryPackageTabViewProps {
   isGenerating: boolean;
   conversationId?: string;
   onGenerateClick?: () => void;
-  streamingContent?: {
-    hostGuide?: string;
-    characters?: MysteryCharacter[];
-    clues?: any[];
-    inspectorScript?: string;
-    characterMatrix?: string;
-    currentlyGenerating?: string;
-  };
 }
 
 const MysteryPackageTabView = ({
@@ -31,8 +22,7 @@ const MysteryPackageTabView = ({
   generationStatus,
   isGenerating,
   conversationId,
-  onGenerateClick,
-  streamingContent = {}
+  onGenerateClick
 }: MysteryPackageTabViewProps) => {
   const [activeTab, setActiveTab] = useState("overview");
   const [progress, setProgress] = useState(0);
@@ -48,8 +38,6 @@ const MysteryPackageTabView = ({
 
   // Sections from package content extraction helpers
   const extractHostGuide = () => {
-    if (streamingContent?.hostGuide) return streamingContent.hostGuide;
-    
     if (!packageContent) return "";
     
     const hostGuidePattern = /# .+ - HOST GUIDE\n([\s\S]*?)(?=# |$)/i;
@@ -58,8 +46,6 @@ const MysteryPackageTabView = ({
   };
 
   const extractInspectorScript = () => {
-    if (streamingContent?.inspectorScript) return streamingContent.inspectorScript;
-    
     if (!packageContent) return "";
     
     const inspectorPattern = /# (?:INSPECTOR|DETECTIVE) SCRIPT\n([\s\S]*?)(?=# |$)/i;
@@ -68,8 +54,6 @@ const MysteryPackageTabView = ({
   };
 
   const extractCharacterMatrix = () => {
-    if (streamingContent?.characterMatrix) return streamingContent.characterMatrix;
-    
     if (!packageContent) return "";
     
     const matrixPattern = /# CHARACTER RELATIONSHIP MATRIX\n([\s\S]*?)(?=# |$)/i;
@@ -78,8 +62,6 @@ const MysteryPackageTabView = ({
   };
 
   const extractCharacters = () => {
-    if (streamingContent?.characters && Array.isArray(streamingContent.characters)) return streamingContent.characters;
-    
     if (!packageContent) return [];
     
     const characters: MysteryCharacter[] = [];
@@ -105,8 +87,6 @@ const MysteryPackageTabView = ({
   };
 
   const extractClues = () => {
-    if (streamingContent?.clues && Array.isArray(streamingContent.clues)) return streamingContent.clues;
-    
     if (!packageContent) return [];
     
     const clues: any[] = [];
@@ -286,9 +266,9 @@ const MysteryPackageTabView = ({
             </div>
           </TabsContent>
         </Tabs>
-      )}
-    </div>
-  );
+     )}
+   </div>
+ );
 };
 
 export default MysteryPackageTabView;
