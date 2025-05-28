@@ -1,4 +1,3 @@
-
 // src/interfaces/mystery.ts
 
 export interface MysteryData {
@@ -61,6 +60,7 @@ export interface Mystery {
   purchase_date?: string;
   has_complete_package?: boolean;
   is_completed?: boolean;
+  needs_package_generation?: boolean;
 }
 
 export interface MysteryCharacter {
