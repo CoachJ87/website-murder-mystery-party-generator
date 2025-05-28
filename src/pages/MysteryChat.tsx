@@ -87,7 +87,7 @@ const MysteryChatPage = () => {
     };
 
     const handleGenerateFullMystery = () => {
-        navigate(`/mystery/preview/${id}`);
+        navigate(`/mystery/purchase/${id}`);
     };
 
     // Check if AI has provided at least one response
