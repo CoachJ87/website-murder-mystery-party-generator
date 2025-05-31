@@ -77,7 +77,11 @@ const MysteryCreation = () => {
             toast.error("Failed to load mystery");
         }
     };
-
+        
+    const getScriptTypeDisplayText = (scriptType: string) => {
+          return scriptType === 'pointForm' ? 'Point Form' : 'Full Scripts';
+        };
+    
     const createFormattedInitialMessage = (data: any) => {
         let message = "";
         
@@ -92,7 +96,7 @@ const MysteryCreation = () => {
         if (data.theme && data.theme.trim() !== "") {
             message += `. The theme/setting should be ${data.theme} for ${data.playerCount} players with ${data.scriptType} scripts`;
         } else {
-            message += `. This is for ${data.playerCount} players with ${data.scriptType} scripts`;
+            message += `. This is for ${data.playerCount} players with ${getScriptTypeDisplayText(data.scriptType)} scripts`;
         }
         
         // Add additional details if provided
