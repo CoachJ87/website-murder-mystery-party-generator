@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,7 +14,6 @@ import CheckEmail from "./pages/CheckEmail";
 import AccountSettings from "./pages/AccountSettings";
 import MysteryCreation from "./pages/MysteryCreation";
 import MysteryChatPage from "./pages/MysteryChat";
-import MysteryPreview from "./pages/MysteryPreview";
 import MysteryPurchase from "./pages/MysteryPurchase";
 import MysteryView from "./pages/MysteryView";
 import Showcase from "./pages/Showcase";
@@ -114,10 +112,6 @@ const AppRoutes = () => (
           <MysteryChatPage />
         </ProtectedRoute>
       } 
-    />
-    <Route 
-      path="/mystery/preview/:id" 
-      element={<MysteryPreview />} 
     />
     <Route 
       path="/mystery/purchase/:id" 

@@ -492,8 +492,8 @@ const MysteryPurchase = () => {
           </div>
           
           <div className="mt-8 text-center">
-            <Button variant="outline" onClick={() => navigate(`/mystery/preview/${id}`)}>
-              Back to Preview
+            <Button variant="outline" onClick={() => navigate(`/mystery/chat/${id}`)}>
+              Back to Mystery Design
             </Button>
           </div>
         </div>
