@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
@@ -8,7 +7,9 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 
 const getScriptTypeDisplayText = (scriptType: string) => {
-  return scriptType === 'pointForm' ? 'point form' : 'full';
+  if (scriptType === 'pointForm') return 'point form';
+  if (scriptType === 'both') return 'both full and point form';
+  return 'full';
 };
 
 interface ConversationManagerProps {

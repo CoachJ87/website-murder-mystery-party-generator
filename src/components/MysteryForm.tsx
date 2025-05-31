@@ -10,7 +10,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
-// Define the schema validation (RE-ADDED hasAccomplice):
+// Define the schema validation with updated scriptType enum:
 const formSchema = z.object({
   userRequest: z.string().optional(),
   theme: z.string().optional(),
@@ -20,7 +20,7 @@ const formSchema = z.object({
     message: "Maximum 32 players allowed"
   }),
   hasAccomplice: z.boolean().default(false),
-  scriptType: z.enum(["full", "pointForm"], {
+  scriptType: z.enum(["full", "pointForm", "both"], {
     required_error: "Please select a script type"
   }),
   additionalDetails: z.string().optional()
@@ -143,6 +143,10 @@ const MysteryForm = ({
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="pointForm" id="pointForm" />
                     <Label htmlFor="pointForm">Point Form - Key points and bullet summaries</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="both" id="both" />
+                    <Label htmlFor="both">Both Formats - Full scripts AND point form notes</Label>
                   </div>
                 </RadioGroup>
               </FormControl>
