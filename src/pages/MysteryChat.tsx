@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -79,6 +78,15 @@ const MysteryChatPage = () => {
                 content: message.content,
                 role: message.is_ai ? "assistant" : "user",
                 is_ai: message.is_ai
+            });
+
+            // Update local messages state to keep button state in sync
+            setMessages(prev => {
+                const exists = prev.some(msg => msg.id === message.id);
+                if (exists) {
+                    return prev;
+                }
+                return [...prev, message].sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
             });
         } catch (error) {
             console.error("Error saving message:", error);
