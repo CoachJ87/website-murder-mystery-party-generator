@@ -79,7 +79,7 @@ const MysteryCreation = () => {
     };
         
     const getScriptTypeDisplayText = (scriptType: string) => {
-          return scriptType === 'pointForm' ? 'Point Form' : 'Full Scripts';
+          return scriptType === 'pointForm' ? 'point form' : 'full';
         };
     
     const createFormattedInitialMessage = (data: any) => {
