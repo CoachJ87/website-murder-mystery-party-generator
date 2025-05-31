@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -25,7 +24,7 @@ const MysteryPackageTabView = ({
   conversationId,
   onGenerateClick
 }: MysteryPackageTabViewProps) => {
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("host-guide");
   const [progress, setProgress] = useState(0);
   const [statusMessage, setStatusMessage] = useState("Starting generation...");
 
@@ -136,10 +135,7 @@ const MysteryPackageTabView = ({
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="w-full grid grid-cols-2 md:grid-cols-6 mb-4">
-          <TabsTrigger value="overview" className="whitespace-nowrap">
-            Overview
-          </TabsTrigger>
+        <TabsList className="w-full grid grid-cols-2 md:grid-cols-5 mb-4">
           <TabsTrigger value="host-guide" className="whitespace-nowrap">
             <div className="flex items-center space-x-1">
               <span>Host Guide</span>
@@ -160,7 +156,7 @@ const MysteryPackageTabView = ({
           </TabsTrigger>
           <TabsTrigger value="inspector" className="whitespace-nowrap">
             <div className="flex items-center space-x-1">
-              <span>Inspector</span>
+              <span>Detective Guide</span>
               {inspectorScript && <CheckCircle2 className="h-3 w-3 text-green-500" />}
             </div>
           </TabsTrigger>
@@ -172,28 +168,13 @@ const MysteryPackageTabView = ({
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="overview" className="space-y-4">
+        <TabsContent value="host-guide">
           <div className="prose prose-stone dark:prose-invert max-w-none">
-            {isGenerating && (
-              <div className="mb-6 p-6 border rounded-lg bg-card">
-                <div className="flex justify-between items-center mb-2">
-                  <div className="text-sm font-medium">
-                    {progress < 100 ? "Processing..." : "Generation Complete"}
-                  </div>
-                  <div className="text-sm text-muted-foreground">{progress}%</div>
-                </div>
-                <Progress value={progress} className="h-2 mb-4" />
-                <div className="text-sm text-muted-foreground mb-4">
-                  {statusMessage}
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  Your mystery is being generated. You can switch between tabs to see the progress of different sections.
-                  Keep this browser tab open during generation.
-                </p>
-              </div>
-            )}
-            
-            {!isGenerating && !packageContent ? (
+            {hostGuide ? (
+              <ReactMarkdown>{hostGuide}</ReactMarkdown>
+            ) : isGenerating ? (
+              <LoadingTabContent message="Generating host guide..." />
+            ) : (
               <div className="text-center py-12 space-y-4">
                 <Wand2 className="h-12 w-12 mx-auto text-muted-foreground" />
                 <h3 className="text-xl font-semibold">Ready to Generate Your Mystery</h3>
@@ -205,31 +186,6 @@ const MysteryPackageTabView = ({
                     Generate Package
                   </Button>
                 )}
-              </div>
-            ) : packageContent ? (
-              <div>
-                <p>Your mystery package is ready! Use the tabs above to explore all the components:</p>
-                <ul>
-                  <li><strong>Host Guide:</strong> Complete instructions for running your murder mystery</li>
-                  <li><strong>Characters:</strong> Detailed character sheets for all players</li>
-                  <li><strong>Clues:</strong> Physical evidence to distribute during the game</li>
-                  <li><strong>Inspector:</strong> Role-playing instructions for the detective</li>
-                  <li><strong>Relationships:</strong> Character relationship matrix</li>
-                </ul>
-              </div>
-            ) : null}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="host-guide">
-          <div className="prose prose-stone dark:prose-invert max-w-none">
-            {hostGuide ? (
-              <ReactMarkdown>{hostGuide}</ReactMarkdown>
-            ) : isGenerating ? (
-              <LoadingTabContent message="Generating host guide..." />
-            ) : (
-              <div className="text-center py-6">
-                <p className="text-muted-foreground">Host guide will be available after generation starts.</p>
               </div>
             )}
           </div>
@@ -282,10 +238,10 @@ const MysteryPackageTabView = ({
             {inspectorScript ? (
               <ReactMarkdown>{inspectorScript}</ReactMarkdown>
             ) : isGenerating ? (
-              <LoadingTabContent message="Generating inspector script..." />
+              <LoadingTabContent message="Generating detective guide..." />
             ) : (
               <div className="text-center py-6">
-                <p className="text-muted-foreground">Inspector script will be available after generation starts.</p>
+                <p className="text-muted-foreground">Detective guide will be available after generation starts.</p>
               </div>
             )}
           </div>
