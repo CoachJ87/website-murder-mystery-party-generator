@@ -7,6 +7,10 @@ import MysteryChat from "@/components/MysteryChat";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 
+const getScriptTypeDisplayText = (scriptType: string) => {
+  return scriptType === 'pointForm' ? 'Point Form' : 'Full Scripts';
+};
+
 interface ConversationManagerProps {
   conversationId: string | null;
   formData: FormValues | null;
