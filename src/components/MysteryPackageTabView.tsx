@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -237,15 +238,15 @@ const MysteryPackageTabView = ({
     return generationStatus?.sections?.[sectionName] || false;
   };
 
-  // Loading component for individual tabs
+  // Simplified loading component for individual tabs
   const LoadingTabContent = ({ message }: { message: string }) => (
     <div className="flex flex-col items-center justify-center py-12 space-y-4">
       <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      <h3 className="text-lg font-semibold">{message}</h3>
-      <p className="text-muted-foreground text-center">
-        This section is being generated. The page automatically refreshes every 30 seconds to check progress.
+      <h3 className="text-lg font-semibold">Generating...</h3>
+      <p className="text-muted-foreground text-center max-w-md">
+        {message}
       </p>
-      {generationStatus?.currentStep && (
+      {statusMessage && (
         <p className="text-sm text-center text-muted-foreground">
           Status: {statusMessage}
         </p>
@@ -298,7 +299,7 @@ const MysteryPackageTabView = ({
             {hostGuide ? (
               <ReactMarkdown>{hostGuide}</ReactMarkdown>
             ) : isGenerating ? (
-              <LoadingTabContent message="Generating host guide..." />
+              <LoadingTabContent message="Creating your complete host guide with all the instructions and materials needed to run your mystery game." />
             ) : (
               <div className="text-center py-12 space-y-4">
                 <Wand2 className="h-12 w-12 mx-auto text-muted-foreground" />
@@ -334,7 +335,7 @@ const MysteryPackageTabView = ({
                 ))}
               </div>
             ) : isGenerating ? (
-              <LoadingTabContent message="Generating character guides..." />
+              <LoadingTabContent message="Developing unique character profiles with backgrounds, motivations, and secrets for your mystery game." />
             ) : (
               <div className="text-center py-6">
                 <p className="text-muted-foreground">Character guides will be available after generation starts.</p>
@@ -348,7 +349,7 @@ const MysteryPackageTabView = ({
             {evidenceCards ? (
               <ReactMarkdown>{evidenceCards}</ReactMarkdown>
             ) : isGenerating ? (
-              <LoadingTabContent message="Generating evidence and clues..." />
+              <LoadingTabContent message="Crafting evidence cards, clues, and investigative materials that will help solve your mystery." />
             ) : (
               <div className="text-center py-6">
                 <p className="text-muted-foreground">Evidence cards will be available after generation starts.</p>
@@ -362,7 +363,7 @@ const MysteryPackageTabView = ({
             {detectiveScript ? (
               <ReactMarkdown>{detectiveScript}</ReactMarkdown>
             ) : isGenerating ? (
-              <LoadingTabContent message="Generating detective guide..." />
+              <LoadingTabContent message="Writing the detective's script and investigation timeline to guide the mystery solving process." />
             ) : (
               <div className="text-center py-6">
                 <p className="text-muted-foreground">Detective guide will be available after generation starts.</p>
@@ -376,7 +377,7 @@ const MysteryPackageTabView = ({
             {relationshipMatrix ? (
               <ReactMarkdown>{relationshipMatrix}</ReactMarkdown>
             ) : isGenerating ? (
-              <LoadingTabContent message="Generating relationship matrix..." />
+              <LoadingTabContent message="Building the character relationship matrix showing connections, conflicts, and hidden relationships." />
             ) : (
               <div className="text-center py-6">
                 <p className="text-muted-foreground">Relationship matrix will be available after generation starts.</p>
