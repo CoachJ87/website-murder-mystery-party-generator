@@ -242,6 +242,7 @@ const MysteryPurchase = () => {
           updated_at: conversation.updated_at,
           status: conversation.is_paid ? "purchased" : (conversation.display_status || "draft"),
           guests: conversation.player_count || 0,
+          theme: conversation.theme || "",
           premise: "",
           purchase_date: conversation.purchase_date,
           is_purchased: conversation.is_paid
