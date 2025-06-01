@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import { Progress } from "@/components/ui/progress";
-import { Loader2, Wand2, CheckCircle2, RefreshCw } from "lucide-react";
+import { Loader2, Wand2, CheckCircle2, RefreshCw, Eye } from "lucide-react";
 import { MysteryCharacter } from "@/interfaces/mystery";
 
 interface MysteryPackageData {
@@ -45,6 +45,7 @@ const MysteryPackageTabView = ({
   const [activeTab, setActiveTab] = useState("host-guide");
   const [progress, setProgress] = useState(0);
   const [statusMessage, setStatusMessage] = useState("Starting generation...");
+  const [generationToastId, setGenerationToastId] = useState<string | number | null>(null);
 
   // Update progress and status message based on generationStatus
   useEffect(() => {
@@ -53,6 +54,85 @@ const MysteryPackageTabView = ({
       setStatusMessage(generationStatus.currentStep || "Processing...");
     }
   }, [generationStatus]);
+
+  // Handle generation toast notifications
+  useEffect(() => {
+    if (isGenerating && generationStatus?.status === 'in_progress') {
+      // Show generation toast if not already showing
+      if (!generationToastId) {
+        const toastId = toast.info(
+          <div className="space-y-3">
+            <div className="flex items-center space-x-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span className="font-semibold">Generating Your Mystery Package</span>
+            </div>
+            <p className="text-sm text-muted-foreground">{statusMessage}</p>
+            <div className="space-y-2">
+              <Progress value={progress} className="h-2" />
+              <p className="text-xs text-muted-foreground">
+                {progress}% complete - Generation takes 3-5 minutes
+              </p>
+            </div>
+            <Button 
+              size="sm" 
+              variant="outline" 
+              className="w-full"
+              onClick={() => {
+                // Keep user on current page to view progress
+                setActiveTab("host-guide");
+              }}
+            >
+              <Eye className="h-3 w-3 mr-1" />
+              View Progress
+            </Button>
+          </div>,
+          {
+            duration: Infinity, // Keep toast until manually dismissed or generation completes
+            id: 'mystery-generation'
+          }
+        );
+        setGenerationToastId(toastId);
+      } else {
+        // Update existing toast with current progress
+        toast.info(
+          <div className="space-y-3">
+            <div className="flex items-center space-x-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span className="font-semibold">Generating Your Mystery Package</span>
+            </div>
+            <p className="text-sm text-muted-foreground">{statusMessage}</p>
+            <div className="space-y-2">
+              <Progress value={progress} className="h-2" />
+              <p className="text-xs text-muted-foreground">
+                {progress}% complete - Generation takes 3-5 minutes
+              </p>
+            </div>
+            <Button 
+              size="sm" 
+              variant="outline" 
+              className="w-full"
+              onClick={() => {
+                setActiveTab("host-guide");
+              }}
+            >
+              <Eye className="h-3 w-3 mr-1" />
+              View Progress
+            </Button>
+          </div>,
+          {
+            duration: Infinity,
+            id: 'mystery-generation'
+          }
+        );
+      }
+    } else {
+      // Dismiss generation toast when not generating
+      if (generationToastId) {
+        toast.dismiss('mystery-generation');
+        setGenerationToastId(null);
+      }
+    }
+  }, [isGenerating, generationStatus?.status, progress, statusMessage, generationToastId]);
 
   // Fallback text parsing functions for backwards compatibility
   const extractHostGuide = () => {
@@ -185,32 +265,8 @@ const MysteryPackageTabView = ({
     </div>
   );
 
-  // Generation overlay for the entire tab view
-  const GenerationOverlay = () => (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-      <Card className="max-w-md mx-4">
-        <CardContent className="p-6 text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
-          <h3 className="text-lg font-semibold mb-2">Generating Your Package</h3>
-          <p className="text-muted-foreground mb-4">{statusMessage}</p>
-          <Progress value={progress} className="mb-2" />
-          <p className="text-sm text-muted-foreground mb-4">
-            {progress}% complete
-          </p>
-          <div className="text-xs text-muted-foreground space-y-1">
-            <p>This page automatically refreshes every 30 seconds</p>
-            <p>Generation typically takes 3-5 minutes</p>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-
   return (
     <div className="w-full relative">
-      {/* Show generation overlay if actively generating */}
-      {isGenerating && generationStatus?.status === 'in_progress' && <GenerationOverlay />}
-      
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-center">{mysteryTitle}</h1>
       </div>

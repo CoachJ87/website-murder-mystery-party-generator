@@ -15,9 +15,13 @@ export type Database = {
           created_at: string | null
           display_status: string | null
           has_accomplice: boolean | null
+          has_complete_package: boolean | null
           id: string
+          is_completed: boolean | null
           is_paid: boolean | null
           mystery_data: Json | null
+          needs_package_generation: boolean | null
+          package_generated_at: string | null
           player_count: number | null
           purchase_date: string | null
           script_type: string | null
@@ -33,9 +37,13 @@ export type Database = {
           created_at?: string | null
           display_status?: string | null
           has_accomplice?: boolean | null
+          has_complete_package?: boolean | null
           id?: string
+          is_completed?: boolean | null
           is_paid?: boolean | null
           mystery_data?: Json | null
+          needs_package_generation?: boolean | null
+          package_generated_at?: string | null
           player_count?: number | null
           purchase_date?: string | null
           script_type?: string | null
@@ -51,9 +59,13 @@ export type Database = {
           created_at?: string | null
           display_status?: string | null
           has_accomplice?: boolean | null
+          has_complete_package?: boolean | null
           id?: string
+          is_completed?: boolean | null
           is_paid?: boolean | null
           mystery_data?: Json | null
+          needs_package_generation?: boolean | null
+          package_generated_at?: string | null
           player_count?: number | null
           purchase_date?: string | null
           script_type?: string | null
@@ -91,7 +103,15 @@ export type Database = {
           is_ai?: boolean | null
           role?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_messages_conversation_id"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       mystery_characters: {
         Row: {
