@@ -163,22 +163,110 @@ export async function saveStructuredPackageData(mysteryId: string, jsonData: any
   }
 }
 
-export async function generateCompletePackage(mysteryId: string, testMode = false): Promise<string> {
-  try {
-    console.log("Fetching content for conversation ID:", mysteryId);
+// Replace the complex polling logic with this simple version
+useEffect(() => {
+  if (!id) return;
+
+  let refreshInterval: number | null = null;
+
+  const startAutoRefresh = () => {
+    // Initial status check
+    checkGenerationStatus();
     
-    // First, get the conversation data with messages and individual columns
-    const { data: conversation, error: conversationError } = await supabase
-      .from("conversations")
-      .select("*, messages(*), user_id, theme, player_count, script_type, has_accomplice, additional_details")
-      .eq("id", mysteryId)
-      .single();
+    // Set up 30-second auto-refresh
+    refreshInterval = window.setInterval(() => {
+      console.log("Auto-refreshing generation status...");
+      checkGenerationStatus();
+    }, 30000); // 30 seconds
+  };
 
-    if (conversationError || !conversation) {
-      console.error("Error fetching conversation:", conversationError);
-      throw new Error("Failed to fetch conversation data");
+  const stopAutoRefresh = () => {
+    if (refreshInterval) {
+      clearInterval(refreshInterval);
+      refreshInterval = null;
     }
+  };
 
+  // Start auto-refresh if generation is in progress
+  if (generationStatus?.status === 'in_progress' || generating) {
+    startAutoRefresh();
+  } else {
+    stopAutoRefresh();
+  }
+
+  // Cleanup on unmount
+  return () => {
+    stopAutoRefresh();
+  };
+}, [id, generationStatus?.status, generating]);
+
+// Simplified status check function
+const checkGenerationStatus = useCallback(async () => {
+  if (!id) return;
+  
+  try {
+    const status = await getPackageGenerationStatus(id);
+    setGenerationStatus(status);
+    setLastUpdate(new Date());
+    
+    // Handle completion
+    if (status.status === 'completed') {
+      setGenerating(false);
+      
+      // Fetch the completed package data
+      await fetchStructuredPackageData();
+      
+      // Only show notification once
+      if (!packageReadyNotified.current) {
+        toast.success("Your mystery package is ready!");
+        packageReadyNotified.current = true;
+      }
+      
+      // Update conversation status
+      await supabase
+        .from("conversations")
+        .update({
+          status: "purchased",
+          is_paid: true,
+          needs_package_generation: false,
+          display_status: "purchased"
+        })
+        .eq("id", id);
+        
+    } else if (status.status === 'failed') {
+      setGenerating(false);
+      toast.error("Generation failed. You can try again.");
+    }
+  } catch (error) {
+    console.error("Error checking generation status:", error);
+  }
+}, [id]);
+
+// Simplified generate package handler
+const handleGeneratePackage = async () => {
+  if (!id) {
+    toast.error("Mystery ID is missing");
+    return;
+  }
+
+  setGenerating(true);
+  packageReadyNotified.current = false; // Reset notification flag
+  
+  try {
+    toast.info("Starting generation of your mystery package. This will take 3-5 minutes...");
+    
+    // Just call the webhook - don't wait for completion
+    await generateCompletePackage(id);
+    
+    // The auto-refresh will handle checking status
+    console.log("Generation started, auto-refresh will check status");
+    
+  } catch (error: any) {
+    console.error("Error starting package generation:", error);
+    setGenerating(false);
+    toast.error(error.message || "Failed to start package generation");
+  }
+};
     console.log(`Found conversation with ${conversation.messages?.length || 0} messages`);
 
     // Create or update the mystery_packages record
