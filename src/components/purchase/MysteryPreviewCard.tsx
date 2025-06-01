@@ -1,7 +1,6 @@
-
 import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Users, Tag } from "lucide-react";
+import { Users } from "lucide-react";
 
 interface MysteryPreviewCardProps {
   mystery: {
@@ -27,17 +26,16 @@ const MysteryPreviewCard = ({ mystery, parsedDetails }: MysteryPreviewCardProps)
       </CardHeader>
       
       <CardContent className="flex-grow space-y-6">
-        {/* Core Details Grid */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1">
-            <div className="flex items-center text-sm">
-              <Users className="h-4 w-4 mr-2 text-muted-foreground" />
-              <span>Players</span>
-            </div>
-            <p className="font-medium">
-              {mystery.guests || "4-8"} Players
-            </p>
+        {/* Core Details - Single Column */}
+        <div className="space-y-1">
+          <div className="flex items-center text-sm">
+            <Users className="h-4 w-4 mr-2 text-muted-foreground" />
+            <span>Players</span>
           </div>
+          <p className="font-medium">
+            {mystery.guests || "Unknown # of"} Players
+          </p>
+        </div>
         
         {/* Story Teaser */}
         {teaser && (
