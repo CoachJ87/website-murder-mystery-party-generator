@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,6 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { RefreshCw, AlertTriangle, Clock, CheckCircle2, Eye } from "lucide-react";
 import MysteryPackageTabView from "@/components/MysteryPackageTabView";
-import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { MysteryCharacter } from "@/interfaces/mystery";
 
@@ -403,26 +403,14 @@ const MysteryView = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>{generationStatus.currentStep}</span>
-              <span>{generationStatus.progress}%</span>
-            </div>
-            <Progress value={generationStatus.progress} className="h-2" />
-          </div>
-          
           <div className="flex flex-col md:flex-row gap-4 text-sm">
             <div className="flex-1 border rounded-md p-3">
               <div className="font-medium mb-2 flex items-center">
                 <Clock className="h-4 w-4 mr-2" />
-                <span>Estimated Time</span>
+                <span>Current Step</span>
               </div>
               <p className="text-muted-foreground">
-                Full generation takes 3-5 minutes. Remaining: 
-                {generationStatus.progress < 30 ? " 4-5 minutes" : 
-                 generationStatus.progress < 60 ? " 2-4 minutes" : 
-                 generationStatus.progress < 90 ? " 1-2 minutes" : 
-                 " less than 1 minute"}
+                {generationStatus.currentStep}
               </p>
             </div>
             
