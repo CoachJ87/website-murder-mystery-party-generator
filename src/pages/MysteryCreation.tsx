@@ -59,7 +59,7 @@ const MysteryCreation = () => {
         try {
             const { data, error } = await supabase
                 .from("conversations")
-                .select("mystery_data, title")
+                .select("theme, player_count, script_type, has_accomplice, additional_details, title")
                 .eq("id", mysteryId)
                 .single();
 
@@ -69,8 +69,15 @@ const MysteryCreation = () => {
                 return;
             }
 
-            if (data?.mystery_data) {
-                setFormData(data.mystery_data);
+            if (data) {
+                const formData = {
+                    theme: data.theme || "",
+                    playerCount: data.player_count || 6,
+                    scriptType: data.script_type || "full",
+                    hasAccomplice: data.has_accomplice || false,
+                    additionalDetails: data.additional_details || ""
+                };
+                setFormData(formData);
             }
         } catch (error) {
             console.error("Error:", error);
@@ -155,13 +162,17 @@ After presenting the mystery concept, ask if the concept works for them and expl
             let conversationId = id;
 
             if (!isEditing) {
-                // Create new conversation
+                // Create new conversation with individual columns
                 const { data: conversation, error: convError } = await supabase
                     .from("conversations")
                     .insert({
                         user_id: user.id,
                         title: `${data.theme || 'Mystery'} - ${data.playerCount} Players`,
-                        mystery_data: data,
+                        theme: data.theme || null,
+                        player_count: data.playerCount || 6,
+                        script_type: data.scriptType || 'full',
+                        has_accomplice: data.hasAccomplice || false,
+                        additional_details: data.additionalDetails || null,
                         system_instruction: systemInstruction,
                         display_status: "draft",
                         is_completed: false
@@ -183,11 +194,15 @@ After presenting the mystery concept, ask if the concept works for them and expl
                     is_ai: false
                 });
             } else {
-                // Update existing conversation
+                // Update existing conversation with individual columns
                 await supabase
                     .from("conversations")
                     .update({
-                        mystery_data: data,
+                        theme: data.theme || null,
+                        player_count: data.playerCount || 6,
+                        script_type: data.scriptType || 'full',
+                        has_accomplice: data.hasAccomplice || false,
+                        additional_details: data.additionalDetails || null,
                         system_instruction: systemInstruction,
                         updated_at: new Date().toISOString()
                     })

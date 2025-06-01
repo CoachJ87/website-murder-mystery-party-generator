@@ -1,4 +1,3 @@
-
 import { supabase } from "@/lib/supabase";
 import { getAIResponse, saveGenerationState, getGenerationState, clearGenerationState } from "@/services/aiService";
 import { toast } from "sonner";
@@ -168,10 +167,10 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
   try {
     console.log("Fetching content for conversation ID:", mysteryId);
     
-    // First, get the conversation data with messages
+    // First, get the conversation data with messages and individual columns
     const { data: conversation, error: conversationError } = await supabase
       .from("conversations")
-      .select("*, messages(*), user_id")
+      .select("*, messages(*), user_id, theme, player_count, script_type, has_accomplice, additional_details")
       .eq("id", mysteryId)
       .single();
 
@@ -265,14 +264,13 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
           }).join("\n\n---\n\n")
         : "";
 
-      // Enhanced payload with all available data
+      // Enhanced payload with individual conversation columns
       const webhookPayload = {
         // Core identifiers
         userId: conversation.user_id,
         conversationId: mysteryId,
         
-        // Enhanced structured data
-        mysteryData: conversation.mystery_data || {},
+        // Enhanced structured data using individual columns
         title: conversation.title || null,
         systemInstruction: conversation.system_instruction || null,
         
@@ -287,12 +285,12 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
         // Legacy concatenated content (keep for backward compatibility)
         content: conversationContent,
         
-        // Parsed requirements for easy access
-        playerCount: conversation.mystery_data?.playerCount || null,
-        theme: conversation.mystery_data?.theme || null,
-        scriptType: conversation.mystery_data?.scriptType || 'full',
-        additionalDetails: conversation.mystery_data?.additionalDetails || null,
-        hasAccomplice: conversation.mystery_data?.hasAccomplice || false,
+        // Parsed requirements using individual columns
+        playerCount: conversation.player_count || null,
+        theme: conversation.theme || null,
+        scriptType: conversation.script_type || 'full',
+        additionalDetails: conversation.additional_details || null,
+        hasAccomplice: conversation.has_accomplice || false,
         
         // Metadata
         createdAt: conversation.created_at,

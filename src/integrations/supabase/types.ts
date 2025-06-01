@@ -13,9 +13,11 @@ export type Database = {
         Row: {
           additional_details: string | null
           created_at: string | null
+          display_status: string | null
           has_accomplice: boolean | null
           id: string
           is_paid: boolean | null
+          mystery_data: Json | null
           player_count: number | null
           purchase_date: string | null
           script_type: string | null
@@ -29,9 +31,11 @@ export type Database = {
         Insert: {
           additional_details?: string | null
           created_at?: string | null
+          display_status?: string | null
           has_accomplice?: boolean | null
           id?: string
           is_paid?: boolean | null
+          mystery_data?: Json | null
           player_count?: number | null
           purchase_date?: string | null
           script_type?: string | null
@@ -45,9 +49,11 @@ export type Database = {
         Update: {
           additional_details?: string | null
           created_at?: string | null
+          display_status?: string | null
           has_accomplice?: boolean | null
           id?: string
           is_paid?: boolean | null
+          mystery_data?: Json | null
           player_count?: number | null
           purchase_date?: string | null
           script_type?: string | null

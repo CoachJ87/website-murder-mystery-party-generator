@@ -39,12 +39,12 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
 
       let query = supabase
         .from("conversations")
-        .select("id, title, created_at, updated_at, mystery_data, display_status, is_paid, purchase_date, is_completed, needs_package_generation")
+        .select("id, title, created_at, updated_at, theme, player_count, script_type, has_accomplice, additional_details, status, display_status, is_paid, purchase_date, is_completed, needs_package_generation")
         .eq("user_id", user.id);
 
       // Apply search filter if provided
       if (searchTerm.trim()) {
-        query = query.or(`title.ilike.%${searchTerm.trim()}%,mystery_data->>theme.ilike.%${searchTerm.trim()}%`);
+        query = query.or(`title.ilike.%${searchTerm.trim()}%,theme.ilike.%${searchTerm.trim()}%`);
       }
 
       // Pagination
@@ -83,8 +83,7 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
             }
             
             const aiTitle = extractTitleFromMessages(messagesData || []);
-            const mysteryData = conversation.mystery_data || {};
-            const theme = mysteryData.theme || 'Mystery';
+            const theme = conversation.theme || 'Mystery';
             
             const title = aiTitle || conversation.title || `${theme} Mystery`;
             
@@ -112,7 +111,7 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
             } else if (conversation.display_status === "archived") {
               status = "archived";
             } else {
-              status = mysteryData.status || "draft";
+              status = conversation.status || "draft";
             }
             
             const mystery: Mystery = {
@@ -122,9 +121,16 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
               updated_at: conversation.updated_at || conversation.created_at,
               status: status,
               display_status: status,
-              mystery_data: mysteryData,
+              mystery_data: {
+                theme: conversation.theme,
+                playerCount: conversation.player_count,
+                scriptType: conversation.script_type,
+                hasAccomplice: conversation.has_accomplice,
+                additionalDetails: conversation.additional_details,
+                status: status
+              },
               theme: theme,
-              guests: mysteryData.playerCount || mysteryData.numberOfGuests || mysteryData.guests,
+              guests: conversation.player_count || 6,
               is_purchased: conversation.is_paid === true || conversation.display_status === "purchased",
               is_completed: conversation.is_completed || false,
               ai_title: aiTitle,
@@ -143,9 +149,15 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
               updated_at: conversation.updated_at || conversation.created_at,
               status: "draft",
               display_status: "draft",
-              mystery_data: conversation.mystery_data || {},
-              theme: "Mystery",
-              guests: 6,
+              mystery_data: {
+                theme: conversation.theme || "Mystery",
+                playerCount: conversation.player_count || 6,
+                scriptType: conversation.script_type || "full",
+                hasAccomplice: conversation.has_accomplice || false,
+                additionalDetails: conversation.additional_details || ""
+              },
+              theme: conversation.theme || "Mystery",
+              guests: conversation.player_count || 6,
               is_purchased: false,
               is_completed: false,
               ai_title: null,
