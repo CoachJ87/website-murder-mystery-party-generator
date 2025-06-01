@@ -38,15 +38,6 @@ const MysteryPreviewCard = ({ mystery, parsedDetails }: MysteryPreviewCardProps)
               {mystery.guests || "4-8"} Players
             </p>
           </div>
-          
-          <div className="space-y-1">
-            <div className="flex items-center text-sm">
-              <Tag className="h-4 w-4 mr-2 text-muted-foreground" />
-              <span>Theme</span>
-            </div>
-            <p className="font-medium">{mystery.theme || "Classic"}</p>
-          </div>
-        </div>
         
         {/* Story Teaser */}
         {teaser && (
