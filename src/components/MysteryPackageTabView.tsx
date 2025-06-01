@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
-import { Progress } from "@/components/ui/progress";
 import { Loader2, Wand2, CheckCircle2, RefreshCw, Eye } from "lucide-react";
 import { MysteryCharacter } from "@/interfaces/mystery";
 
@@ -43,14 +42,12 @@ const MysteryPackageTabView = ({
   characters = []
 }: MysteryPackageTabViewProps) => {
   const [activeTab, setActiveTab] = useState("host-guide");
-  const [progress, setProgress] = useState(0);
   const [statusMessage, setStatusMessage] = useState("Starting generation...");
   const [generationToastId, setGenerationToastId] = useState<string | number | null>(null);
 
-  // Update progress and status message based on generationStatus
+  // Update status message based on generationStatus
   useEffect(() => {
     if (generationStatus) {
-      setProgress(generationStatus.progress || 0);
       setStatusMessage(generationStatus.currentStep || "Processing...");
     }
   }, [generationStatus]);
@@ -67,12 +64,9 @@ const MysteryPackageTabView = ({
               <span className="font-semibold">Generating Your Mystery Package</span>
             </div>
             <p className="text-sm text-muted-foreground">{statusMessage}</p>
-            <div className="space-y-2">
-              <Progress value={progress} className="h-2" />
-              <p className="text-xs text-muted-foreground">
-                {progress}% complete - Generation takes 3-5 minutes
-              </p>
-            </div>
+            <p className="text-xs text-muted-foreground">
+              Generation takes 3-5 minutes
+            </p>
             <Button 
               size="sm" 
               variant="outline" 
@@ -101,12 +95,9 @@ const MysteryPackageTabView = ({
               <span className="font-semibold">Generating Your Mystery Package</span>
             </div>
             <p className="text-sm text-muted-foreground">{statusMessage}</p>
-            <div className="space-y-2">
-              <Progress value={progress} className="h-2" />
-              <p className="text-xs text-muted-foreground">
-                {progress}% complete - Generation takes 3-5 minutes
-              </p>
-            </div>
+            <p className="text-xs text-muted-foreground">
+              Generation takes 3-5 minutes
+            </p>
             <Button 
               size="sm" 
               variant="outline" 
@@ -132,7 +123,7 @@ const MysteryPackageTabView = ({
         setGenerationToastId(null);
       }
     }
-  }, [isGenerating, generationStatus?.status, progress, statusMessage, generationToastId]);
+  }, [isGenerating, generationStatus?.status, statusMessage, generationToastId]);
 
   // Fallback text parsing functions for backwards compatibility
   const extractHostGuide = () => {
@@ -254,13 +245,10 @@ const MysteryPackageTabView = ({
       <p className="text-muted-foreground text-center">
         This section is being generated. The page automatically refreshes every 30 seconds to check progress.
       </p>
-      {generationStatus && (
-        <div className="w-full max-w-md space-y-2">
-          <Progress value={progress} className="h-2" />
-          <p className="text-sm text-center text-muted-foreground">
-            {progress}% complete - {statusMessage}
-          </p>
-        </div>
+      {generationStatus?.currentStep && (
+        <p className="text-sm text-center text-muted-foreground">
+          Status: {statusMessage}
+        </p>
       )}
     </div>
   );
