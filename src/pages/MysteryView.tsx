@@ -19,10 +19,26 @@ import MysteryPackageTabView from "@/components/MysteryPackageTabView";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { clearGenerationState } from "@/services/aiService";
+import { MysteryCharacter } from "@/interfaces/mystery";
+
+interface MysteryPackageData {
+  title?: string;
+  gameOverview?: string;
+  hostGuide?: string;
+  materials?: string;
+  preparation?: string;
+  timeline?: string;
+  hostingTips?: string;
+  evidenceCards?: string;
+  relationshipMatrix?: string;
+  detectiveScript?: string;
+}
 
 const MysteryView = () => {
   const [mystery, setMystery] = useState<any | null>(null);
   const [packageContent, setPackageContent] = useState<string | null>(null);
+  const [packageData, setPackageData] = useState<MysteryPackageData | null>(null);
+  const [characters, setCharacters] = useState<MysteryCharacter[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [generationStatus, setGenerationStatus] = useState<GenerationStatus | null>(null);
@@ -90,37 +106,30 @@ const MysteryView = () => {
         clearStatusPolling();
         setGenerating(false);
         
-        const { data: packageData } = await supabase
-          .from("mystery_packages")
-          .select("content")
-          .eq("conversation_id", id)
-          .single();
-          
-        if (packageData) {
-          setPackageContent(packageData.content);
-          
-          // Clear saved generation state
-          clearGenerationState(id);
-          
-          // Only show the notification if we haven't shown it before
-          if (!packageReadyNotified.current) {
-            toast.success("Your mystery package is ready!");
-            packageReadyNotified.current = true;
-          }
-          
-          await supabase
-            .from("conversations")
-            .update({
-              status: "purchased",
-              is_paid: true,
-              is_purchased: true,
-              display_status: "purchased"
-            })
-            .eq("id", id);
-          
-          if (window.location.pathname.includes('/preview/')) {
-            navigate(`/mystery/${id}`);
-          }
+        // Fetch structured data when generation is complete
+        await fetchStructuredPackageData();
+        
+        // Clear saved generation state
+        clearGenerationState(id);
+        
+        // Only show the notification if we haven't shown it before
+        if (!packageReadyNotified.current) {
+          toast.success("Your mystery package is ready!");
+          packageReadyNotified.current = true;
+        }
+        
+        await supabase
+          .from("conversations")
+          .update({
+            status: "purchased",
+            is_paid: true,
+            is_purchased: true,
+            display_status: "purchased"
+          })
+          .eq("id", id);
+        
+        if (window.location.pathname.includes('/preview/')) {
+          navigate(`/mystery/${id}`);
         }
       } else if (status.status === 'failed') {
         clearStatusPolling();
@@ -144,6 +153,71 @@ const MysteryView = () => {
       console.error("Error checking generation status:", error);
     }
   }, [id, navigate, clearStatusPolling]);
+
+  const fetchStructuredPackageData = async () => {
+    if (!id) return;
+
+    try {
+      // Fetch mystery packages data with structured fields
+      const { data: packageData, error: packageError } = await supabase
+        .from("mystery_packages")
+        .select(`
+          title,
+          game_overview,
+          host_guide,
+          materials,
+          preparation_instructions,
+          timeline,
+          hosting_tips,
+          evidence_cards,
+          relationship_matrix,
+          detective_script,
+          id
+        `)
+        .eq("conversation_id", id)
+        .single();
+
+      if (packageError) {
+        console.error("Error fetching package data:", packageError);
+        return;
+      }
+
+      if (packageData) {
+        // Map database fields to component props
+        const structuredPackageData: MysteryPackageData = {
+          title: packageData.title,
+          gameOverview: packageData.game_overview,
+          hostGuide: packageData.host_guide,
+          materials: packageData.materials,
+          preparation: packageData.preparation_instructions,
+          timeline: packageData.timeline,
+          hostingTips: packageData.hosting_tips,
+          evidenceCards: packageData.evidence_cards,
+          relationshipMatrix: packageData.relationship_matrix,
+          detectiveScript: packageData.detective_script,
+        };
+        
+        setPackageData(structuredPackageData);
+        console.log("Structured package data loaded:", structuredPackageData);
+
+        // Fetch characters using the package ID
+        const { data: charactersData, error: charactersError } = await supabase
+          .from("mystery_characters")
+          .select("*")
+          .eq("package_id", packageData.id)
+          .order("character_name");
+
+        if (charactersError) {
+          console.error("Error fetching characters:", charactersError);
+        } else if (charactersData) {
+          setCharacters(charactersData);
+          console.log("Characters loaded:", charactersData);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching structured package data:", error);
+    }
+  };
 
   useEffect(() => {
     const handleVisibilityChange = () => {
@@ -239,14 +313,18 @@ const MysteryView = () => {
         }
 
         if (conversation.has_complete_package) {
+          // Try to fetch structured data first
+          await fetchStructuredPackageData();
+
+          // Fallback to legacy content if structured data is not available
           const { data: packageData, error: packageError } = await supabase
             .from("mystery_packages")
-            .select("content")
+            .select("legacy_content")
             .eq("conversation_id", id)
             .single();
 
-          if (!packageError && packageData) {
-            setPackageContent(packageData.content);
+          if (!packageError && packageData && packageData.legacy_content) {
+            setPackageContent(packageData.legacy_content);
           }
         }
       } catch (error) {
@@ -486,14 +564,17 @@ const MysteryView = () => {
           {(!window.location.pathname.includes('/preview/') && 
             (generationStatus?.status === 'completed' || 
              packageContent || 
+             packageData ||
              (mystery && mystery.is_paid))) ? (
             <MysteryPackageTabView 
-              packageContent={packageContent} 
+              packageContent={packageContent || ""} 
               mysteryTitle={mystery?.title || mystery?.mystery_data?.theme || "Mystery Package"}
               generationStatus={generationStatus || undefined}
               conversationId={id}
               onGenerateClick={handleGeneratePackage}
               isGenerating={generating}
+              packageData={packageData || undefined}
+              characters={characters}
             />
           ) : (
             generationStatus?.status === 'in_progress' ? renderGenerationProgress() : (
