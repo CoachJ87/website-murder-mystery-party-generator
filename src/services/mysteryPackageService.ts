@@ -1,3 +1,4 @@
+
 import { supabase } from "@/lib/supabase";
 import { getAIResponse, saveGenerationState, getGenerationState, clearGenerationState } from "@/services/aiService";
 import { toast } from "sonner";
@@ -39,6 +40,130 @@ export interface GenerationStatus {
   };
 }
 
+// New function to save structured package data from JSON response
+export async function saveStructuredPackageData(mysteryId: string, jsonData: any): Promise<void> {
+  try {
+    console.log("Saving structured package data for mystery:", mysteryId);
+    
+    // Validate required fields
+    if (!jsonData.title || !jsonData.gameOverview || !jsonData.hostGuide || !Array.isArray(jsonData.characters)) {
+      throw new Error("Missing required fields: title, gameOverview, hostGuide, or characters array");
+    }
+    
+    console.log("Validation passed, proceeding with data save");
+    
+    // Get the package ID for this conversation
+    const { data: packageData, error: packageError } = await supabase
+      .from("mystery_packages")
+      .select("id")
+      .eq("conversation_id", mysteryId)
+      .maybeSingle();
+    
+    if (packageError) {
+      console.error("Error fetching package:", packageError);
+      throw new Error("Failed to fetch package record");
+    }
+    
+    if (!packageData) {
+      throw new Error("No package record found for this conversation");
+    }
+    
+    const packageId = packageData.id;
+    
+    // Upsert mystery_packages table with field mapping
+    const { error: upsertError } = await supabase
+      .from("mystery_packages")
+      .update({
+        title: jsonData.title,
+        game_overview: jsonData.gameOverview,
+        host_guide: jsonData.hostGuide,
+        materials: jsonData.materials || null,
+        preparation_instructions: jsonData.preparation || null,
+        timeline: jsonData.timeline || null,
+        hosting_tips: jsonData.hostingTips || null,
+        evidence_cards: jsonData.evidenceCards ? JSON.stringify(jsonData.evidenceCards) : null,
+        relationship_matrix: jsonData.relationshipMatrix ? JSON.stringify(jsonData.relationshipMatrix) : null,
+        detective_script: jsonData.detectiveScript || null,
+        generation_status: {
+          status: 'completed',
+          progress: 100,
+          currentStep: 'Package generation completed'
+        },
+        generation_completed_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .eq("id", packageId);
+    
+    if (upsertError) {
+      console.error("Error upserting package data:", upsertError);
+      throw new Error("Failed to save package data");
+    }
+    
+    console.log("Package data saved successfully");
+    
+    // Delete existing characters first
+    const { error: deleteError } = await supabase
+      .from("mystery_characters")
+      .delete()
+      .eq("package_id", packageId);
+    
+    if (deleteError) {
+      console.error("Error deleting existing characters:", deleteError);
+      throw new Error("Failed to delete existing characters");
+    }
+    
+    console.log("Existing characters deleted");
+    
+    // Insert new characters with field mapping
+    const charactersToInsert = jsonData.characters.map((char: any) => ({
+      package_id: packageId,
+      character_name: char.name,
+      description: char.description || null,
+      background: char.background || null,
+      secret: char.secret || null,
+      introduction: char.introduction || null,
+      rumors: char.rumors || null,
+      round2_questions: char.round2Questions || null,
+      round2_innocent: char.round2Innocent || null,
+      round2_guilty: char.round2Guilty || null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }));
+    
+    const { error: charactersError } = await supabase
+      .from("mystery_characters")
+      .insert(charactersToInsert);
+    
+    if (charactersError) {
+      console.error("Error inserting characters:", charactersError);
+      throw new Error("Failed to save characters data");
+    }
+    
+    console.log(`Successfully saved ${charactersToInsert.length} characters`);
+    
+    // Update conversation table
+    const { error: conversationError } = await supabase
+      .from("conversations")
+      .update({
+        needs_package_generation: false,
+        updated_at: new Date().toISOString()
+      })
+      .eq("id", mysteryId);
+    
+    if (conversationError) {
+      console.error("Error updating conversation:", conversationError);
+      throw new Error("Failed to update conversation status");
+    }
+    
+    console.log("Conversation updated successfully");
+    console.log("Structured package data saved successfully for mystery:", mysteryId);
+    
+  } catch (error) {
+    console.error("Error in saveStructuredPackageData:", error);
+    throw error;
+  }
+}
+
 export async function generateCompletePackage(mysteryId: string, testMode = false): Promise<string> {
   try {
     console.log("Fetching content for conversation ID:", mysteryId);
@@ -60,7 +185,7 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
     // Create or update the mystery_packages record
     const { data: packageData, error: checkError } = await supabase
       .from("mystery_packages")
-      .select("id, content")
+      .select("id, legacy_content")
       .eq("conversation_id", mysteryId)
       .maybeSingle();
     
@@ -108,7 +233,7 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
         .from("mystery_packages")
         .insert({
           conversation_id: mysteryId,
-          content: "",
+          legacy_content: "",
           generation_status: initialStatus,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
@@ -232,6 +357,14 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
       try {
         responseData = await response.json();
         console.log("Make.com webhook response:", responseData);
+        
+        // If the response contains structured data, save it immediately
+        if (responseData && typeof responseData === 'object' && responseData.title) {
+          console.log("Received structured JSON response, saving data...");
+          await saveStructuredPackageData(mysteryId, responseData);
+          console.log("Structured data saved successfully");
+          return "Package generation completed successfully";
+        }
       } catch (e) {
         // If response isn't JSON, that's okay for webhooks
         console.log("Webhook responded with non-JSON (this is normal for many webhooks)");

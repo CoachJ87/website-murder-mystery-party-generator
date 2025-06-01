@@ -11,75 +11,54 @@ export type Database = {
     Tables: {
       conversations: {
         Row: {
+          additional_details: string | null
           created_at: string | null
-          display_status: string | null
-          has_complete_package: boolean | null
+          has_accomplice: boolean | null
           id: string
-          is_completed: boolean | null
           is_paid: boolean | null
-          mystery_data: Json | null
-          mystery_id: string | null
-          needs_package_generation: boolean | null
-          package_generated_at: string | null
-          prompt_version: string | null
+          player_count: number | null
           purchase_date: string | null
+          script_type: string | null
+          status: string | null
           system_instruction: string | null
+          theme: string | null
           title: string | null
           updated_at: string | null
-          user_id: string
+          user_id: string | null
         }
         Insert: {
+          additional_details?: string | null
           created_at?: string | null
-          display_status?: string | null
-          has_complete_package?: boolean | null
+          has_accomplice?: boolean | null
           id?: string
-          is_completed?: boolean | null
           is_paid?: boolean | null
-          mystery_data?: Json | null
-          mystery_id?: string | null
-          needs_package_generation?: boolean | null
-          package_generated_at?: string | null
-          prompt_version?: string | null
+          player_count?: number | null
           purchase_date?: string | null
+          script_type?: string | null
+          status?: string | null
           system_instruction?: string | null
+          theme?: string | null
           title?: string | null
           updated_at?: string | null
-          user_id: string
+          user_id?: string | null
         }
         Update: {
+          additional_details?: string | null
           created_at?: string | null
-          display_status?: string | null
-          has_complete_package?: boolean | null
+          has_accomplice?: boolean | null
           id?: string
-          is_completed?: boolean | null
           is_paid?: boolean | null
-          mystery_data?: Json | null
-          mystery_id?: string | null
-          needs_package_generation?: boolean | null
-          package_generated_at?: string | null
-          prompt_version?: string | null
+          player_count?: number | null
           purchase_date?: string | null
+          script_type?: string | null
+          status?: string | null
           system_instruction?: string | null
+          theme?: string | null
           title?: string | null
           updated_at?: string | null
-          user_id?: string
+          user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "conversations_mystery_id_fkey"
-            columns: ["mystery_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "conversations_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       messages: {
         Row: {
@@ -106,15 +85,7 @@ export type Database = {
           is_ai?: boolean | null
           role?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "messages_conversation_id_fkey"
-            columns: ["conversation_id"]
-            isOneToOne: false
-            referencedRelation: "conversations"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       mystery_characters: {
         Row: {
@@ -122,6 +93,9 @@ export type Database = {
           character_name: string
           created_at: string | null
           description: string | null
+          final_accomplice: string | null
+          final_guilty: string | null
+          final_innocent: string | null
           id: string
           introduction: string | null
           package_id: string | null
@@ -129,8 +103,22 @@ export type Database = {
           relationships: Json | null
           round_scripts: Json | null
           round1_statement: string | null
+          round2_accomplice: string | null
+          round2_guilty: string | null
+          round2_innocent: string | null
+          round2_questions: string | null
           round2_statement: string | null
+          round3_accomplice: string | null
+          round3_guilty: string | null
+          round3_innocent: string | null
+          round3_questions: string | null
           round3_statement: string | null
+          round4_accomplice: string | null
+          round4_guilty: string | null
+          round4_innocent: string | null
+          round4_questions: string | null
+          rumors: string | null
+          secret: string | null
           secrets: Json | null
           updated_at: string | null
           whereabouts: string | null
@@ -140,6 +128,9 @@ export type Database = {
           character_name: string
           created_at?: string | null
           description?: string | null
+          final_accomplice?: string | null
+          final_guilty?: string | null
+          final_innocent?: string | null
           id?: string
           introduction?: string | null
           package_id?: string | null
@@ -147,8 +138,22 @@ export type Database = {
           relationships?: Json | null
           round_scripts?: Json | null
           round1_statement?: string | null
+          round2_accomplice?: string | null
+          round2_guilty?: string | null
+          round2_innocent?: string | null
+          round2_questions?: string | null
           round2_statement?: string | null
+          round3_accomplice?: string | null
+          round3_guilty?: string | null
+          round3_innocent?: string | null
+          round3_questions?: string | null
           round3_statement?: string | null
+          round4_accomplice?: string | null
+          round4_guilty?: string | null
+          round4_innocent?: string | null
+          round4_questions?: string | null
+          rumors?: string | null
+          secret?: string | null
           secrets?: Json | null
           updated_at?: string | null
           whereabouts?: string | null
@@ -158,6 +163,9 @@ export type Database = {
           character_name?: string
           created_at?: string | null
           description?: string | null
+          final_accomplice?: string | null
+          final_guilty?: string | null
+          final_innocent?: string | null
           id?: string
           introduction?: string | null
           package_id?: string | null
@@ -165,8 +173,22 @@ export type Database = {
           relationships?: Json | null
           round_scripts?: Json | null
           round1_statement?: string | null
+          round2_accomplice?: string | null
+          round2_guilty?: string | null
+          round2_innocent?: string | null
+          round2_questions?: string | null
           round2_statement?: string | null
+          round3_accomplice?: string | null
+          round3_guilty?: string | null
+          round3_innocent?: string | null
+          round3_questions?: string | null
           round3_statement?: string | null
+          round4_accomplice?: string | null
+          round4_guilty?: string | null
+          round4_innocent?: string | null
+          round4_questions?: string | null
+          rumors?: string | null
+          secret?: string | null
           secrets?: Json | null
           updated_at?: string | null
           whereabouts?: string | null
@@ -183,53 +205,69 @@ export type Database = {
       }
       mystery_packages: {
         Row: {
-          content: string
           conversation_id: string | null
           created_at: string | null
           detective_script: string | null
           evidence_cards: Json | null
+          game_overview: string | null
+          generation_completed_at: string | null
+          generation_started_at: string | null
           generation_status: Json | null
           host_guide: string | null
+          hosting_tips: string | null
           id: string
+          legacy_content: string | null
+          materials: string | null
           partial_content: Json | null
+          preparation_instructions: string | null
           relationship_matrix: Json | null
+          timeline: string | null
+          title: string | null
           updated_at: string | null
         }
         Insert: {
-          content: string
           conversation_id?: string | null
           created_at?: string | null
           detective_script?: string | null
           evidence_cards?: Json | null
+          game_overview?: string | null
+          generation_completed_at?: string | null
+          generation_started_at?: string | null
           generation_status?: Json | null
           host_guide?: string | null
+          hosting_tips?: string | null
           id?: string
+          legacy_content?: string | null
+          materials?: string | null
           partial_content?: Json | null
+          preparation_instructions?: string | null
           relationship_matrix?: Json | null
+          timeline?: string | null
+          title?: string | null
           updated_at?: string | null
         }
         Update: {
-          content?: string
           conversation_id?: string | null
           created_at?: string | null
           detective_script?: string | null
           evidence_cards?: Json | null
+          game_overview?: string | null
+          generation_completed_at?: string | null
+          generation_started_at?: string | null
           generation_status?: Json | null
           host_guide?: string | null
+          hosting_tips?: string | null
           id?: string
+          legacy_content?: string | null
+          materials?: string | null
           partial_content?: Json | null
+          preparation_instructions?: string | null
           relationship_matrix?: Json | null
+          timeline?: string | null
+          title?: string | null
           updated_at?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "mystery_packages_conversation_id_fkey"
-            columns: ["conversation_id"]
-            isOneToOne: false
-            referencedRelation: "conversations"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       profiles: {
         Row: {
