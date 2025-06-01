@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,19 @@ import { Progress } from "@/components/ui/progress";
 import { Loader2, Wand2, CheckCircle2 } from "lucide-react";
 import { MysteryCharacter } from "@/interfaces/mystery";
 
+interface MysteryPackageData {
+  title?: string;
+  gameOverview?: string;
+  hostGuide?: string;
+  materials?: string;
+  preparation?: string;
+  timeline?: string;
+  hostingTips?: string;
+  evidenceCards?: string;
+  relationshipMatrix?: string;
+  detectiveScript?: string;
+}
+
 interface MysteryPackageTabViewProps {
   packageContent: string;
   mysteryTitle: string;
@@ -14,6 +28,8 @@ interface MysteryPackageTabViewProps {
   isGenerating: boolean;
   conversationId?: string;
   onGenerateClick?: () => void;
+  packageData?: MysteryPackageData;
+  characters?: MysteryCharacter[];
 }
 
 const MysteryPackageTabView = ({
@@ -22,7 +38,9 @@ const MysteryPackageTabView = ({
   generationStatus,
   isGenerating,
   conversationId,
-  onGenerateClick
+  onGenerateClick,
+  packageData,
+  characters = []
 }: MysteryPackageTabViewProps) => {
   const [activeTab, setActiveTab] = useState("host-guide");
   const [progress, setProgress] = useState(0);
@@ -36,7 +54,7 @@ const MysteryPackageTabView = ({
     }
   }, [generationStatus]);
 
-  // Sections from package content extraction helpers
+  // Fallback text parsing functions for backwards compatibility
   const extractHostGuide = () => {
     if (!packageContent) return "";
     
@@ -64,7 +82,7 @@ const MysteryPackageTabView = ({
   const extractCharacters = () => {
     if (!packageContent) return [];
     
-    const characters: MysteryCharacter[] = [];
+    const charactersList: MysteryCharacter[] = [];
     const characterPattern = /# ([^-\n]+) - CHARACTER GUIDE\n([\s\S]*?)(?=# \w+ - CHARACTER GUIDE|# |$)/g;
     
     let match;
@@ -72,7 +90,7 @@ const MysteryPackageTabView = ({
       const characterName = match[1].trim();
       const characterContent = match[2].trim();
       
-      characters.push({
+      charactersList.push({
         id: crypto.randomUUID(),
         package_id: conversationId || "",
         character_name: characterName,
@@ -83,7 +101,7 @@ const MysteryPackageTabView = ({
       });
     }
     
-    return characters;
+    return charactersList;
   };
 
   const extractClues = () => {
@@ -106,11 +124,42 @@ const MysteryPackageTabView = ({
     return clues;
   };
 
-  const hostGuide = extractHostGuide();
-  const inspectorScript = extractInspectorScript();
-  const relationshipMatrix = extractCharacterMatrix();
-  const characters = extractCharacters();
-  const clues = extractClues();
+  // Get data with structured data priority, fallback to text parsing
+  const getHostGuide = () => {
+    return packageData?.hostGuide || extractHostGuide();
+  };
+
+  const getDetectiveScript = () => {
+    return packageData?.detectiveScript || extractInspectorScript();
+  };
+
+  const getRelationshipMatrix = () => {
+    return packageData?.relationshipMatrix || extractCharacterMatrix();
+  };
+
+  const getCharacters = () => {
+    return characters.length > 0 ? characters : extractCharacters();
+  };
+
+  const getEvidenceCards = () => {
+    if (packageData?.evidenceCards) {
+      return packageData.evidenceCards;
+    }
+    
+    // Fallback to extracting clues and formatting them
+    const clues = extractClues();
+    if (clues.length > 0) {
+      return clues.map(clue => `## ${clue.title}\n\n${clue.content}`).join('\n\n---\n\n');
+    }
+    
+    return "";
+  };
+
+  const hostGuide = getHostGuide();
+  const detectiveScript = getDetectiveScript();
+  const relationshipMatrix = getRelationshipMatrix();
+  const charactersList = getCharacters();
+  const evidenceCards = getEvidenceCards();
 
   // Helper function to check if a section is generated based on generationStatus
   const isSectionComplete = (sectionName: string) => {
@@ -144,20 +193,20 @@ const MysteryPackageTabView = ({
           </TabsTrigger>
           <TabsTrigger value="characters" className="whitespace-nowrap">
             <div className="flex items-center space-x-1">
-              <span>Characters ({characters && Array.isArray(characters) ? characters.length : 0})</span>
+              <span>Characters ({charactersList && Array.isArray(charactersList) ? charactersList.length : 0})</span>
               {isSectionComplete('characters') && <CheckCircle2 className="h-3 w-3 text-green-500" />}
             </div>
           </TabsTrigger>
           <TabsTrigger value="clues" className="whitespace-nowrap">
             <div className="flex items-center space-x-1">
-              <span>Clues ({clues && Array.isArray(clues) ? clues.length : 0})</span>
+              <span>Evidence</span>
               {isSectionComplete('clues') && <CheckCircle2 className="h-3 w-3 text-green-500" />}
             </div>
           </TabsTrigger>
           <TabsTrigger value="inspector" className="whitespace-nowrap">
             <div className="flex items-center space-x-1">
               <span>Detective Guide</span>
-              {inspectorScript && <CheckCircle2 className="h-3 w-3 text-green-500" />}
+              {detectiveScript && <CheckCircle2 className="h-3 w-3 text-green-500" />}
             </div>
           </TabsTrigger>
           <TabsTrigger value="matrix" className="whitespace-nowrap">
@@ -193,12 +242,18 @@ const MysteryPackageTabView = ({
 
         <TabsContent value="characters">
           <div className="prose prose-stone dark:prose-invert max-w-none">
-            {Array.isArray(characters) && characters.length > 0 ? (
+            {Array.isArray(charactersList) && charactersList.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {characters.map((character, index) => (
+                {charactersList.map((character, index) => (
                   <div key={character.id || index} className="border rounded-lg p-4 bg-card">
                     <h3 className="text-lg font-bold mb-2">{character.character_name}</h3>
                     <p>{character.description}</p>
+                    {character.background && (
+                      <div className="mt-2">
+                        <h4 className="font-semibold text-sm">Background:</h4>
+                        <p className="text-sm text-muted-foreground">{character.background}</p>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -214,20 +269,13 @@ const MysteryPackageTabView = ({
 
         <TabsContent value="clues">
           <div className="prose prose-stone dark:prose-invert max-w-none">
-            {Array.isArray(clues) && clues.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {clues.map((clue, index) => (
-                  <div key={index} className="border rounded-lg p-4 bg-card">
-                    <h3 className="text-lg font-bold mb-2">{clue.title}</h3>
-                    <ReactMarkdown>{clue.content}</ReactMarkdown>
-                  </div>
-                ))}
-              </div>
+            {evidenceCards ? (
+              <ReactMarkdown>{evidenceCards}</ReactMarkdown>
             ) : isGenerating ? (
-              <LoadingTabContent message="Generating clues and evidence..." />
+              <LoadingTabContent message="Generating evidence and clues..." />
             ) : (
               <div className="text-center py-6">
-                <p className="text-muted-foreground">Clues and evidence will be available after generation starts.</p>
+                <p className="text-muted-foreground">Evidence cards will be available after generation starts.</p>
               </div>
             )}
           </div>
@@ -235,8 +283,8 @@ const MysteryPackageTabView = ({
 
         <TabsContent value="inspector">
           <div className="prose prose-stone dark:prose-invert max-w-none">
-            {inspectorScript ? (
-              <ReactMarkdown>{inspectorScript}</ReactMarkdown>
+            {detectiveScript ? (
+              <ReactMarkdown>{detectiveScript}</ReactMarkdown>
             ) : isGenerating ? (
               <LoadingTabContent message="Generating detective guide..." />
             ) : (
