@@ -1,11 +1,11 @@
-
 import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import { Progress } from "@/components/ui/progress";
-import { Loader2, Wand2, CheckCircle2 } from "lucide-react";
+import { Loader2, Wand2, CheckCircle2, RefreshCw } from "lucide-react";
 import { MysteryCharacter } from "@/interfaces/mystery";
 
 interface MysteryPackageData {
@@ -172,13 +172,45 @@ const MysteryPackageTabView = ({
       <Loader2 className="h-8 w-8 animate-spin text-primary" />
       <h3 className="text-lg font-semibold">{message}</h3>
       <p className="text-muted-foreground text-center">
-        This section is being generated. You can switch between tabs to check the progress of other sections.
+        This section is being generated. The page automatically refreshes every 30 seconds to check progress.
       </p>
+      {generationStatus && (
+        <div className="w-full max-w-md space-y-2">
+          <Progress value={progress} className="h-2" />
+          <p className="text-sm text-center text-muted-foreground">
+            {progress}% complete - {statusMessage}
+          </p>
+        </div>
+      )}
+    </div>
+  );
+
+  // Generation overlay for the entire tab view
+  const GenerationOverlay = () => (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+      <Card className="max-w-md mx-4">
+        <CardContent className="p-6 text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
+          <h3 className="text-lg font-semibold mb-2">Generating Your Package</h3>
+          <p className="text-muted-foreground mb-4">{statusMessage}</p>
+          <Progress value={progress} className="mb-2" />
+          <p className="text-sm text-muted-foreground mb-4">
+            {progress}% complete
+          </p>
+          <div className="text-xs text-muted-foreground space-y-1">
+            <p>This page automatically refreshes every 30 seconds</p>
+            <p>Generation typically takes 3-5 minutes</p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 
   return (
-    <div className="w-full">
+    <div className="w-full relative">
+      {/* Show generation overlay if actively generating */}
+      {isGenerating && generationStatus?.status === 'in_progress' && <GenerationOverlay />}
+      
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-center">{mysteryTitle}</h1>
       </div>
@@ -188,19 +220,19 @@ const MysteryPackageTabView = ({
           <TabsTrigger value="host-guide" className="whitespace-nowrap">
             <div className="flex items-center space-x-1">
               <span>Host Guide</span>
-              {isSectionComplete('hostGuide') && <CheckCircle2 className="h-3 w-3 text-green-500" />}
+              {(hostGuide || isSectionComplete('hostGuide')) && <CheckCircle2 className="h-3 w-3 text-green-500" />}
             </div>
           </TabsTrigger>
           <TabsTrigger value="characters" className="whitespace-nowrap">
             <div className="flex items-center space-x-1">
               <span>Characters ({charactersList && Array.isArray(charactersList) ? charactersList.length : 0})</span>
-              {isSectionComplete('characters') && <CheckCircle2 className="h-3 w-3 text-green-500" />}
+              {(charactersList.length > 0 || isSectionComplete('characters')) && <CheckCircle2 className="h-3 w-3 text-green-500" />}
             </div>
           </TabsTrigger>
           <TabsTrigger value="clues" className="whitespace-nowrap">
             <div className="flex items-center space-x-1">
               <span>Evidence</span>
-              {isSectionComplete('clues') && <CheckCircle2 className="h-3 w-3 text-green-500" />}
+              {(evidenceCards || isSectionComplete('clues')) && <CheckCircle2 className="h-3 w-3 text-green-500" />}
             </div>
           </TabsTrigger>
           <TabsTrigger value="inspector" className="whitespace-nowrap">
