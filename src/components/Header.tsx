@@ -1,16 +1,63 @@
 
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Loader2 } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 const Header = () => {
   const { isAuthenticated, user, signOut } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [generatingMystery, setGeneratingMystery] = useState<{id: string, title: string} | null>(null);
+  const navigate = useNavigate();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  // Check for active generation
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const checkForGeneratingMystery = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("conversations")
+          .select("id, title, needs_package_generation, is_paid")
+          .eq("user_id", user?.id)
+          .eq("needs_package_generation", true)
+          .eq("is_paid", true)
+          .limit(1)
+          .single();
+
+        if (!error && data) {
+          setGeneratingMystery({
+            id: data.id,
+            title: data.title || "Mystery Package"
+          });
+        } else {
+          setGeneratingMystery(null);
+        }
+      } catch (error) {
+        console.error("Error checking for generating mystery:", error);
+      }
+    };
+
+    // Initial check
+    checkForGeneratingMystery();
+
+    // Check every 30 seconds
+    const interval = setInterval(checkForGeneratingMystery, 30000);
+
+    return () => clearInterval(interval);
+  }, [isAuthenticated, user?.id]);
+
+  const handleGenerationClick = () => {
+    if (generatingMystery) {
+      navigate(`/mystery/${generatingMystery.id}`);
+      setIsMenuOpen(false);
+    }
   };
 
   return (
@@ -27,8 +74,21 @@ const Header = () => {
           </nav>
         </div>
 
-        {/* Auth Buttons - Desktop */}
+        {/* Generation Indicator and Auth Buttons - Desktop */}
         <div className="hidden md:flex items-center space-x-4">
+          {/* Generation Indicator */}
+          {generatingMystery && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleGenerationClick}
+              className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 transition-colors"
+            >
+              <Loader2 className="h-3 w-3 mr-2 animate-spin" />
+              <span className="text-xs">Mystery Generating</span>
+            </Button>
+          )}
+
           {isAuthenticated ? (
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
@@ -73,8 +133,19 @@ const Header = () => {
       {/* Mobile Menu - Now with Showcase hidden */}
       {isMenuOpen && (
         <div className="md:hidden absolute top-16 left-0 right-0 bg-background border-b p-4 flex flex-col space-y-4 z-50">
-          {/* Showcase link removed */}
-          
+          {/* Generation Indicator - Mobile */}
+          {generatingMystery && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleGenerationClick}
+              className="w-full bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 transition-colors"
+            >
+              <Loader2 className="h-3 w-3 mr-2 animate-spin" />
+              <span className="text-xs">Mystery Generating - Tap to View</span>
+            </Button>
+          )}
+
           {isAuthenticated ? (
             <>
               <div className="flex items-center space-x-2 py-2">
