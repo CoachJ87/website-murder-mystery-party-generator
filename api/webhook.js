@@ -94,6 +94,10 @@ export default async function handler(req) {
               // Basic parsing of the AI response
               const content = latestAiMessage.content || '';
               
+              // Extract title
+              const titleMatch = content.match(/#\s*["']?([^"'\n#]+)["']?(?:\s*-\s*A\s+MURDER\s+MYSTERY)?/i);
+              const extractedTitle = titleMatch ? titleMatch[1].trim() : null;
+              
               // Extract premise
               const premiseMatch = content.match(/##?\s*PREMISE\s*\n([\s\S]*?)(?=##|$)/i);
               const premise = premiseMatch ? premiseMatch[1].trim() : null;
@@ -122,6 +126,7 @@ export default async function handler(req) {
               const murderMethod = murderMethodMatch ? murderMethodMatch[1].trim() : null;
               
               extractedMysteryElements = {
+                title: extractedTitle,
                 premise,
                 victim,
                 characters,
@@ -198,7 +203,8 @@ export default async function handler(req) {
               conversation_id: comprehensivePayload.mystery_metadata.conversation_id,
               theme: comprehensivePayload.form_data?.theme,
               player_count: comprehensivePayload.form_data?.player_count,
-              messages_count: comprehensivePayload.conversation_content?.messages?.length || 0
+              messages_count: comprehensivePayload.conversation_content?.messages?.length || 0,
+              extracted_title: comprehensivePayload.extracted_mystery_elements?.title
             });
             
             const webhookResponse = await fetch(makeWebhookUrl, {
@@ -234,16 +240,13 @@ export default async function handler(req) {
             console.log('User profile updated successfully for user ID:', userId);
           }
 
-          // UPDATE CONVERSATION
+          // UPDATE CONVERSATION (using only fields that exist in your schema)
           const { error: conversationUpdateError } = await supabaseAdmin
             .from('conversations')
             .update({ 
               is_paid: true,
               display_status: "purchased",
               purchase_date: new Date().toISOString(),
-              payment_intent_id: session.payment_intent || null,
-              payment_amount: session.amount_total || null,
-              payment_currency: session.currency || null,
               needs_package_generation: true,
               updated_at: new Date().toISOString()
             })
@@ -255,13 +258,12 @@ export default async function handler(req) {
             console.log('Conversation updated successfully for mystery ID:', mysteryId);
           }
 
-          // ADD EVENT TO WEBHOOK_EVENTS TABLE (if it exists)
+          // TRY TO LOG WEBHOOK EVENT (optional - won't fail if table doesn't exist)
           try {
             const { error: eventLogError } = await supabaseAdmin
               .from('webhook_events')
               .insert({
                 event_type: event.type,
-                payment_intent_id: session.payment_intent || null,
                 mystery_id: mysteryId,
                 user_id: userId,
                 amount: session.amount_total || null,
@@ -289,7 +291,8 @@ export default async function handler(req) {
             success: true,
             mysteryId,
             userId,
-            comprehensive_data_sent: true
+            comprehensive_data_sent: true,
+            extracted_title: extractedMysteryElements?.title || null
           }), { 
             status: 200,
             headers: { 'Content-Type': 'application/json' }
