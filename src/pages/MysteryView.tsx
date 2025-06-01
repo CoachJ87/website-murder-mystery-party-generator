@@ -13,7 +13,7 @@ import {
   GenerationStatus 
 } from "@/services/mysteryPackageService";
 import { useAuth } from "@/context/AuthContext";
-import { RefreshCw, AlertTriangle, Clock, CheckCircle2 } from "lucide-react";
+import { RefreshCw, AlertTriangle, Clock, CheckCircle2, Eye } from "lucide-react";
 import MysteryPackageTabView from "@/components/MysteryPackageTabView";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -66,9 +66,32 @@ const MysteryView = () => {
         // Fetch the completed package data
         await fetchStructuredPackageData();
         
-        // Only show notification once
+        // Only show notification once with action buttons
         if (!packageReadyNotified.current) {
-          toast.success("Your mystery package is ready!");
+          toast.success(
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2">
+                <CheckCircle2 className="h-4 w-4 text-green-500" />
+                <span className="font-semibold">Your Mystery Package is Ready!</span>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Your complete mystery package has been generated and is ready to use.
+              </p>
+              <div className="flex space-x-2">
+                <Button size="sm" onClick={() => window.location.reload()}>
+                  <Eye className="h-3 w-3 mr-1" />
+                  View Mystery
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => navigate("/dashboard")}>
+                  Go to Dashboard
+                </Button>
+              </div>
+            </div>,
+            { 
+              duration: 10000,
+              id: 'mystery-completed'
+            }
+          );
           packageReadyNotified.current = true;
         }
         
@@ -103,7 +126,7 @@ const MysteryView = () => {
     } catch (error) {
       console.error("Error checking generation status:", error);
     }
-  }, [id]);
+  }, [id, navigate]);
 
   // Auto-refresh effect - simple 30-second interval
   useEffect(() => {

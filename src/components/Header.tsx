@@ -3,26 +3,28 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Loader2 } from "lucide-react";
+import { Menu, X, Loader2, CheckCircle2, Eye } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 const Header = () => {
   const { isAuthenticated, user, signOut } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [generatingMystery, setGeneratingMystery] = useState<{id: string, title: string} | null>(null);
+  const [completedMystery, setCompletedMystery] = useState<{id: string, title: string} | null>(null);
   const navigate = useNavigate();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  // Check for active generation
+  // Check for active generation and completed mysteries
   useEffect(() => {
     if (!isAuthenticated) return;
 
-    const checkForGeneratingMystery = async () => {
+    const checkForMysteryStatus = async () => {
       try {
-        const { data, error } = await supabase
+        // Check for generating mysteries
+        const { data: generatingData, error: generatingError } = await supabase
           .from("conversations")
           .select("id, title, needs_package_generation, is_paid")
           .eq("user_id", user?.id)
@@ -31,24 +33,47 @@ const Header = () => {
           .limit(1)
           .single();
 
-        if (!error && data) {
+        if (!generatingError && generatingData) {
           setGeneratingMystery({
-            id: data.id,
-            title: data.title || "Mystery Package"
+            id: generatingData.id,
+            title: generatingData.title || "Mystery Package"
           });
+          setCompletedMystery(null);
         } else {
           setGeneratingMystery(null);
+          
+          // Check for recently completed mysteries (within last hour)
+          const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+          const { data: completedData, error: completedError } = await supabase
+            .from("conversations")
+            .select("id, title, updated_at")
+            .eq("user_id", user?.id)
+            .eq("is_paid", true)
+            .eq("needs_package_generation", false)
+            .gte("updated_at", oneHourAgo)
+            .order("updated_at", { ascending: false })
+            .limit(1)
+            .single();
+
+          if (!completedError && completedData) {
+            setCompletedMystery({
+              id: completedData.id,
+              title: completedData.title || "Mystery Package"
+            });
+          } else {
+            setCompletedMystery(null);
+          }
         }
       } catch (error) {
-        console.error("Error checking for generating mystery:", error);
+        console.error("Error checking for mystery status:", error);
       }
     };
 
     // Initial check
-    checkForGeneratingMystery();
+    checkForMysteryStatus();
 
     // Check every 30 seconds
-    const interval = setInterval(checkForGeneratingMystery, 30000);
+    const interval = setInterval(checkForMysteryStatus, 30000);
 
     return () => clearInterval(interval);
   }, [isAuthenticated, user?.id]);
@@ -60,6 +85,15 @@ const Header = () => {
     }
   };
 
+  const handleCompletedClick = () => {
+    if (completedMystery) {
+      navigate(`/mystery/${completedMystery.id}`);
+      setIsMenuOpen(false);
+      // Clear the completed indicator after user views it
+      setCompletedMystery(null);
+    }
+  };
+
   return (
     <header className="py-4 px-4 md:px-8 border-b sticky top-0 bg-background/95 backdrop-blur-sm z-50">
       <div className="container mx-auto flex justify-between items-center">
@@ -68,13 +102,13 @@ const Header = () => {
             <span className="text-2xl font-bold gradient-text">Murder Mystery Generator</span>
           </Link>
 
-          {/* Desktop Navigation - Now with Showcase hidden */}
+          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
-            {/* Showcase link removed */}
+            {/* Navigation items can be added here if needed */}
           </nav>
         </div>
 
-        {/* Generation Indicator and Auth Buttons - Desktop */}
+        {/* Status Indicators and Auth Buttons - Desktop */}
         <div className="hidden md:flex items-center space-x-4">
           {/* Generation Indicator */}
           {generatingMystery && (
@@ -86,6 +120,19 @@ const Header = () => {
             >
               <Loader2 className="h-3 w-3 mr-2 animate-spin" />
               <span className="text-xs">Mystery Generating</span>
+            </Button>
+          )}
+
+          {/* Completion Indicator */}
+          {completedMystery && !generatingMystery && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleCompletedClick}
+              className="bg-green-50 border-green-200 text-green-700 hover:bg-green-100 transition-colors"
+            >
+              <CheckCircle2 className="h-3 w-3 mr-2" />
+              <span className="text-xs">Mystery Complete</span>
             </Button>
           )}
 
@@ -130,7 +177,7 @@ const Header = () => {
         </button>
       </div>
 
-      {/* Mobile Menu - Now with Showcase hidden */}
+      {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="md:hidden absolute top-16 left-0 right-0 bg-background border-b p-4 flex flex-col space-y-4 z-50">
           {/* Generation Indicator - Mobile */}
@@ -143,6 +190,19 @@ const Header = () => {
             >
               <Loader2 className="h-3 w-3 mr-2 animate-spin" />
               <span className="text-xs">Mystery Generating - Tap to View</span>
+            </Button>
+          )}
+
+          {/* Completion Indicator - Mobile */}
+          {completedMystery && !generatingMystery && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleCompletedClick}
+              className="w-full bg-green-50 border-green-200 text-green-700 hover:bg-green-100 transition-colors"
+            >
+              <CheckCircle2 className="h-3 w-3 mr-2" />
+              <span className="text-xs">Mystery Complete - Tap to View</span>
             </Button>
           )}
 
