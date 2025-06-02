@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -215,7 +214,7 @@ const MysteryView = () => {
         setPackageData(structuredPackageData);
         console.log("Structured package data loaded:", structuredPackageData);
 
-        // Fetch characters using the package ID
+        // PRIMARY: Fetch characters from database using the package ID
         const { data: charactersData, error: charactersError } = await supabase
           .from("mystery_characters")
           .select("*")
@@ -223,15 +222,53 @@ const MysteryView = () => {
           .order("character_name");
 
         if (charactersError) {
-          console.error("Error fetching characters:", charactersError);
-        } else if (charactersData) {
+          console.error("Error fetching characters from database:", charactersError);
+          
+          // FALLBACK: If database query fails, try text parsing
+          console.log("Falling back to text parsing for characters");
+          const parsedCharacters = extractCharactersFromText();
+          setCharacters(parsedCharacters);
+        } else if (charactersData && charactersData.length > 0) {
+          // SUCCESS: Use database characters as primary source
+          console.log("Characters loaded from database:", charactersData);
           setCharacters(charactersData);
-          console.log("Characters loaded:", charactersData);
+        } else {
+          // FALLBACK: If database is empty, try text parsing
+          console.log("No characters in database, falling back to text parsing");
+          const parsedCharacters = extractCharactersFromText();
+          setCharacters(parsedCharacters);
         }
       }
     } catch (error) {
       console.error("Error fetching structured package data:", error);
     }
+  };
+
+  // Helper function to extract characters from text (fallback only)
+  const extractCharactersFromText = (): MysteryCharacter[] => {
+    if (!packageContent) return [];
+    
+    const charactersList: MysteryCharacter[] = [];
+    const characterPattern = /# ([^-\n]+) - CHARACTER GUIDE\n([\s\S]*?)(?=# \w+ - CHARACTER GUIDE|# |$)/g;
+    
+    let match;
+    while ((match = characterPattern.exec(packageContent)) !== null) {
+      const characterName = match[1].trim();
+      const characterContent = match[2].trim();
+      
+      charactersList.push({
+        id: crypto.randomUUID(),
+        package_id: id || "",
+        character_name: characterName,
+        description: characterContent.substring(0, characterContent.indexOf('\n\n')) || '',
+        background: '',
+        relationships: [],
+        secrets: []
+      });
+    }
+    
+    console.log("Characters extracted from text parsing:", charactersList);
+    return charactersList;
   };
 
   // Initial data loading
