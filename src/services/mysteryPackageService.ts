@@ -1,5 +1,3 @@
-
-
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 
@@ -35,6 +33,7 @@ export interface GenerationStatus {
     clues?: boolean;
     inspectorScript?: boolean;
     characterMatrix?: boolean;
+    solution?: boolean;
     [key: string]: boolean | undefined;
   };
 }
@@ -269,15 +268,6 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
       updatedAt: conversation.updated_at,
       testMode: testMode || false
     };
-
-    console.log("=== WEBHOOK PAYLOAD DEBUG ===");
-    console.log("Conversation ID:", webhookPayload.conversationId);
-    console.log("User ID:", webhookPayload.userId);
-    console.log("Messages count:", webhookPayload.messages?.length || 0);
-    console.log("Theme:", webhookPayload.theme);
-    console.log("Player count:", webhookPayload.playerCount);
-    console.log("Payload size (chars):", JSON.stringify(webhookPayload).length);
-    console.log("=== END WEBHOOK PAYLOAD DEBUG ===");
 
     console.log("Sending payload to Make.com webhook");
 
