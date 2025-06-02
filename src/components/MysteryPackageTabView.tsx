@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -136,7 +135,13 @@ const MysteryPackageTabView = ({
   };
 
   const getCharacters = () => {
-    return characters.length > 0 ? characters : extractCharacters();
+    // Priority 1: Use characters prop from database
+    if (characters && characters.length > 0) {
+      return characters;
+    }
+    
+    // Priority 2: Fallback to text parsing only if no database characters
+    return extractCharacters();
   };
 
   const getEvidenceCards = () => {
