@@ -13,7 +13,7 @@ import {
   GenerationStatus 
 } from "@/services/mysteryPackageService";
 import { useAuth } from "@/context/AuthContext";
-import { RefreshCw, AlertTriangle, Clock, CheckCircle2, Eye } from "lucide-react";
+import { RefreshCw, AlertTriangle, Clock, CheckCircle2, Eye, XCircle } from "lucide-react";
 import MysteryPackageTabView from "@/components/MysteryPackageTabView";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { MysteryCharacter } from "@/interfaces/mystery";
@@ -112,18 +112,55 @@ const MysteryView = () => {
       } else if (status.status === 'failed' && previousStatus !== 'failed') {
         setGenerating(false);
         
+        // Show detailed error message with current step
+        const errorMessage = status.currentStep || "Generation failed at an unknown step";
+        
         if (status.resumable) {
           toast.error(
-            <div className="space-y-2">
-              <p>Generation encountered an error but can be resumed.</p>
-              <Button size="sm" variant="outline" onClick={handleResumeGeneration}>
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2">
+                <AlertTriangle className="h-4 w-4 text-orange-500" />
+                <span className="font-semibold">Generation Paused</span>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {errorMessage}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Don't worry - your progress has been saved and you can resume where you left off.
+              </p>
+              <Button size="sm" onClick={handleResumeGeneration} className="w-full">
+                <RefreshCw className="h-3 w-3 mr-1" />
                 Resume Generation
               </Button>
             </div>,
-            { duration: 10000 }
+            { 
+              duration: 15000,
+              id: 'mystery-failed-resumable'
+            }
           );
         } else {
-          toast.error("Generation failed. You can try again.");
+          toast.error(
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2">
+                <XCircle className="h-4 w-4 text-red-500" />
+                <span className="font-semibold">Generation Failed</span>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {errorMessage}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                You can try generating your mystery package again.
+              </p>
+              <Button size="sm" onClick={handleGeneratePackage} className="w-full">
+                <RefreshCw className="h-3 w-3 mr-1" />
+                Try Again
+              </Button>
+            </div>,
+            { 
+              duration: 15000,
+              id: 'mystery-failed-retry'
+            }
+          );
         }
       }
       
@@ -133,7 +170,7 @@ const MysteryView = () => {
       console.error("Error checking generation status:", error);
       return null;
     }
-  }, [id, navigate, generationStatus?.status]);
+  }, [id, navigate, generationStatus?.status, handleResumeGeneration, handleGeneratePackage]);
 
   // Auto-refresh effect - simple 30-second interval with proper cleanup
   useEffect(() => {
@@ -443,6 +480,63 @@ const MysteryView = () => {
   const renderGenerationProgress = () => {
     if (!generationStatus) return null;
     
+    // Show error state for failed generation
+    if (generationStatus.status === 'failed') {
+      return (
+        <Card className="mb-6 border-red-200 bg-red-50">
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between text-red-700">
+              <div className="flex items-center space-x-2">
+                <XCircle className="h-5 w-5" />
+                <span>Generation Failed</span>
+              </div>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={handleManualRefresh} 
+                className="h-8 w-8 p-0"
+                title="Refresh status"
+              >
+                <RefreshCw className="h-4 w-4" />
+              </Button>
+            </CardTitle>
+            <CardDescription className="text-red-600">
+              {generationStatus.currentStep || "An error occurred during generation"}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Alert className="border-red-200">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>What happened?</AlertTitle>
+              <AlertDescription>
+                {generationStatus.resumable 
+                  ? "Your generation encountered an issue but can be resumed from where it left off. Your progress has been saved."
+                  : "The generation process failed and needs to be restarted. Don't worry - this happens sometimes and trying again usually works."
+                }
+              </AlertDescription>
+            </Alert>
+            
+            <div className="flex space-x-2">
+              {generationStatus.resumable ? (
+                <Button onClick={handleResumeGeneration} disabled={generating} className="flex-1">
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Resume Generation
+                </Button>
+              ) : (
+                <Button onClick={handleGeneratePackage} disabled={generating} className="flex-1">
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Try Again
+                </Button>
+              )}
+              <Button variant="outline" onClick={() => navigate("/dashboard")}>
+                Back to Dashboard
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      );
+    }
+    
     return (
       <Card className="mb-6">
         <CardHeader>
@@ -497,12 +591,6 @@ const MysteryView = () => {
             <strong>Auto-refresh:</strong> This page automatically checks for updates every 30 seconds.
             {lastUpdate && ` Last update: ${lastUpdate.toLocaleTimeString()}`}
           </p>
-          
-          {generationStatus.status === 'failed' && generationStatus.resumable && (
-            <Button onClick={handleResumeGeneration} disabled={generating} className="mt-2">
-              Resume Generation
-            </Button>
-          )}
         </CardContent>
       </Card>
     );
