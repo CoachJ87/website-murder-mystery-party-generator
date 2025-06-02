@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -172,17 +173,19 @@ const MysteryPackageTabView = ({
 
   // Simplified loading component for individual tabs
   const LoadingTabContent = ({ message }: { message: string }) => (
-    <div className="flex flex-col items-center justify-center py-12 space-y-4">
-      <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      <h3 className="text-lg font-semibold">Generating...</h3>
-      <p className="text-muted-foreground text-center max-w-md">
-        {message}
-      </p>
-      {statusMessage && (
-        <p className="text-sm text-center text-muted-foreground">
-          Status: {statusMessage}
+    <div className="loading-section">
+      <div className="flex flex-col items-center justify-center space-y-4">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <h3 className="text-lg font-semibold">Generating...</h3>
+        <p className="text-muted-foreground text-center max-w-md">
+          {message}
         </p>
-      )}
+        {statusMessage && (
+          <p className="text-sm text-center text-muted-foreground">
+            Status: {statusMessage}
+          </p>
+        )}
+      </div>
     </div>
   );
 
@@ -227,9 +230,19 @@ const MysteryPackageTabView = ({
         </TabsList>
 
         <TabsContent value="host-guide">
-          <div className="prose prose-stone dark:prose-invert max-w-none">
+          <div className="mystery-content">
             {hostGuide ? (
-              <ReactMarkdown>{hostGuide}</ReactMarkdown>
+              <ReactMarkdown 
+                components={{
+                  table: ({ children }) => (
+                    <div className="overflow-x-auto">
+                      <table>{children}</table>
+                    </div>
+                  ),
+                }}
+              >
+                {hostGuide}
+              </ReactMarkdown>
             ) : isGenerating ? (
               <LoadingTabContent message="Creating your complete host guide with all the instructions and materials needed to run your mystery game." />
             ) : (
@@ -250,12 +263,12 @@ const MysteryPackageTabView = ({
         </TabsContent>
 
         <TabsContent value="characters">
-          <div className="prose prose-stone dark:prose-invert max-w-none">
+          <div className="mystery-content">
             {Array.isArray(charactersList) && charactersList.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {charactersList.map((character, index) => (
-                  <div key={character.id || index} className="border rounded-lg p-4 bg-card">
-                    <h3 className="text-lg font-bold mb-2">{character.character_name}</h3>
+                  <div key={character.id || index} className="character-card">
+                    <h3>{character.character_name}</h3>
                     <p>{character.description}</p>
                     {character.background && (
                       <div className="mt-2">
@@ -277,9 +290,19 @@ const MysteryPackageTabView = ({
         </TabsContent>
 
         <TabsContent value="clues">
-          <div className="prose prose-stone dark:prose-invert max-w-none">
+          <div className="mystery-content">
             {evidenceCards ? (
-              <ReactMarkdown>{evidenceCards}</ReactMarkdown>
+              <ReactMarkdown 
+                components={{
+                  table: ({ children }) => (
+                    <div className="overflow-x-auto">
+                      <table>{children}</table>
+                    </div>
+                  ),
+                }}
+              >
+                {evidenceCards}
+              </ReactMarkdown>
             ) : isGenerating ? (
               <LoadingTabContent message="Crafting evidence cards, clues, and investigative materials that will help solve your mystery." />
             ) : (
@@ -291,9 +314,19 @@ const MysteryPackageTabView = ({
         </TabsContent>
 
         <TabsContent value="inspector">
-          <div className="prose prose-stone dark:prose-invert max-w-none">
+          <div className="mystery-content">
             {detectiveScript ? (
-              <ReactMarkdown>{detectiveScript}</ReactMarkdown>
+              <ReactMarkdown 
+                components={{
+                  table: ({ children }) => (
+                    <div className="overflow-x-auto">
+                      <table>{children}</table>
+                    </div>
+                  ),
+                }}
+              >
+                {detectiveScript}
+              </ReactMarkdown>
             ) : isGenerating ? (
               <LoadingTabContent message="Writing the detective's script and investigation timeline to guide the mystery solving process." />
             ) : (
@@ -305,9 +338,19 @@ const MysteryPackageTabView = ({
         </TabsContent>
 
         <TabsContent value="matrix">
-          <div className="prose prose-stone dark:prose-invert max-w-none">
+          <div className="mystery-content">
             {relationshipMatrix ? (
-              <ReactMarkdown>{relationshipMatrix}</ReactMarkdown>
+              <ReactMarkdown 
+                components={{
+                  table: ({ children }) => (
+                    <div className="overflow-x-auto">
+                      <table>{children}</table>
+                    </div>
+                  ),
+                }}
+              >
+                {relationshipMatrix}
+              </ReactMarkdown>
             ) : isGenerating ? (
               <LoadingTabContent message="Building the character relationship matrix showing connections, conflicts, and hidden relationships." />
             ) : (
