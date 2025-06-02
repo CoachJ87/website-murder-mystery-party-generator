@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // Define the schema validation with updated scriptType enum:
 const formSchema = z.object({
@@ -25,12 +26,15 @@ const formSchema = z.object({
   }),
   additionalDetails: z.string().optional()
 });
+
 type FormData = z.infer<typeof formSchema>;
+
 interface MysteryFormProps {
   onSave: (data: FormData) => void;
   isSaving?: boolean;
   initialData?: Partial<FormData>;
 }
+
 const MysteryForm = ({
   onSave,
   isSaving = false,
@@ -39,6 +43,7 @@ const MysteryForm = ({
   // Add debugging
   console.log("=== MysteryForm Debug ===");
   console.log("initialData received:", initialData);
+  
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -69,16 +74,22 @@ const MysteryForm = ({
       });
     }
   }, [initialData, form]);
+
   const onSubmit = (data: FormData) => {
     console.log("Form submitted with data:", data);
     onSave(data);
   };
-  return <Form {...form}>
+
+  return (
+    <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         {/* NEW: User's original request field - ONLY show if we have a userRequest */}
-        {initialData?.userRequest && <FormField control={form.control} name="userRequest" render={({
-        field
-      }) => <FormItem>
+        {initialData?.userRequest && (
+          <FormField
+            control={form.control}
+            name="userRequest"
+            render={({ field }) => (
+              <FormItem>
                 <FormLabel>What you want to create</FormLabel>
                 <FormControl>
                   <Input {...field} disabled className="bg-muted" />
@@ -86,39 +97,69 @@ const MysteryForm = ({
                 <FormDescription>
                   Your original request from the homepage
                 </FormDescription>
-              </FormItem>} />}
+              </FormItem>
+            )}
+          />
+        )}
 
-        <FormField control={form.control} name="theme" render={({
-        field
-      }) => <FormItem>
+        <FormField
+          control={form.control}
+          name="theme"
+          render={({ field }) => (
+            <FormItem>
               <FormLabel>Theme/Setting Details (Optional)</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., time period, setting specifics, must-have's, etc." {...field} />
+                <Input 
+                  placeholder="e.g., time period, setting specifics, must-have's, etc." 
+                  {...field} 
+                />
               </FormControl>
               <FormDescription>
                 Choose a specific theme or setting for your murder mystery
               </FormDescription>
               <FormMessage />
-            </FormItem>} />
+            </FormItem>
+          )}
+        />
 
-        <FormField control={form.control} name="playerCount" render={({
-        field
-      }) => <FormItem>
+        <FormField
+          control={form.control}
+          name="playerCount"
+          render={({ field }) => (
+            <FormItem>
               <FormLabel>
-                How many players will participate? (4-32)
+                How many players will participate?
               </FormLabel>
               <FormControl>
-                <Input type="number" min={4} max={32} {...field} />
+                <Select 
+                  onValueChange={(value) => field.onChange(parseInt(value))} 
+                  value={field.value?.toString()}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select number of players" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Array.from({ length: 29 }, (_, i) => i + 4).map((num) => (
+                      <SelectItem key={num} value={num.toString()}>
+                        {num} players
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </FormControl>
               <FormDescription>
-                Enter a specific, whole number between 4 and 32 players.
+                Choose between 4 and 32 players for your murder mystery.
               </FormDescription>
               <FormMessage />
-            </FormItem>} />
+            </FormItem>
+          )}
+        />
 
-        <FormField control={form.control} name="hasAccomplice" render={({
-        field
-      }) => <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+        <FormField
+          control={form.control}
+          name="hasAccomplice"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
               <div className="space-y-0.5">
                 <FormLabel className="text-base">
                   Include Accomplice Mechanism
@@ -126,16 +167,27 @@ const MysteryForm = ({
                 <FormDescription>Best for games with 10 or more players</FormDescription>
               </div>
               <FormControl>
-                <Switch checked={field.value} onCheckedChange={field.onChange} />
+                <Switch 
+                  checked={field.value} 
+                  onCheckedChange={field.onChange} 
+                />
               </FormControl>
-            </FormItem>} />
+            </FormItem>
+          )}
+        />
 
-        <FormField control={form.control} name="scriptType" render={({
-        field
-      }) => <FormItem className="space-y-3">
+        <FormField
+          control={form.control}
+          name="scriptType"
+          render={({ field }) => (
+            <FormItem className="space-y-3">
               <FormLabel>Script Detail Level</FormLabel>
               <FormControl>
-                <RadioGroup onValueChange={field.onChange} value={field.value} className="flex flex-col space-y-2">
+                <RadioGroup 
+                  onValueChange={field.onChange} 
+                  value={field.value} 
+                  className="flex flex-col space-y-2"
+                >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="full" id="full" />
                     <Label htmlFor="full">Full Scripts - Complete dialogue and detailed instructions</Label>
@@ -151,25 +203,37 @@ const MysteryForm = ({
                 </RadioGroup>
               </FormControl>
               <FormMessage />
-            </FormItem>} />
+            </FormItem>
+          )}
+        />
 
-        <FormField control={form.control} name="additionalDetails" render={({
-        field
-      }) => <FormItem>
+        <FormField
+          control={form.control}
+          name="additionalDetails"
+          render={({ field }) => (
+            <FormItem>
               <FormLabel>Additional Details (Optional)</FormLabel>
               <FormControl>
-                <Textarea placeholder="Any specific requirements, special rules, or additional context for your mystery..." className="resize-none" {...field} />
+                <Textarea 
+                  placeholder="Any specific requirements, special rules, or additional context for your mystery..." 
+                  className="resize-none" 
+                  {...field} 
+                />
               </FormControl>
               <FormDescription>
                 Provide any extra details or special requests for your mystery
               </FormDescription>
               <FormMessage />
-            </FormItem>} />
+            </FormItem>
+          )}
+        />
 
         <Button type="submit" disabled={isSaving} className="w-full">
           {isSaving ? "Starting Chat..." : "Start AI Chat"}
         </Button>
       </form>
-    </Form>;
+    </Form>
+  );
 };
+
 export default MysteryForm;
