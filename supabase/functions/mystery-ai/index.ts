@@ -56,30 +56,12 @@ serve(async (req) => {
       throw new Error('ANTHROPIC_API_KEY not configured');
     }
 
-    // Initialize Supabase client to fetch prompt from database
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-    let supabase = null;
-    let databasePrompt = null;
-
-    if (supabaseUrl && supabaseServiceKey) {
-      try {
-        supabase = createClient(supabaseUrl, supabaseServiceKey);
-        const { data: promptData, error: promptError } = await supabase
-          .from('prompts')
-          .select('content')
-          .eq('name', 'MYSTERY_FREE_PROMPT')
-          .single();
-
-        if (!promptError && promptData) {
-          databasePrompt = promptData.content;
-          console.log("Retrieved database prompt successfully");
-        } else {
-          console.log("No database prompt found, using fallback logic");
-        }
-      } catch (error) {
-        console.error("Error fetching database prompt:", error);
-      }
+    // Get database prompt from environment secrets instead of database
+    let databasePrompt = Deno.env.get('MYSTERY_FREE_PROMPT');
+    if (databasePrompt) {
+      console.log("Retrieved database prompt from environment secrets");
+    } else {
+      console.log("No database prompt found in secrets, using fallback logic");
     }
     
     // Determine system prompt based on conversation state
@@ -151,7 +133,7 @@ Only ask this question and wait for their response before proceeding.`;
           console.log("Has both player count and script preference - proceeding to mystery creation");
           
           if (databasePrompt) {
-            console.log("Using database prompt for mystery creation");
+            console.log("Using environment prompt for mystery creation");
             systemPrompt = databasePrompt;
           } else {
             // Fallback to inline prompt with proper confirmation message
