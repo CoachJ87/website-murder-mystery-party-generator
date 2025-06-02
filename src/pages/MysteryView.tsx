@@ -278,12 +278,18 @@ const MysteryView = () => {
     };
   }, [id, generationStatus?.status, generating, checkGenerationStatus]);
 
-  // Fetch structured package data
+  // Enhanced Fetch structured package data with extensive debugging
   const fetchStructuredPackageData = async () => {
-    if (!id) return;
+    if (!id) {
+      console.log("❌ [DEBUG] No mystery ID provided to fetchStructuredPackageData");
+      return;
+    }
+
+    console.log(`🔍 [DEBUG] Starting fetchStructuredPackageData for mystery ID: ${id}`);
 
     try {
       // Fetch mystery packages data with structured fields
+      console.log("🔍 [DEBUG] Querying mystery_packages table...");
       const { data: packageData, error: packageError } = await supabase
         .from("mystery_packages")
         .select(`
@@ -303,9 +309,16 @@ const MysteryView = () => {
         .single();
 
       if (packageError) {
-        console.error("Error fetching package data:", packageError);
+        console.error("❌ [DEBUG] Error fetching package data:", packageError);
+        
+        // Check if it's a "no rows" error vs actual error
+        if (packageError.code === 'PGRST116') {
+          console.log("ℹ️ [DEBUG] No mystery package found in database for this conversation");
+        }
         return;
       }
+
+      console.log("✅ [DEBUG] Raw package data from database:", packageData);
 
       if (packageData) {
         // Map database fields to component props
@@ -322,10 +335,20 @@ const MysteryView = () => {
           detectiveScript: packageData.detective_script,
         };
         
+        console.log("🔧 [DEBUG] Mapped structured package data:", structuredPackageData);
+        
+        // Check what content is actually available
+        const availableContent = Object.entries(structuredPackageData)
+          .filter(([key, value]) => value && value.trim && value.trim().length > 0)
+          .map(([key]) => key);
+        
+        console.log("📋 [DEBUG] Available content fields:", availableContent);
+        
         setPackageData(structuredPackageData);
-        console.log("Structured package data loaded:", structuredPackageData);
+        console.log("✅ [DEBUG] Package data state updated");
 
         // PRIMARY: Fetch characters from database using the package ID
+        console.log(`🔍 [DEBUG] Querying mystery_characters for package_id: ${packageData.id}`);
         const { data: charactersData, error: charactersError } = await supabase
           .from("mystery_characters")
           .select("*")
@@ -333,31 +356,48 @@ const MysteryView = () => {
           .order("character_name");
 
         if (charactersError) {
-          console.error("Error fetching characters from database:", charactersError);
+          console.error("❌ [DEBUG] Error fetching characters from database:", charactersError);
           
           // FALLBACK: If database query fails, try text parsing
-          console.log("Falling back to text parsing for characters");
+          console.log("🔄 [DEBUG] Falling back to text parsing for characters");
           const parsedCharacters = extractCharactersFromText();
           setCharacters(parsedCharacters);
         } else if (charactersData && charactersData.length > 0) {
           // SUCCESS: Use database characters as primary source
-          console.log("Characters loaded from database:", charactersData);
+          console.log("✅ [DEBUG] Characters loaded from database:", charactersData.length, "characters found");
+          console.log("📋 [DEBUG] Character names:", charactersData.map(c => c.character_name));
           setCharacters(charactersData);
         } else {
           // FALLBACK: If database is empty, try text parsing
-          console.log("No characters in database, falling back to text parsing");
+          console.log("ℹ️ [DEBUG] No characters in database, falling back to text parsing");
           const parsedCharacters = extractCharactersFromText();
           setCharacters(parsedCharacters);
         }
+        
+        // Update conversation to mark as having complete package
+        console.log("🔧 [DEBUG] Updating conversation to mark as having complete package");
+        await supabase
+          .from("conversations")
+          .update({
+            has_complete_package: true,
+            is_paid: true,
+            display_status: "purchased"
+          })
+          .eq("id", id);
+      } else {
+        console.log("ℹ️ [DEBUG] No package data returned from query");
       }
     } catch (error) {
-      console.error("Error fetching structured package data:", error);
+      console.error("❌ [DEBUG] Error in fetchStructuredPackageData:", error);
     }
   };
 
   // Helper function to extract characters from text (fallback only)
   const extractCharactersFromText = (): MysteryCharacter[] => {
-    if (!packageContent) return [];
+    if (!packageContent) {
+      console.log("ℹ️ [DEBUG] No packageContent available for text parsing");
+      return [];
+    }
     
     const charactersList: MysteryCharacter[] = [];
     const characterPattern = /# ([^-\n]+) - CHARACTER GUIDE\n([\s\S]*?)(?=# \w+ - CHARACTER GUIDE|# |$)/g;
@@ -378,8 +418,29 @@ const MysteryView = () => {
       });
     }
     
-    console.log("Characters extracted from text parsing:", charactersList);
+    console.log("📋 [DEBUG] Characters extracted from text parsing:", charactersList.length, "characters found");
     return charactersList;
+  };
+
+  // Enhanced shouldShowTabs function with debugging
+  const shouldShowTabs = () => {
+    console.log("🤔 [DEBUG] Checking shouldShowTabs conditions:");
+    console.log("  - generationStatus?.status:", generationStatus?.status);
+    console.log("  - packageContent exists:", !!packageContent);
+    console.log("  - packageData exists:", !!packageData);
+    console.log("  - mystery?.is_paid:", mystery?.is_paid);
+    console.log("  - mystery?.has_complete_package:", mystery?.has_complete_package);
+    
+    const shouldShow = (
+      generationStatus?.status === 'completed' || 
+      packageContent || 
+      packageData ||
+      (mystery && mystery.is_paid) ||
+      (mystery && mystery.has_complete_package)
+    );
+    
+    console.log("➡️ [DEBUG] shouldShowTabs result:", shouldShow);
+    return shouldShow;
   };
 
   // Initial data loading
@@ -387,6 +448,7 @@ const MysteryView = () => {
     const fetchMystery = async () => {
       if (!id) return;
 
+      console.log(`🔍 [DEBUG] Starting fetchMystery for ID: ${id}`);
       setLoading(true);
       try {
         // Check if this is a redirect from a purchase
@@ -397,6 +459,7 @@ const MysteryView = () => {
           toast.success("Purchase successful! You now have full access to this mystery package.");
         }
         
+        console.log("🔍 [DEBUG] Querying conversations table...");
         const { data: conversation, error } = await supabase
           .from("conversations")
           .select("*, mystery_data, is_paid, has_complete_package, needs_package_generation")
@@ -404,25 +467,29 @@ const MysteryView = () => {
           .single();
 
         if (error) {
-          console.error("Error fetching mystery:", error);
+          console.error("❌ [DEBUG] Error fetching mystery:", error);
           toast.error("Failed to load mystery");
           return;
         }
 
-        console.log("Mystery data loaded:", {
+        console.log("✅ [DEBUG] Mystery conversation loaded:", {
           id: conversation.id,
           is_paid: conversation.is_paid,
           needs_package_generation: conversation.needs_package_generation,
-          has_complete_package: conversation.has_complete_package
+          has_complete_package: conversation.has_complete_package,
+          title: conversation.title
         });
 
         setMystery(conversation);
 
         // Check generation status if package generation is needed
         if (conversation.needs_package_generation || conversation.is_paid) {
+          console.log("🔍 [DEBUG] Checking package generation status...");
           const status = await getPackageGenerationStatus(id);
           setGenerationStatus(status);
           setLastUpdate(new Date());
+          
+          console.log("📊 [DEBUG] Generation status:", status);
           
           if (status.status === 'in_progress') {
             setGenerating(true);
@@ -435,6 +502,7 @@ const MysteryView = () => {
                 is_paid: true,
                 is_purchased: true,
                 display_status: "purchased",
+                has_complete_package: true,
                 mystery_data: {
                   ...conversation.mystery_data,
                   status: "purchased"
@@ -446,24 +514,32 @@ const MysteryView = () => {
 
         // Fetch package data if it exists
         if (conversation.has_complete_package || conversation.is_paid) {
+          console.log("🔍 [DEBUG] Conversation indicates package exists, fetching structured data...");
           await fetchStructuredPackageData();
 
           // Fallback to legacy content if structured data is not available
-          const { data: packageData, error: packageError } = await supabase
+          console.log("🔍 [DEBUG] Also checking for legacy content...");
+          const { data: legacyPackageData, error: packageError } = await supabase
             .from("mystery_packages")
             .select("legacy_content")
             .eq("conversation_id", id)
             .single();
 
-          if (!packageError && packageData && packageData.legacy_content) {
-            setPackageContent(packageData.legacy_content);
+          if (!packageError && legacyPackageData && legacyPackageData.legacy_content) {
+            console.log("✅ [DEBUG] Legacy content found, setting as fallback");
+            setPackageContent(legacyPackageData.legacy_content);
+          } else {
+            console.log("ℹ️ [DEBUG] No legacy content found");
           }
+        } else {
+          console.log("ℹ️ [DEBUG] No complete package indicated, skipping package data fetch");
         }
       } catch (error) {
-        console.error("Error:", error);
+        console.error("❌ [DEBUG] Error in fetchMystery:", error);
         toast.error("Failed to load mystery");
       } finally {
         setLoading(false);
+        console.log("✅ [DEBUG] fetchMystery completed");
       }
     };
 
@@ -472,7 +548,7 @@ const MysteryView = () => {
 
   // Manual refresh function
   const handleManualRefresh = () => {
-    console.log("Manual refresh triggered");
+    console.log("🔄 [DEBUG] Manual refresh triggered");
     checkGenerationStatus();
   };
 
@@ -617,10 +693,7 @@ const MysteryView = () => {
       <main className="flex-1 py-12 px-4">
         <div className="container mx-auto max-w-4xl">
           {/* Show tabs for completed or purchased mysteries */}
-          {(generationStatus?.status === 'completed' || 
-            packageContent || 
-            packageData ||
-            (mystery && mystery.is_paid)) ? (
+          {shouldShowTabs() ? (
             <MysteryPackageTabView 
               packageContent={packageContent || ""} 
               mysteryTitle={mystery?.title || mystery?.mystery_data?.theme || "Mystery Package"}
