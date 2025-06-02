@@ -1,0 +1,188 @@
+
+/* Mystery Package Custom Styles */
+:root {
+  --mystery-primary: #8b5a3c;
+  --mystery-secondary: #6b4423;
+  --mystery-accent: #d4af37;
+  --mystery-text: #1a1a1a;
+  --mystery-bg-light: #faf5f0;
+  --mystery-bg-card: #f5f0e8;
+  --mystery-border: #e2e8f0;
+  --mystery-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --mystery-shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.mystery-content {
+  font-family: inherit; /* Use system font stack */
+  line-height: 1.7;
+  color: var(--mystery-text);
+  max-width: none;
+}
+
+.mystery-content h1 {
+  color: var(--mystery-primary);
+  border-bottom: 3px solid var(--mystery-accent);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+  font-size: clamp(1.5rem, 4vw, 2.25rem); /* Responsive font size */
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.mystery-content h2 {
+  color: var(--mystery-secondary);
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  font-size: clamp(1.25rem, 3vw, 1.5rem);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.mystery-content h3 {
+  color: var(--mystery-primary);
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.mystery-content blockquote {
+  background: linear-gradient(135deg, #f8f4e6 0%, #f0e68c 100%);
+  border-left: 5px solid var(--mystery-accent);
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 0;
+  border-radius: 0 8px 8px 0;
+  font-style: italic;
+  position: relative;
+}
+
+.mystery-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: var(--mystery-shadow);
+  font-size: 0.9rem; /* Ensure readability */
+}
+
+.mystery-content table th {
+  background: linear-gradient(135deg, var(--mystery-primary) 0%, var(--mystery-secondary) 100%);
+  color: white;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.mystery-content table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--mystery-border);
+  vertical-align: top;
+}
+
+.mystery-content table tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+.mystery-content table tr:hover {
+  background-color: #e3f2fd;
+  transition: background-color 0.2s ease;
+}
+
+.mystery-content table tr:focus-within {
+  outline: 2px solid var(--mystery-accent);
+  outline-offset: -2px;
+}
+
+.mystery-content hr {
+  border: none;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--mystery-accent), transparent);
+  margin: 2rem 0;
+}
+
+.character-card {
+  background: linear-gradient(135deg, var(--mystery-bg-light) 0%, var(--mystery-bg-card) 100%);
+  border: 2px solid var(--mystery-accent);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  box-shadow: var(--mystery-shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.character-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--mystery-shadow-hover);
+}
+
+.character-card:focus-within {
+  outline: 2px solid var(--mystery-accent);
+  outline-offset: 2px;
+}
+
+.character-card h3 {
+  color: var(--mystery-primary);
+  margin-bottom: 1rem;
+  margin-top: 0;
+}
+
+.loading-section {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 2px dashed #dee2e6;
+  padding: 2rem;
+  border-radius: 12px;
+  text-align: center;
+  margin: 1rem 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .mystery-content table {
+    font-size: 0.8rem;
+  }
+  
+  .mystery-content table th,
+  .mystery-content table td {
+    padding: 0.5rem;
+  }
+  
+  .character-card {
+    padding: 1rem;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --mystery-text: #e2e8f0;
+    --mystery-bg-light: #2d3748;
+    --mystery-bg-card: #4a5568;
+  }
+  
+  .mystery-content table {
+    background: #2d3748;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --mystery-primary: #000000;
+    --mystery-secondary: #000000;
+    --mystery-accent: #000000;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .character-card {
+    transition: none;
+  }
+  
+  .mystery-content table tr {
+    transition: none;
+  }
+}

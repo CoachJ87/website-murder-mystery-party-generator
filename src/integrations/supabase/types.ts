@@ -301,42 +301,21 @@ export type Database = {
           has_purchased: boolean | null
           id: string
           updated_at: string | null
+          user_id: string | null
         }
         Insert: {
           created_at?: string | null
           has_purchased?: boolean | null
           id: string
           updated_at?: string | null
+          user_id?: string | null
         }
         Update: {
           created_at?: string | null
           has_purchased?: boolean | null
           id?: string
           updated_at?: string | null
-        }
-        Relationships: []
-      }
-      prompts: {
-        Row: {
-          content: string
-          created_at: string | null
-          id: string
-          name: string
-          updated_at: string | null
-        }
-        Insert: {
-          content: string
-          created_at?: string | null
-          id?: string
-          name: string
-          updated_at?: string | null
-        }
-        Update: {
-          content?: string
-          created_at?: string | null
-          id?: string
-          name?: string
-          updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
