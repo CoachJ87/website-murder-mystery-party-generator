@@ -1,4 +1,5 @@
 
+
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 
@@ -34,7 +35,6 @@ export interface GenerationStatus {
     clues?: boolean;
     inspectorScript?: boolean;
     characterMatrix?: boolean;
-    solution?: boolean;
     [key: string]: boolean | undefined;
   };
 }
