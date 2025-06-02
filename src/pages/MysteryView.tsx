@@ -100,38 +100,6 @@ const MysteryView = () => {
     }
   };
 
-  // Enhanced check for package existence - THIS IS THE KEY FIX
-  const checkForExistingPackage = useCallback(async () => {
-    if (!id) return false;
-    
-    try {
-      // Check if package exists in database
-      const { data: packageData, error } = await supabase
-        .from("mystery_packages")
-        .select("*")
-        .eq("conversation_id", id)
-        .single();
-
-      console.log("🔍 Package existence check:", { 
-        found: !!packageData, 
-        hasHostGuide: !!packageData?.host_guide,
-        hasTitle: !!packageData?.title,
-        packageData: packageData 
-      });
-
-      if (packageData && (packageData.host_guide || packageData.title)) {
-        console.log("✅ Package found with content - loading structured data");
-        await fetchStructuredPackageData();
-        return true;
-      }
-      
-      return false;
-    } catch (error) {
-      console.error("Error checking package existence:", error);
-      return false;
-    }
-  }, [id]);
-
   // Simplified status checking function
   const checkGenerationStatus = useCallback(async () => {
     if (!id) return;
@@ -349,8 +317,8 @@ const MysteryView = () => {
           preparation: packageData.preparation_instructions,
           timeline: packageData.timeline,
           hostingTips: packageData.hosting_tips,
-          evidenceCards: packageData.evidence_cards ? JSON.stringify(packageData.evidence_cards) : null,
-          relationshipMatrix: packageData.relationship_matrix ? JSON.stringify(packageData.relationship_matrix) : null,
+          evidenceCards: packageData.evidence_cards,
+          relationshipMatrix: packageData.relationship_matrix,
           detectiveScript: packageData.detective_script,
         };
         
@@ -366,6 +334,7 @@ const MysteryView = () => {
 
         if (charactersError) {
           console.error("Error fetching characters from database:", charactersError);
+          
           // FALLBACK: If database query fails, try text parsing
           console.log("Falling back to text parsing for characters");
           const parsedCharacters = extractCharactersFromText();
@@ -413,7 +382,7 @@ const MysteryView = () => {
     return charactersList;
   };
 
-  // Initial data loading - UPDATED WITH BETTER PACKAGE DETECTION
+  // Initial data loading
   useEffect(() => {
     const fetchMystery = async () => {
       if (!id) return;
@@ -449,35 +418,35 @@ const MysteryView = () => {
 
         setMystery(conversation);
 
-        // ENHANCED: Always check for existing package first
-        const hasExistingPackage = await checkForExistingPackage();
-        
-        if (!hasExistingPackage) {
-          // Only check generation status if no existing package found
-          if (conversation.needs_package_generation || conversation.is_paid) {
-            const status = await getPackageGenerationStatus(id);
-            setGenerationStatus(status);
-            setLastUpdate(new Date());
-            
-            if (status.status === 'in_progress') {
-              setGenerating(true);
-            } else if (status.status === 'completed') {
-              // Reset notification state on new page load if package is complete
-              packageReadyNotified.current = false;
-              await supabase
-                .from("conversations")
-                .update({
-                  is_paid: true,
-                  is_purchased: true,
-                  display_status: "purchased",
-                  mystery_data: {
-                    ...conversation.mystery_data,
-                    status: "purchased"
-                  }
-                })
-                .eq("id", id);
-            }
+        // Check generation status if package generation is needed
+        if (conversation.needs_package_generation || conversation.is_paid) {
+          const status = await getPackageGenerationStatus(id);
+          setGenerationStatus(status);
+          setLastUpdate(new Date());
+          
+          if (status.status === 'in_progress') {
+            setGenerating(true);
+          } else if (status.status === 'completed') {
+            // Reset notification state on new page load if package is complete
+            packageReadyNotified.current = false;
+            await supabase
+              .from("conversations")
+              .update({
+                is_paid: true,
+                is_purchased: true,
+                display_status: "purchased",
+                mystery_data: {
+                  ...conversation.mystery_data,
+                  status: "purchased"
+                }
+              })
+              .eq("id", id);
           }
+        }
+
+        // Fetch package data if it exists
+        if (conversation.has_complete_package || conversation.is_paid) {
+          await fetchStructuredPackageData();
 
           // Fallback to legacy content if structured data is not available
           const { data: packageData, error: packageError } = await supabase
@@ -499,7 +468,7 @@ const MysteryView = () => {
     };
 
     fetchMystery();
-  }, [id, checkForExistingPackage]);
+  }, [id]);
 
   // Manual refresh function
   const handleManualRefresh = () => {
@@ -642,24 +611,16 @@ const MysteryView = () => {
     );
   }
 
-  // UPDATED: Better logic for determining when to show tabs vs generation
-  const shouldShowTabs = () => {
-    return (
-      generationStatus?.status === 'completed' || 
-      packageContent || 
-      packageData ||
-      (mystery && mystery.is_paid && mystery.has_complete_package) ||
-      (packageData && (packageData.hostGuide || packageData.title))
-    );
-  };
-
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1 py-12 px-4">
         <div className="container mx-auto max-w-4xl">
           {/* Show tabs for completed or purchased mysteries */}
-          {shouldShowTabs() ? (
+          {(generationStatus?.status === 'completed' || 
+            packageContent || 
+            packageData ||
+            (mystery && mystery.is_paid)) ? (
             <MysteryPackageTabView 
               packageContent={packageContent || ""} 
               mysteryTitle={mystery?.title || mystery?.mystery_data?.theme || "Mystery Package"}
