@@ -46,6 +46,8 @@ const MysteryView = () => {
   
   // Track notification state
   const packageReadyNotified = useRef<boolean>(false);
+  // Track polling state
+  const pollingIntervalRef = useRef<number | null>(null);
 
   // Simplified status checking function
   const checkGenerationStatus = useCallback(async () => {
@@ -53,13 +55,15 @@ const MysteryView = () => {
     
     try {
       const status = await getPackageGenerationStatus(id);
+      const previousStatus = generationStatus?.status;
+      
       setGenerationStatus(status);
       setLastUpdate(new Date());
       
       console.log("Status check result:", status);
       
-      // Handle completion
-      if (status.status === 'completed') {
+      // Handle completion - only trigger when status changes to completed
+      if (status.status === 'completed' && previousStatus !== 'completed') {
         setGenerating(false);
         
         // Fetch the completed package data
@@ -105,7 +109,7 @@ const MysteryView = () => {
           })
           .eq("id", id);
           
-      } else if (status.status === 'failed') {
+      } else if (status.status === 'failed' && previousStatus !== 'failed') {
         setGenerating(false);
         
         if (status.resumable) {
@@ -122,39 +126,58 @@ const MysteryView = () => {
           toast.error("Generation failed. You can try again.");
         }
       }
+      
+      // Return status to help with polling control
+      return status;
     } catch (error) {
       console.error("Error checking generation status:", error);
+      return null;
     }
-  }, [id, navigate]);
+  }, [id, navigate, generationStatus?.status]);
 
-  // Auto-refresh effect - simple 30-second interval
+  // Auto-refresh effect - simple 30-second interval with proper cleanup
   useEffect(() => {
     if (!id) return;
-
-    let refreshInterval: number | null = null;
 
     const startAutoRefresh = () => {
       console.log("Starting auto-refresh every 30 seconds");
       
-      // Initial status check
-      checkGenerationStatus();
+      // Clear any existing interval
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+      }
       
-      // Set up 30-second auto-refresh
-      refreshInterval = window.setInterval(() => {
-        console.log("Auto-refreshing generation status...");
-        checkGenerationStatus();
-      }, 30000); // 30 seconds
+      // Initial status check
+      checkGenerationStatus().then((status) => {
+        // Only continue polling if generation is still in progress
+        if (status && status.status === 'in_progress') {
+          // Set up 30-second auto-refresh
+          pollingIntervalRef.current = window.setInterval(async () => {
+            console.log("Auto-refreshing generation status...");
+            const currentStatus = await checkGenerationStatus();
+            
+            // Stop polling if generation is complete or failed
+            if (currentStatus && (currentStatus.status === 'completed' || currentStatus.status === 'failed')) {
+              if (pollingIntervalRef.current) {
+                console.log("Stopping auto-refresh - generation finished");
+                clearInterval(pollingIntervalRef.current);
+                pollingIntervalRef.current = null;
+              }
+            }
+          }, 30000); // 30 seconds
+        }
+      });
     };
 
     const stopAutoRefresh = () => {
-      if (refreshInterval) {
+      if (pollingIntervalRef.current) {
         console.log("Stopping auto-refresh");
-        clearInterval(refreshInterval);
-        refreshInterval = null;
+        clearInterval(pollingIntervalRef.current);
+        pollingIntervalRef.current = null;
       }
     };
 
-    // Start auto-refresh if generation is in progress
+    // Start auto-refresh if generation is in progress or generating
     if (generationStatus?.status === 'in_progress' || generating) {
       startAutoRefresh();
     } else {
