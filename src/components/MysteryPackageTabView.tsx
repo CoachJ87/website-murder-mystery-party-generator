@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import { Loader2, Wand2, CheckCircle2, Eye } from "lucide-react";
 import { MysteryCharacter } from "@/interfaces/mystery";
+import "../styles/mystery-package.css";
 
 interface MysteryPackageData {
   title?: string;
