@@ -1,5 +1,3 @@
-
-
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 
@@ -38,6 +36,27 @@ export interface GenerationStatus {
     [key: string]: boolean | undefined;
   };
 }
+
+// Helper function to detect current domain
+const getCurrentDomain = () => {
+  // Client-side detection
+  if (typeof window !== 'undefined') {
+    return window.location.origin;
+  }
+  
+  // Server-side detection for different environments
+  if (process.env.VERCEL_URL) {
+    // Vercel automatically sets this in production and preview deployments
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  
+  if (process.env.NODE_ENV === 'development') {
+    return 'http://localhost:3000';
+  }
+  
+  // Fallback to your production domain
+  return 'https://murder-mystery.party';
+};
 
 // Save structured package data from JSON response
 export async function saveStructuredPackageData(mysteryId: string, jsonData: any): Promise<void> {
@@ -164,7 +183,7 @@ export async function saveStructuredPackageData(mysteryId: string, jsonData: any
   }
 }
 
-// Simplified package generation - just send webhook and update status
+// Enhanced package generation with domain detection
 export async function generateCompletePackage(mysteryId: string, testMode = false): Promise<string> {
   try {
     console.log("Starting package generation for conversation ID:", mysteryId);
@@ -244,7 +263,7 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
       packageId = newPackage.id;
     }
 
-    // Prepare webhook payload
+    // Prepare conversation content
     const conversationContent = conversation.messages
       ? conversation.messages.map((msg: any) => {
           const role = msg.role === "assistant" ? "AI" : "User";
@@ -252,9 +271,21 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
         }).join("\n\n---\n\n")
       : "";
 
+    // Detect current domain for callback
+    const currentDomain = getCurrentDomain();
+    console.log("Detected domain for webhook callback:", currentDomain);
+
+    // Enhanced webhook payload with callback information
     const webhookPayload = {
       userId: conversation.user_id,
       conversationId: mysteryId,
+      
+      // NEW: Add callback domain and URL for webhook response
+      callback_domain: currentDomain,
+      callback_url: `${currentDomain}/api/generation-complete`,
+      environment: process.env.NODE_ENV || 'production',
+      
+      // Existing payload fields
       title: conversation.title || null,
       systemInstruction: conversation.system_instruction || null,
       messages: conversation.messages ? conversation.messages.map((msg: any) => ({
@@ -274,16 +305,20 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
       testMode: testMode || false
     };
 
-    console.log("=== WEBHOOK PAYLOAD DEBUG ===");
+    console.log("=== ENHANCED WEBHOOK PAYLOAD DEBUG ===");
     console.log("Conversation ID:", webhookPayload.conversationId);
     console.log("User ID:", webhookPayload.userId);
+    console.log("Callback Domain:", webhookPayload.callback_domain);
+    console.log("Callback URL:", webhookPayload.callback_url);
+    console.log("Environment:", webhookPayload.environment);
     console.log("Messages count:", webhookPayload.messages?.length || 0);
     console.log("Theme:", webhookPayload.theme);
     console.log("Player count:", webhookPayload.playerCount);
+    console.log("Test Mode:", webhookPayload.testMode);
     console.log("Payload size (chars):", JSON.stringify(webhookPayload).length);
-    console.log("=== END WEBHOOK PAYLOAD DEBUG ===");
+    console.log("=== END ENHANCED WEBHOOK PAYLOAD DEBUG ===");
 
-    console.log("Sending payload to Make.com webhook");
+    console.log("Sending enhanced payload to Make.com webhook");
 
     // Send to Make.com webhook
     const response = await fetch("https://hook.eu2.make.com/uannnuc9hc79vorh1iyxwb9t5lp484n3", {
@@ -361,7 +396,7 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
       })
       .eq("id", mysteryId);
 
-    console.log("Successfully sent data to Make.com webhook");
+    console.log("Successfully sent enhanced data to Make.com webhook with callback URL");
     return "Webhook sent - generation in progress";
     
   } catch (error) {
