@@ -56,6 +56,8 @@ export async function saveStructuredPackageData(mysteryId: string, jsonData: any
       .from("mystery_packages")
       .select("id")
       .eq("conversation_id", mysteryId)
+      .order('updated_at', { ascending: false })
+      .limit(1)
       .maybeSingle();
     
     if (packageError) {
@@ -186,6 +188,8 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
       .from("mystery_packages")
       .select("id")
       .eq("conversation_id", mysteryId)
+      .order('updated_at', { ascending: false })
+      .limit(1)
       .maybeSingle();
     
     if (checkError && checkError.code !== 'PGRST116') {
@@ -379,6 +383,8 @@ export async function getPackageGenerationStatus(mysteryId: string): Promise<Gen
       .from("mystery_packages")
       .select("generation_status")
       .eq("conversation_id", mysteryId)
+      .order('updated_at', { ascending: false })
+      .limit(1)
       .maybeSingle();
       
     if (error) {
