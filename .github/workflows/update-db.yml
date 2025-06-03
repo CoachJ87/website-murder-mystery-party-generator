@@ -8,6 +8,10 @@ on:
       - main
   workflow_dispatch:  # Allow manual triggering
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   update-db:
     runs-on: ubuntu-latest
@@ -55,9 +59,6 @@ jobs:
         with:
           commit_message: "chore: update browserslist database"
           file_pattern: "."
-          commit_user_name: "github-actions[bot]"
-          commit_user_email: "github-actions[bot]@users.noreply.github.com"
-          commit_author: "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
 
       - name: Summary
         run: |
