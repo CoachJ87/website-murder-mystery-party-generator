@@ -96,11 +96,16 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
                 const generationStatus = await getPackageGenerationStatus(conversation.id);
                 if (generationStatus.status === 'in_progress') {
                   status = "generating";
-                } else if (generationStatus.status === 'completed') {
-                  status = "purchased";
-                } else {
-                  status = "purchased"; // Default to purchased if paid but status unclear
-                }
+                  } else if (generationStatus.status === 'completed') {
+                    status = "purchased";
+                    // Update database to prevent future checks
+                    await supabase
+                      .from("conversations")
+                      .update({ needs_package_generation: false })
+                      .eq("id", conversation.id);
+                  } else {
+                    status = "purchased"; // Default to purchased if paid but status unclear
+                  }
               } catch (error) {
                 console.error(`Error checking generation status for ${conversation.id}:`, error);
                 // Default to purchased if we can't check generation status
