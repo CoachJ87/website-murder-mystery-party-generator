@@ -30,8 +30,11 @@ jobs:
 
       - name: Update browserslist database
         run: |
-          npx update-browserslist-db
+          # Force npm usage by setting NPM environment variable
+          NPM_CLIENT=npm npx update-browserslist-db
           echo "Browserslist database updated successfully"
+        env:
+          FORCE_COLOR: 0
 
       - name: Check for changes
         id: verify-changed-files
