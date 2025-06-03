@@ -44,109 +44,55 @@ const MysteryView = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   
-  // Track notification state
+  // Controlled logging and polling
+  const DEBUG_MODE = process.env.NODE_ENV === 'development';
   const packageReadyNotified = useRef<boolean>(false);
-  // Track polling state
   const pollingIntervalRef = useRef<number | null>(null);
+  const lastStatusCheck = useRef<number>(0);
+  const lastLogTime = useRef<number>(0);
 
-  // Resume generation handler
-  const handleResumeGeneration = async () => {
-    if (!id) {
-      toast.error("Mystery ID is missing");
-      return;
-    }
-
-    setGenerating(true);
-    try {
-      toast.info("Resuming your mystery generation...");
-      
-      // Reset notification state on resume
-      packageReadyNotified.current = false;
-      
-      await resumePackageGeneration(id);
-      
-      console.log("Resume generation initiated");
-      
-    } catch (error: any) {
-      console.error("Error resuming package generation:", error);
-      setGenerating(false);
-      toast.error(error.message || "Failed to resume generation");
-    }
-  };
-
-  // Generate package handler
-  const handleGeneratePackage = async () => {
-    if (!id) {
-      toast.error("Mystery ID is missing");
-      return;
-    }
-
-    setGenerating(true);
-    packageReadyNotified.current = false; // Reset notification flag
+  const debugLog = useCallback((message: string, data?: any) => {
+    if (!DEBUG_MODE) return;
     
-    try {
-      toast.info("Starting generation of your mystery package. This will take 3-5 minutes...");
-      
-      // Just call the webhook - don't wait for completion
-      await generateCompletePackage(id);
-      
-      // The auto-refresh will handle checking status
-      console.log("Generation started, auto-refresh will check status");
-      
-    } catch (error: any) {
-      console.error("Error starting package generation:", error);
-      setGenerating(false);
-      toast.error(error.message || "Failed to start package generation");
+    const now = Date.now();
+    // Only log every 15 seconds max
+    if (now - lastLogTime.current > 15000) {
+      console.log(`[MysteryView] ${message}`, data ? JSON.stringify(data).slice(0, 100) + '...' : '');
+      lastLogTime.current = now;
     }
-  };
+  }, []);
 
-  // Enhanced status checking function with better error handling
-  const checkGenerationStatus = useCallback(async () => {
-    if (!id) {
-      console.log("❌ [DEBUG] checkGenerationStatus: No ID provided");
-      return null;
+  // Throttled status checking to prevent spam
+  const throttledCheckGenerationStatus = useCallback(async () => {
+    if (!id) return null;
+    
+    const now = Date.now();
+    
+    // Don't check more than once every 10 seconds
+    if (now - lastStatusCheck.current < 10000) {
+      debugLog("Status check throttled");
+      return generationStatus;
     }
     
-    console.log("🔍 [DEBUG] checkGenerationStatus called for mystery:", id);
+    lastStatusCheck.current = now;
     
     try {
       const status = await getPackageGenerationStatus(id);
       const previousStatus = generationStatus?.status;
       
-      console.log("📊 [DEBUG] Current status:", status);
-      console.log("📊 [DEBUG] Previous status:", previousStatus);
-      
-      // CRITICAL FIX: Ensure status is properly set
       setGenerationStatus(status);
       setLastUpdate(new Date());
       
-      console.log("✅ [DEBUG] Status updated in state");
+      debugLog(`Status check result: ${status.status} (was: ${previousStatus})`);
       
       // Handle completion - only trigger when status changes to completed
       if (status.status === 'completed' && previousStatus !== 'completed') {
-        console.log("🎉 [DEBUG] Generation completed! Fetching package data...");
         setGenerating(false);
         
-        // CRITICAL FIX: Add delay and retry logic for data fetching
-        setTimeout(async () => {
-          try {
-            await fetchStructuredPackageData();
-            console.log("✅ [DEBUG] Package data fetched successfully after completion");
-          } catch (error) {
-            console.error("❌ [DEBUG] Error fetching package data after completion:", error);
-            // Retry once after 2 seconds
-            setTimeout(async () => {
-              try {
-                await fetchStructuredPackageData();
-                console.log("✅ [DEBUG] Package data fetched successfully on retry");
-              } catch (retryError) {
-                console.error("❌ [DEBUG] Final retry failed:", retryError);
-              }
-            }, 2000);
-          }
-        }, 1000);
+        // Fetch the completed package data
+        await fetchStructuredPackageData();
         
-        // Only show notification once with action buttons
+        // Only show notification once
         if (!packageReadyNotified.current) {
           toast.success(
             <div className="space-y-3">
@@ -182,13 +128,11 @@ const MysteryView = () => {
             status: "purchased",
             is_paid: true,
             needs_package_generation: false,
-            has_complete_package: true,
             display_status: "purchased"
           })
           .eq("id", id);
           
       } else if (status.status === 'failed' && previousStatus !== 'failed') {
-        console.log("❌ [DEBUG] Generation failed");
         setGenerating(false);
         
         // Show detailed error message with current step
@@ -243,81 +187,110 @@ const MysteryView = () => {
         }
       }
       
-      // Return status to help with polling control
       return status;
     } catch (error) {
-      console.error("❌ [DEBUG] Error checking generation status:", error);
+      debugLog("Error checking generation status", error);
       return null;
     }
-  }, [id, navigate, generationStatus?.status, handleResumeGeneration, handleGeneratePackage]);
+  }, [id, navigate, generationStatus?.status, debugLog]);
 
-  // Auto-refresh effect - simple 30-second interval with proper cleanup
+  // Controlled auto-refresh with proper cleanup
   useEffect(() => {
     if (!id) return;
 
-    const startAutoRefresh = () => {
-      console.log("Starting auto-refresh every 30 seconds");
-      
-      // Clear any existing interval
+    const cleanup = () => {
       if (pollingIntervalRef.current) {
         clearInterval(pollingIntervalRef.current);
+        pollingIntervalRef.current = null;
+        debugLog("Auto-refresh stopped");
       }
+    };
+
+    const shouldStartPolling = generationStatus?.status === 'in_progress' || generating;
+    const isAlreadyPolling = pollingIntervalRef.current !== null;
+
+    if (shouldStartPolling && !isAlreadyPolling) {
+      debugLog("Starting controlled auto-refresh (30s intervals)");
       
       // Initial status check
-      checkGenerationStatus().then((status) => {
-        // Only continue polling if generation is still in progress
+      throttledCheckGenerationStatus().then((status) => {
+        // Only continue polling if still in progress
         if (status && status.status === 'in_progress') {
-          // Set up 30-second auto-refresh
           pollingIntervalRef.current = window.setInterval(async () => {
-            console.log("Auto-refreshing generation status...");
-            const currentStatus = await checkGenerationStatus();
+            const currentStatus = await throttledCheckGenerationStatus();
             
             // Stop polling if generation is complete or failed
             if (currentStatus && (currentStatus.status === 'completed' || currentStatus.status === 'failed')) {
-              if (pollingIntervalRef.current) {
-                console.log("Stopping auto-refresh - generation finished");
-                clearInterval(pollingIntervalRef.current);
-                pollingIntervalRef.current = null;
-              }
+              cleanup();
             }
           }, 30000); // 30 seconds
         }
       });
-    };
-
-    const stopAutoRefresh = () => {
-      if (pollingIntervalRef.current) {
-        console.log("Stopping auto-refresh");
-        clearInterval(pollingIntervalRef.current);
-        pollingIntervalRef.current = null;
-      }
-    };
-
-    // Start auto-refresh if generation is in progress or generating
-    if (generationStatus?.status === 'in_progress' || generating) {
-      startAutoRefresh();
-    } else {
-      stopAutoRefresh();
+    } else if (!shouldStartPolling && isAlreadyPolling) {
+      cleanup();
     }
 
-    // Cleanup on unmount or dependency change
-    return () => {
-      stopAutoRefresh();
-    };
-  }, [id, generationStatus?.status, generating, checkGenerationStatus]);
+    return cleanup;
+  }, [id, generationStatus?.status, generating, throttledCheckGenerationStatus, debugLog]);
 
-  // Enhanced Fetch structured package data with comprehensive debugging and error handling
-  const fetchStructuredPackageData = async () => {
+  // Resume generation handler
+  const handleResumeGeneration = useCallback(async () => {
     if (!id) {
-      console.log("❌ [DEBUG] fetchStructuredPackageData: No mystery ID provided");
+      toast.error("Mystery ID is missing");
       return;
     }
 
-    console.log(`🔍 [DEBUG] Starting fetchStructuredPackageData for mystery ID: ${id}`);
+    setGenerating(true);
+    try {
+      toast.info("Resuming your mystery generation...");
+      
+      // Reset notification state on resume
+      packageReadyNotified.current = false;
+      
+      await resumePackageGeneration(id);
+      
+      debugLog("Resume generation initiated");
+      
+    } catch (error: any) {
+      debugLog("Error resuming package generation", error);
+      setGenerating(false);
+      toast.error(error.message || "Failed to resume generation");
+    }
+  }, [id, debugLog]);
+
+  // Generate package handler
+  const handleGeneratePackage = useCallback(async () => {
+    if (!id) {
+      toast.error("Mystery ID is missing");
+      return;
+    }
+
+    setGenerating(true);
+    packageReadyNotified.current = false; // Reset notification flag
+    
+    try {
+      toast.info("Starting generation of your mystery package. This will take 3-5 minutes...");
+      
+      // Just call the webhook - don't wait for completion
+      await generateCompletePackage(id);
+      
+      debugLog("Generation started, auto-refresh will check status");
+      
+    } catch (error: any) {
+      debugLog("Error starting package generation", error);
+      setGenerating(false);
+      toast.error(error.message || "Failed to start package generation");
+    }
+  }, [id, debugLog]);
+
+  // Fetch structured package data
+  const fetchStructuredPackageData = useCallback(async () => {
+    if (!id) return;
 
     try {
+      debugLog("Fetching structured package data");
+      
       // Fetch mystery packages data with structured fields
-      console.log("🔍 [DEBUG] Querying mystery_packages table...");
       const { data: packageData, error: packageError } = await supabase
         .from("mystery_packages")
         .select(`
@@ -334,23 +307,12 @@ const MysteryView = () => {
           id
         `)
         .eq("conversation_id", id)
-        .order('updated_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
+        .single();
 
       if (packageError) {
-        console.error("❌ [DEBUG] Error fetching package data:", packageError);
-        
-        // Check if it's a "no rows" error vs actual error
-        if (packageError.code === 'PGRST116') {
-          console.log("ℹ️ [DEBUG] No mystery package found in database for this conversation");
-        } else {
-          throw new Error(`Database error: ${packageError.message}`);
-        }
+        debugLog("Error fetching package data", packageError);
         return;
       }
-
-      console.log("✅ [DEBUG] Raw package data from database:", packageData);
 
       if (packageData) {
         // Map database fields to component props
@@ -367,20 +329,10 @@ const MysteryView = () => {
           detectiveScript: packageData.detective_script,
         };
         
-        console.log("🔧 [DEBUG] Mapped structured package data:", structuredPackageData);
-        
-        // Check what content is actually available
-        const availableContent = Object.entries(structuredPackageData)
-          .filter(([key, value]) => value && value.trim && value.trim().length > 0)
-          .map(([key]) => key);
-        
-        console.log("📋 [DEBUG] Available content fields:", availableContent);
-        
         setPackageData(structuredPackageData);
-        console.log("✅ [DEBUG] Package data state updated");
+        debugLog("Structured package data loaded");
 
-        // PRIMARY: Fetch characters from database using the package ID
-        console.log(`🔍 [DEBUG] Querying mystery_characters for package_id: ${packageData.id}`);
+        // Fetch characters from database
         const { data: charactersData, error: charactersError } = await supabase
           .from("mystery_characters")
           .select("*")
@@ -388,102 +340,26 @@ const MysteryView = () => {
           .order("character_name");
 
         if (charactersError) {
-          console.error("❌ [DEBUG] Error fetching characters from database:", charactersError);
-          
-          // FALLBACK: If database query fails, try text parsing
-          console.log("🔄 [DEBUG] Falling back to text parsing for characters");
-          const parsedCharacters = extractCharactersFromText();
-          setCharacters(parsedCharacters);
+          debugLog("Error fetching characters", charactersError);
         } else if (charactersData && charactersData.length > 0) {
-          // SUCCESS: Use database characters as primary source
-          console.log("✅ [DEBUG] Characters loaded from database:", charactersData.length, "characters found");
-          console.log("📋 [DEBUG] Character names:", charactersData.map(c => c.character_name));
           setCharacters(charactersData);
-        } else {
-          // FALLBACK: If database is empty, try text parsing
-          console.log("ℹ️ [DEBUG] No characters in database, falling back to text parsing");
-          const parsedCharacters = extractCharactersFromText();
-          setCharacters(parsedCharacters);
+          debugLog(`Loaded ${charactersData.length} characters from database`);
         }
-        
-        // Update conversation to mark as having complete package
-        console.log("🔧 [DEBUG] Updating conversation to mark as having complete package");
-        await supabase
-          .from("conversations")
-          .update({
-            has_complete_package: true,
-            is_paid: true,
-            display_status: "purchased"
-          })
-          .eq("id", id);
-      } else {
-        console.log("ℹ️ [DEBUG] No package data returned from query");
       }
     } catch (error) {
-      console.error("❌ [DEBUG] Error in fetchStructuredPackageData:", error);
-      // Don't throw here to prevent breaking the UI
+      debugLog("Error in fetchStructuredPackageData", error);
     }
-  };
-
-  // Helper function to extract characters from text (fallback only)
-  const extractCharactersFromText = (): MysteryCharacter[] => {
-    if (!packageContent) {
-      console.log("ℹ️ [DEBUG] No packageContent available for text parsing");
-      return [];
-    }
-    
-    const charactersList: MysteryCharacter[] = [];
-    const characterPattern = /# ([^-\n]+) - CHARACTER GUIDE\n([\s\S]*?)(?=# \w+ - CHARACTER GUIDE|# |$)/g;
-    
-    let match;
-    while ((match = characterPattern.exec(packageContent)) !== null) {
-      const characterName = match[1].trim();
-      const characterContent = match[2].trim();
-      
-      charactersList.push({
-        id: crypto.randomUUID(),
-        package_id: id || "",
-        character_name: characterName,
-        description: characterContent.substring(0, characterContent.indexOf('\n\n')) || '',
-        background: '',
-        relationships: [],
-        secrets: []
-      });
-    }
-    
-    console.log("📋 [DEBUG] Characters extracted from text parsing:", charactersList.length, "characters found");
-    return charactersList;
-  };
-
-  // Enhanced shouldShowTabs function with better debugging
-  const shouldShowTabs = () => {
-    console.log("🤔 [DEBUG] Checking shouldShowTabs conditions:");
-    console.log("  - generationStatus?.status:", generationStatus?.status);
-    console.log("  - packageContent exists:", !!packageContent);
-    console.log("  - packageData exists:", !!packageData);
-    console.log("  - mystery?.is_paid:", mystery?.is_paid);
-    console.log("  - mystery?.has_complete_package:", mystery?.has_complete_package);
-    
-    const shouldShow = (
-      generationStatus?.status === 'completed' || 
-      packageContent || 
-      packageData ||
-      (mystery && mystery.is_paid) ||
-      (mystery && mystery.has_complete_package)
-    );
-    
-    console.log("➡️ [DEBUG] shouldShowTabs result:", shouldShow);
-    return shouldShow;
-  };
+  }, [id, debugLog]);
 
   // Initial data loading
   useEffect(() => {
     const fetchMystery = async () => {
       if (!id) return;
 
-      console.log(`🔍 [DEBUG] Starting fetchMystery for ID: ${id}`);
       setLoading(true);
       try {
+        debugLog("Starting fetchMystery");
+        
         // Check if this is a redirect from a purchase
         const urlParams = new URLSearchParams(window.location.search);
         const purchaseStatus = urlParams.get('purchase');
@@ -492,7 +368,6 @@ const MysteryView = () => {
           toast.success("Purchase successful! You now have full access to this mystery package.");
         }
         
-        console.log("🔍 [DEBUG] Querying conversations table...");
         const { data: conversation, error } = await supabase
           .from("conversations")
           .select("*, mystery_data, is_paid, has_complete_package, needs_package_generation")
@@ -500,29 +375,25 @@ const MysteryView = () => {
           .single();
 
         if (error) {
-          console.error("❌ [DEBUG] Error fetching mystery:", error);
+          debugLog("Error fetching mystery", error);
           toast.error("Failed to load mystery");
           return;
         }
 
-        console.log("✅ [DEBUG] Mystery conversation loaded:", {
+        debugLog("Mystery data loaded", {
           id: conversation.id,
           is_paid: conversation.is_paid,
           needs_package_generation: conversation.needs_package_generation,
-          has_complete_package: conversation.has_complete_package,
-          title: conversation.title
+          has_complete_package: conversation.has_complete_package
         });
 
         setMystery(conversation);
 
         // Check generation status if package generation is needed
         if (conversation.needs_package_generation || conversation.is_paid) {
-          console.log("🔍 [DEBUG] Checking package generation status...");
           const status = await getPackageGenerationStatus(id);
           setGenerationStatus(status);
           setLastUpdate(new Date());
-          
-          console.log("📊 [DEBUG] Generation status:", status);
           
           if (status.status === 'in_progress') {
             setGenerating(true);
@@ -535,7 +406,6 @@ const MysteryView = () => {
                 is_paid: true,
                 is_purchased: true,
                 display_status: "purchased",
-                has_complete_package: true,
                 mystery_data: {
                   ...conversation.mystery_data,
                   status: "purchased"
@@ -547,29 +417,35 @@ const MysteryView = () => {
 
         // Fetch package data if it exists
         if (conversation.has_complete_package || conversation.is_paid) {
-          console.log("🔍 [DEBUG] Conversation indicates package exists, fetching structured data...");
           await fetchStructuredPackageData();
 
-        } else {
-          console.log("ℹ️ [DEBUG] No complete package indicated, skipping package data fetch");
+          // Fallback to legacy content if structured data is not available
+          const { data: packageData, error: packageError } = await supabase
+            .from("mystery_packages")
+            .select("legacy_content")
+            .eq("conversation_id", id)
+            .single();
+
+          if (!packageError && packageData && packageData.legacy_content) {
+            setPackageContent(packageData.legacy_content);
+          }
         }
       } catch (error) {
-        console.error("❌ [DEBUG] Error in fetchMystery:", error);
+        debugLog("Error in fetchMystery", error);
         toast.error("Failed to load mystery");
       } finally {
         setLoading(false);
-        console.log("✅ [DEBUG] fetchMystery completed");
       }
     };
 
     fetchMystery();
-  }, [id]);
+  }, [id, fetchStructuredPackageData, debugLog]);
 
   // Manual refresh function
-  const handleManualRefresh = () => {
-    console.log("🔄 [DEBUG] Manual refresh triggered");
-    checkGenerationStatus();
-  };
+  const handleManualRefresh = useCallback(() => {
+    debugLog("Manual refresh triggered");
+    throttledCheckGenerationStatus();
+  }, [throttledCheckGenerationStatus, debugLog]);
 
   // Render generation progress
   const renderGenerationProgress = () => {
@@ -706,13 +582,17 @@ const MysteryView = () => {
     );
   }
 
+  const shouldShowTabs = (generationStatus?.status === 'completed' || 
+    packageContent || 
+    packageData ||
+    (mystery && mystery.is_paid));
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1 py-12 px-4">
         <div className="container mx-auto max-w-4xl">
-          {/* Show tabs for completed or purchased mysteries */}
-          {shouldShowTabs() ? (
+          {shouldShowTabs ? (
             <MysteryPackageTabView 
               packageContent={packageContent || ""} 
               mysteryTitle={mystery?.title || mystery?.mystery_data?.theme || "Mystery Package"}
