@@ -290,11 +290,11 @@ const MysteryPackageTabView = React.memo(({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {charactersList.map((character, index) => (
                   <div key={character.id || index} className="character-card">
-                    <h3>{character.character_name}</h3>
-                    <p>{character.description}</p>
+                    <h3 className="text-foreground">{character.character_name}</h3>
+                    <p className="text-foreground">{character.description}</p>
                     {character.background && (
                       <div className="mt-2">
-                        <h4 className="font-semibold text-sm">Background:</h4>
+                        <h4 className="font-semibold text-sm text-foreground">Background:</h4>
                         <p className="text-sm text-muted-foreground">{character.background}</p>
                       </div>
                     )}
