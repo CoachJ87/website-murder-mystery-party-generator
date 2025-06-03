@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -287,18 +288,119 @@ const MysteryPackageTabView = React.memo(({
         <TabsContent value="characters">
           <div className="mystery-content">
             {Array.isArray(charactersList) && charactersList.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
                 {charactersList.map((character, index) => (
-                  <div key={character.id || index} className="character-card">
-                    <h3 className="text-foreground">{character.character_name}</h3>
-                    <p className="text-foreground">{character.description}</p>
-                    {character.background && (
-                      <div className="mt-2">
-                        <h4 className="font-semibold text-sm text-foreground">Background:</h4>
-                        <p className="text-sm text-muted-foreground">{character.background}</p>
-                      </div>
-                    )}
-                  </div>
+                  <Accordion key={character.id || index} type="single" collapsible className="character-accordion">
+                    <AccordionItem value={`character-${index}`}>
+                      <AccordionTrigger className="text-left">
+                        <h3 className="text-lg font-semibold text-foreground">{character.character_name}</h3>
+                      </AccordionTrigger>
+                      <AccordionContent className="text-foreground">
+                        <div className="space-y-4">
+                          
+                          {/* Character Description */}
+                          {character.description && (
+                            <div className="mb-4">
+                              <h4 className="font-semibold mb-2 text-foreground">Character Description</h4>
+                              <p className="text-foreground">{character.description}</p>
+                            </div>
+                          )}
+
+                          {/* Background */}
+                          {character.background && (
+                            <div className="mb-4">
+                              <h4 className="font-semibold mb-2 text-foreground">Background</h4>
+                              <p className="text-foreground">{character.background}</p>
+                            </div>
+                          )}
+
+                          {/* Relationships */}
+                          {character.relationships && character.relationships.length > 0 && (
+                            <div className="mb-4">
+                              <h4 className="font-semibold mb-2 text-foreground">Relationships</h4>
+                              <ul className="list-disc pl-5 space-y-1">
+                                {character.relationships.map((rel, idx) => (
+                                  <li key={idx} className="text-foreground">
+                                    <strong>{rel.character}:</strong> {rel.description}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {/* Secrets */}
+                          {character.secrets && character.secrets.length > 0 && (
+                            <div className="mb-4">
+                              <h4 className="font-semibold mb-2 text-foreground">Secrets</h4>
+                              <ul className="list-disc pl-5 space-y-1">
+                                {character.secrets.map((secret, idx) => (
+                                  <li key={idx} className="text-foreground">{secret}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {/* Introduction */}
+                          {character.introduction && (
+                            <div className="mb-4">
+                              <h4 className="font-semibold mb-2 text-foreground">Introduction</h4>
+                              <p className="text-foreground">{character.introduction}</p>
+                            </div>
+                          )}
+
+                          {/* Game Rounds */}
+                          {(character.round1_statement || character.round2_statement || character.round3_statement) && (
+                            <div className="mb-4">
+                              <h4 className="font-semibold mb-2 text-foreground">Game Rounds</h4>
+                              <div className="space-y-2">
+                                {character.round1_statement && (
+                                  <div>
+                                    <h5 className="font-medium text-sm text-foreground">Round 1:</h5>
+                                    <p className="text-sm text-foreground">{character.round1_statement}</p>
+                                  </div>
+                                )}
+                                {character.round2_statement && (
+                                  <div>
+                                    <h5 className="font-medium text-sm text-foreground">Round 2:</h5>
+                                    <p className="text-sm text-foreground">{character.round2_statement}</p>
+                                  </div>
+                                )}
+                                {character.round3_statement && (
+                                  <div>
+                                    <h5 className="font-medium text-sm text-foreground">Round 3:</h5>
+                                    <p className="text-sm text-foreground">{character.round3_statement}</p>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Whereabouts */}
+                          {character.whereabouts && (
+                            <div className="mb-4">
+                              <h4 className="font-semibold mb-2 text-foreground">Whereabouts</h4>
+                              <p className="text-foreground">{character.whereabouts}</p>
+                            </div>
+                          )}
+
+                          {/* Questioning Options */}
+                          {character.questioning_options && character.questioning_options.length > 0 && (
+                            <div className="mb-4">
+                              <h4 className="font-semibold mb-2 text-foreground">Questioning Options</h4>
+                              <ul className="list-disc pl-5 space-y-1">
+                                {character.questioning_options.map((option, idx) => (
+                                  <li key={idx} className="text-foreground">
+                                    <strong>To {option.target}:</strong> {option.question}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
                 ))}
               </div>
             ) : isGenerating ? (
