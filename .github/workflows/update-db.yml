@@ -1,66 +1,43 @@
-name: Update Browserslist DB
+Run # Force npm usage by setting NPM environment variable
+/bin/sh: 1: pnpm: not found
+/home/runner/work/website-murder-mystery-party-generator/website-murder-mystery-party-generator/node_modules/update-browserslist-db/cli.js:39
+      throw e
+      ^
 
-on:
-  schedule:
-    - cron: '0 0 * * 0'  # Weekly on Sunday at midnight UTC
-  push:
-    branches:
-      - main
-  workflow_dispatch:  # Allow manual triggering
+Error: Command failed: pnpm info caniuse-lite --json
+/bin/sh: 1: pnpm: not found
 
-jobs:
-  update-db:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+    at genericNodeError (node:internal/errors:984:15)
+    at wrappedFn (node:internal/errors:538:14)
+    at checkExecSyncError (node:child_process:891:11)
+    at execSync (node:child_process:963:15)
+    at getLatestInfo (/home/runner/work/website-murder-mystery-party-generator/website-murder-mystery-party-generator/node_modules/update-browserslist-db/index.js:79:23)
+    at updateDB (/home/runner/work/website-murder-mystery-party-generator/website-murder-mystery-party-generator/node_modules/update-browserslist-db/index.js:282:16)
+    at Object.<anonymous> (/home/runner/work/website-murder-mystery-party-generator/website-murder-mystery-party-generator/node_modules/update-browserslist-db/cli.js:34:5)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32) {
+  status: 127,
+  signal: null,
+  output: [
+    null,
+    Buffer(0) [Uint8Array] [],
+    Buffer(28) [Uint8Array] [
+       47,  98, 105, 110,  47, 115, 104,
+       58,  32,  49,  58,  32, 112, 110,
+      112, 109,  58,  32, 110, 111, 116,
+       32, 102, 111, 117, 110, 100,  10
+    ]
+  ],
+  pid: 2082,
+  stdout: Buffer(0) [Uint8Array] [],
+  stderr: Buffer(28) [Uint8Array] [
+     47,  98, 105, 110,  47, 115, 104,
+     58,  32,  49,  58,  32, 112, 110,
+    112, 109,  58,  32, 110, 111, 116,
+     32, 102, 111, 117, 110, 100,  10
+  ]
+}
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Update browserslist database
-        run: |
-          # Force npm usage by setting NPM environment variable
-          NPM_CLIENT=npm npx update-browserslist-db
-          echo "Browserslist database updated successfully"
-        env:
-          FORCE_COLOR: 0
-
-      - name: Check for changes
-        id: verify-changed-files
-        run: |
-          if [ -n "$(git status --porcelain)" ]; then
-            echo "changed=true" >> $GITHUB_OUTPUT
-            echo "Changes detected in browserslist database"
-          else
-            echo "changed=false" >> $GITHUB_OUTPUT
-            echo "No changes detected"
-          fi
-
-      - name: Commit and push changes
-        if: steps.verify-changed-files.outputs.changed == 'true'
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "chore: update browserslist database"
-          file_pattern: "."
-          commit_user_name: "github-actions[bot]"
-          commit_user_email: "github-actions[bot]@users.noreply.github.com"
-          commit_author: "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
-
-      - name: Summary
-        run: |
-          if [ "${{ steps.verify-changed-files.outputs.changed }}" == "true" ]; then
-            echo "✅ Browserslist database updated and committed"
-          else
-            echo "ℹ️ Browserslist database was already up to date"
-          fi
+Node.js v20.19.2
+Error: Process completed with exit code 1.
