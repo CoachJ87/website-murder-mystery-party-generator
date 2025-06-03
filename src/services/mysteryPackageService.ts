@@ -209,18 +209,30 @@ export async function saveStructuredPackageData(mysteryId: string, jsonData: any
       
       // Insert new characters
       const charactersToInsert = normalizedData.characters.map((char: any) => ({
-        package_id: packageId,
-        character_name: char.name || char.character_name,
-        description: char.description || null,
-        background: char.background || null,
-        secret: char.secret || null,
-        introduction: char.introduction || null,
-        rumors: char.rumors || null,
-        round2_questions: char.round2Questions || char.round2_questions || null,
-        round2_innocent: char.round2Innocent || char.round2_innocent || null,
-        round2_guilty: char.round2Guilty || char.round2_guilty || null,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+          package_id: packageId,
+          character_name: char.name || char.character_name,
+          description: char.description || null,
+          background: char.background || null,
+          secret: char.secret || null,
+          introduction: char.introduction || null,
+          rumors: char.rumors || null,
+          round2_questions: char.round2Questions || char.round2_questions || null,
+          round2_innocent: char.round2Innocent || char.round2_innocent || null,
+          round2_guilty: char.round2Guilty || char.round2_guilty || null,
+          round2_accomplice: char.round2Accomplice || char.round2_accomplice || null, // ADD
+          round3_questions: char.round3Questions || char.round3_questions || null,
+          round3_innocent: char.round3Innocent || char.round3_innocent || null,
+          round3_guilty: char.round3Guilty || char.round3_guilty || null,
+          round3_accomplice: char.round3Accomplice || char.round3_accomplice || null, // ADD
+          round4_questions: char.round4Questions || char.round4_questions || null,
+          round4_innocent: char.round4Innocent || char.round4_innocent || null,
+          round4_guilty: char.round4Guilty || char.round4_guilty || null,
+          round4_accomplice: char.round4Accomplice || char.round4_accomplice || null, // ADD
+          final_innocent: char.finalInnocent || char.final_innocent || null,
+          final_guilty: char.finalGuilty || char.final_guilty || null,
+          final_accomplice: char.finalAccomplice || char.final_accomplice || null, // ADD
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
       }));
       
       console.log("🔍 [DEBUG] Characters to insert:", charactersToInsert);
