@@ -290,24 +290,24 @@ const MysteryView = () => {
     try {
       debugLog("Fetching structured package data");
       
-      // Fetch mystery packages data with structured fields
-      const { data: packageData, error: packageError } = await supabase
-        .from("mystery_packages")
-        .select(`
-          title,
-          game_overview,
-          host_guide,
-          materials,
-          preparation_instructions,
-          timeline,
-          hosting_tips,
-          evidence_cards,
-          relationship_matrix,
-          detective_script,
-          id
-        `)
-        .eq("conversation_id", id)
-        .single();
+    //  // Fetch mystery packages data with structured fields
+    //  const { data: packageData, error: packageError } = await supabase
+    //    .from("mystery_packages")
+    //    .select(`
+    //      title,
+    //      game_overview,
+    //      host_guide,
+    //      materials,
+    //      preparation_instructions,
+    //      timeline,
+    //      hosting_tips,
+    //      evidence_cards,
+    //      relationship_matrix,
+    //      detective_script,
+    //      id
+    //    `)
+    //    .eq("conversation_id", id)
+    //    .single();
 
       if (packageError) {
         debugLog("Error fetching package data", packageError);
@@ -420,15 +420,15 @@ const MysteryView = () => {
           await fetchStructuredPackageData();
 
           // Fallback to legacy content if structured data is not available
-          const { data: packageData, error: packageError } = await supabase
-            .from("mystery_packages")
-            .select("legacy_content")
-            .eq("conversation_id", id)
-            .single();
+         // const { data: packageData, error: packageError } = await supabase
+           // .from("mystery_packages")
+           // .select("legacy_content")
+           // .eq("conversation_id", id)
+           // .single();
 
-          if (!packageError && packageData && packageData.legacy_content) {
-            setPackageContent(packageData.legacy_content);
-          }
+        //  if (!packageError && packageData && packageData.legacy_content) {
+          //  setPackageContent(packageData.legacy_content);
+         // }
         }
       } catch (error) {
         debugLog("Error in fetchMystery", error);
