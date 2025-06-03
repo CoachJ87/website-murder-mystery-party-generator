@@ -121,6 +121,160 @@ const MysteryPackageTabView = React.memo(({
     return [];
   }, []);
 
+  // Function to build complete character guide content
+  const buildCharacterGuideContent = useCallback((character: MysteryCharacter): string => {
+    const relationships = getRelationshipsArray(character.relationships);
+    const secrets = getSecretsArray(character.secrets);
+    
+    let content = `# ${character.character_name} - CHARACTER GUIDE\n\n`;
+    
+    // Character Description
+    if (character.description) {
+      content += `## CHARACTER DESCRIPTION\n\n${character.description}\n\n`;
+    }
+    
+    // Your Background
+    if (character.background) {
+      content += `## YOUR BACKGROUND\n\n${character.background}\n\n`;
+    }
+    
+    // Your Relationships
+    if (relationships.length > 0) {
+      content += `## YOUR RELATIONSHIPS\n\n`;
+      relationships.forEach(rel => {
+        if (rel.character && rel.description) {
+          content += `- **${rel.character}**: ${rel.description}\n`;
+        }
+      });
+      content += '\n';
+    }
+    
+    // Your Secret
+    const secret = character.secret || (secrets.length > 0 ? secrets[0] : '');
+    if (secret) {
+      content += `## YOUR SECRET\n\n${secret}\n\n`;
+    }
+    
+    // Round 1: Introductions & Rumors
+    if (character.introduction || character.rumors || character.round1_statement) {
+      content += `## ROUND 1: INTRODUCTIONS & RUMORS\n\n`;
+      
+      if (character.introduction) {
+        content += `### SAY HELLO\n\n${character.introduction}\n\n`;
+      }
+      
+      if (character.round1_statement) {
+        content += `${character.round1_statement}\n\n`;
+      }
+      
+      if (character.rumors) {
+        content += `### RUMORS TO SPREAD\n\n${character.rumors}\n\n`;
+      }
+    }
+    
+    // Round 2: Motives
+    if (character.round2_statement || character.round2_questions || character.round2_innocent || character.round2_guilty || character.round2_accomplice) {
+      content += `## ROUND 2: MOTIVES\n\n`;
+      
+      if (character.round2_statement) {
+        content += `${character.round2_statement}\n\n`;
+      }
+      
+      if (character.round2_questions) {
+        content += `### CHOOSE SOMEONE TO QUESTION\n\n${character.round2_questions}\n\n`;
+      }
+      
+      if (character.round2_innocent || character.round2_guilty || character.round2_accomplice) {
+        content += `### YOUR RESPONSES WHEN QUESTIONED\n\n`;
+        
+        if (character.round2_innocent) {
+          content += `**IF YOU ARE INNOCENT:**\n\n${character.round2_innocent}\n\n`;
+        }
+        
+        if (character.round2_guilty) {
+          content += `**IF YOU ARE GUILTY:**\n\n${character.round2_guilty}\n\n`;
+        }
+        
+        if (character.round2_accomplice) {
+          content += `**IF YOU ARE THE ACCOMPLICE:**\n\n${character.round2_accomplice}\n\n`;
+        }
+      }
+    }
+    
+    // Round 3: Method
+    if (character.round3_statement || character.round3_questions || character.round3_innocent || character.round3_guilty || character.round3_accomplice) {
+      content += `## ROUND 3: METHOD\n\n`;
+      
+      if (character.round3_statement) {
+        content += `${character.round3_statement}\n\n`;
+      }
+      
+      if (character.round3_questions) {
+        content += `### CHOOSE SOMEONE TO QUESTION\n\n${character.round3_questions}\n\n`;
+      }
+      
+      if (character.round3_innocent || character.round3_guilty || character.round3_accomplice) {
+        content += `### YOUR RESPONSES WHEN QUESTIONED\n\n`;
+        
+        if (character.round3_innocent) {
+          content += `**IF YOU ARE INNOCENT:**\n\n${character.round3_innocent}\n\n`;
+        }
+        
+        if (character.round3_guilty) {
+          content += `**IF YOU ARE GUILTY:**\n\n${character.round3_guilty}\n\n`;
+        }
+        
+        if (character.round3_accomplice) {
+          content += `**IF YOU ARE THE ACCOMPLICE:**\n\n${character.round3_accomplice}\n\n`;
+        }
+      }
+    }
+    
+    // Round 4: Opportunity
+    if (character.round4_questions || character.round4_innocent || character.round4_guilty || character.round4_accomplice) {
+      content += `## ROUND 4: OPPORTUNITY\n\n`;
+      
+      if (character.round4_questions) {
+        content += `### CHOOSE SOMEONE TO QUESTION\n\n${character.round4_questions}\n\n`;
+      }
+      
+      if (character.round4_innocent || character.round4_guilty || character.round4_accomplice) {
+        content += `### YOUR RESPONSES WHEN QUESTIONED\n\n`;
+        
+        if (character.round4_innocent) {
+          content += `**IF YOU ARE INNOCENT:**\n\n${character.round4_innocent}\n\n`;
+        }
+        
+        if (character.round4_guilty) {
+          content += `**IF YOU ARE GUILTY:**\n\n${character.round4_guilty}\n\n`;
+        }
+        
+        if (character.round4_accomplice) {
+          content += `**IF YOU ARE THE ACCOMPLICE:**\n\n${character.round4_accomplice}\n\n`;
+        }
+      }
+    }
+    
+    // Final Statement
+    if (character.final_innocent || character.final_guilty || character.final_accomplice) {
+      content += `## FINAL STATEMENT\n\n`;
+      
+      if (character.final_innocent) {
+        content += `**IF YOU ARE INNOCENT:**\n\n${character.final_innocent}\n\n`;
+      }
+      
+      if (character.final_guilty) {
+        content += `**IF YOU ARE GUILTY:**\n\n${character.final_guilty}\n\n`;
+      }
+      
+      if (character.final_accomplice) {
+        content += `**IF YOU ARE THE ACCOMPLICE:**\n\n${character.final_accomplice}\n\n`;
+      }
+    }
+    
+    return content;
+  }, [getRelationshipsArray, getSecretsArray]);
+
   // Memoized content extraction functions to prevent unnecessary recalculations
   const extractHostGuide = useCallback(() => {
     if (!packageContent) return "";
@@ -343,10 +497,8 @@ const MysteryPackageTabView = React.memo(({
             {Array.isArray(charactersList) && charactersList.length > 0 ? (
               <div className="space-y-4">
                 {charactersList.map((character, index) => {
-                  const relationships = getRelationshipsArray(character.relationships);
-                  const secrets = getSecretsArray(character.secrets);
-                  const questioningOptions = getQuestioningOptionsArray(character.questioning_options);
-
+                  const characterGuideContent = buildCharacterGuideContent(character);
+                  
                   return (
                     <Accordion key={character.id || index} type="single" collapsible className="character-accordion">
                       <AccordionItem value={`character-${index}`}>
@@ -354,248 +506,17 @@ const MysteryPackageTabView = React.memo(({
                           <h3 className="text-lg font-semibold text-foreground">{character.character_name}</h3>
                         </AccordionTrigger>
                         <AccordionContent className="text-foreground">
-                          <div className="space-y-4">
-                            
-                            {/* Character Description */}
-                            {character.description && (
-                              <div className="mb-4">
-                                <h4 className="font-semibold mb-2 text-foreground">Character Description</h4>
-                                <p className="text-foreground">{character.description}</p>
-                              </div>
-                            )}
-
-                            {/* Your Background */}
-                            {character.background && (
-                              <div className="mb-4">
-                                <h4 className="font-semibold mb-2 text-foreground">Your Background</h4>
-                                <p className="text-foreground">{character.background}</p>
-                              </div>
-                            )}
-
-                            {/* Your Relationships */}
-                            {relationships.length > 0 && (
-                              <div className="mb-4">
-                                <h4 className="font-semibold mb-2 text-foreground">Your Relationships</h4>
-                                <ul className="list-disc pl-5 space-y-1">
-                                  {relationships.map((rel, idx) => (
-                                    <li key={idx} className="text-foreground">
-                                      <strong>{rel.character}:</strong> {rel.description}
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-
-                            {/* Your Secrets */}
-                            {(secrets.length > 0 || character.secret) && (
-                              <div className="mb-4">
-                                <h4 className="font-semibold mb-2 text-foreground">Your Secrets</h4>
-                                <ul className="list-disc pl-5 space-y-1">
-                                  {secrets.map((secret, idx) => (
-                                    <li key={idx} className="text-foreground">{secret}</li>
-                                  ))}
-                                  {character.secret && (
-                                    <li className="text-foreground">{character.secret}</li>
-                                  )}
-                                </ul>
-                              </div>
-                            )}
-
-                            {/* Introduction */}
-                            {character.introduction && (
-                              <div className="mb-4">
-                                <h4 className="font-semibold mb-2 text-foreground">Introduction</h4>
-                                <p className="text-foreground">{character.introduction}</p>
-                              </div>
-                            )}
-
-                            {/* Your Whereabouts */}
-                            {character.whereabouts && (
-                              <div className="mb-4">
-                                <h4 className="font-semibold mb-2 text-foreground">Your Whereabouts</h4>
-                                <p className="text-foreground">{character.whereabouts}</p>
-                              </div>
-                            )}
-
-                            {/* Game Rounds */}
-                            {(character.round1_statement || character.round2_statement || character.round3_statement) && (
-                              <div className="mb-4">
-                                <h4 className="font-semibold mb-2 text-foreground">Game Rounds</h4>
-                                <div className="space-y-4">
-                                  
-                                  {/* Round 1 */}
-                                  {character.round1_statement && (
-                                    <div className="border-l-4 border-blue-500 pl-4">
-                                      <h5 className="font-medium text-foreground mb-2">Round 1</h5>
-                                      <p className="text-foreground mb-2">{character.round1_statement}</p>
-                                    </div>
-                                  )}
-
-                                  {/* Round 2 */}
-                                  {(character.round2_statement || character.round2_questions || character.round2_innocent || character.round2_guilty || character.round2_accomplice) && (
-                                    <div className="border-l-4 border-green-500 pl-4">
-                                      <h5 className="font-medium text-foreground mb-2">Round 2</h5>
-                                      {character.round2_statement && (
-                                        <p className="text-foreground mb-2">{character.round2_statement}</p>
-                                      )}
-                                      {character.round2_questions && (
-                                        <div className="mb-2">
-                                          <h6 className="font-medium text-sm text-foreground">Questions:</h6>
-                                          <p className="text-foreground text-sm">{character.round2_questions}</p>
-                                        </div>
-                                      )}
-                                      {(character.round2_innocent || character.round2_guilty || character.round2_accomplice) && (
-                                        <div className="space-y-1">
-                                          {character.round2_innocent && (
-                                            <div>
-                                              <h6 className="font-medium text-xs text-foreground">If Innocent:</h6>
-                                              <p className="text-foreground text-sm">{character.round2_innocent}</p>
-                                            </div>
-                                          )}
-                                          {character.round2_guilty && (
-                                            <div>
-                                              <h6 className="font-medium text-xs text-foreground">If Guilty:</h6>
-                                              <p className="text-foreground text-sm">{character.round2_guilty}</p>
-                                            </div>
-                                          )}
-                                          {character.round2_accomplice && (
-                                            <div>
-                                              <h6 className="font-medium text-xs text-foreground">If Accomplice:</h6>
-                                              <p className="text-foreground text-sm">{character.round2_accomplice}</p>
-                                            </div>
-                                          )}
-                                        </div>
-                                      )}
-                                    </div>
-                                  )}
-
-                                  {/* Round 3 */}
-                                  {(character.round3_statement || character.round3_questions || character.round3_innocent || character.round3_guilty || character.round3_accomplice) && (
-                                    <div className="border-l-4 border-yellow-500 pl-4">
-                                      <h5 className="font-medium text-foreground mb-2">Round 3</h5>
-                                      {character.round3_statement && (
-                                        <p className="text-foreground mb-2">{character.round3_statement}</p>
-                                      )}
-                                      {character.round3_questions && (
-                                        <div className="mb-2">
-                                          <h6 className="font-medium text-sm text-foreground">Questions:</h6>
-                                          <p className="text-foreground text-sm">{character.round3_questions}</p>
-                                        </div>
-                                      )}
-                                      {(character.round3_innocent || character.round3_guilty || character.round3_accomplice) && (
-                                        <div className="space-y-1">
-                                          {character.round3_innocent && (
-                                            <div>
-                                              <h6 className="font-medium text-xs text-foreground">If Innocent:</h6>
-                                              <p className="text-foreground text-sm">{character.round3_innocent}</p>
-                                            </div>
-                                          )}
-                                          {character.round3_guilty && (
-                                            <div>
-                                              <h6 className="font-medium text-xs text-foreground">If Guilty:</h6>
-                                              <p className="text-foreground text-sm">{character.round3_guilty}</p>
-                                            </div>
-                                          )}
-                                          {character.round3_accomplice && (
-                                            <div>
-                                              <h6 className="font-medium text-xs text-foreground">If Accomplice:</h6>
-                                              <p className="text-foreground text-sm">{character.round3_accomplice}</p>
-                                            </div>
-                                          )}
-                                        </div>
-                                      )}
-                                    </div>
-                                  )}
-
-                                  {/* Round 4 */}
-                                  {(character.round4_questions || character.round4_innocent || character.round4_guilty || character.round4_accomplice) && (
-                                    <div className="border-l-4 border-purple-500 pl-4">
-                                      <h5 className="font-medium text-foreground mb-2">Round 4</h5>
-                                      {character.round4_questions && (
-                                        <div className="mb-2">
-                                          <h6 className="font-medium text-sm text-foreground">Questions:</h6>
-                                          <p className="text-foreground text-sm">{character.round4_questions}</p>
-                                        </div>
-                                      )}
-                                      {(character.round4_innocent || character.round4_guilty || character.round4_accomplice) && (
-                                        <div className="space-y-1">
-                                          {character.round4_innocent && (
-                                            <div>
-                                              <h6 className="font-medium text-xs text-foreground">If Innocent:</h6>
-                                              <p className="text-foreground text-sm">{character.round4_innocent}</p>
-                                            </div>
-                                          )}
-                                          {character.round4_guilty && (
-                                            <div>
-                                              <h6 className="font-medium text-xs text-foreground">If Guilty:</h6>
-                                              <p className="text-foreground text-sm">{character.round4_guilty}</p>
-                                            </div>
-                                          )}
-                                          {character.round4_accomplice && (
-                                            <div>
-                                              <h6 className="font-medium text-xs text-foreground">If Accomplice:</h6>
-                                              <p className="text-foreground text-sm">{character.round4_accomplice}</p>
-                                            </div>
-                                          )}
-                                        </div>
-                                      )}
-                                    </div>
-                                  )}
-
+                          <ReactMarkdown 
+                            components={{
+                              table: ({ children }) => (
+                                <div className="overflow-x-auto">
+                                  <table>{children}</table>
                                 </div>
-                              </div>
-                            )}
-
-                            {/* Final Statement */}
-                            {(character.final_innocent || character.final_guilty || character.final_accomplice) && (
-                              <div className="mb-4">
-                                <h4 className="font-semibold mb-2 text-foreground">Final Statement</h4>
-                                <div className="space-y-2">
-                                  {character.final_innocent && (
-                                    <div>
-                                      <h6 className="font-medium text-sm text-foreground">If Innocent:</h6>
-                                      <p className="text-foreground">{character.final_innocent}</p>
-                                    </div>
-                                  )}
-                                  {character.final_guilty && (
-                                    <div>
-                                      <h6 className="font-medium text-sm text-foreground">If Guilty:</h6>
-                                      <p className="text-foreground">{character.final_guilty}</p>
-                                    </div>
-                                  )}
-                                  {character.final_accomplice && (
-                                    <div>
-                                      <h6 className="font-medium text-sm text-foreground">If Accomplice:</h6>
-                                      <p className="text-foreground">{character.final_accomplice}</p>
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            )}
-
-                            {/* Rumors to Spread */}
-                            {character.rumors && (
-                              <div className="mb-4">
-                                <h4 className="font-semibold mb-2 text-foreground">Rumors to Spread</h4>
-                                <p className="text-foreground">{character.rumors}</p>
-                              </div>
-                            )}
-
-                            {/* Questioning Options */}
-                            {questioningOptions.length > 0 && (
-                              <div className="mb-4">
-                                <h4 className="font-semibold mb-2 text-foreground">Questioning Options</h4>
-                                <ul className="list-disc pl-5 space-y-1">
-                                  {questioningOptions.map((option, idx) => (
-                                    <li key={idx} className="text-foreground">
-                                      <strong>To {option.target}:</strong> {option.question}
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-
-                          </div>
+                              ),
+                            }}
+                          >
+                            {characterGuideContent}
+                          </ReactMarkdown>
                         </AccordionContent>
                       </AccordionItem>
                     </Accordion>
