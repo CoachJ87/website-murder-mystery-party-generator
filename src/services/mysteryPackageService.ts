@@ -58,19 +58,52 @@ const getCurrentDomain = () => {
   return 'https://murder-mystery.party';
 };
 
-// Save structured package data from JSON response
+// Enhanced Save structured package data with comprehensive debugging
 export async function saveStructuredPackageData(mysteryId: string, jsonData: any): Promise<void> {
+  console.log("🔧 [DEBUG] saveStructuredPackageData called with:");
+  console.log("  - mysteryId:", mysteryId);
+  console.log("  - jsonData keys:", jsonData ? Object.keys(jsonData) : "null/undefined");
+  console.log("  - jsonData:", jsonData);
+
   try {
-    console.log("Saving structured package data for mystery:", mysteryId);
-    
-    // Validate required fields
-    if (!jsonData.title || !jsonData.gameOverview || !jsonData.hostGuide || !Array.isArray(jsonData.characters)) {
-      throw new Error("Missing required fields: title, gameOverview, hostGuide, or characters array");
+    // Enhanced validation with detailed logging
+    if (!jsonData) {
+      console.error("❌ [DEBUG] No jsonData provided");
+      throw new Error("No JSON data provided");
     }
     
-    console.log("Validation passed, proceeding with data save");
-    
-    // Get the package ID for this conversation
+    if (!jsonData.title) {
+      console.error("❌ [DEBUG] Missing title in jsonData");
+    }
+    if (!jsonData.gameOverview && !jsonData.game_overview) {
+      console.error("❌ [DEBUG] Missing gameOverview/game_overview in jsonData");
+    }
+    if (!jsonData.hostGuide && !jsonData.host_guide) {
+      console.error("❌ [DEBUG] Missing hostGuide/host_guide in jsonData");
+    }
+    if (!Array.isArray(jsonData.characters)) {
+      console.error("❌ [DEBUG] Missing or invalid characters array in jsonData");
+    }
+
+    // Flexible field mapping to handle different data formats
+    const normalizedData = {
+      title: jsonData.title,
+      gameOverview: jsonData.gameOverview || jsonData.game_overview,
+      hostGuide: jsonData.hostGuide || jsonData.host_guide,
+      materials: jsonData.materials,
+      preparation: jsonData.preparation || jsonData.preparation_instructions,
+      timeline: jsonData.timeline,
+      hostingTips: jsonData.hostingTips || jsonData.hosting_tips,
+      evidenceCards: jsonData.evidenceCards || jsonData.evidence_cards,
+      relationshipMatrix: jsonData.relationshipMatrix || jsonData.relationship_matrix,
+      detectiveScript: jsonData.detectiveScript || jsonData.detective_script,
+      characters: jsonData.characters || []
+    };
+
+    console.log("✅ [DEBUG] Normalized data:", normalizedData);
+
+    // Get the package ID for this conversation with enhanced error handling
+    console.log("🔍 [DEBUG] Fetching package for conversation:", mysteryId);
     const { data: packageData, error: packageError } = await supabase
       .from("mystery_packages")
       .select("id")
@@ -80,105 +113,155 @@ export async function saveStructuredPackageData(mysteryId: string, jsonData: any
       .maybeSingle();
     
     if (packageError) {
-      console.error("Error fetching package:", packageError);
-      throw new Error("Failed to fetch package record");
+      console.error("❌ [DEBUG] Error fetching package:", packageError);
+      throw new Error(`Failed to fetch package record: ${packageError.message}`);
     }
     
     if (!packageData) {
-      throw new Error("No package record found for this conversation");
+      console.log("ℹ️ [DEBUG] No existing package found, creating new one");
+      
+      // Create new package if none exists
+      const { data: newPackage, error: createError } = await supabase
+        .from("mystery_packages")
+        .insert({
+          conversation_id: mysteryId,
+          title: normalizedData.title,
+          game_overview: normalizedData.gameOverview,
+          host_guide: normalizedData.hostGuide,
+          materials: normalizedData.materials || null,
+          preparation_instructions: normalizedData.preparation || null,
+          timeline: normalizedData.timeline || null,
+          hosting_tips: normalizedData.hostingTips || null,
+          evidence_cards: normalizedData.evidenceCards || null,
+          relationship_matrix: normalizedData.relationshipMatrix || null,
+          detective_script: normalizedData.detectiveScript || null,
+          generation_status: {
+            status: 'completed',
+            progress: 100,
+            currentStep: 'Package generation completed'
+          },
+          generation_completed_at: new Date().toISOString(),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select("id")
+        .single();
+        
+      if (createError || !newPackage) {
+        console.error("❌ [DEBUG] Error creating package:", createError);
+        throw new Error(`Failed to create package record: ${createError?.message}`);
+      }
+      
+      var packageId = newPackage.id;
+      console.log("✅ [DEBUG] Created new package with ID:", packageId);
+    } else {
+      var packageId = packageData.id;
+      console.log("✅ [DEBUG] Found existing package with ID:", packageId);
+
+      // Update existing mystery_packages table with structured data
+      const { error: upsertError } = await supabase
+        .from("mystery_packages")
+        .update({
+          title: normalizedData.title,
+          game_overview: normalizedData.gameOverview,
+          host_guide: normalizedData.hostGuide,
+          materials: normalizedData.materials || null,
+          preparation_instructions: normalizedData.preparation || null,
+          timeline: normalizedData.timeline || null,
+          hosting_tips: normalizedData.hostingTips || null,
+          evidence_cards: normalizedData.evidenceCards || null,
+          relationship_matrix: normalizedData.relationshipMatrix || null,
+          detective_script: normalizedData.detectiveScript || null,
+          generation_status: {
+            status: 'completed',
+            progress: 100,
+            currentStep: 'Package generation completed'
+          },
+          generation_completed_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", packageId);
+      
+      if (upsertError) {
+        console.error("❌ [DEBUG] Error updating package data:", upsertError);
+        throw new Error(`Failed to save package data: ${upsertError.message}`);
+      }
+      
+      console.log("✅ [DEBUG] Package data updated successfully");
     }
     
-    const packageId = packageData.id;
-    
-    // Update mystery_packages table with structured data
-    const { error: upsertError } = await supabase
-      .from("mystery_packages")
-      .update({
-        title: jsonData.title,
-        game_overview: jsonData.gameOverview,
-        host_guide: jsonData.hostGuide,
-        materials: jsonData.materials || null,
-        preparation_instructions: jsonData.preparation || null,
-        timeline: jsonData.timeline || null,
-        hosting_tips: jsonData.hostingTips || null,
-        evidence_cards: jsonData.evidenceCards ? JSON.stringify(jsonData.evidenceCards) : null,
-        relationship_matrix: jsonData.relationshipMatrix ? JSON.stringify(jsonData.relationshipMatrix) : null,
-        detective_script: jsonData.detectiveScript || null,
-        generation_status: {
-          status: 'completed',
-          progress: 100,
-          currentStep: 'Package generation completed'
-        },
-        generation_completed_at: new Date().toISOString(),
+    // Handle characters if provided
+    if (Array.isArray(normalizedData.characters) && normalizedData.characters.length > 0) {
+      console.log(`🔍 [DEBUG] Processing ${normalizedData.characters.length} characters`);
+      
+      // Delete existing characters first
+      const { error: deleteError } = await supabase
+        .from("mystery_characters")
+        .delete()
+        .eq("package_id", packageId);
+      
+      if (deleteError) {
+        console.error("❌ [DEBUG] Error deleting existing characters:", deleteError);
+        throw new Error(`Failed to delete existing characters: ${deleteError.message}`);
+      }
+      
+      console.log("✅ [DEBUG] Existing characters deleted");
+      
+      // Insert new characters
+      const charactersToInsert = normalizedData.characters.map((char: any) => ({
+        package_id: packageId,
+        character_name: char.name || char.character_name,
+        description: char.description || null,
+        background: char.background || null,
+        secret: char.secret || null,
+        introduction: char.introduction || null,
+        rumors: char.rumors || null,
+        round2_questions: char.round2Questions || char.round2_questions || null,
+        round2_innocent: char.round2Innocent || char.round2_innocent || null,
+        round2_guilty: char.round2Guilty || char.round2_guilty || null,
+        created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
-      })
-      .eq("id", packageId);
-    
-    if (upsertError) {
-      console.error("Error upserting package data:", upsertError);
-      throw new Error("Failed to save package data");
+      }));
+      
+      console.log("🔍 [DEBUG] Characters to insert:", charactersToInsert);
+      
+      const { error: charactersError } = await supabase
+        .from("mystery_characters")
+        .insert(charactersToInsert);
+      
+      if (charactersError) {
+        console.error("❌ [DEBUG] Error inserting characters:", charactersError);
+        throw new Error(`Failed to save characters data: ${charactersError.message}`);
+      }
+      
+      console.log(`✅ [DEBUG] Successfully saved ${charactersToInsert.length} characters`);
+    } else {
+      console.log("ℹ️ [DEBUG] No characters provided or empty array");
     }
-    
-    console.log("Package data saved successfully");
-    
-    // Delete existing characters first
-    const { error: deleteError } = await supabase
-      .from("mystery_characters")
-      .delete()
-      .eq("package_id", packageId);
-    
-    if (deleteError) {
-      console.error("Error deleting existing characters:", deleteError);
-      throw new Error("Failed to delete existing characters");
-    }
-    
-    console.log("Existing characters deleted");
-    
-    // Insert new characters
-    const charactersToInsert = jsonData.characters.map((char: any) => ({
-      package_id: packageId,
-      character_name: char.name,
-      description: char.description || null,
-      background: char.background || null,
-      secret: char.secret || null,
-      introduction: char.introduction || null,
-      rumors: char.rumors || null,
-      round2_questions: char.round2Questions || null,
-      round2_innocent: char.round2Innocent || null,
-      round2_guilty: char.round2Guilty || null,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    }));
-    
-    const { error: charactersError } = await supabase
-      .from("mystery_characters")
-      .insert(charactersToInsert);
-    
-    if (charactersError) {
-      console.error("Error inserting characters:", charactersError);
-      throw new Error("Failed to save characters data");
-    }
-    
-    console.log(`Successfully saved ${charactersToInsert.length} characters`);
     
     // Update conversation table
+    console.log("🔍 [DEBUG] Updating conversation status");
     const { error: conversationError } = await supabase
       .from("conversations")
       .update({
         needs_package_generation: false,
+        has_complete_package: true,
+        is_paid: true,
+        display_status: "purchased",
         updated_at: new Date().toISOString()
       })
       .eq("id", mysteryId);
     
     if (conversationError) {
-      console.error("Error updating conversation:", conversationError);
-      throw new Error("Failed to update conversation status");
+      console.error("❌ [DEBUG] Error updating conversation:", conversationError);
+      throw new Error(`Failed to update conversation status: ${conversationError.message}`);
     }
     
-    console.log("Structured package data saved successfully for mystery:", mysteryId);
+    console.log("✅ [DEBUG] Conversation updated successfully");
+    console.log("🎉 [DEBUG] saveStructuredPackageData completed successfully for mystery:", mysteryId);
     
   } catch (error) {
-    console.error("Error in saveStructuredPackageData:", error);
+    console.error("❌ [DEBUG] Error in saveStructuredPackageData:", error);
     throw error;
   }
 }
@@ -411,8 +494,10 @@ export async function resumePackageGeneration(mysteryId: string): Promise<string
   return generateCompletePackage(mysteryId);
 }
 
-// Get generation status from database
+// Enhanced Get generation status with better error handling
 export async function getPackageGenerationStatus(mysteryId: string): Promise<GenerationStatus> {
+  console.log("🔍 [DEBUG] getPackageGenerationStatus called for:", mysteryId);
+  
   try {
     const { data, error } = await supabase
       .from("mystery_packages")
@@ -423,22 +508,29 @@ export async function getPackageGenerationStatus(mysteryId: string): Promise<Gen
       .maybeSingle();
       
     if (error) {
-      console.error("Error fetching generation status:", error);
-      throw new Error("Failed to fetch generation status");
+      console.error("❌ [DEBUG] Error fetching generation status:", error);
+      throw new Error(`Failed to fetch generation status: ${error.message}`);
     }
     
+    console.log("📊 [DEBUG] Raw generation status data:", data);
+    
     if (!data || !data.generation_status) {
-      return {
-        status: 'not_started',
+      console.log("ℹ️ [DEBUG] No generation status found, returning default");
+      const defaultStatus = {
+        status: 'not_started' as const,
         progress: 0,
         currentStep: 'Not started',
         sections: {}
       };
+      console.log("📊 [DEBUG] Returning default status:", defaultStatus);
+      return defaultStatus;
     }
     
-    return data.generation_status as GenerationStatus;
+    const status = data.generation_status as GenerationStatus;
+    console.log("✅ [DEBUG] Returning generation status:", status);
+    return status;
   } catch (error) {
-    console.error("Error in getPackageGenerationStatus:", error);
+    console.error("❌ [DEBUG] Error in getPackageGenerationStatus:", error);
     throw error;
   }
 }

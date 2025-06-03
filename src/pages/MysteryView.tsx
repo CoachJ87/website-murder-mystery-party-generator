@@ -100,25 +100,51 @@ const MysteryView = () => {
     }
   };
 
-  // Simplified status checking function
+  // Enhanced status checking function with better error handling
   const checkGenerationStatus = useCallback(async () => {
-    if (!id) return;
+    if (!id) {
+      console.log("❌ [DEBUG] checkGenerationStatus: No ID provided");
+      return null;
+    }
+    
+    console.log("🔍 [DEBUG] checkGenerationStatus called for mystery:", id);
     
     try {
       const status = await getPackageGenerationStatus(id);
       const previousStatus = generationStatus?.status;
       
+      console.log("📊 [DEBUG] Current status:", status);
+      console.log("📊 [DEBUG] Previous status:", previousStatus);
+      
+      // CRITICAL FIX: Ensure status is properly set
       setGenerationStatus(status);
       setLastUpdate(new Date());
       
-      console.log("Status check result:", status);
+      console.log("✅ [DEBUG] Status updated in state");
       
       // Handle completion - only trigger when status changes to completed
       if (status.status === 'completed' && previousStatus !== 'completed') {
+        console.log("🎉 [DEBUG] Generation completed! Fetching package data...");
         setGenerating(false);
         
-        // Fetch the completed package data
-        await fetchStructuredPackageData();
+        // CRITICAL FIX: Add delay and retry logic for data fetching
+        setTimeout(async () => {
+          try {
+            await fetchStructuredPackageData();
+            console.log("✅ [DEBUG] Package data fetched successfully after completion");
+          } catch (error) {
+            console.error("❌ [DEBUG] Error fetching package data after completion:", error);
+            // Retry once after 2 seconds
+            setTimeout(async () => {
+              try {
+                await fetchStructuredPackageData();
+                console.log("✅ [DEBUG] Package data fetched successfully on retry");
+              } catch (retryError) {
+                console.error("❌ [DEBUG] Final retry failed:", retryError);
+              }
+            }, 2000);
+          }
+        }, 1000);
         
         // Only show notification once with action buttons
         if (!packageReadyNotified.current) {
@@ -156,11 +182,13 @@ const MysteryView = () => {
             status: "purchased",
             is_paid: true,
             needs_package_generation: false,
+            has_complete_package: true,
             display_status: "purchased"
           })
           .eq("id", id);
           
       } else if (status.status === 'failed' && previousStatus !== 'failed') {
+        console.log("❌ [DEBUG] Generation failed");
         setGenerating(false);
         
         // Show detailed error message with current step
@@ -218,7 +246,7 @@ const MysteryView = () => {
       // Return status to help with polling control
       return status;
     } catch (error) {
-      console.error("Error checking generation status:", error);
+      console.error("❌ [DEBUG] Error checking generation status:", error);
       return null;
     }
   }, [id, navigate, generationStatus?.status, handleResumeGeneration, handleGeneratePackage]);
@@ -278,10 +306,10 @@ const MysteryView = () => {
     };
   }, [id, generationStatus?.status, generating, checkGenerationStatus]);
 
-  // Enhanced Fetch structured package data with extensive debugging
+  // Enhanced Fetch structured package data with comprehensive debugging and error handling
   const fetchStructuredPackageData = async () => {
     if (!id) {
-      console.log("❌ [DEBUG] No mystery ID provided to fetchStructuredPackageData");
+      console.log("❌ [DEBUG] fetchStructuredPackageData: No mystery ID provided");
       return;
     }
 
@@ -306,7 +334,9 @@ const MysteryView = () => {
           id
         `)
         .eq("conversation_id", id)
-        .single();
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
 
       if (packageError) {
         console.error("❌ [DEBUG] Error fetching package data:", packageError);
@@ -314,6 +344,8 @@ const MysteryView = () => {
         // Check if it's a "no rows" error vs actual error
         if (packageError.code === 'PGRST116') {
           console.log("ℹ️ [DEBUG] No mystery package found in database for this conversation");
+        } else {
+          throw new Error(`Database error: ${packageError.message}`);
         }
         return;
       }
@@ -389,6 +421,7 @@ const MysteryView = () => {
       }
     } catch (error) {
       console.error("❌ [DEBUG] Error in fetchStructuredPackageData:", error);
+      // Don't throw here to prevent breaking the UI
     }
   };
 
@@ -422,7 +455,7 @@ const MysteryView = () => {
     return charactersList;
   };
 
-  // Enhanced shouldShowTabs function with debugging
+  // Enhanced shouldShowTabs function with better debugging
   const shouldShowTabs = () => {
     console.log("🤔 [DEBUG] Checking shouldShowTabs conditions:");
     console.log("  - generationStatus?.status:", generationStatus?.status);
