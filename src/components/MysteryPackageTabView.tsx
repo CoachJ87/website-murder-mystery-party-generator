@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -365,18 +364,18 @@ const MysteryPackageTabView = React.memo(({
                               </div>
                             )}
 
-                            {/* Background */}
+                            {/* Your Background */}
                             {character.background && (
                               <div className="mb-4">
-                                <h4 className="font-semibold mb-2 text-foreground">Background</h4>
+                                <h4 className="font-semibold mb-2 text-foreground">Your Background</h4>
                                 <p className="text-foreground">{character.background}</p>
                               </div>
                             )}
 
-                            {/* Relationships */}
+                            {/* Your Relationships */}
                             {relationships.length > 0 && (
                               <div className="mb-4">
-                                <h4 className="font-semibold mb-2 text-foreground">Relationships</h4>
+                                <h4 className="font-semibold mb-2 text-foreground">Your Relationships</h4>
                                 <ul className="list-disc pl-5 space-y-1">
                                   {relationships.map((rel, idx) => (
                                     <li key={idx} className="text-foreground">
@@ -387,14 +386,17 @@ const MysteryPackageTabView = React.memo(({
                               </div>
                             )}
 
-                            {/* Secrets */}
-                            {secrets.length > 0 && (
+                            {/* Your Secrets */}
+                            {(secrets.length > 0 || character.secret) && (
                               <div className="mb-4">
-                                <h4 className="font-semibold mb-2 text-foreground">Secrets</h4>
+                                <h4 className="font-semibold mb-2 text-foreground">Your Secrets</h4>
                                 <ul className="list-disc pl-5 space-y-1">
                                   {secrets.map((secret, idx) => (
                                     <li key={idx} className="text-foreground">{secret}</li>
                                   ))}
+                                  {character.secret && (
+                                    <li className="text-foreground">{character.secret}</li>
+                                  )}
                                 </ul>
                               </div>
                             )}
@@ -407,38 +409,175 @@ const MysteryPackageTabView = React.memo(({
                               </div>
                             )}
 
+                            {/* Your Whereabouts */}
+                            {character.whereabouts && (
+                              <div className="mb-4">
+                                <h4 className="font-semibold mb-2 text-foreground">Your Whereabouts</h4>
+                                <p className="text-foreground">{character.whereabouts}</p>
+                              </div>
+                            )}
+
                             {/* Game Rounds */}
                             {(character.round1_statement || character.round2_statement || character.round3_statement) && (
                               <div className="mb-4">
                                 <h4 className="font-semibold mb-2 text-foreground">Game Rounds</h4>
-                                <div className="space-y-2">
+                                <div className="space-y-4">
+                                  
+                                  {/* Round 1 */}
                                   {character.round1_statement && (
-                                    <div>
-                                      <h5 className="font-medium text-sm text-foreground">Round 1:</h5>
-                                      <p className="text-sm text-foreground">{character.round1_statement}</p>
+                                    <div className="border-l-4 border-blue-500 pl-4">
+                                      <h5 className="font-medium text-foreground mb-2">Round 1</h5>
+                                      <p className="text-foreground mb-2">{character.round1_statement}</p>
                                     </div>
                                   )}
-                                  {character.round2_statement && (
-                                    <div>
-                                      <h5 className="font-medium text-sm text-foreground">Round 2:</h5>
-                                      <p className="text-sm text-foreground">{character.round2_statement}</p>
+
+                                  {/* Round 2 */}
+                                  {(character.round2_statement || character.round2_questions || character.round2_innocent || character.round2_guilty || character.round2_accomplice) && (
+                                    <div className="border-l-4 border-green-500 pl-4">
+                                      <h5 className="font-medium text-foreground mb-2">Round 2</h5>
+                                      {character.round2_statement && (
+                                        <p className="text-foreground mb-2">{character.round2_statement}</p>
+                                      )}
+                                      {character.round2_questions && (
+                                        <div className="mb-2">
+                                          <h6 className="font-medium text-sm text-foreground">Questions:</h6>
+                                          <p className="text-foreground text-sm">{character.round2_questions}</p>
+                                        </div>
+                                      )}
+                                      {(character.round2_innocent || character.round2_guilty || character.round2_accomplice) && (
+                                        <div className="space-y-1">
+                                          {character.round2_innocent && (
+                                            <div>
+                                              <h6 className="font-medium text-xs text-foreground">If Innocent:</h6>
+                                              <p className="text-foreground text-sm">{character.round2_innocent}</p>
+                                            </div>
+                                          )}
+                                          {character.round2_guilty && (
+                                            <div>
+                                              <h6 className="font-medium text-xs text-foreground">If Guilty:</h6>
+                                              <p className="text-foreground text-sm">{character.round2_guilty}</p>
+                                            </div>
+                                          )}
+                                          {character.round2_accomplice && (
+                                            <div>
+                                              <h6 className="font-medium text-xs text-foreground">If Accomplice:</h6>
+                                              <p className="text-foreground text-sm">{character.round2_accomplice}</p>
+                                            </div>
+                                          )}
+                                        </div>
+                                      )}
                                     </div>
                                   )}
-                                  {character.round3_statement && (
+
+                                  {/* Round 3 */}
+                                  {(character.round3_statement || character.round3_questions || character.round3_innocent || character.round3_guilty || character.round3_accomplice) && (
+                                    <div className="border-l-4 border-yellow-500 pl-4">
+                                      <h5 className="font-medium text-foreground mb-2">Round 3</h5>
+                                      {character.round3_statement && (
+                                        <p className="text-foreground mb-2">{character.round3_statement}</p>
+                                      )}
+                                      {character.round3_questions && (
+                                        <div className="mb-2">
+                                          <h6 className="font-medium text-sm text-foreground">Questions:</h6>
+                                          <p className="text-foreground text-sm">{character.round3_questions}</p>
+                                        </div>
+                                      )}
+                                      {(character.round3_innocent || character.round3_guilty || character.round3_accomplice) && (
+                                        <div className="space-y-1">
+                                          {character.round3_innocent && (
+                                            <div>
+                                              <h6 className="font-medium text-xs text-foreground">If Innocent:</h6>
+                                              <p className="text-foreground text-sm">{character.round3_innocent}</p>
+                                            </div>
+                                          )}
+                                          {character.round3_guilty && (
+                                            <div>
+                                              <h6 className="font-medium text-xs text-foreground">If Guilty:</h6>
+                                              <p className="text-foreground text-sm">{character.round3_guilty}</p>
+                                            </div>
+                                          )}
+                                          {character.round3_accomplice && (
+                                            <div>
+                                              <h6 className="font-medium text-xs text-foreground">If Accomplice:</h6>
+                                              <p className="text-foreground text-sm">{character.round3_accomplice}</p>
+                                            </div>
+                                          )}
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+
+                                  {/* Round 4 */}
+                                  {(character.round4_questions || character.round4_innocent || character.round4_guilty || character.round4_accomplice) && (
+                                    <div className="border-l-4 border-purple-500 pl-4">
+                                      <h5 className="font-medium text-foreground mb-2">Round 4</h5>
+                                      {character.round4_questions && (
+                                        <div className="mb-2">
+                                          <h6 className="font-medium text-sm text-foreground">Questions:</h6>
+                                          <p className="text-foreground text-sm">{character.round4_questions}</p>
+                                        </div>
+                                      )}
+                                      {(character.round4_innocent || character.round4_guilty || character.round4_accomplice) && (
+                                        <div className="space-y-1">
+                                          {character.round4_innocent && (
+                                            <div>
+                                              <h6 className="font-medium text-xs text-foreground">If Innocent:</h6>
+                                              <p className="text-foreground text-sm">{character.round4_innocent}</p>
+                                            </div>
+                                          )}
+                                          {character.round4_guilty && (
+                                            <div>
+                                              <h6 className="font-medium text-xs text-foreground">If Guilty:</h6>
+                                              <p className="text-foreground text-sm">{character.round4_guilty}</p>
+                                            </div>
+                                          )}
+                                          {character.round4_accomplice && (
+                                            <div>
+                                              <h6 className="font-medium text-xs text-foreground">If Accomplice:</h6>
+                                              <p className="text-foreground text-sm">{character.round4_accomplice}</p>
+                                            </div>
+                                          )}
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Final Statement */}
+                            {(character.final_innocent || character.final_guilty || character.final_accomplice) && (
+                              <div className="mb-4">
+                                <h4 className="font-semibold mb-2 text-foreground">Final Statement</h4>
+                                <div className="space-y-2">
+                                  {character.final_innocent && (
                                     <div>
-                                      <h5 className="font-medium text-sm text-foreground">Round 3:</h5>
-                                      <p className="text-sm text-foreground">{character.round3_statement}</p>
+                                      <h6 className="font-medium text-sm text-foreground">If Innocent:</h6>
+                                      <p className="text-foreground">{character.final_innocent}</p>
+                                    </div>
+                                  )}
+                                  {character.final_guilty && (
+                                    <div>
+                                      <h6 className="font-medium text-sm text-foreground">If Guilty:</h6>
+                                      <p className="text-foreground">{character.final_guilty}</p>
+                                    </div>
+                                  )}
+                                  {character.final_accomplice && (
+                                    <div>
+                                      <h6 className="font-medium text-sm text-foreground">If Accomplice:</h6>
+                                      <p className="text-foreground">{character.final_accomplice}</p>
                                     </div>
                                   )}
                                 </div>
                               </div>
                             )}
 
-                            {/* Whereabouts */}
-                            {character.whereabouts && (
+                            {/* Rumors to Spread */}
+                            {character.rumors && (
                               <div className="mb-4">
-                                <h4 className="font-semibold mb-2 text-foreground">Whereabouts</h4>
-                                <p className="text-foreground">{character.whereabouts}</p>
+                                <h4 className="font-semibold mb-2 text-foreground">Rumors to Spread</h4>
+                                <p className="text-foreground">{character.rumors}</p>
                               </div>
                             )}
 
