@@ -550,20 +550,6 @@ const MysteryView = () => {
           console.log("🔍 [DEBUG] Conversation indicates package exists, fetching structured data...");
           await fetchStructuredPackageData();
 
-          // Fallback to legacy content if structured data is not available
-          console.log("🔍 [DEBUG] Also checking for legacy content...");
-          const { data: legacyPackageData, error: packageError } = await supabase
-            .from("mystery_packages")
-            .select("legacy_content")
-            .eq("conversation_id", id)
-            .single();
-
-          if (!packageError && legacyPackageData && legacyPackageData.legacy_content) {
-            console.log("✅ [DEBUG] Legacy content found, setting as fallback");
-            setPackageContent(legacyPackageData.legacy_content);
-          } else {
-            console.log("ℹ️ [DEBUG] No legacy content found");
-          }
         } else {
           console.log("ℹ️ [DEBUG] No complete package indicated, skipping package data fetch");
         }
