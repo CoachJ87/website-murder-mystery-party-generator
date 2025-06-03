@@ -62,6 +62,83 @@ const MysteryView = () => {
     }
   }, []);
 
+  // Fetch structured package data with proper error handling
+  const fetchStructuredPackageData = useCallback(async () => {
+    if (!id) {
+      console.log("❌ [DEBUG] No ID provided to fetchStructuredPackageData");
+      return;
+    }
+
+    try {
+      console.log("🔍 [DEBUG] Fetching structured package data for:", id);
+      
+      // Fetch mystery packages data with structured fields
+      const { data: packageData, error: packageError } = await supabase
+        .from("mystery_packages")
+        .select(`
+          title,
+          game_overview,
+          host_guide,
+          materials,
+          preparation_instructions,
+          timeline,
+          hosting_tips,
+          evidence_cards,
+          relationship_matrix,
+          detective_script,
+          id
+        `)
+        .eq("conversation_id", id)
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (packageError) {
+        console.error("❌ [DEBUG] Error fetching package data:", packageError);
+        return;
+      }
+
+      if (packageData) {
+        console.log("✅ [DEBUG] Package data found:", packageData);
+        
+        // Map database fields to component props
+        const structuredPackageData: MysteryPackageData = {
+          title: packageData.title,
+          gameOverview: packageData.game_overview,
+          hostGuide: packageData.host_guide,
+          materials: packageData.materials,
+          preparation: packageData.preparation_instructions,
+          timeline: packageData.timeline,
+          hostingTips: packageData.hosting_tips,
+          evidenceCards: packageData.evidence_cards,
+          relationshipMatrix: packageData.relationship_matrix,
+          detectiveScript: packageData.detective_script,
+        };
+        
+        setPackageData(structuredPackageData);
+        console.log("✅ [DEBUG] Structured package data loaded");
+
+        // Fetch characters from database
+        const { data: charactersData, error: charactersError } = await supabase
+          .from("mystery_characters")
+          .select("*")
+          .eq("package_id", packageData.id)
+          .order("character_name");
+
+        if (charactersError) {
+          console.error("❌ [DEBUG] Error fetching characters:", charactersError);
+        } else if (charactersData && charactersData.length > 0) {
+          setCharacters(charactersData);
+          console.log(`✅ [DEBUG] Loaded ${charactersData.length} characters from database`);
+        }
+      } else {
+        console.log("ℹ️ [DEBUG] No package data found");
+      }
+    } catch (error) {
+      console.error("❌ [DEBUG] Error in fetchStructuredPackageData:", error);
+    }
+  }, [id]);
+
   // Throttled status checking to prevent spam
   const throttledCheckGenerationStatus = useCallback(async () => {
     if (!id) return null;
@@ -77,17 +154,26 @@ const MysteryView = () => {
     lastStatusCheck.current = now;
     
     try {
+      console.log("🔍 [DEBUG] Checking generation status for:", id);
       const status = await getPackageGenerationStatus(id);
       const previousStatus = generationStatus?.status;
+      
+      console.log("📊 [DEBUG] Status check result:", status.status, "(was:", previousStatus + ")");
       
       setGenerationStatus(status);
       setLastUpdate(new Date());
       
-      debugLog(`Status check result: ${status.status} (was: ${previousStatus})`);
-      
       // Handle completion - only trigger when status changes to completed
       if (status.status === 'completed' && previousStatus !== 'completed') {
+        console.log("🎉 [DEBUG] Generation completed! Stopping polling and fetching data...");
         setGenerating(false);
+        
+        // Stop polling immediately
+        if (pollingIntervalRef.current) {
+          clearInterval(pollingIntervalRef.current);
+          pollingIntervalRef.current = null;
+          console.log("⏹️ [DEBUG] Polling stopped");
+        }
         
         // Fetch the completed package data
         await fetchStructuredPackageData();
@@ -128,12 +214,20 @@ const MysteryView = () => {
             status: "purchased",
             is_paid: true,
             needs_package_generation: false,
+            has_complete_package: true,
             display_status: "purchased"
           })
           .eq("id", id);
           
       } else if (status.status === 'failed' && previousStatus !== 'failed') {
+        console.log("❌ [DEBUG] Generation failed");
         setGenerating(false);
+        
+        // Stop polling on failure
+        if (pollingIntervalRef.current) {
+          clearInterval(pollingIntervalRef.current);
+          pollingIntervalRef.current = null;
+        }
         
         // Show detailed error message with current step
         const errorMessage = status.currentStep || "Generation failed at an unknown step";
@@ -189,10 +283,10 @@ const MysteryView = () => {
       
       return status;
     } catch (error) {
-      debugLog("Error checking generation status", error);
+      console.error("❌ [DEBUG] Error checking generation status:", error);
       return null;
     }
-  }, [id, navigate, generationStatus?.status, debugLog]);
+  }, [id, navigate, generationStatus?.status, fetchStructuredPackageData, debugLog]);
 
   // Controlled auto-refresh with proper cleanup
   useEffect(() => {
@@ -202,20 +296,20 @@ const MysteryView = () => {
       if (pollingIntervalRef.current) {
         clearInterval(pollingIntervalRef.current);
         pollingIntervalRef.current = null;
-        debugLog("Auto-refresh stopped");
+        console.log("⏹️ [DEBUG] Auto-refresh stopped");
       }
     };
 
-    const shouldStartPolling = generationStatus?.status === 'in_progress' || generating;
+    const shouldStartPolling = (generationStatus?.status === 'in_progress' || generating) && generationStatus?.status !== 'completed';
     const isAlreadyPolling = pollingIntervalRef.current !== null;
 
     if (shouldStartPolling && !isAlreadyPolling) {
-      debugLog("Starting controlled auto-refresh (30s intervals)");
+      console.log("▶️ [DEBUG] Starting controlled auto-refresh (15s intervals)");
       
       // Initial status check
       throttledCheckGenerationStatus().then((status) => {
-        // Only continue polling if still in progress
-        if (status && status.status === 'in_progress') {
+        // Only continue polling if still in progress and not completed
+        if (status && status.status === 'in_progress' && status.status !== 'completed') {
           pollingIntervalRef.current = window.setInterval(async () => {
             const currentStatus = await throttledCheckGenerationStatus();
             
@@ -223,7 +317,7 @@ const MysteryView = () => {
             if (currentStatus && (currentStatus.status === 'completed' || currentStatus.status === 'failed')) {
               cleanup();
             }
-          }, 30000); // 30 seconds
+          }, 15000); // 15 seconds for faster detection
         }
       });
     } else if (!shouldStartPolling && isAlreadyPolling) {
@@ -231,7 +325,7 @@ const MysteryView = () => {
     }
 
     return cleanup;
-  }, [id, generationStatus?.status, generating, throttledCheckGenerationStatus, debugLog]);
+  }, [id, generationStatus?.status, generating, throttledCheckGenerationStatus]);
 
   // Resume generation handler
   const handleResumeGeneration = useCallback(async () => {
@@ -283,74 +377,6 @@ const MysteryView = () => {
     }
   }, [id, debugLog]);
 
-  // Fetch structured package data
-  const fetchStructuredPackageData = useCallback(async () => {
-    if (!id) return;
-
-    try {
-      debugLog("Fetching structured package data");
-      
-    //  // Fetch mystery packages data with structured fields
-    //  const { data: packageData, error: packageError } = await supabase
-    //    .from("mystery_packages")
-    //    .select(`
-    //      title,
-    //      game_overview,
-    //      host_guide,
-    //      materials,
-    //      preparation_instructions,
-    //      timeline,
-    //      hosting_tips,
-    //      evidence_cards,
-    //      relationship_matrix,
-    //      detective_script,
-    //      id
-    //    `)
-    //    .eq("conversation_id", id)
-    //    .single();
-
-      if (packageError) {
-        debugLog("Error fetching package data", packageError);
-        return;
-      }
-
-      if (packageData) {
-        // Map database fields to component props
-        const structuredPackageData: MysteryPackageData = {
-          title: packageData.title,
-          gameOverview: packageData.game_overview,
-          hostGuide: packageData.host_guide,
-          materials: packageData.materials,
-          preparation: packageData.preparation_instructions,
-          timeline: packageData.timeline,
-          hostingTips: packageData.hosting_tips,
-          evidenceCards: packageData.evidence_cards,
-          relationshipMatrix: packageData.relationship_matrix,
-          detectiveScript: packageData.detective_script,
-        };
-        
-        setPackageData(structuredPackageData);
-        debugLog("Structured package data loaded");
-
-        // Fetch characters from database
-        const { data: charactersData, error: charactersError } = await supabase
-          .from("mystery_characters")
-          .select("*")
-          .eq("package_id", packageData.id)
-          .order("character_name");
-
-        if (charactersError) {
-          debugLog("Error fetching characters", charactersError);
-        } else if (charactersData && charactersData.length > 0) {
-          setCharacters(charactersData);
-          debugLog(`Loaded ${charactersData.length} characters from database`);
-        }
-      }
-    } catch (error) {
-      debugLog("Error in fetchStructuredPackageData", error);
-    }
-  }, [id, debugLog]);
-
   // Initial data loading
   useEffect(() => {
     const fetchMystery = async () => {
@@ -358,7 +384,7 @@ const MysteryView = () => {
 
       setLoading(true);
       try {
-        debugLog("Starting fetchMystery");
+        console.log("🔍 [DEBUG] Starting fetchMystery for:", id);
         
         // Check if this is a redirect from a purchase
         const urlParams = new URLSearchParams(window.location.search);
@@ -375,12 +401,12 @@ const MysteryView = () => {
           .single();
 
         if (error) {
-          debugLog("Error fetching mystery", error);
+          console.error("❌ [DEBUG] Error fetching mystery:", error);
           toast.error("Failed to load mystery");
           return;
         }
 
-        debugLog("Mystery data loaded", {
+        console.log("✅ [DEBUG] Mystery data loaded:", {
           id: conversation.id,
           is_paid: conversation.is_paid,
           needs_package_generation: conversation.needs_package_generation,
@@ -389,22 +415,29 @@ const MysteryView = () => {
 
         setMystery(conversation);
 
-        // Check generation status if package generation is needed
-        if (conversation.needs_package_generation || conversation.is_paid) {
+        // Check generation status if package generation is needed OR if already paid
+        if (conversation.needs_package_generation || conversation.is_paid || conversation.has_complete_package) {
           const status = await getPackageGenerationStatus(id);
+          console.log("📊 [DEBUG] Initial status check:", status);
           setGenerationStatus(status);
           setLastUpdate(new Date());
           
           if (status.status === 'in_progress') {
             setGenerating(true);
+            console.log("🔄 [DEBUG] Generation in progress, starting polling");
           } else if (status.status === 'completed') {
             // Reset notification state on new page load if package is complete
             packageReadyNotified.current = false;
+            console.log("✅ [DEBUG] Generation already completed, loading data");
+            
+            // Load the package data immediately
+            await fetchStructuredPackageData();
+            
             await supabase
               .from("conversations")
               .update({
                 is_paid: true,
-                is_purchased: true,
+                has_complete_package: true,
                 display_status: "purchased",
                 mystery_data: {
                   ...conversation.mystery_data,
@@ -415,23 +448,12 @@ const MysteryView = () => {
           }
         }
 
-        // Fetch package data if it exists
+        // Always try to fetch package data if conversation indicates it should exist
         if (conversation.has_complete_package || conversation.is_paid) {
           await fetchStructuredPackageData();
-
-          // Fallback to legacy content if structured data is not available
-         // const { data: packageData, error: packageError } = await supabase
-           // .from("mystery_packages")
-           // .select("legacy_content")
-           // .eq("conversation_id", id)
-           // .single();
-
-        //  if (!packageError && packageData && packageData.legacy_content) {
-          //  setPackageContent(packageData.legacy_content);
-         // }
         }
       } catch (error) {
-        debugLog("Error in fetchMystery", error);
+        console.error("❌ [DEBUG] Error in fetchMystery:", error);
         toast.error("Failed to load mystery");
       } finally {
         setLoading(false);
@@ -439,7 +461,7 @@ const MysteryView = () => {
     };
 
     fetchMystery();
-  }, [id, fetchStructuredPackageData, debugLog]);
+  }, [id, fetchStructuredPackageData]);
 
   // Manual refresh function
   const handleManualRefresh = useCallback(() => {
@@ -524,7 +546,7 @@ const MysteryView = () => {
             </Button>
           </CardTitle>
           <CardDescription>
-            This process takes 3-5 minutes to complete. This page automatically refreshes every 30 seconds.
+            This process takes 3-5 minutes to complete. This page automatically refreshes every 15 seconds.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -559,7 +581,7 @@ const MysteryView = () => {
           </div>
           
           <p className="text-sm text-muted-foreground">
-            <strong>Auto-refresh:</strong> This page automatically checks for updates every 30 seconds.
+            <strong>Auto-refresh:</strong> This page automatically checks for updates every 15 seconds.
             {lastUpdate && ` Last update: ${lastUpdate.toLocaleTimeString()}`}
           </p>
         </CardContent>
@@ -582,10 +604,24 @@ const MysteryView = () => {
     );
   }
 
-  const shouldShowTabs = (generationStatus?.status === 'completed' || 
+  // Updated logic to determine when to show tabs
+  const shouldShowTabs = (
+    generationStatus?.status === 'completed' || 
     packageContent || 
     packageData ||
-    (mystery && mystery.is_paid));
+    characters.length > 0 ||
+    (mystery && (mystery.is_paid || mystery.has_complete_package))
+  );
+
+  console.log("🎭 [DEBUG] shouldShowTabs decision:", {
+    generationStatus: generationStatus?.status,
+    hasPackageContent: !!packageContent,
+    hasPackageData: !!packageData,
+    charactersCount: characters.length,
+    mysteryPaid: mystery?.is_paid,
+    mysteryComplete: mystery?.has_complete_package,
+    result: shouldShowTabs
+  });
 
   return (
     <div className="min-h-screen flex flex-col">
