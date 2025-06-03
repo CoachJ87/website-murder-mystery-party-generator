@@ -300,7 +300,7 @@ const MysteryView = () => {
       }
     };
 
-    const shouldStartPolling = (generationStatus?.status === 'in_progress' || generating) && generationStatus?.status !== 'completed';
+    const shouldStartPolling = generationStatus?.status === 'in_progress' && !generating;
     const isAlreadyPolling = pollingIntervalRef.current !== null;
 
     if (shouldStartPolling && !isAlreadyPolling) {
@@ -308,8 +308,8 @@ const MysteryView = () => {
       
       // Initial status check
       throttledCheckGenerationStatus().then((status) => {
-        // Only continue polling if still in progress and not completed
-        if (status && status.status === 'in_progress' && status.status !== 'completed') {
+        // Only continue polling if still in progress
+        if (status && status.status === 'in_progress') {
           pollingIntervalRef.current = window.setInterval(async () => {
             const currentStatus = await throttledCheckGenerationStatus();
             
