@@ -139,6 +139,56 @@ const MysteryView = () => {
     }
   }, [id]);
 
+  // Resume generation handler
+  const handleResumeGeneration = useCallback(async () => {
+    if (!id) {
+      toast.error("Mystery ID is missing");
+      return;
+    }
+
+    setGenerating(true);
+    try {
+      toast.info("Resuming your mystery generation...");
+      
+      // Reset notification state on resume
+      packageReadyNotified.current = false;
+      
+      await resumePackageGeneration(id);
+      
+      debugLog("Resume generation initiated");
+      
+    } catch (error: any) {
+      debugLog("Error resuming package generation", error);
+      setGenerating(false);
+      toast.error(error.message || "Failed to resume generation");
+    }
+  }, [id, debugLog]);
+
+  // Generate package handler
+  const handleGeneratePackage = useCallback(async () => {
+    if (!id) {
+      toast.error("Mystery ID is missing");
+      return;
+    }
+
+    setGenerating(true);
+    packageReadyNotified.current = false; // Reset notification flag
+    
+    try {
+      toast.info("Starting generation of your mystery package. This will take 3-5 minutes...");
+      
+      // Just call the webhook - don't wait for completion
+      await generateCompletePackage(id);
+      
+      debugLog("Generation started, auto-refresh will check status");
+      
+    } catch (error: any) {
+      debugLog("Error starting package generation", error);
+      setGenerating(false);
+      toast.error(error.message || "Failed to start package generation");
+    }
+  }, [id, debugLog]);
+
   // Enhanced status checking with content detection
   const checkGenerationStatus = useCallback(async () => {
     if (!id) return null;
@@ -400,56 +450,6 @@ const MysteryView = () => {
 
     return cleanup;
   }, [id, generationStatus?.status, generating, checkGenerationStatus]);
-
-  // Resume generation handler
-  const handleResumeGeneration = useCallback(async () => {
-    if (!id) {
-      toast.error("Mystery ID is missing");
-      return;
-    }
-
-    setGenerating(true);
-    try {
-      toast.info("Resuming your mystery generation...");
-      
-      // Reset notification state on resume
-      packageReadyNotified.current = false;
-      
-      await resumePackageGeneration(id);
-      
-      debugLog("Resume generation initiated");
-      
-    } catch (error: any) {
-      debugLog("Error resuming package generation", error);
-      setGenerating(false);
-      toast.error(error.message || "Failed to resume generation");
-    }
-  }, [id, debugLog]);
-
-  // Generate package handler
-  const handleGeneratePackage = useCallback(async () => {
-    if (!id) {
-      toast.error("Mystery ID is missing");
-      return;
-    }
-
-    setGenerating(true);
-    packageReadyNotified.current = false; // Reset notification flag
-    
-    try {
-      toast.info("Starting generation of your mystery package. This will take 3-5 minutes...");
-      
-      // Just call the webhook - don't wait for completion
-      await generateCompletePackage(id);
-      
-      debugLog("Generation started, auto-refresh will check status");
-      
-    } catch (error: any) {
-      debugLog("Error starting package generation", error);
-      setGenerating(false);
-      toast.error(error.message || "Failed to start package generation");
-    }
-  }, [id, debugLog]);
 
   // Initial data loading
   useEffect(() => {
