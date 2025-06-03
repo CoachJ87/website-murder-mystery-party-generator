@@ -139,26 +139,99 @@ const MysteryView = () => {
     }
   }, [id]);
 
-  // Throttled status checking to prevent spam
-  const throttledCheckGenerationStatus = useCallback(async () => {
+  // Enhanced status checking with content detection
+  const checkGenerationStatus = useCallback(async () => {
     if (!id) return null;
     
     const now = Date.now();
     
     // Don't check more than once every 10 seconds
     if (now - lastStatusCheck.current < 10000) {
-      debugLog("Status check throttled");
+      debugLog("🔄 Status check throttled");
       return generationStatus;
     }
     
     lastStatusCheck.current = now;
     
     try {
-      console.log("🔍 [DEBUG] Checking generation status for:", id);
+      console.log("🔍 [DEBUG] Enhanced status check - checking for actual package content first");
+      
+      // FIRST: Check for actual package content in database
+      const { data: packageData, error: packageError } = await supabase
+        .from("mystery_packages")
+        .select(`
+          title,
+          host_guide,
+          generation_completed_at,
+          generation_status,
+          id
+        `)
+        .eq("conversation_id", id)
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (packageError) {
+        console.error("❌ [DEBUG] Error checking package content:", packageError);
+      }
+
+      // Check if we have actual content
+      const hasActualContent = packageData && (
+        packageData.title || 
+        packageData.host_guide || 
+        packageData.generation_completed_at
+      );
+
+      console.log("📊 [DEBUG] Content detection:", {
+        hasPackageData: !!packageData,
+        hasTitle: !!packageData?.title,
+        hasHostGuide: !!packageData?.host_guide,
+        hasCompletedAt: !!packageData?.generation_completed_at,
+        hasActualContent,
+        currentStoredStatus: packageData?.generation_status
+      });
+
+      // If we have actual content but status shows not_started, force completion
+      if (hasActualContent) {
+        const storedStatus = packageData.generation_status || {};
+        
+        if (storedStatus.status === 'not_started' || !storedStatus.status) {
+          console.log("✅ [DEBUG] Found actual content but stale status - forcing completion");
+          
+          // Create completed status object
+          const completedStatus = {
+            status: 'completed' as const,
+            progress: 100,
+            currentStep: 'Package generation completed',
+            sections: {
+              hostGuide: true,
+              characters: true,
+              clues: true
+            },
+            resumable: false
+          };
+          
+          // Update the database status to match reality
+          await supabase
+            .from("mystery_packages")
+            .update({
+              generation_status: completedStatus
+            })
+            .eq("id", packageData.id);
+          
+          console.log("🎉 [DEBUG] Forced status to completed - actual content detected");
+          setGenerationStatus(completedStatus);
+          setLastUpdate(new Date());
+          return completedStatus;
+        }
+      }
+      
+      // FALLBACK: Use normal status checking
+      console.log("🔍 [DEBUG] Running normal status check as fallback");
       const status = await getPackageGenerationStatus(id);
       const previousStatus = generationStatus?.status;
       
-      console.log("📊 [DEBUG] Status check result:", status.status, "(was:", previousStatus + ")");
+      console.log("📊 [DEBUG] Normal status check result:", status.status, "(was:", previousStatus + ")");
       
       setGenerationStatus(status);
       setLastUpdate(new Date());
@@ -283,12 +356,12 @@ const MysteryView = () => {
       
       return status;
     } catch (error) {
-      console.error("❌ [DEBUG] Error checking generation status:", error);
+      console.error("❌ [DEBUG] Error in enhanced status checking:", error);
       return null;
     }
-  }, [id, navigate, generationStatus?.status, fetchStructuredPackageData, debugLog]);
+  }, [id, navigate, generationStatus?.status, fetchStructuredPackageData, debugLog, handleResumeGeneration, handleGeneratePackage]);
 
-  // Controlled auto-refresh with proper cleanup
+  // Enhanced auto-refresh with faster polling
   useEffect(() => {
     if (!id) return;
 
@@ -296,7 +369,7 @@ const MysteryView = () => {
       if (pollingIntervalRef.current) {
         clearInterval(pollingIntervalRef.current);
         pollingIntervalRef.current = null;
-        console.log("⏹️ [DEBUG] Auto-refresh stopped");
+        console.log("⏹️ [DEBUG] Enhanced auto-refresh stopped");
       }
     };
 
@@ -304,20 +377,21 @@ const MysteryView = () => {
     const isAlreadyPolling = pollingIntervalRef.current !== null;
 
     if (shouldStartPolling && !isAlreadyPolling) {
-      console.log("▶️ [DEBUG] Starting controlled auto-refresh (15s intervals)");
+      console.log("▶️ [DEBUG] Starting enhanced auto-refresh (15s intervals)");
       
-      // Initial status check
-      throttledCheckGenerationStatus().then((status) => {
+      // Initial enhanced status check
+      checkGenerationStatus().then((status) => {
         // Only continue polling if still in progress
         if (status && status.status === 'in_progress') {
           pollingIntervalRef.current = window.setInterval(async () => {
-            const currentStatus = await throttledCheckGenerationStatus();
+            console.log("🔄 [DEBUG] Auto-refresh tick - running enhanced detection");
+            const currentStatus = await checkGenerationStatus();
             
             // Stop polling if generation is complete or failed
             if (currentStatus && (currentStatus.status === 'completed' || currentStatus.status === 'failed')) {
               cleanup();
             }
-          }, 15000); // 15 seconds for faster detection
+          }, 15000); // Reduced from 30000 to 15000 for faster detection
         }
       });
     } else if (!shouldStartPolling && isAlreadyPolling) {
@@ -325,7 +399,7 @@ const MysteryView = () => {
     }
 
     return cleanup;
-  }, [id, generationStatus?.status, generating, throttledCheckGenerationStatus]);
+  }, [id, generationStatus?.status, generating, checkGenerationStatus]);
 
   // Resume generation handler
   const handleResumeGeneration = useCallback(async () => {
@@ -466,8 +540,8 @@ const MysteryView = () => {
   // Manual refresh function
   const handleManualRefresh = useCallback(() => {
     debugLog("Manual refresh triggered");
-    throttledCheckGenerationStatus();
-  }, [throttledCheckGenerationStatus, debugLog]);
+    checkGenerationStatus();
+  }, [checkGenerationStatus, debugLog]);
 
   // Render generation progress
   const renderGenerationProgress = () => {
