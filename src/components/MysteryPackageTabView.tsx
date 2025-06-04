@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -308,11 +307,11 @@ const MysteryPackageTabView = React.memo(({
     // Detective Setup Choice
     content += `### DETECTIVE SETUP CHOICE\n\n`;
     content += `Choose your detective mechanism:\n\n`;
-    content += `**If using Host as Detective:**\n`;
-    content += `- 8a. Review and practice all detective scripts to embody the detective character\n`;
-    content += `- 8b. Decide murderer and accomplice (if applicable) in advance\n`;
-    content += `- 8c. Send private messages to selected players with their roles\n\n`;
-    content += `**If using Audio Detective:**\n`;
+    content += `**If using Host as Detective:**\n\n`;
+    content += `- Review and practice all detective scripts to embody the detective character\n`;
+    content += `- Decide murderer and accomplice (if applicable) in advance\n`;
+    content += `- Send private messages to selected players with their roles\n\n`;
+    content += `**If using Audio Detective:**\n\n`;
     content += `- Record all detective script sections using AI voice service\n`;
     content += `- Test audio files and prepare playback method\n`;
     content += `- Include yourself in paper slip system\n`;
@@ -434,7 +433,7 @@ const MysteryPackageTabView = React.memo(({
     
     content += `## GENERAL HOSTING GUIDANCE\n\n`;
     content += `- Keep the game moving - don't let any round go on too long\n`;
-    content += `- Have backup questions ready if players get stuck\n`;
+    content += `- Have backup questions ready if players get stuck\n\n`;
     
     return content;
   }, [packageData, mysteryTitle]);
