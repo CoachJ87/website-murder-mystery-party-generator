@@ -290,12 +290,8 @@ const MysteryView = () => {
         console.log("🎉 [DEBUG] Generation completed! Stopping polling and fetching data...");
         setGenerating(false);
         
-        // Stop polling immediately
-        if (pollingIntervalRef.current) {
-          clearInterval(pollingIntervalRef.current);
-          pollingIntervalRef.current = null;
-          console.log("⏹️ [DEBUG] Polling stopped");
-        }
+        // Note: Polling cleanup is handled in the useEffect where the interval is created
+        console.log("⏹️ [DEBUG] Polling will be stopped by useEffect cleanup");
         
         // Fetch the completed package data
         await fetchStructuredPackageData();
@@ -345,11 +341,8 @@ const MysteryView = () => {
         console.log("❌ [DEBUG] Generation failed");
         setGenerating(false);
         
-        // Stop polling on failure
-        if (pollingIntervalRef.current) {
-          clearInterval(pollingIntervalRef.current);
-          pollingIntervalRef.current = null;
-        }
+        // Note: Polling cleanup is handled in the useEffect where the interval is created
+        console.log("⏹️ [DEBUG] Polling will be stopped by useEffect cleanup");
         
         // Show detailed error message with current step
         const errorMessage = status.currentStep || "Generation failed at an unknown step";
