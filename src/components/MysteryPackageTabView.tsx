@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -275,6 +276,169 @@ const MysteryPackageTabView = React.memo(({
     return content;
   }, [getRelationshipsArray, getSecretsArray]);
 
+  // Function to build complete host guide content
+  const buildCompleteHostGuide = useCallback((): string => {
+    if (!packageData) return "";
+    
+    const title = packageData.title || mysteryTitle || "Mystery";
+    
+    let content = `# ${title} - HOST GUIDE\n\n`;
+    
+    // Game Overview
+    if (packageData.gameOverview) {
+      content += `## GAME OVERVIEW\n\n${packageData.gameOverview}\n\n`;
+    }
+    
+    // Materials Needed
+    if (packageData.materials) {
+      content += `## MATERIALS NEEDED\n\n${packageData.materials}\n\n`;
+    }
+    
+    // Preparation Before the Party
+    content += `## PREPARATION BEFORE THE PARTY\n\n`;
+    
+    // Add accomplice mechanism dependency warning
+    content += `### IMPORTANT: ACCOMPLICE MECHANISM DEPENDENCY\n\n`;
+    content += `This mystery uses an accomplice mechanism that was specifically designed for all confirmed players to participate. If any player cannot attend at the last minute, you should disable the accomplice mechanism entirely and have all players use only "Innocent" and "Guilty" scripts to ensure smooth gameplay.\n\n`;
+    
+    if (packageData.preparation) {
+      content += `${packageData.preparation}\n\n`;
+    }
+    
+    // Detective Setup Choice
+    content += `### DETECTIVE SETUP CHOICE\n\n`;
+    content += `Choose your detective mechanism:\n\n`;
+    content += `**If using Host as Detective:**\n`;
+    content += `- 8a. Review and practice all detective scripts to embody the detective character\n`;
+    content += `- 8b. Decide murderer and accomplice (if applicable) in advance\n`;
+    content += `- 8c. Send private messages to selected players with their roles\n\n`;
+    content += `**If using Audio Detective:**\n`;
+    content += `- Record all detective script sections using AI voice service\n`;
+    content += `- Test audio files and prepare playback method\n`;
+    content += `- Include yourself in paper slip system\n`;
+    content += `- Prepare backup method (printed scripts) in case of technical issues\n\n`;
+    
+    // Time Guidelines
+    if (packageData.timeline) {
+      content += `## TIME GUIDELINES\n\n${packageData.timeline}\n\n`;
+    }
+    
+    // Detective Role Options
+    content += `## DETECTIVE ROLE OPTIONS\n\n`;
+    content += `Before starting the game, you need to decide how to handle the detective/narrator role. You have two main options:\n\n`;
+    content += `**Option 1: Host as Detective Character** - You play the role of the detective investigating the murder. This gives you full control over pacing and allows you to manually select the murderer and accomplice beforehand.\n\n`;
+    content += `**Option 2: Host as Participant** - You play as one of the suspect characters and use pre-recorded audio files for the detective narration. This allows you to fully participate in the mystery while maintaining the random murderer selection.\n\n`;
+    
+    content += `### IF YOU CHOOSE TO PLAY THE DETECTIVE CHARACTER:\n\n`;
+    content += `- You will act as the detective throughout the game, not just read scripts\n`;
+    content += `- Before the game begins, privately select which player will be the murderer (and accomplice if applicable)\n`;
+    content += `- Send these players private messages explaining their roles\n`;
+    content += `- You'll deliver all detective dialogue as your character during the game\n`;
+    content += `- Skip the random murderer determination process described below\n\n`;
+    
+    content += `### IF YOU CHOOSE TO PARTICIPATE AS A SUSPECT CHARACTER:\n\n`;
+    content += `- Include yourself in the paper slip system\n`;
+    content += `- Create audio files for all detective scripts using AI voice services like Eleven Labs or Google AI Studio Generate Speech (free at https://aistudio.google.com/generate-speech)\n`;
+    content += `- Record each script section as separate files (opening.mp3, round2-intro.mp3, etc.)\n`;
+    content += `- Test audio quality and have backup printed scripts ready\n`;
+    content += `- Follow the random murderer determination process below\n\n`;
+    
+    // Accomplice Mechanism Recommendation
+    content += `## ACCOMPLICE MECHANISM RECOMMENDATION\n\n`;
+    content += `This mystery can be played with or without the accomplice mechanism. For simpler gameplay, especially with new players or smaller groups, consider skipping the accomplice entirely and using only "Innocent" and "Guilty" scripts. The accomplice adds complexity but can make the mystery more engaging for experienced players.\n\n`;
+    
+    // Determining the Murderer
+    content += `## DETERMINING THE MURDERER\n\n`;
+    content += `**If you are playing as the detective:** The murderer and accomplice are pre-selected by you before the game begins. Skip to the Round-by-Round Instructions.\n\n`;
+    content += `**If you are participating as a suspect character:** The murderer is determined randomly AFTER Round 1 and BEFORE Round 2:\n\n`;
+    content += `1. After Round 1 is complete, tell players to maintain a blank face\n`;
+    content += `2. Have each player draw one slip from the container\n`;
+    content += `3. Whoever draws the "Murderer" slip is the murderer\n`;
+    content += `4. If using an accomplice, have the murderer privately approach their designated accomplice\n`;
+    content += `5. The murderer must tell the accomplice out-of-character: "I am the murderer and you are my accomplice, so use the accomplice scripts"\n`;
+    content += `6. Inform all players that the murderer should use "Guilty" scripts, everyone else should use "Innocent" scripts, and if the murderer tells you that you are an accomplice, then use the "Accomplice" scripts\n`;
+    content += `7. Continue to Round 2\n\n`;
+    
+    content += `**IMPORTANT NOTE FOR ACCOMPLICE COMMUNICATION:** Make it very clear to all players that when the murderer is selected, they need to privately inform their accomplice of both roles. This is done out-of-character and is a necessary part of the game mechanics.\n\n`;
+    
+    // Accomplice Mechanism
+    content += `## ACCOMPLICE MECHANISM\n\n`;
+    content += `**WARNING:** The accomplice relationships in this mystery were designed specifically for the confirmed player list. If any player is absent, skip the accomplice mechanism entirely and use only "Innocent" and "Guilty" scripts.\n\n`;
+    content += `### HOW THE ACCOMPLICE SYSTEM WORKS:\n\n`;
+    content += `- Each character has a designated accomplice partner (specified in their character guide)\n`;
+    content += `- The murderer must privately inform their accomplice after being selected\n`;
+    content += `- The accomplice doesn't know they're the accomplice until the murderer tells them\n`;
+    content += `- The accomplice should subtly support the murderer's alibis and redirect suspicion\n`;
+    content += `- The accomplice should never directly contradict evidence but can provide alternative interpretations\n`;
+    content += `- Both murderer and accomplice should avoid being seen conferring too obviously\n\n`;
+    
+    content += `**IMPORTANT:** The murderer is not pre-determined in the materials you create. Any character must be capable of being the murderer with their provided motives and background. The selection happens randomly after Round 1 unless you choose to play detective.\n\n`;
+    
+    // Round-by-Round Instructions
+    content += `## ROUND-BY-ROUND INSTRUCTIONS\n\n`;
+    content += `### ROUND 1: INTRODUCTIONS & RUMORS\n\n`;
+    content += `**Part A: Introductions**\n\n`;
+    content += `- Have each player introduce their character using their "Introduction" script\n`;
+    content += `- Players should share basic character information but not reveal their secrets\n\n`;
+    content += `**Part B: Rumors**\n\n`;
+    content += `- Divide players into small groups if possible (use breakout rooms for virtual play)\n`;
+    content += `- Direct players to spread one rumor about another character to anyone who will listen\n`;
+    content += `- Allow 15 minutes for this gossip session\n`;
+    content += `- For smaller groups, you may have time for two rumors per player\n\n`;
+    
+    content += `### ROUND 2: MOTIVES\n\n`;
+    content += `- Share the Round 2 evidence as described in the evidence cards\n`;
+    content += `- Select a player to begin by choosing a scripted question to ask another player\n`;
+    content += `- The questioned player reads their answer (either "Innocent" or "Guilty" version)\n`;
+    content += `- Continue until all players have answered one question\n\n`;
+    
+    content += `### ROUND 3: METHOD\n\n`;
+    content += `- Share the Round 3 evidence\n`;
+    content += `- Follow the same questioning format as Round 2\n`;
+    content += `- Ensure all players have an opportunity to answer\n\n`;
+    
+    content += `### ROUND 4: OPPORTUNITY\n\n`;
+    content += `- Share the Round 4 evidence\n`;
+    content += `- Follow the same questioning format as Rounds 2 and 3\n`;
+    content += `- Ensure all players have an opportunity to answer\n\n`;
+    
+    content += `### ACCUSATIONS\n\n`;
+    content += `- Direct players to prepare a brief accusation of who they think is the murderer and why\n`;
+    content += `- Encourage the actual murderer to accuse someone else to avoid suspicion\n`;
+    content += `- Call on players to make their accusations\n`;
+    content += `- Keep track of accusations - the first correct answer will determine the winner\n\n`;
+    
+    content += `### FINAL STATEMENTS\n\n`;
+    content += `- Call on players in any order you choose\n`;
+    content += `- Each player reads their "Innocent" final statement when called\n`;
+    content += `- The murderer goes last and reads their "Guilty" statement as a confession\n`;
+    content += `- Award prizes as desired (Best Inspector, Best Costume, Best Performer, etc.)\n\n`;
+    
+    // Hosting Tips
+    if (packageData.hostingTips) {
+      content += `## HOSTING TIPS\n\n${packageData.hostingTips}\n\n`;
+    }
+    
+    // Detective Character Guidance
+    content += `## DETECTIVE CHARACTER GUIDANCE\n\n`;
+    content += `**If you're playing the detective character:**\n\n`;
+    content += `- Fully embody the detective role throughout the game\n`;
+    content += `- Stay in character while guiding the investigation\n`;
+    content += `- Use the detective's authority to keep the game moving and manage pacing\n\n`;
+    
+    content += `**If you're using audio files:**\n\n`;
+    content += `- Test all audio files and playback method before guests arrive\n`;
+    content += `- Set volume at appropriate level for your space\n`;
+    content += `- Keep printed backup scripts handy in case of technical issues\n`;
+    content += `- Consider dimming lights during audio playback for added atmosphere\n\n`;
+    
+    content += `## GENERAL HOSTING GUIDANCE\n\n`;
+    content += `- Keep the game moving - don't let any round go on too long\n`;
+    content += `- Have backup questions ready if players get stuck\n`;
+    
+    return content;
+  }, [packageData, mysteryTitle]);
+
   // Memoized content extraction functions to prevent unnecessary recalculations
   const extractHostGuide = useCallback(() => {
     if (!packageContent) return "";
@@ -347,8 +511,19 @@ const MysteryPackageTabView = React.memo(({
 
   // Memoized content getters - only recalculate when dependencies change
   const hostGuide = useMemo(() => {
-    return packageData?.hostGuide || extractHostGuide();
-  }, [packageData?.hostGuide, extractHostGuide]);
+    // Priority 1: Use complete host guide from database fields
+    if (packageData) {
+      return buildCompleteHostGuide();
+    }
+    
+    // Priority 2: Use legacy hostGuide field
+    if (packageData?.hostGuide) {
+      return packageData.hostGuide;
+    }
+    
+    // Priority 3: Fallback to text parsing
+    return extractHostGuide();
+  }, [packageData, buildCompleteHostGuide, extractHostGuide]);
 
   const detectiveScript = useMemo(() => {
     return packageData?.detectiveScript || extractInspectorScript();
