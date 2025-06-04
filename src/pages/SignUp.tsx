@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -15,7 +14,8 @@ const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [socialLoading, setSocialLoading] = useState<string | null>(null);
+  // TODO: Re-enable when Google OAuth is fixed
+  // const [socialLoading, setSocialLoading] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -81,28 +81,29 @@ const SignUp = () => {
     }
   };
 
-  const handleGoogleSignIn = async () => {
-    try {
-      setSocialLoading('google');
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        }
-      });
-      
-      if (error) {
-        console.error("Google sign in error:", error);
-        toast.error(`Failed to sign in with Google: ${error.message}`);
-        setSocialLoading(null);
-      }
-      // Page will redirect if successful
-    } catch (error: any) {
-      console.error("Google sign in catch block:", error);
-      toast.error(`An unexpected error occurred: ${error.message || "Unknown error"}`);
-      setSocialLoading(null);
-    }
-  };
+  // TODO: Re-enable Google auth when OAuth issues are resolved
+  // const handleGoogleSignIn = async () => {
+  //   try {
+  //     setSocialLoading('google');
+  //     const { error } = await supabase.auth.signInWithOAuth({
+  //       provider: "google",
+  //       options: {
+  //         redirectTo: `${window.location.origin}/auth/callback`,
+  //       }
+  //     });
+  //     
+  //     if (error) {
+  //       console.error("Google sign in error:", error);
+  //       toast.error(`Failed to sign in with Google: ${error.message}`);
+  //       setSocialLoading(null);
+  //     }
+  //     // Page will redirect if successful
+  //   } catch (error: any) {
+  //     console.error("Google sign in catch block:", error);
+  //     toast.error(`An unexpected error occurred: ${error.message || "Unknown error"}`);
+  //     setSocialLoading(null);
+  //   }
+  // };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -113,7 +114,8 @@ const SignUp = () => {
           <div className="bg-card rounded-lg shadow-lg border p-8">
             <h1 className="text-2xl font-bold mb-6 text-center">Create an Account</h1>
             
-            <div className="space-y-4 mb-6">
+            {/* TODO: Re-enable Google auth when OAuth issues are resolved */}
+            {/* <div className="space-y-4 mb-6">
               <Button 
                 variant="outline" 
                 className="w-full flex items-center justify-center gap-2"
@@ -153,7 +155,7 @@ const SignUp = () => {
               <div className="relative flex justify-center text-xs uppercase">
                 <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
               </div>
-            </div>
+            </div> */}
             
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">

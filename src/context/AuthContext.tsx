@@ -20,7 +20,8 @@ type AuthContextType = {
   setIsPublic: (value: boolean) => void;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (name: string, email: string, password: string) => Promise<void>;
-  signInWithGoogle: () => Promise<void>;
+  // TODO: Re-enable Google auth when OAuth issues are resolved
+  // signInWithGoogle: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   signOut: () => Promise<void>;
 };
@@ -35,7 +36,8 @@ const AuthContext = createContext<AuthContextType>({
   setIsPublic: () => {},
   signIn: async () => {},
   signUp: async () => {},
-  signInWithGoogle: async () => {},
+  // TODO: Re-enable Google auth when OAuth issues are resolved
+  // signInWithGoogle: async () => {},
   resetPassword: async () => {},
   signOut: async () => {},
 });
@@ -207,51 +209,52 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // TODO: Re-enable Google auth when OAuth issues are resolved
   // Sign in with Google - Enhanced with detailed debugging
-  const signInWithGoogle = async () => {
-    try {
-      console.log("=== Starting Google OAuth Flow ===");
-      console.log("Current origin:", window.location.origin);
-      
-      const redirectUrl = `${window.location.origin}/auth/callback`;
-      console.log("Redirect URL:", redirectUrl);
-      
-      const oauthConfig = {
-        provider: "google" as const,
-        options: {
-          redirectTo: redirectUrl,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          },
-        },
-      };
-      
-      console.log("OAuth config:", oauthConfig);
-      
-      const { data, error } = await supabase.auth.signInWithOAuth(oauthConfig);
-      
-      console.log("signInWithOAuth result:", { data, error });
-      
-      if (error) {
-        console.error("Google sign-in error:", error);
-        toast.error(`Failed to sign in with Google: ${error.message}`);
-        throw error;
-      }
-      
-      if (data.url) {
-        console.log("OAuth redirect URL generated:", data.url);
-        console.log("Redirecting to Google...");
-        // The redirect will happen automatically
-      } else {
-        console.warn("No redirect URL returned from signInWithOAuth");
-      }
-      
-    } catch (error: any) {
-      console.error("Google sign-in catch block:", error);
-      toast.error("Failed to initiate Google sign-in. Please try again.");
-    }
-  };
+  // const signInWithGoogle = async () => {
+  //   try {
+  //     console.log("=== Starting Google OAuth Flow ===");
+  //     console.log("Current origin:", window.location.origin);
+  //     
+  //     const redirectUrl = `${window.location.origin}/auth/callback`;
+  //     console.log("Redirect URL:", redirectUrl);
+  //     
+  //     const oauthConfig = {
+  //       provider: "google" as const,
+  //       options: {
+  //         redirectTo: redirectUrl,
+  //         queryParams: {
+  //           access_type: 'offline',
+  //           prompt: 'consent',
+  //         },
+  //       },
+  //     };
+  //     
+  //     console.log("OAuth config:", oauthConfig);
+  //     
+  //     const { data, error } = await supabase.auth.signInWithOAuth(oauthConfig);
+  //     
+  //     console.log("signInWithOAuth result:", { data, error });
+  //     
+  //     if (error) {
+  //       console.error("Google sign-in error:", error);
+  //       toast.error(`Failed to sign in with Google: ${error.message}`);
+  //       throw error;
+  //     }
+  //     
+  //     if (data.url) {
+  //       console.log("OAuth redirect URL generated:", data.url);
+  //       console.log("Redirecting to Google...");
+  //       // The redirect will happen automatically
+  //     } else {
+  //       console.warn("No redirect URL returned from signInWithOAuth");
+  //     }
+  //     
+  //   } catch (error: any) {
+  //     console.error("Google sign-in catch block:", error);
+  //     toast.error("Failed to initiate Google sign-in. Please try again.");
+  //   }
+  // };
 
   // Reset password
   const resetPassword = async (email: string) => {
@@ -312,7 +315,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsPublic,
     signIn,
     signUp,
-    signInWithGoogle,
+    // TODO: Re-enable Google auth when OAuth issues are resolved
+    // signInWithGoogle,
     resetPassword,
     signOut,
   };
