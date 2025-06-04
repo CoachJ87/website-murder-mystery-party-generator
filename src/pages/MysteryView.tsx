@@ -47,7 +47,6 @@ const MysteryView = () => {
   // Controlled logging and polling
   const DEBUG_MODE = process.env.NODE_ENV === 'development';
   const packageReadyNotified = useRef<boolean>(false);
-  const pollingIntervalRef = useRef<number | null>(null);
   const lastStatusCheck = useRef<number>(0);
   const lastLogTime = useRef<number>(0);
 
@@ -415,33 +414,37 @@ const MysteryView = () => {
   useEffect(() => {
     if (!id) return;
 
+    let pollingInterval: number | null = null;
+
     const cleanup = () => {
-      if (pollingIntervalRef.current) {
-        clearInterval(pollingIntervalRef.current);
-        pollingIntervalRef.current = null;
+      if (pollingInterval) {
+        clearInterval(pollingInterval);
+        pollingInterval = null;
         console.log("⏹️ [DEBUG] Enhanced auto-refresh stopped");
       }
     };
 
     const shouldStartPolling = generationStatus?.status === 'in_progress' && !generating;
-    const isAlreadyPolling = pollingIntervalRef.current !== null;
+    const isAlreadyPolling = pollingInterval !== null;
 
     if (shouldStartPolling && !isAlreadyPolling) {
-      console.log("▶️ [DEBUG] Starting enhanced auto-refresh (15s intervals)");
+      console.log("▶️ [DEBUG] Starting enhanced auto-refresh (10s intervals)");
       
       // Initial enhanced status check
       checkGenerationStatus().then((status) => {
         // Only continue polling if still in progress
         if (status && status.status === 'in_progress') {
-          pollingIntervalRef.current = window.setInterval(async () => {
+          pollingInterval = window.setInterval(async () => {
             console.log("🔄 [DEBUG] Auto-refresh tick - running enhanced detection");
+            console.log("Polling for status update...");
             const currentStatus = await checkGenerationStatus();
             
             // Stop polling if generation is complete or failed
             if (currentStatus && (currentStatus.status === 'completed' || currentStatus.status === 'failed')) {
+              console.log("Generation finished - stopping polling");
               cleanup();
             }
-          }, 15000); // Reduced from 30000 to 15000 for faster detection
+          }, 10000); // Changed from 15000 to 10000 for faster detection
         }
       });
     } else if (!shouldStartPolling && isAlreadyPolling) {
