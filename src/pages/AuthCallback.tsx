@@ -35,21 +35,9 @@ const AuthCallback = () => {
           toast.success("Successfully signed in with Google!");
           navigate("/dashboard");
         } else {
-          console.log("No session found in callback, checking URL for auth data...");
-          
-          // Try to handle the session from URL hash/fragment
-          const { data: sessionData, error: sessionError } = await supabase.auth.getSessionFromUrl();
-          console.log("getSessionFromUrl result:", { sessionData, sessionError });
-          
-          if (sessionData.session) {
-            console.log("Session found from URL:", sessionData.session.user.email);
-            toast.success("Successfully signed in with Google!");
-            navigate("/dashboard");
-          } else {
-            console.log("No session found from URL either");
-            toast.error("No authentication session found. Please try again.");
-            navigate("/sign-in");
-          }
+          console.log("No session found in callback");
+          toast.error("No authentication session found. Please try again.");
+          navigate("/sign-in");
         }
       } catch (error: any) {
         console.error("OAuth callback catch block:", error);
