@@ -10,10 +10,14 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        console.log("Handling OAuth callback");
+        console.log("=== OAuth Callback Handler Started ===");
+        console.log("Current URL:", window.location.href);
+        console.log("URL Hash:", window.location.hash);
+        console.log("URL Search:", window.location.search);
         
-        // Get the session from the URL hash
+        // Get the session from the URL hash/params
         const { data, error } = await supabase.auth.getSession();
+        console.log("getSession result:", { data, error });
         
         if (error) {
           console.error("OAuth callback error:", error);
@@ -23,12 +27,29 @@ const AuthCallback = () => {
         }
 
         if (data.session) {
-          console.log("OAuth callback successful:", data.session.user.email);
+          console.log("OAuth callback successful:", {
+            userId: data.session.user.id,
+            email: data.session.user.email,
+            provider: data.session.user.app_metadata?.provider
+          });
           toast.success("Successfully signed in with Google!");
           navigate("/dashboard");
         } else {
-          console.log("No session found in callback");
-          navigate("/sign-in");
+          console.log("No session found in callback, checking URL for auth data...");
+          
+          // Try to handle the session from URL hash/fragment
+          const { data: sessionData, error: sessionError } = await supabase.auth.getSessionFromUrl();
+          console.log("getSessionFromUrl result:", { sessionData, sessionError });
+          
+          if (sessionData.session) {
+            console.log("Session found from URL:", sessionData.session.user.email);
+            toast.success("Successfully signed in with Google!");
+            navigate("/dashboard");
+          } else {
+            console.log("No session found from URL either");
+            toast.error("No authentication session found. Please try again.");
+            navigate("/sign-in");
+          }
         }
       } catch (error: any) {
         console.error("OAuth callback catch block:", error);

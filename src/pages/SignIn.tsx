@@ -62,20 +62,30 @@ const SignIn = () => {
 
   const handleGoogleSignIn = async () => {
     try {
+      console.log("=== Google Sign-In Button Clicked ===");
       setSocialLoading('google');
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
         }
       });
+      
+      console.log("Direct OAuth call result:", { error });
       
       if (error) {
         console.error("Google sign in error:", error);
         toast.error(`Failed to sign in with Google: ${error.message}`);
         setSocialLoading(null);
+      } else {
+        console.log("OAuth redirect should be happening...");
+        // Don't reset loading state here - page will redirect
       }
-      // Page will redirect if successful
     } catch (error: any) {
       console.error("Google sign in catch block:", error);
       toast.error(`An unexpected error occurred: ${error.message || "Unknown error"}`);

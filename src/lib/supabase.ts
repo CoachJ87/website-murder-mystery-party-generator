@@ -23,3 +23,8 @@ export const supabase = createClient(
 
 // Add console log to confirm the client is properly initialized
 console.log('Supabase client initialized with OAuth support');
+console.log('Auth config:', {
+  detectSessionInUrl: true,
+  flowType: 'pkce',
+  storage: 'localStorage'
+});
