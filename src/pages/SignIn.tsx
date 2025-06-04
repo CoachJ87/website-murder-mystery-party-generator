@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -62,32 +61,74 @@ const SignIn = () => {
 
   const handleGoogleSignIn = async () => {
     try {
-      console.log("=== Google Sign-In Button Clicked ===");
+      console.log("=== Google Sign-In Debug Info ===");
+      console.log("Current origin:", window.location.origin);
+      console.log("Current URL:", window.location.href);
+      
       setSocialLoading('google');
       
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
+      const redirectUrl = `${window.location.origin}/auth/callback`;
+      console.log("Redirect URL:", redirectUrl);
+      
+      const oauthConfig = {
+        provider: "google" as const,
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: redirectUrl,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
           },
         }
+      };
+      
+      console.log("OAuth config:", JSON.stringify(oauthConfig, null, 2));
+      console.log("Calling supabase.auth.signInWithOAuth...");
+      
+      const { data, error } = await supabase.auth.signInWithOAuth(oauthConfig);
+      
+      console.log("signInWithOAuth response:", { 
+        data, 
+        error,
+        hasUrl: !!data?.url,
+        provider: data?.provider 
       });
       
-      console.log("Direct OAuth call result:", { error });
-      
       if (error) {
-        console.error("Google sign in error:", error);
+        console.error("❌ Google sign-in error:", error);
+        console.error("Error details:", {
+          message: error.message,
+          status: error.status,
+          details: error
+        });
         toast.error(`Failed to sign in with Google: ${error.message}`);
         setSocialLoading(null);
-      } else {
-        console.log("OAuth redirect should be happening...");
-        // Don't reset loading state here - page will redirect
+        return;
       }
+      
+      if (data?.url) {
+        console.log("✅ OAuth redirect URL generated:", data.url);
+        console.log("🔄 Browser should redirect to Google now...");
+        // The redirect will happen automatically, so don't reset loading state
+        
+        // Add a timeout as a fallback in case redirect doesn't work
+        setTimeout(() => {
+          console.log("⚠️ Redirect timeout - this might indicate an issue");
+          setSocialLoading(null);
+        }, 5000);
+      } else {
+        console.warn("⚠️ No redirect URL returned from signInWithOAuth");
+        console.log("Response data:", data);
+        toast.error("Failed to initiate Google sign-in. No redirect URL received.");
+        setSocialLoading(null);
+      }
+      
     } catch (error: any) {
-      console.error("Google sign in catch block:", error);
+      console.error("❌ Google sign-in catch block:", error);
+      console.error("Catch block error details:", {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
       toast.error(`An unexpected error occurred: ${error.message || "Unknown error"}`);
       setSocialLoading(null);
     }
