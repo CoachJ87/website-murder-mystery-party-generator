@@ -160,7 +160,7 @@ const MysteryPackageTabView = React.memo(({
       content += `## ROUND 1: INTRODUCTIONS & RUMORS\n\n`;
       
       if (character.introduction) {
-        content += `### SAY HELLO\n\n${character.introduction}\n\n`;
+        content += `### INTRODUCE YOURSELF\n\n${character.introduction}\n\n`;
       }
       
       if (character.round1_statement) {
