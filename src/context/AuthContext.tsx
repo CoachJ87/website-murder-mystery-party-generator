@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -208,7 +207,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // Sign in with Google
+  // Sign in with Google - Updated for better OAuth handling
   const signInWithGoogle = async () => {
     try {
       console.log("Attempting to sign in with Google");
@@ -217,6 +216,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         provider: "google",
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
         },
       });
       
@@ -226,8 +229,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         throw error;
       }
       
+      // Note: The redirect will happen automatically, so we don't need to navigate here
+      console.log("Google OAuth redirect initiated");
     } catch (error: any) {
       console.error("Google sign-in catch block:", error);
+      toast.error("Failed to initiate Google sign-in. Please try again.");
     }
   };
 

@@ -21,6 +21,7 @@ import Contact from "./pages/Contact";
 import Privacy from "./pages/Privacy";
 import Support from "./pages/Support";
 import NotFound from "./pages/NotFound";
+import AuthCallback from "./pages/AuthCallback";
 import React from "react";
 
 const queryClient = new QueryClient();
@@ -67,6 +68,7 @@ const AppRoutes = () => (
     <Route path="/forgot-password" element={<ForgotPassword />} />
     <Route path="/reset-password" element={<ResetPassword />} />
     <Route path="/check-email" element={<CheckEmail />} />
+    <Route path="/auth/callback" element={<AuthCallback />} />
     <Route path="/showcase" element={<Showcase />} />
     <Route path="/contact" element={<Contact />} />
     <Route path="/privacy" element={<Privacy />} />

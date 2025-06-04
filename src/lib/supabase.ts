@@ -9,8 +9,9 @@ export const supabase = createClient(
     auth: {
       persistSession: true,
       autoRefreshToken: true,
-      detectSessionInUrl: false,
-      storage: localStorage
+      detectSessionInUrl: true, // Important for OAuth flows
+      storage: localStorage,
+      flowType: 'pkce' // Use PKCE flow for better security
     },
     global: {
       headers: {
@@ -21,4 +22,4 @@ export const supabase = createClient(
 );
 
 // Add console log to confirm the client is properly initialized
-console.log('Supabase client initialized');
+console.log('Supabase client initialized with OAuth support');
