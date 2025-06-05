@@ -15,11 +15,14 @@ const Header = () => {
   };
 
   return (
-    <header className="py-4 px-4 md:px-8 border-b sticky top-0 bg-background/95 backdrop-blur-sm z-50">
+    <header className="py-3 px-3 md:py-4 md:px-8 border-b sticky top-0 bg-background/95 backdrop-blur-sm z-50">
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex items-center">
-          <Link to="/" className="flex items-center space-x-2 mr-8 no-underline">
-            <span className="text-2xl font-bold gradient-text">Murder Mystery Generator</span>
+          <Link to="/" className="flex items-center space-x-2 mr-4 md:mr-8 no-underline">
+            <span className="text-lg md:text-2xl font-bold gradient-text">
+              <span className="hidden sm:inline">Murder Mystery Generator</span>
+              <span className="sm:hidden">MMG</span>
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -61,51 +64,71 @@ const Header = () => {
           )}
         </div>
 
-        {/* Mobile Menu Button */}
+        {/* Mobile Menu Button - Enhanced touch target */}
         <button
-          className="md:hidden text-foreground p-2"
+          className="md:hidden text-foreground p-3 -mr-3 min-w-[44px] min-h-[44px] flex items-center justify-center"
           onClick={toggleMenu}
           aria-label="Toggle menu"
+          aria-expanded={isMenuOpen}
         >
           {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu - Improved layout and touch targets */}
       {isMenuOpen && (
-        <div className="md:hidden absolute top-16 left-0 right-0 bg-background border-b p-4 flex flex-col space-y-4 z-50">
-          {isAuthenticated ? (
-            <>
-              <div className="flex items-center space-x-2 py-2">
-                {user?.avatar && (
-                  <img 
-                    src={user.avatar} 
-                    alt={user.name}
-                    className="w-8 h-8 rounded-full"
-                  />
-                )}
-                <span className="font-medium">{user?.name}</span>
-              </div>
-              <Button asChild className="w-full no-underline" onClick={toggleMenu}>
-                <Link to="/dashboard">Dashboard</Link>
-              </Button>
-              <Button variant="outline" className="w-full no-underline" onClick={() => {
-                signOut();
-                toggleMenu();
-              }}>
-                Sign Out
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button asChild variant="outline" className="w-full no-underline" onClick={toggleMenu}>
-                <Link to="/sign-in">Sign In</Link>
-              </Button>
-              <Button asChild className="w-full no-underline" onClick={toggleMenu}>
-                <Link to="/sign-up">Sign Up</Link>
-              </Button>
-            </>
-          )}
+        <div className="md:hidden absolute top-full left-0 right-0 bg-background border-b shadow-lg z-50">
+          <div className="p-4 space-y-4">
+            {isAuthenticated ? (
+              <>
+                <div className="flex items-center space-x-3 py-3 border-b border-border">
+                  {user?.avatar && (
+                    <img 
+                      src={user.avatar} 
+                      alt={user.name}
+                      className="w-8 h-8 rounded-full"
+                    />
+                  )}
+                  <span className="font-medium text-sm">{user?.name}</span>
+                </div>
+                <Button 
+                  asChild 
+                  className="w-full h-12 no-underline text-base" 
+                  onClick={toggleMenu}
+                >
+                  <Link to="/dashboard">Dashboard</Link>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full h-12 no-underline text-base" 
+                  onClick={() => {
+                    signOut();
+                    toggleMenu();
+                  }}
+                >
+                  Sign Out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button 
+                  asChild 
+                  variant="outline" 
+                  className="w-full h-12 no-underline text-base" 
+                  onClick={toggleMenu}
+                >
+                  <Link to="/sign-in">Sign In</Link>
+                </Button>
+                <Button 
+                  asChild 
+                  className="w-full h-12 no-underline text-base" 
+                  onClick={toggleMenu}
+                >
+                  <Link to="/sign-up">Sign Up</Link>
+                </Button>
+              </>
+            )}
+          </div>
         </div>
       )}
     </header>
