@@ -20,7 +20,7 @@ const Header = () => {
         <div className="flex items-center">
           <Link to="/" className="flex items-center space-x-2 mr-4 md:mr-8 no-underline">
             <span className="text-lg md:text-2xl font-bold gradient-text">
-              <span className="hidden sm:inline">Murder Mystery Generator</span>
+              <span className="hidden sm:inline">Murder Maker</span>
               <span className="sm:hidden">MMG</span>
             </span>
           </Link>
