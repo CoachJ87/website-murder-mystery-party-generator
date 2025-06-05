@@ -126,16 +126,16 @@ const MysteryPackageTabView = React.memo(({
     const relationships = getRelationshipsArray(character.relationships);
     const secrets = getSecretsArray(character.secrets);
     
-    let content = `# ${character.character_name} - CHARACTER GUIDE\n\n`;
+    let content = `# ${character.character_name} - Character Guide\n\n`;
     
     // Character Description
     if (character.description) {
-      content += `## CHARACTER DESCRIPTION\n\n${character.description}\n\n`;
+      content += `${character.description}\n\n`;
     }
     
     // Your Background
     if (character.background) {
-      content += `## YOUR BACKGROUND\n\n${character.background}\n\n`;
+      content += `${character.background}\n\n`;
     }
     
     // Your Relationships
@@ -152,15 +152,13 @@ const MysteryPackageTabView = React.memo(({
     // Your Secret
     const secret = character.secret || (secrets.length > 0 ? secrets[0] : '');
     if (secret) {
-      content += `## YOUR SECRET\n\n${secret}\n\n`;
+      content += `${secret}\n\n`;
     }
     
     // Round 1: Introductions & Rumors
-    if (character.introduction || character.rumors || character.round1_statement) {
-      content += `## ROUND 1: INTRODUCTIONS & RUMORS\n\n`;
       
       if (character.introduction) {
-        content += `### INTRODUCE YOURSELF\n\n${character.introduction}\n\n`;
+        content += `${character.introduction}\n\n`;
       }
       
       if (character.round1_statement) {
@@ -168,107 +166,93 @@ const MysteryPackageTabView = React.memo(({
       }
       
       if (character.rumors) {
-        content += `### RUMORS TO SPREAD\n\n${character.rumors}\n\n`;
+        content += `${character.rumors}\n\n`;
       }
     }
     
     // Round 2: Motives
-    if (character.round2_statement || character.round2_questions || character.round2_innocent || character.round2_guilty || character.round2_accomplice) {
-      content += `## ROUND 2: MOTIVES\n\n`;
       
       if (character.round2_statement) {
         content += `${character.round2_statement}\n\n`;
       }
       
       if (character.round2_questions) {
-        content += `### CHOOSE SOMEONE TO QUESTION\n\n${character.round2_questions}\n\n`;
+        content += `${character.round2_questions}\n\n`;
       }
       
       if (character.round2_innocent || character.round2_guilty || character.round2_accomplice) {
         content += `### YOUR RESPONSES WHEN QUESTIONED\n\n`;
         
         if (character.round2_innocent) {
-          content += `**IF YOU ARE INNOCENT:**\n\n${character.round2_innocent}\n\n`;
+          content += `${character.round2_innocent}\n\n`;
         }
         
         if (character.round2_guilty) {
-          content += `**IF YOU ARE GUILTY:**\n\n${character.round2_guilty}\n\n`;
+          content += `${character.round2_guilty}\n\n`;
         }
         
         if (character.round2_accomplice) {
-          content += `**IF YOU ARE THE ACCOMPLICE:**\n\n${character.round2_accomplice}\n\n`;
+          content += `${character.round2_accomplice}\n\n`;
         }
       }
     }
     
     // Round 3: Method
-    if (character.round3_statement || character.round3_questions || character.round3_innocent || character.round3_guilty || character.round3_accomplice) {
-      content += `## ROUND 3: METHOD\n\n`;
-      
+    
       if (character.round3_statement) {
         content += `${character.round3_statement}\n\n`;
       }
       
       if (character.round3_questions) {
-        content += `### CHOOSE SOMEONE TO QUESTION\n\n${character.round3_questions}\n\n`;
+        content += `${character.round3_questions}\n\n`;
       }
-      
-      if (character.round3_innocent || character.round3_guilty || character.round3_accomplice) {
-        content += `### YOUR RESPONSES WHEN QUESTIONED\n\n`;
-        
+              
         if (character.round3_innocent) {
-          content += `**IF YOU ARE INNOCENT:**\n\n${character.round3_innocent}\n\n`;
+          content += `${character.round3_innocent}\n\n`;
         }
         
         if (character.round3_guilty) {
-          content += `**IF YOU ARE GUILTY:**\n\n${character.round3_guilty}\n\n`;
+          content += `${character.round3_guilty}\n\n`;
         }
         
         if (character.round3_accomplice) {
-          content += `**IF YOU ARE THE ACCOMPLICE:**\n\n${character.round3_accomplice}\n\n`;
+          content += `${character.round3_accomplice}\n\n`;
         }
       }
     }
     
     // Round 4: Opportunity
-    if (character.round4_questions || character.round4_innocent || character.round4_guilty || character.round4_accomplice) {
-      content += `## ROUND 4: OPPORTUNITY\n\n`;
       
       if (character.round4_questions) {
-        content += `### CHOOSE SOMEONE TO QUESTION\n\n${character.round4_questions}\n\n`;
+        content += `${character.round4_questions}\n\n`;
       }
-      
-      if (character.round4_innocent || character.round4_guilty || character.round4_accomplice) {
-        content += `### YOUR RESPONSES WHEN QUESTIONED\n\n`;
         
         if (character.round4_innocent) {
-          content += `**IF YOU ARE INNOCENT:**\n\n${character.round4_innocent}\n\n`;
+          content += `${character.round4_innocent}\n\n`;
         }
         
         if (character.round4_guilty) {
-          content += `**IF YOU ARE GUILTY:**\n\n${character.round4_guilty}\n\n`;
+          content += `${character.round4_guilty}\n\n`;
         }
         
         if (character.round4_accomplice) {
-          content += `**IF YOU ARE THE ACCOMPLICE:**\n\n${character.round4_accomplice}\n\n`;
+          content += `${character.round4_accomplice}\n\n`;
         }
       }
     }
     
     // Final Statement
-    if (character.final_innocent || character.final_guilty || character.final_accomplice) {
-      content += `## FINAL STATEMENT\n\n`;
       
       if (character.final_innocent) {
-        content += `**IF YOU ARE INNOCENT:**\n\n${character.final_innocent}\n\n`;
+        content += `${character.final_innocent}\n\n`;
       }
       
       if (character.final_guilty) {
-        content += `**IF YOU ARE GUILTY:**\n\n${character.final_guilty}\n\n`;
+        content += `${character.final_guilty}\n\n`;
       }
       
       if (character.final_accomplice) {
-        content += `**IF YOU ARE THE ACCOMPLICE:**\n\n${character.final_accomplice}\n\n`;
+        content += `${character.final_accomplice}\n\n`;
       }
     }
     
@@ -284,11 +268,11 @@ const MysteryPackageTabView = React.memo(({
     
     // Use the content EXACTLY as generated by Make.com - no rebuilding headers
     if (packageData.gameOverview) {
-      content += `## GAME OVERVIEW\n\n${packageData.gameOverview}\n\n`;
+      content += `${packageData.gameOverview}\n\n`;
     }
     
     if (packageData.materials) {
-      content += `## MATERIALS\n\n${packageData.materials}\n\n`;
+      content += `${packageData.materials}\n\n`;
     }
     
     if (packageData.preparation) {
@@ -308,7 +292,7 @@ const MysteryPackageTabView = React.memo(({
     }
     
     if (packageData.evidenceCards) {
-      content += `## EVIDENCE CARDS\n\n${packageData.evidenceCards}\n\n`;
+      content += `${packageData.evidenceCards}\n\n`;
     }
     
     return content;
@@ -318,7 +302,7 @@ const MysteryPackageTabView = React.memo(({
   const extractHostGuide = useCallback(() => {
     if (!packageContent) return "";
     
-    const hostGuidePattern = /# .+ - HOST GUIDE\n([\s\S]*?)(?=# |$)/i;
+    const hostGuidePattern = /# .+ - Host Guide\n([\s\S]*?)(?=# |$)/i;
     const match = packageContent.match(hostGuidePattern);
     return match ? match[1].trim() : "";
   }, [packageContent]);
