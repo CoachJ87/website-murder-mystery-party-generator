@@ -133,22 +133,22 @@ const Hero = () => {
   };
 
   return (
-    <div className="py-12 md:py-20 px-4 bg-background">
-      <div className="container mx-auto text-center">
-        <div className="flex justify-center mb-6">
-          <div className="w-24 h-24 rounded-full bg-gradient-to-r from-primary to-secondary opacity-90 blur-sm"></div>
+    <div className="py-8 sm:py-12 md:py-20 px-2 sm:px-4 md:px-6 lg:px-8 bg-background">
+      <div className="w-full max-w-7xl mx-auto text-center">
+        <div className="flex justify-center mb-4 sm:mb-6">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-r from-primary to-secondary opacity-90 blur-sm"></div>
         </div>
         
-        <h1 className="text-5xl md:text-7xl font-bold mb-4 tracking-tight">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold mb-3 sm:mb-4 tracking-tight leading-tight">
           Host a Killer Party Tonight.
         </h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-5">
+        <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-4 sm:mb-5 px-2">
           {isAuthenticated 
             ? "Tell us what you'd like to create and we'll make it happen."
             : "Generate custom murder mysteries with characters, clues, and everything you need."}
         </p>
         
-        <div className="max-w-xl mx-auto">
+        <div className="max-w-xl mx-auto px-2 sm:px-0">
           <AIInputWithLoading
             placeholder={isAuthenticated 
               ? "What kind of murder mystery would you like to create today?" 
@@ -160,16 +160,16 @@ const Hero = () => {
           />
         </div>
         
-        <div className="flex flex-wrap justify-center gap-4 mt-5">
+        <div className="flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-4 mt-4 sm:mt-5 px-2">
           {selectedThemes.map((theme) => (
             <Button 
               key={theme.name} 
               variant="outline" 
-              className="rounded-full px-6 border-border/50 bg-card/30 backdrop-blur-sm"
+              className="rounded-full px-3 sm:px-4 md:px-6 border-border/50 bg-card/30 backdrop-blur-sm text-xs sm:text-sm h-8 sm:h-9 md:h-10"
               onClick={() => handleThemeSelect(theme.prompt)}
             >
-              {theme.name}
-              <ArrowRight className="ml-2 h-4 w-4" />
+              <span className="truncate max-w-[120px] sm:max-w-none">{theme.name}</span>
+              <ArrowRight className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
             </Button>
           ))}
         </div>
