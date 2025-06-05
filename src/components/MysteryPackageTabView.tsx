@@ -156,104 +156,92 @@ const MysteryPackageTabView = React.memo(({
     }
     
     // Round 1: Introductions & Rumors
-      
-      if (character.introduction) {
-        content += `${character.introduction}\n\n`;
-      }
-      
-      if (character.round1_statement) {
-        content += `${character.round1_statement}\n\n`;
-      }
-      
-      if (character.rumors) {
-        content += `${character.rumors}\n\n`;
-      }
+    if (character.introduction) {
+      content += `${character.introduction}\n\n`;
+    }
+    
+    if (character.round1_statement) {
+      content += `${character.round1_statement}\n\n`;
+    }
+    
+    if (character.rumors) {
+      content += `${character.rumors}\n\n`;
     }
     
     // Round 2: Motives
+    if (character.round2_statement) {
+      content += `${character.round2_statement}\n\n`;
+    }
+    
+    if (character.round2_questions) {
+      content += `${character.round2_questions}\n\n`;
+    }
+    
+    if (character.round2_innocent || character.round2_guilty || character.round2_accomplice) {
+      content += `### YOUR RESPONSES WHEN QUESTIONED\n\n`;
       
-      if (character.round2_statement) {
-        content += `${character.round2_statement}\n\n`;
+      if (character.round2_innocent) {
+        content += `${character.round2_innocent}\n\n`;
       }
       
-      if (character.round2_questions) {
-        content += `${character.round2_questions}\n\n`;
+      if (character.round2_guilty) {
+        content += `${character.round2_guilty}\n\n`;
       }
       
-      if (character.round2_innocent || character.round2_guilty || character.round2_accomplice) {
-        content += `### YOUR RESPONSES WHEN QUESTIONED\n\n`;
-        
-        if (character.round2_innocent) {
-          content += `${character.round2_innocent}\n\n`;
-        }
-        
-        if (character.round2_guilty) {
-          content += `${character.round2_guilty}\n\n`;
-        }
-        
-        if (character.round2_accomplice) {
-          content += `${character.round2_accomplice}\n\n`;
-        }
+      if (character.round2_accomplice) {
+        content += `${character.round2_accomplice}\n\n`;
       }
     }
     
     // Round 3: Method
+    if (character.round3_statement) {
+      content += `${character.round3_statement}\n\n`;
+    }
     
-      if (character.round3_statement) {
-        content += `${character.round3_statement}\n\n`;
-      }
-      
-      if (character.round3_questions) {
-        content += `${character.round3_questions}\n\n`;
-      }
-              
-        if (character.round3_innocent) {
-          content += `${character.round3_innocent}\n\n`;
-        }
-        
-        if (character.round3_guilty) {
-          content += `${character.round3_guilty}\n\n`;
-        }
-        
-        if (character.round3_accomplice) {
-          content += `${character.round3_accomplice}\n\n`;
-        }
-      }
+    if (character.round3_questions) {
+      content += `${character.round3_questions}\n\n`;
+    }
+    
+    if (character.round3_innocent) {
+      content += `${character.round3_innocent}\n\n`;
+    }
+    
+    if (character.round3_guilty) {
+      content += `${character.round3_guilty}\n\n`;
+    }
+    
+    if (character.round3_accomplice) {
+      content += `${character.round3_accomplice}\n\n`;
     }
     
     // Round 4: Opportunity
-      
-      if (character.round4_questions) {
-        content += `${character.round4_questions}\n\n`;
-      }
-        
-        if (character.round4_innocent) {
-          content += `${character.round4_innocent}\n\n`;
-        }
-        
-        if (character.round4_guilty) {
-          content += `${character.round4_guilty}\n\n`;
-        }
-        
-        if (character.round4_accomplice) {
-          content += `${character.round4_accomplice}\n\n`;
-        }
-      }
+    if (character.round4_questions) {
+      content += `${character.round4_questions}\n\n`;
+    }
+    
+    if (character.round4_innocent) {
+      content += `${character.round4_innocent}\n\n`;
+    }
+    
+    if (character.round4_guilty) {
+      content += `${character.round4_guilty}\n\n`;
+    }
+    
+    if (character.round4_accomplice) {
+      content += `${character.round4_accomplice}\n\n`;
     }
     
     // Final Statement
-      
-      if (character.final_innocent) {
-        content += `${character.final_innocent}\n\n`;
-      }
-      
-      if (character.final_guilty) {
-        content += `${character.final_guilty}\n\n`;
-      }
-      
-      if (character.final_accomplice) {
-        content += `${character.final_accomplice}\n\n`;
-      }
+    if (character.final_innocent) {
+      content += `${character.final_innocent}\n\n`;
+    }
+    
+    if (character.final_guilty) {
+      content += `${character.final_guilty}\n\n`;
+    }
+    
+    if (character.final_accomplice) {
+      content += `${character.final_accomplice}\n\n`;
     }
     
     return content;
