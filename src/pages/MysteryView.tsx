@@ -18,6 +18,8 @@ import MysteryPackageTabView from "@/components/MysteryPackageTabView";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { MysteryCharacter } from "@/interfaces/mystery";
 import { extractTitleFromMessages } from "@/utils/titleExtraction";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 interface MysteryPackageData {
   title?: string;
@@ -45,6 +47,7 @@ const MysteryView = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const isMobile = useIsMobile();
   
   // Controlled logging and polling
   const DEBUG_MODE = process.env.NODE_ENV === 'development';
@@ -654,39 +657,59 @@ const MysteryView = () => {
     checkGenerationStatus();
   }, [checkGenerationStatus, debugLog]);
 
-  // Render generation progress
+  // Render generation progress with mobile optimization
   const renderGenerationProgress = () => {
     if (!generationStatus) return null;
     
     // Show error state for failed generation
     if (generationStatus.status === 'failed') {
       return (
-        <Card className="mb-6 border-red-200 bg-red-50">
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between text-red-700">
+        <Card className={cn(
+          "mb-6 border-red-200 bg-red-50",
+          isMobile && "mx-2"
+        )}>
+          <CardHeader className={cn(isMobile && "p-4 pb-3")}>
+            <CardTitle className={cn(
+              "flex items-center justify-between text-red-700",
+              isMobile ? "text-lg flex-col space-y-2 items-start" : "flex-row"
+            )}>
               <div className="flex items-center space-x-2">
-                <XCircle className="h-5 w-5" />
-                <span>Generation Failed</span>
+                <XCircle className={cn(
+                  "text-red-500",
+                  isMobile ? "h-4 w-4" : "h-5 w-5"
+                )} />
+                <span className={cn(isMobile && "text-base")}>Generation Failed</span>
               </div>
               <Button 
                 variant="ghost" 
                 size="sm" 
                 onClick={handleManualRefresh} 
-                className="h-8 w-8 p-0"
+                className={cn(
+                  "h-8 w-8 p-0",
+                  isMobile && "self-end"
+                )}
                 title="Refresh status"
               >
                 <RefreshCw className="h-4 w-4" />
               </Button>
             </CardTitle>
-            <CardDescription className="text-red-600">
+            <CardDescription className={cn(
+              "text-red-600",
+              isMobile && "text-sm"
+            )}>
               {generationStatus.currentStep || "An error occurred during generation"}
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className={cn(
+            "space-y-4",
+            isMobile && "p-4 pt-0 space-y-3"
+          )}>
             <Alert className="border-red-200">
-              <AlertTriangle className="h-4 w-4" />
-              <AlertTitle>What happened?</AlertTitle>
-              <AlertDescription>
+              <AlertTriangle className={cn(
+                isMobile ? "h-3 w-3" : "h-4 w-4"
+              )} />
+              <AlertTitle className={cn(isMobile && "text-sm")}>What happened?</AlertTitle>
+              <AlertDescription className={cn(isMobile && "text-xs")}>
                 {generationStatus.resumable 
                   ? "Your generation encountered an issue but can be resumed from where it left off. Your progress has been saved."
                   : "The generation process failed and needs to be restarted. Don't worry - this happens sometimes and trying again usually works."
@@ -694,19 +717,46 @@ const MysteryView = () => {
               </AlertDescription>
             </Alert>
             
-            <div className="flex space-x-2">
+            <div className={cn(
+              "flex space-x-2",
+              isMobile && "flex-col space-x-0 space-y-2"
+            )}>
               {generationStatus.resumable ? (
-                <Button onClick={handleResumeGeneration} disabled={generating} className="flex-1">
-                  <RefreshCw className="h-4 w-4 mr-2" />
+                <Button 
+                  onClick={handleResumeGeneration} 
+                  disabled={generating} 
+                  className={cn(
+                    "flex-1",
+                    isMobile && "w-full text-sm h-10"
+                  )}
+                >
+                  <RefreshCw className={cn(
+                    "mr-2",
+                    isMobile ? "h-3 w-3" : "h-4 w-4"
+                  )} />
                   Resume Generation
                 </Button>
               ) : (
-                <Button onClick={handleGeneratePackage} disabled={generating} className="flex-1">
-                  <RefreshCw className="h-4 w-4 mr-2" />
+                <Button 
+                  onClick={handleGeneratePackage} 
+                  disabled={generating} 
+                  className={cn(
+                    "flex-1",
+                    isMobile && "w-full text-sm h-10"
+                  )}
+                >
+                  <RefreshCw className={cn(
+                    "mr-2",
+                    isMobile ? "h-3 w-3" : "h-4 w-4"
+                  )} />
                   Try Again
                 </Button>
               )}
-              <Button variant="outline" onClick={() => navigate("/dashboard")}>
+              <Button 
+                variant="outline" 
+                onClick={() => navigate("/dashboard")}
+                className={cn(isMobile && "w-full text-sm h-10")}
+              >
                 Back to Dashboard
               </Button>
             </div>
@@ -716,56 +766,109 @@ const MysteryView = () => {
     }
     
     return (
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span>Generating Your Mystery Package</span>
+      <Card className={cn(
+        "mb-6",
+        isMobile && "mx-2"
+      )}>
+        <CardHeader className={cn(isMobile && "p-4 pb-3")}>
+          <CardTitle className={cn(
+            "flex items-center justify-between",
+            isMobile ? "text-lg flex-col space-y-2 items-start" : "flex-row"
+          )}>
+            <span className={cn(isMobile && "text-base")}>Generating Your Mystery Package</span>
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={handleManualRefresh} 
-              className="h-8 w-8 p-0"
+              className={cn(
+                "h-8 w-8 p-0",
+                isMobile && "self-end"
+              )}
               title="Refresh status"
             >
               <RefreshCw className="h-4 w-4" />
             </Button>
           </CardTitle>
-          <CardDescription>
+          <CardDescription className={cn(isMobile && "text-sm")}>
             This process takes 3-5 minutes to complete. This page automatically refreshes every 15 seconds.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex flex-col md:flex-row gap-4 text-sm">
-            <div className="flex-1 border rounded-md p-3">
-              <div className="font-medium mb-2 flex items-center">
-                <Clock className="h-4 w-4 mr-2" />
+        <CardContent className={cn(
+          "space-y-4",
+          isMobile && "p-4 pt-0 space-y-3"
+        )}>
+          <div className={cn(
+            "flex flex-col md:flex-row gap-4 text-sm",
+            isMobile && "gap-3"
+          )}>
+            <div className={cn(
+              "flex-1 border rounded-md p-3",
+              isMobile && "p-3"
+            )}>
+              <div className={cn(
+                "font-medium mb-2 flex items-center",
+                isMobile && "text-sm"
+              )}>
+                <Clock className={cn(
+                  "mr-2",
+                  isMobile ? "h-3 w-3" : "h-4 w-4"
+                )} />
                 <span>Current Step</span>
               </div>
-              <p className="text-muted-foreground">
+              <p className={cn(
+                "text-muted-foreground",
+                isMobile && "text-xs leading-relaxed"
+              )}>
                 {generationStatus.currentStep}
               </p>
             </div>
             
-            <div className="flex-1 border rounded-md p-3">
-              <div className="font-medium mb-2">Generation Progress</div>
+            <div className={cn(
+              "flex-1 border rounded-md p-3",
+              isMobile && "p-3"
+            )}>
+              <div className={cn(
+                "font-medium mb-2",
+                isMobile && "text-sm"
+              )}>
+                Generation Progress
+              </div>
               <div className="space-y-1">
                 <div className="flex items-center">
                   <div className={`h-2 w-2 rounded-full mr-2 ${generationStatus.sections?.hostGuide ? "bg-green-500" : "bg-muted"}`}></div>
-                  <span className={generationStatus.sections?.hostGuide ? "" : "text-muted-foreground"}>Host Guide</span>
+                  <span className={cn(
+                    generationStatus.sections?.hostGuide ? "" : "text-muted-foreground",
+                    isMobile && "text-xs"
+                  )}>
+                    Host Guide
+                  </span>
                 </div>
                 <div className="flex items-center">
                   <div className={`h-2 w-2 rounded-full mr-2 ${generationStatus.sections?.characters ? "bg-green-500" : "bg-muted"}`}></div>
-                  <span className={generationStatus.sections?.characters ? "" : "text-muted-foreground"}>Character Guides</span>
+                  <span className={cn(
+                    generationStatus.sections?.characters ? "" : "text-muted-foreground",
+                    isMobile && "text-xs"
+                  )}>
+                    Character Guides
+                  </span>
                 </div>
                 <div className="flex items-center">
                   <div className={`h-2 w-2 rounded-full mr-2 ${generationStatus.sections?.clues ? "bg-green-500" : "bg-muted"}`}></div>
-                  <span className={generationStatus.sections?.clues ? "" : "text-muted-foreground"}>Clues & Materials</span>
+                  <span className={cn(
+                    generationStatus.sections?.clues ? "" : "text-muted-foreground",
+                    isMobile && "text-xs"
+                  )}>
+                    Clues & Materials
+                  </span>
                 </div>
               </div>
             </div>
           </div>
           
-          <p className="text-sm text-muted-foreground">
+          <p className={cn(
+            "text-sm text-muted-foreground",
+            isMobile && "text-xs"
+          )}>
             <strong>Auto-refresh:</strong> This page automatically checks for updates every 15 seconds.
             {lastUpdate && ` Last update: ${lastUpdate.toLocaleTimeString()}`}
           </p>
@@ -778,10 +881,18 @@ const MysteryView = () => {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
-        <main className="flex-1 py-12 px-4">
+        <main className={cn(
+          "flex-1 py-12 px-4",
+          isMobile && "py-6 px-3"
+        )}>
           <div className="container mx-auto max-w-4xl">
             <div className="h-8 w-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-            <p className="text-center mt-4">Loading your mystery...</p>
+            <p className={cn(
+              "text-center mt-4",
+              isMobile && "text-sm mt-3"
+            )}>
+              Loading your mystery...
+            </p>
           </div>
         </main>
         <Footer />
@@ -811,8 +922,14 @@ const MysteryView = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-1 py-12 px-4">
-        <div className="container mx-auto max-w-4xl">
+      <main className={cn(
+        "flex-1 py-12 px-4",
+        isMobile && "py-6 px-3"
+      )}>
+        <div className={cn(
+          "container mx-auto max-w-4xl",
+          isMobile && "max-w-full"
+        )}>
           {shouldShowTabs ? (
             <MysteryPackageTabView 
               packageContent={packageContent || ""} 
@@ -827,29 +944,43 @@ const MysteryView = () => {
           ) : (
             // Show generation progress or start button
             generationStatus?.status === 'in_progress' ? renderGenerationProgress() : (
-              <Card className="mb-6">
-                <CardHeader>
-                  <CardTitle>Generate Your Mystery Package</CardTitle>
-                  <CardDescription>
+              <Card className={cn(
+                "mb-6",
+                isMobile && "mx-2"
+              )}>
+                <CardHeader className={cn(isMobile && "p-4 pb-3")}>
+                  <CardTitle className={cn(isMobile && "text-lg")}>
+                    Generate Your Mystery Package
+                  </CardTitle>
+                  <CardDescription className={cn(isMobile && "text-sm")}>
                     Your mystery is ready to be generated. Click the button below to create your custom murder mystery package.
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className={cn(isMobile && "p-4 pt-0")}>
                   <Button
                     onClick={handleGeneratePackage}
                     disabled={generating}
-                    className="w-full sm:w-auto"
+                    className={cn(
+                      "w-full sm:w-auto",
+                      isMobile && "w-full text-sm h-11"
+                    )}
                   >
                     {generating ? (
                       <>
-                        <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                        <RefreshCw className={cn(
+                          "mr-2 animate-spin",
+                          isMobile ? "h-3 w-3" : "h-4 w-4"
+                        )} />
                         Starting Generation...
                       </>
                     ) : (
                       "Generate Mystery Package"
                     )}
                   </Button>
-                  <p className="text-sm text-muted-foreground mt-3">
+                  <p className={cn(
+                    "text-sm text-muted-foreground mt-3",
+                    isMobile && "text-xs mt-2"
+                  )}>
                     Generation takes 3-5 minutes. This page will auto-refresh to show progress.
                   </p>
                 </CardContent>
@@ -857,8 +988,15 @@ const MysteryView = () => {
             )
           )}
           
-          <div className="flex justify-center mt-8">
-            <Button variant="outline" onClick={() => navigate("/dashboard")}>
+          <div className={cn(
+            "flex justify-center mt-8",
+            isMobile && "mt-6"
+          )}>
+            <Button 
+              variant="outline" 
+              onClick={() => navigate("/dashboard")}
+              className={cn(isMobile && "text-sm h-10 px-6")}
+            >
               Back to Dashboard
             </Button>
           </div>
