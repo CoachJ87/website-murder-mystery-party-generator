@@ -189,7 +189,7 @@ const MysteryView = () => {
     }
   }, [id, debugLog]);
 
-  // Enhanced status checking with content detection
+  // Enhanced status checking with comprehensive completion detection
   const checkGenerationStatus = useCallback(async () => {
     if (!id) return null;
     
@@ -204,9 +204,9 @@ const MysteryView = () => {
     lastStatusCheck.current = now;
     
     try {
-      console.log("🔍 [DEBUG] Enhanced status check - checking for actual package content first");
+      console.log("=== STATUS CHECK DEBUG === Starting comprehensive status check");
       
-      // FIRST: Check for actual package content in database
+      // STEP 1: Check mystery_packages table for completion indicators
       const { data: packageData, error: packageError } = await supabase
         .from("mystery_packages")
         .select(`
@@ -221,129 +221,137 @@ const MysteryView = () => {
         .limit(1)
         .maybeSingle();
 
+      console.log("=== STATUS CHECK DEBUG === Package data:", packageData);
       if (packageError) {
-        console.error("❌ [DEBUG] Error checking package content:", packageError);
+        console.error("=== STATUS CHECK DEBUG === Package error:", packageError);
       }
 
-      // Check if we have actual content
+      // STEP 2: Check conversations table for completion indicators  
+      const { data: conversationData, error: conversationError } = await supabase
+        .from("conversations")
+        .select(`
+          has_complete_package,
+          is_paid,
+          needs_package_generation,
+          status,
+          display_status
+        `)
+        .eq("id", id)
+        .single();
+
+      console.log("=== STATUS CHECK DEBUG === Conversation data:", conversationData);
+      if (conversationError) {
+        console.error("=== STATUS CHECK DEBUG === Conversation error:", conversationError);
+      }
+
+      // STEP 3: Determine completion status from multiple indicators
       const hasActualContent = packageData && (
         packageData.title || 
         packageData.host_guide || 
         packageData.generation_completed_at
       );
 
-      console.log("📊 [DEBUG] Content detection:", {
-        hasPackageData: !!packageData,
-        hasTitle: !!packageData?.title,
-        hasHostGuide: !!packageData?.host_guide,
-        hasCompletedAt: !!packageData?.generation_completed_at,
+      const conversationIndicatesComplete = conversationData && (
+        conversationData.has_complete_package === true ||
+        conversationData.is_paid === true
+      );
+
+      const packageStatusComplete = packageData?.generation_status?.status === 'completed';
+
+      console.log("=== STATUS CHECK DEBUG === Completion indicators:", {
         hasActualContent,
-        currentStoredStatus: packageData?.generation_status
+        conversationIndicatesComplete,
+        packageStatusComplete,
+        packageGenerationStatus: packageData?.generation_status,
+        conversationStatus: conversationData
       });
 
-      // If we have actual content but status shows not_started, force completion
-      if (hasActualContent) {
-        const storedStatus = packageData.generation_status || {};
+      // STEP 4: If any completion indicator is true, force completion
+      if (hasActualContent || conversationIndicatesComplete || packageStatusComplete) {
+        const previousStatus = generationStatus?.status;
+        console.log("=== STATUS CHECK DEBUG === Completion detected, previous status:", previousStatus);
         
-        if (storedStatus.status === 'not_started' || !storedStatus.status) {
-          console.log("✅ [DEBUG] Found actual content but stale status - forcing completion");
-          
-          // Create completed status object
-          const completedStatus = {
-            status: 'completed' as const,
-            progress: 100,
-            currentStep: 'Package generation completed',
-            sections: {
-              hostGuide: true,
-              characters: true,
-              clues: true
-            },
-            resumable: false
-          };
-          
-          // Update the database status to match reality
+        // Create completed status object
+        const completedStatus = {
+          status: 'completed' as const,
+          progress: 100,
+          currentStep: 'Package generation completed',
+          sections: {
+            hostGuide: true,
+            characters: true,
+            clues: true
+          },
+          resumable: false
+        };
+        
+        // Update the database status to match reality
+        if (packageData?.id) {
           await supabase
             .from("mystery_packages")
             .update({
               generation_status: completedStatus
             })
             .eq("id", packageData.id);
-          
-          console.log("🎉 [DEBUG] Forced status to completed - actual content detected");
-          setGenerationStatus(completedStatus);
-          setLastUpdate(new Date());
-          return completedStatus;
         }
+        
+        console.log("=== STATUS CHECK DEBUG === Forced status to completed");
+        setGenerationStatus(completedStatus);
+        setLastUpdate(new Date());
+        
+        // Only trigger completion actions when status changes to completed
+        if (previousStatus !== 'completed') {
+          console.log("=== STATUS CHECK DEBUG === Status changed to completed - triggering completion actions");
+          setGenerating(false);
+          
+          // Fetch the completed package data
+          await fetchStructuredPackageData();
+          
+          // Update conversation status for consistency
+          await supabase
+            .from("conversations")
+            .update({
+              status: "purchased",
+              is_paid: true,
+              needs_package_generation: false,
+              display_status: "purchased",
+              has_complete_package: true
+            })
+            .eq("id", id);
+          
+          // Show success notification only once
+          if (!packageReadyNotified.current) {
+            toast.success("Your mystery package is ready! The page will refresh automatically.", {
+              duration: 10000,
+              id: 'mystery-completed'
+            });
+            packageReadyNotified.current = true;
+            
+            // Force page refresh after 2 seconds to ensure all data loads
+            setTimeout(() => window.location.reload(), 2000);
+          }
+        }
+        
+        return completedStatus;
       }
       
-      // FALLBACK: Use normal status checking
-      console.log("🔍 [DEBUG] Running normal status check as fallback");
+      // STEP 5: Fallback to normal status checking if no completion detected
+      console.log("=== STATUS CHECK DEBUG === No completion detected, using normal status check");
       const status = await getPackageGenerationStatus(id);
       const previousStatus = generationStatus?.status;
       
-      console.log("📊 [DEBUG] Normal status check result:", status.status, "(was:", previousStatus + ")");
+      console.log("=== STATUS CHECK DEBUG === Normal status result:", {
+        currentStatus: status.status,
+        previousStatus,
+        statusChanged: status.status !== previousStatus
+      });
       
       setGenerationStatus(status);
       setLastUpdate(new Date());
       
-      // Handle completion - only trigger when status changes to completed
-      if (status.status === 'completed' && previousStatus !== 'completed') {
-        console.log("🎉 [DEBUG] Generation completed! Stopping polling and fetching data...");
+      // Handle failed status
+      if (status.status === 'failed' && previousStatus !== 'failed') {
+        console.log("=== STATUS CHECK DEBUG === Generation failed");
         setGenerating(false);
-        
-        // Note: Polling cleanup is handled in the useEffect where the interval is created
-        console.log("⏹️ [DEBUG] Polling will be stopped by useEffect cleanup");
-        
-        // Fetch the completed package data
-        await fetchStructuredPackageData();
-        
-        // Only show notification once
-        if (!packageReadyNotified.current) {
-          toast.success(
-            <div className="space-y-3">
-              <div className="flex items-center space-x-2">
-                <CheckCircle2 className="h-4 w-4 text-green-500" />
-                <span className="font-semibold">Your Mystery Package is Ready!</span>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Your complete mystery package has been generated and is ready to use.
-              </p>
-              <div className="flex space-x-2">
-                <Button size="sm" onClick={() => window.location.reload()}>
-                  <Eye className="h-3 w-3 mr-1" />
-                  View Mystery
-                </Button>
-                <Button size="sm" variant="outline" onClick={() => navigate("/dashboard")}>
-                  Go to Dashboard
-                </Button>
-              </div>
-            </div>,
-            { 
-              duration: 10000,
-              id: 'mystery-completed'
-            }
-          );
-          packageReadyNotified.current = true;
-        }
-        
-        // Update conversation status
-        await supabase
-          .from("conversations")
-          .update({
-            status: "purchased",
-            is_paid: true,
-            needs_package_generation: false,
-            has_complete_package: true,
-            display_status: "purchased"
-          })
-          .eq("id", id);
-          
-      } else if (status.status === 'failed' && previousStatus !== 'failed') {
-        console.log("❌ [DEBUG] Generation failed");
-        setGenerating(false);
-        
-        // Note: Polling cleanup is handled in the useEffect where the interval is created
-        console.log("⏹️ [DEBUG] Polling will be stopped by useEffect cleanup");
         
         // Show detailed error message with current step
         const errorMessage = status.currentStep || "Generation failed at an unknown step";
@@ -399,7 +407,7 @@ const MysteryView = () => {
       
       return status;
     } catch (error) {
-      console.error("❌ [DEBUG] Error in enhanced status checking:", error);
+      console.error("=== STATUS CHECK DEBUG === Error in status checking:", error);
       return null;
     }
   }, [id, navigate, generationStatus?.status, fetchStructuredPackageData, debugLog, handleResumeGeneration, handleGeneratePackage]);
