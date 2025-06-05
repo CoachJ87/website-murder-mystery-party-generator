@@ -17,6 +17,7 @@ import { RefreshCw, AlertTriangle, Clock, CheckCircle2, Eye, XCircle } from "luc
 import MysteryPackageTabView from "@/components/MysteryPackageTabView";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { MysteryCharacter } from "@/interfaces/mystery";
+import { extractTitleFromMessages } from "@/utils/titleExtraction";
 
 interface MysteryPackageData {
   title?: string;
@@ -33,6 +34,7 @@ interface MysteryPackageData {
 
 const MysteryView = () => {
   const [mystery, setMystery] = useState<any | null>(null);
+  const [messages, setMessages] = useState<any[]>([]);
   const [packageContent, setPackageContent] = useState<string | null>(null);
   const [packageData, setPackageData] = useState<MysteryPackageData | null>(null);
   const [characters, setCharacters] = useState<MysteryCharacter[]>([]);
@@ -138,6 +140,54 @@ const MysteryView = () => {
       console.error("❌ [DEBUG] Error in fetchStructuredPackageData:", error);
     }
   }, [id]);
+
+  // Fetch conversation messages for title extraction
+  const fetchMessages = useCallback(async () => {
+    if (!id) return;
+
+    try {
+      const { data: messagesData, error: messagesError } = await supabase
+        .from("messages")
+        .select("*")
+        .eq("conversation_id", id)
+        .order("created_at", { ascending: true });
+
+      if (messagesError) {
+        console.error("❌ [DEBUG] Error fetching messages:", messagesError);
+        return;
+      }
+
+      if (messagesData) {
+        setMessages(messagesData);
+        console.log(`✅ [DEBUG] Loaded ${messagesData.length} messages for title extraction`);
+      }
+    } catch (error) {
+      console.error("❌ [DEBUG] Error in fetchMessages:", error);
+    }
+  }, [id]);
+
+  // Extract mystery title using the same logic as HomeDashboard
+  const extractedTitle = useCallback(() => {
+    if (!messages || messages.length === 0) return null;
+    
+    try {
+      return extractTitleFromMessages(messages);
+    } catch (error) {
+      console.error("❌ [DEBUG] Error extracting title:", error);
+      return null;
+    }
+  }, [messages]);
+
+  // Get the best available title with proper fallback hierarchy
+  const getMysteryTitle = useCallback(() => {
+    const aiGeneratedTitle = extractedTitle();
+    
+    // Fallback hierarchy: AI title → conversation.title → theme → "Mystery Package"
+    return aiGeneratedTitle || 
+           mystery?.title || 
+           mystery?.mystery_data?.theme || 
+           "Mystery Package";
+  }, [extractedTitle, mystery]);
 
   // Resume generation handler
   const handleResumeGeneration = useCallback(async () => {
@@ -547,6 +597,9 @@ const MysteryView = () => {
 
         setMystery(conversation);
 
+        // Fetch messages for title extraction
+        await fetchMessages();
+
         // Check generation status if package generation is needed OR if already paid
         if (conversation.needs_package_generation || conversation.is_paid || conversation.has_complete_package) {
           const status = await getPackageGenerationStatus(id);
@@ -593,7 +646,7 @@ const MysteryView = () => {
     };
 
     fetchMystery();
-  }, [id, fetchStructuredPackageData]);
+  }, [id, fetchStructuredPackageData, fetchMessages]);
 
   // Manual refresh function
   const handleManualRefresh = useCallback(() => {
@@ -763,7 +816,7 @@ const MysteryView = () => {
           {shouldShowTabs ? (
             <MysteryPackageTabView 
               packageContent={packageContent || ""} 
-              mysteryTitle={mystery?.title || mystery?.mystery_data?.theme || "Mystery Package"}
+              mysteryTitle={getMysteryTitle()}
               generationStatus={generationStatus || undefined}
               conversationId={id}
               onGenerateClick={handleGeneratePackage}
