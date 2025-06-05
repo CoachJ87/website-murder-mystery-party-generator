@@ -291,10 +291,6 @@ const MysteryPackageTabView = React.memo(({
       content += `${packageData.hostingTips}\n\n`;  // Already has headers
     }
     
-    if (packageData.evidenceCards) {
-      content += `${packageData.evidenceCards}\n\n`;
-    }
-    
     return content;
   }, [packageData, mysteryTitle]);
 
