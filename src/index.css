@@ -5,44 +5,96 @@
 
 @layer base {
   :root {
-    --background: 39 27% 89%;     /* Light gray #E9E5DC */
-    --foreground: 206 29% 16%;    /* Dark blue/navy #1D2B35 */
-
-    --card: 43 61% 87%;           /* Cream/beige #F6E8C6 */
-    --card-foreground: 206 29% 16%;
-
-    --popover: 43 61% 87%;
-    --popover-foreground: 206 29% 16%;
-
-    --primary: 35 76% 57%;        /* Golden yellow #E6A73E */
-    --primary-foreground: 206 29% 16%;
-
-    --secondary: 16 52% 50%;      /* Terracotta #C26E3E */
-    --secondary-foreground: 0 0% 100%;
-
-    --muted: 39 27% 80%;
-    --muted-foreground: 206 29% 40%;
-
-    --accent: 35 76% 57%;
-    --accent-foreground: 206 29% 16%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 206 29% 16%;
-    --input: 206 29% 16%;
-    --ring: 35 76% 57%;
-
+    /* Mystery Maker Color System */
+    /* Primary Colors */
+    --color-primary: 183 48% 20%;        /* Deep Teal #1D4B47 */
+    --color-primary-foreground: 0 0% 100%;
+    --color-primary-hover: 183 48% 15%;
+    --color-primary-light: 183 48% 35%;
+    
+    --color-secondary: 343 74% 32%;      /* Rich Burgundy #8B1538 */
+    --color-secondary-foreground: 0 0% 100%;
+    --color-secondary-hover: 343 74% 25%;
+    --color-secondary-light: 343 74% 45%;
+    
+    /* Accent Colors */
+    --color-accent: 172 76% 64%;         /* Bright Teal #2DD4BF */
+    --color-accent-foreground: 183 48% 20%;
+    --color-accent-hover: 172 76% 55%;
+    --color-accent-light: 172 76% 75%;
+    
+    --color-danger: 0 84% 49%;           /* Soft Red #DC2626 */
+    --color-danger-foreground: 0 0% 100%;
+    --color-danger-hover: 0 84% 40%;
+    --color-danger-light: 0 84% 65%;
+    
+    /* Neutral Colors */
+    --color-surface: 48 67% 94%;         /* Warm Cream #F7F3E9 */
+    --color-surface-foreground: 0 0% 16%; /* Charcoal Black #2A2A2A */
+    --color-surface-hover: 48 67% 90%;
+    
+    --color-muted: 220 14% 96%;          /* Light Gray #F3F4F6 */
+    --color-muted-foreground: 215 16% 47%; /* Medium Gray #6B7280 */
+    
+    --color-subtle: 212 18% 31%;         /* Dark Gray #374151 */
+    --color-subtle-foreground: 0 0% 100%;
+    
+    /* Semantic Tokens */
+    --background: var(--color-surface);
+    --foreground: var(--color-surface-foreground);
+    
+    --card: 0 0% 100%;
+    --card-foreground: var(--color-surface-foreground);
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: var(--color-surface-foreground);
+    
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: var(--color-primary);
+    
+    --destructive: var(--color-danger);
+    --destructive-foreground: var(--color-danger-foreground);
+    
     --radius: 0.5rem;
-
-    --sidebar-background: 39 27% 89%;
-    --sidebar-foreground: 206 29% 16%;
-    --sidebar-primary: 35 76% 57%;
-    --sidebar-primary-foreground: 206 29% 16%;
-    --sidebar-accent: 43 61% 87%;
-    --sidebar-accent-foreground: 206 29% 16%;
-    --sidebar-border: 206 29% 16%;
-    --sidebar-ring: 35 76% 57%;
+    
+    /* Sidebar Colors */
+    --sidebar-background: var(--color-surface);
+    --sidebar-foreground: var(--color-surface-foreground);
+    --sidebar-primary: var(--color-primary);
+    --sidebar-primary-foreground: var(--color-primary-foreground);
+    --sidebar-accent: var(--color-muted);
+    --sidebar-accent-foreground: var(--color-surface-foreground);
+    --sidebar-border: var(--border);
+    --sidebar-ring: var(--color-primary);
+  }
+  
+  /* Dark mode variants for future implementation */
+  .dark {
+    --color-surface: 0 0% 16%;           /* Charcoal Black */
+    --color-surface-foreground: 48 67% 94%; /* Warm Cream */
+    --color-surface-hover: 0 0% 20%;
+    
+    --color-muted: 212 18% 31%;          /* Dark Gray */
+    --color-muted-foreground: 215 16% 65%; /* Lighter Medium Gray */
+    
+    --background: var(--color-surface);
+    --foreground: var(--color-surface-foreground);
+    
+    --card: 0 0% 20%;
+    --card-foreground: var(--color-surface-foreground);
+    
+    --popover: 0 0% 20%;
+    --popover-foreground: var(--color-surface-foreground);
+    
+    --border: 212 18% 25%;
+    --input: 212 18% 25%;
+    
+    --sidebar-background: var(--color-surface);
+    --sidebar-foreground: var(--color-surface-foreground);
+    --sidebar-accent: var(--color-muted);
+    --sidebar-accent-foreground: var(--color-surface-foreground);
+    --sidebar-border: var(--border);
   }
 }
 
@@ -56,7 +108,7 @@
   }
 
   a {
-    @apply text-foreground hover:text-secondary transition-colors no-underline;
+    @apply text-foreground hover:text-primary transition-colors no-underline;
   }
   
   .no-underline {
@@ -68,6 +120,84 @@
   }
 }
 
+/* Mystery Maker Utility Classes */
+@layer utilities {
+  /* Background Utilities */
+  .bg-primary-soft {
+    @apply bg-primary/10;
+  }
+  
+  .bg-secondary-soft {
+    @apply bg-secondary/10;
+  }
+  
+  .bg-accent-soft {
+    @apply bg-accent/10;
+  }
+  
+  /* Text Utilities */
+  .text-primary-light {
+    color: hsl(var(--color-primary-light));
+  }
+  
+  .text-secondary-light {
+    color: hsl(var(--color-secondary-light));
+  }
+  
+  /* Border Utilities */
+  .border-primary-light {
+    border-color: hsl(var(--color-primary-light));
+  }
+  
+  /* Hover States */
+  .hover-primary {
+    @apply hover:bg-primary/90 hover:text-primary-foreground transition-colors;
+  }
+  
+  .hover-secondary {
+    @apply hover:bg-secondary/90 hover:text-secondary-foreground transition-colors;
+  }
+  
+  .hover-accent {
+    @apply hover:bg-accent/90 hover:text-accent-foreground transition-colors;
+  }
+  
+  /* Status Colors */
+  .status-success {
+    @apply bg-accent/10 text-accent border-accent/20;
+  }
+  
+  .status-warning {
+    @apply bg-yellow-50 text-yellow-800 border-yellow-200;
+  }
+  
+  .status-error {
+    @apply bg-danger/10 text-danger border-danger/20;
+  }
+  
+  /* Interactive Elements */
+  .interactive-surface {
+    @apply bg-card hover:bg-muted/50 border border-border rounded-lg transition-colors;
+  }
+  
+  .mystery-card {
+    @apply bg-card border border-border/50 rounded-lg shadow-sm hover:shadow-md transition-all duration-200;
+  }
+  
+  .mystery-button-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-2 focus:ring-primary/20 transition-all;
+  }
+  
+  .mystery-button-secondary {
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/90 focus:ring-2 focus:ring-secondary/20 transition-all;
+  }
+  
+  .mystery-button-accent {
+    @apply bg-accent text-accent-foreground hover:bg-accent/90 focus:ring-2 focus:ring-accent/20 transition-all;
+  }
+}
+
+/* Legacy gradient and chat styles for existing components */
 .gradient-text {
   @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary;
 }
@@ -77,7 +207,7 @@
 }
 
 .user-bubble {
-  @apply chat-bubble bg-primary text-foreground self-end;
+  @apply chat-bubble bg-primary text-primary-foreground self-end;
 }
 
 .assistant-bubble {
@@ -102,22 +232,18 @@
     @apply p-2 space-x-2;
   }
   
-  /* Fix viewport height issues on mobile */
   .mobile-vh-fix {
     height: calc(100vh - 80px);
   }
   
-  /* Expanded chat container for mobile */
   .mobile-chat-container {
     @apply min-h-[80vh] border-0 p-0;
   }
   
-  /* Remove borders for mobile chat experience */
   .mobile-borderless {
     @apply border-0 shadow-none bg-transparent;
   }
   
-  /* Full height chat on mobile */
   .mobile-full-height {
     height: calc(100vh - 100px);
     max-height: none;

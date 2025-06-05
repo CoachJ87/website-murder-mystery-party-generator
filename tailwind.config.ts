@@ -20,30 +20,54 @@ export default {
 		},
 		extend: {
 			colors: {
+				/* Mystery Maker Color System */
+				primary: {
+					DEFAULT: 'hsl(var(--color-primary))',
+					foreground: 'hsl(var(--color-primary-foreground))',
+					hover: 'hsl(var(--color-primary-hover))',
+					light: 'hsl(var(--color-primary-light))',
+				},
+				secondary: {
+					DEFAULT: 'hsl(var(--color-secondary))',
+					foreground: 'hsl(var(--color-secondary-foreground))',
+					hover: 'hsl(var(--color-secondary-hover))',
+					light: 'hsl(var(--color-secondary-light))',
+				},
+				accent: {
+					DEFAULT: 'hsl(var(--color-accent))',
+					foreground: 'hsl(var(--color-accent-foreground))',
+					hover: 'hsl(var(--color-accent-hover))',
+					light: 'hsl(var(--color-accent-light))',
+				},
+				danger: {
+					DEFAULT: 'hsl(var(--color-danger))',
+					foreground: 'hsl(var(--color-danger-foreground))',
+					hover: 'hsl(var(--color-danger-hover))',
+					light: 'hsl(var(--color-danger-light))',
+				},
+				surface: {
+					DEFAULT: 'hsl(var(--color-surface))',
+					foreground: 'hsl(var(--color-surface-foreground))',
+					hover: 'hsl(var(--color-surface-hover))',
+				},
+				subtle: {
+					DEFAULT: 'hsl(var(--color-subtle))',
+					foreground: 'hsl(var(--color-subtle-foreground))',
+				},
+				
+				/* System Colors */
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
-				primary: {
-					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
-				},
-				secondary: {
-					DEFAULT: 'hsl(var(--secondary))',
-					foreground: 'hsl(var(--secondary-foreground))'
-				},
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',
 					foreground: 'hsl(var(--destructive-foreground))'
 				},
 				muted: {
-					DEFAULT: 'hsl(var(--muted))',
-					foreground: 'hsl(var(--muted-foreground))'
-				},
-				accent: {
-					DEFAULT: 'hsl(var(--accent))',
-					foreground: 'hsl(var(--accent-foreground))'
+					DEFAULT: 'hsl(var(--color-muted))',
+					foreground: 'hsl(var(--color-muted-foreground))'
 				},
 				popover: {
 					DEFAULT: 'hsl(var(--popover))',
@@ -97,9 +121,12 @@ export default {
                         maxWidth: '100%',
                         color: 'inherit',
                         a: {
-                            color: 'inherit',
+                            color: 'hsl(var(--color-primary))',
                             textDecoration: 'underline',
                             fontWeight: '500',
+                            '&:hover': {
+                                color: 'hsl(var(--color-primary-hover))',
+                            },
                         },
                         p: {
                             marginTop: '0.75em',
@@ -107,7 +134,7 @@ export default {
                             lineHeight: '1.6',
                         },
                         'h1, h2, h3, h4': {
-                            color: 'inherit',
+                            color: 'hsl(var(--color-primary))',
                             marginTop: '1.25em',
                             marginBottom: '0.75em',
                             lineHeight: '1.3',
@@ -145,20 +172,24 @@ export default {
                         blockquote: {
                             fontStyle: 'italic',
                             borderLeftWidth: '4px',
-                            borderLeftColor: 'hsl(var(--muted))',
+                            borderLeftColor: 'hsl(var(--color-accent))',
+                            backgroundColor: 'hsl(var(--color-accent) / 0.1)',
                             paddingLeft: '1em',
+                            paddingTop: '0.5em',
+                            paddingBottom: '0.5em',
                             marginLeft: '0',
                             marginRight: '0',
                         },
                         code: {
-                            color: 'inherit',
-                            backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                            color: 'hsl(var(--color-secondary))',
+                            backgroundColor: 'hsl(var(--color-muted))',
                             padding: '0.2em 0.4em',
                             borderRadius: '0.25em',
                             fontWeight: '400',
                         },
                         strong: {
                             fontWeight: '700',
+                            color: 'hsl(var(--color-secondary))',
                         },
                         em: {
                             fontStyle: 'italic',
@@ -170,6 +201,8 @@ export default {
                         'thead th': {
                           fontWeight: '600',
                           borderBottomWidth: '1px',
+                          backgroundColor: 'hsl(var(--color-primary) / 0.1)',
+                          color: 'hsl(var(--color-primary))',
                         },
                         'tbody td, tfoot td': {
                           padding: '0.75em',
