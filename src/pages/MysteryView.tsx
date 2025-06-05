@@ -49,6 +49,7 @@ const MysteryView = () => {
   const packageReadyNotified = useRef<boolean>(false);
   const lastStatusCheck = useRef<number>(0);
   const lastLogTime = useRef<number>(0);
+  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const debugLog = useCallback((message: string, data?: any) => {
     if (!DEBUG_MODE) return;
@@ -403,48 +404,63 @@ const MysteryView = () => {
     }
   }, [id, navigate, generationStatus?.status, fetchStructuredPackageData, debugLog, handleResumeGeneration, handleGeneratePackage]);
 
-  // Enhanced auto-refresh with faster polling
+  // Fixed auto-refresh polling with proper cleanup
   useEffect(() => {
     if (!id) return;
 
-    let pollingInterval: number | null = null;
-
-    const cleanup = () => {
-      if (pollingInterval) {
-        clearInterval(pollingInterval);
-        pollingInterval = null;
-        console.log("⏹️ [DEBUG] Enhanced auto-refresh stopped");
+    // Clear any existing interval
+    const clearPolling = () => {
+      if (pollingIntervalRef.current) {
+        console.log("🛑 [DEBUG] Clearing existing polling interval");
+        clearInterval(pollingIntervalRef.current);
+        pollingIntervalRef.current = null;
       }
     };
 
-    const shouldStartPolling = generationStatus?.status === 'in_progress' && !generating;
-    const isAlreadyPolling = pollingInterval !== null;
+    // Determine if we should be polling
+    const shouldPoll = (
+      (generationStatus?.status === 'in_progress') || 
+      (generating && !generationStatus) ||
+      (generating && generationStatus?.status !== 'completed' && generationStatus?.status !== 'failed')
+    );
 
-    if (shouldStartPolling && !isAlreadyPolling) {
-      console.log("▶️ [DEBUG] Starting enhanced auto-refresh (10s intervals)");
+    console.log("🔍 [DEBUG] Polling decision:", {
+      shouldPoll,
+      generationStatus: generationStatus?.status,
+      generating,
+      hasInterval: !!pollingIntervalRef.current
+    });
+
+    if (shouldPoll && !pollingIntervalRef.current) {
+      console.log("▶️ [DEBUG] Starting auto-refresh polling (30s intervals)");
       
-      // Initial enhanced status check
-      checkGenerationStatus().then((status) => {
-        // Only continue polling if still in progress
-        if (status && status.status === 'in_progress') {
-          pollingInterval = window.setInterval(async () => {
-            console.log("🔄 [DEBUG] Auto-refresh tick - running enhanced detection");
-            console.log("Polling for status update...");
-            const currentStatus = await checkGenerationStatus();
-            
-            // Stop polling if generation is complete or failed
-            if (currentStatus && (currentStatus.status === 'completed' || currentStatus.status === 'failed')) {
-              console.log("Generation finished - stopping polling");
-              cleanup();
-            }
-          }, 10000); // Changed from 15000 to 10000 for faster detection
+      // Start polling
+      pollingIntervalRef.current = setInterval(async () => {
+        console.log("🔄 [DEBUG] Polling tick - checking generation status");
+        
+        try {
+          const currentStatus = await checkGenerationStatus();
+          
+          // Stop polling if generation is complete or failed
+          if (currentStatus && (currentStatus.status === 'completed' || currentStatus.status === 'failed')) {
+            console.log(`✅ [DEBUG] Generation finished with status: ${currentStatus.status} - stopping polling`);
+            clearPolling();
+          }
+        } catch (error) {
+          console.error("❌ [DEBUG] Error during polling tick:", error);
         }
-      });
-    } else if (!shouldStartPolling && isAlreadyPolling) {
-      cleanup();
+      }, 30000); // 30-second intervals
+      
+    } else if (!shouldPoll && pollingIntervalRef.current) {
+      console.log("⏹️ [DEBUG] Stopping polling - conditions no longer met");
+      clearPolling();
     }
 
-    return cleanup;
+    // Cleanup function
+    return () => {
+      console.log("🧹 [DEBUG] useEffect cleanup - clearing polling interval");
+      clearPolling();
+    };
   }, [id, generationStatus?.status, generating, checkGenerationStatus]);
 
   // Initial data loading
