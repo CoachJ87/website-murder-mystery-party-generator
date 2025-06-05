@@ -20,7 +20,7 @@ export default {
 		},
 		extend: {
 			colors: {
-				/* Mystery Maker Color System */
+				/* Mystery Maker Color System - Sophisticated & Premium */
 				primary: {
 					DEFAULT: 'hsl(var(--color-primary))',
 					foreground: 'hsl(var(--color-primary-foreground))',
@@ -54,6 +54,7 @@ export default {
 					DEFAULT: 'hsl(var(--color-subtle))',
 					foreground: 'hsl(var(--color-subtle-foreground))',
 				},
+				tertiary: 'hsl(var(--color-tertiary))',
 				
 				/* System Colors */
 				border: 'hsl(var(--border))',
@@ -119,7 +120,7 @@ export default {
                 DEFAULT: {
                     css: {
                         maxWidth: '100%',
-                        color: 'inherit',
+                        color: 'hsl(var(--color-surface-foreground))',
                         a: {
                             color: 'hsl(var(--color-primary))',
                             textDecoration: 'underline',
@@ -132,6 +133,7 @@ export default {
                             marginTop: '0.75em',
                             marginBottom: '0.75em',
                             lineHeight: '1.6',
+                            color: 'hsl(var(--color-surface-foreground))',
                         },
                         'h1, h2, h3, h4': {
                             color: 'hsl(var(--color-primary))',
@@ -168,6 +170,7 @@ export default {
                             marginTop: '0.375em',
                             marginBottom: '0.375em',
                             display: 'list-item',
+                            color: 'hsl(var(--color-surface-foreground))',
                         },
                         blockquote: {
                             fontStyle: 'italic',
@@ -179,6 +182,7 @@ export default {
                             paddingBottom: '0.5em',
                             marginLeft: '0',
                             marginRight: '0',
+                            color: 'hsl(var(--color-surface-foreground))',
                         },
                         code: {
                             color: 'hsl(var(--color-secondary))',
@@ -208,6 +212,7 @@ export default {
                           padding: '0.75em',
                           borderBottomWidth: '1px',
                           borderBottomColor: 'hsl(var(--border))',
+                          color: 'hsl(var(--color-surface-foreground))',
                         }
                     },
                 },
