@@ -224,19 +224,19 @@ After presenting the mystery concept, ask if the concept works for them and expl
     return (
         <div className="min-h-screen flex flex-col">
             <Header />
-            <main className={cn("flex-1", isMobile ? "py-4 px-2" : "py-12 px-4")}>
-                <div className={cn("container mx-auto", isMobile ? "max-w-full" : "max-w-4xl")}>
-                    <div className={cn("mb-8", isMobile && "mb-4")}>
-                        <h1 className={cn("text-3xl font-bold mb-2", isMobile && "text-2xl mb-1")}>
+            <main className="flex-1 py-4 sm:py-8 md:py-12 px-2 sm:px-4 md:px-6 lg:px-8">
+                <div className="container mx-auto max-w-full sm:max-w-4xl">
+                    <div className="mb-4 sm:mb-6 md:mb-8">
+                        <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">
                             {isEditing ? "Edit Mystery" : "Create New Mystery"}
                         </h1>
-                        <p className="text-muted-foreground">
+                        <p className="text-sm sm:text-base text-muted-foreground">
                             Fill out the form below to generate your custom murder mystery
                         </p>
                     </div>
 
-                    <Card className={isMobile ? "border-0 shadow-none bg-transparent" : ""}>
-                        <CardContent className={cn("p-6", isMobile && "p-0")}>
+                    <Card className="border-0 sm:border shadow-none sm:shadow-sm bg-transparent sm:bg-card">
+                        <CardContent className="p-0 sm:p-4 md:p-6">
                             <MysteryForm
                                 onSave={handleSave}
                                 isSaving={loading}
@@ -245,11 +245,12 @@ After presenting the mystery concept, ask if the concept works for them and expl
                         </CardContent>
                     </Card>
 
-                    <div className={cn("mt-8 flex justify-center gap-4", isMobile && "mt-4")}>
+                    <div className="mt-4 sm:mt-6 md:mt-8 flex justify-center gap-2 sm:gap-4">
                         <Button
                             variant="outline"
                             onClick={() => navigate("/dashboard")}
-                            size={isMobile ? "sm" : "default"}
+                            size="sm"
+                            className="h-10 sm:h-auto text-sm sm:text-base px-4 sm:px-6"
                         >
                             Back to Dashboard
                         </Button>

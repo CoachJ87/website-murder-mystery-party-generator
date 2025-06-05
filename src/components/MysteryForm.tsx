@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -82,19 +83,19 @@ const MysteryForm = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        {/* NEW: User's original request field - ONLY show if we have a userRequest */}
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 sm:space-y-8">
+        {/* User's original request field - mobile optimized */}
         {initialData?.userRequest && (
           <FormField
             control={form.control}
             name="userRequest"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>What you want to create</FormLabel>
+                <FormLabel className="text-sm sm:text-base font-medium">What you want to create</FormLabel>
                 <FormControl>
-                  <Input {...field} disabled className="bg-muted" />
+                  <Input {...field} disabled className="bg-muted text-sm sm:text-base h-10 sm:h-auto" />
                 </FormControl>
-                <FormDescription>
+                <FormDescription className="text-xs sm:text-sm">
                   Your original request from the homepage
                 </FormDescription>
               </FormItem>
@@ -107,14 +108,15 @@ const MysteryForm = ({
           name="theme"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Theme/Setting Details (Optional)</FormLabel>
+              <FormLabel className="text-sm sm:text-base font-medium">Theme/Setting Details (Optional)</FormLabel>
               <FormControl>
                 <Input 
                   placeholder="e.g., time period, setting specifics, must-have's, etc." 
+                  className="text-sm sm:text-base h-10 sm:h-auto"
                   {...field} 
                 />
               </FormControl>
-              <FormDescription>
+              <FormDescription className="text-xs sm:text-sm">
                 Choose a specific theme or setting for your murder mystery
               </FormDescription>
               <FormMessage />
@@ -127,7 +129,7 @@ const MysteryForm = ({
           name="playerCount"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>
+              <FormLabel className="text-sm sm:text-base font-medium">
                 How many players will participate?
               </FormLabel>
               <FormControl>
@@ -135,19 +137,19 @@ const MysteryForm = ({
                   onValueChange={(value) => field.onChange(parseInt(value))} 
                   value={field.value?.toString()}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="h-10 sm:h-auto text-sm sm:text-base">
                     <SelectValue placeholder="Select number of players" />
                   </SelectTrigger>
                   <SelectContent>
                     {Array.from({ length: 29 }, (_, i) => i + 4).map((num) => (
-                      <SelectItem key={num} value={num.toString()}>
+                      <SelectItem key={num} value={num.toString()} className="text-sm sm:text-base">
                         {num} players
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </FormControl>
-              <FormDescription>
+              <FormDescription className="text-xs sm:text-sm">
                 Choose between 4 and 32 players for your murder mystery.
               </FormDescription>
               <FormMessage />
@@ -159,17 +161,20 @@ const MysteryForm = ({
           control={form.control}
           name="hasAccomplice"
           render={({ field }) => (
-            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-              <div className="space-y-0.5">
-                <FormLabel className="text-base">
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 sm:p-4">
+              <div className="space-y-0.5 flex-1 pr-3">
+                <FormLabel className="text-sm sm:text-base font-medium">
                   Include Accomplice Mechanism
                 </FormLabel>
-                <FormDescription>Best for games with 10 or more players</FormDescription>
+                <FormDescription className="text-xs sm:text-sm">
+                  Best for games with 10 or more players
+                </FormDescription>
               </div>
               <FormControl>
                 <Switch 
                   checked={field.value} 
-                  onCheckedChange={field.onChange} 
+                  onCheckedChange={field.onChange}
+                  className="shrink-0"
                 />
               </FormControl>
             </FormItem>
@@ -181,24 +186,30 @@ const MysteryForm = ({
           name="scriptType"
           render={({ field }) => (
             <FormItem className="space-y-3">
-              <FormLabel>Script Detail Level</FormLabel>
+              <FormLabel className="text-sm sm:text-base font-medium">Script Detail Level</FormLabel>
               <FormControl>
                 <RadioGroup 
                   onValueChange={field.onChange} 
                   value={field.value} 
-                  className="flex flex-col space-y-2"
+                  className="flex flex-col space-y-3 sm:space-y-2"
                 >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="full" id="full" />
-                    <Label htmlFor="full">Full Scripts - Complete dialogue and detailed instructions</Label>
+                  <div className="flex items-start space-x-3 py-2">
+                    <RadioGroupItem value="full" id="full" className="mt-0.5 shrink-0" />
+                    <Label htmlFor="full" className="text-sm sm:text-base leading-5 cursor-pointer">
+                      Full Scripts - Complete dialogue and detailed instructions
+                    </Label>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="pointForm" id="pointForm" />
-                    <Label htmlFor="pointForm">Point Form - Key points and bullet summaries</Label>
+                  <div className="flex items-start space-x-3 py-2">
+                    <RadioGroupItem value="pointForm" id="pointForm" className="mt-0.5 shrink-0" />
+                    <Label htmlFor="pointForm" className="text-sm sm:text-base leading-5 cursor-pointer">
+                      Point Form - Key points and bullet summaries
+                    </Label>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="both" id="both" />
-                    <Label htmlFor="both">Both Formats - Full scripts AND point form notes</Label>
+                  <div className="flex items-start space-x-3 py-2">
+                    <RadioGroupItem value="both" id="both" className="mt-0.5 shrink-0" />
+                    <Label htmlFor="both" className="text-sm sm:text-base leading-5 cursor-pointer">
+                      Both Formats - Full scripts AND point form notes
+                    </Label>
                   </div>
                 </RadioGroup>
               </FormControl>
@@ -212,15 +223,15 @@ const MysteryForm = ({
           name="additionalDetails"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Additional Details (Optional)</FormLabel>
+              <FormLabel className="text-sm sm:text-base font-medium">Additional Details (Optional)</FormLabel>
               <FormControl>
                 <Textarea 
                   placeholder="Any specific requirements, special rules, or additional context for your mystery..." 
-                  className="resize-none" 
+                  className="resize-none min-h-20 sm:min-h-24 text-sm sm:text-base" 
                   {...field} 
                 />
               </FormControl>
-              <FormDescription>
+              <FormDescription className="text-xs sm:text-sm">
                 Provide any extra details or special requests for your mystery
               </FormDescription>
               <FormMessage />
@@ -228,7 +239,11 @@ const MysteryForm = ({
           )}
         />
 
-        <Button type="submit" disabled={isSaving} className="w-full">
+        <Button 
+          type="submit" 
+          disabled={isSaving} 
+          className="w-full h-12 text-base font-medium"
+        >
           {isSaving ? "Starting Chat..." : "Start AI Chat"}
         </Button>
       </form>
