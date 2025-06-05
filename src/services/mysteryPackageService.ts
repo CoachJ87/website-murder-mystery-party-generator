@@ -506,44 +506,101 @@ export async function resumePackageGeneration(mysteryId: string): Promise<string
   return generateCompletePackage(mysteryId);
 }
 
-// Enhanced Get generation status with better error handling
+// Enhanced Get generation status with content-based completion detection
 export async function getPackageGenerationStatus(mysteryId: string): Promise<GenerationStatus> {
-  console.log("🔍 [DEBUG] getPackageGenerationStatus called for:", mysteryId);
+  console.log("🔍 [STATUS CHECK] getPackageGenerationStatus called for:", mysteryId);
   
   try {
+    // Enhanced database query to include content fields and character count
     const { data, error } = await supabase
       .from("mystery_packages")
-      .select("generation_status, generation_completed_at, generation_started_at")
+      .select(`
+        generation_status, 
+        generation_completed_at, 
+        generation_started_at,
+        title,
+        host_guide,
+        characters:mystery_characters(count)
+      `)
       .eq("conversation_id", mysteryId)
       .order('updated_at', { ascending: false })
       .limit(1)
       .maybeSingle();
       
     if (error) {
-      console.error("❌ [DEBUG] Error fetching generation status:", error);
+      console.error("❌ [STATUS CHECK] Error fetching generation status:", error);
       throw new Error(`Failed to fetch generation status: ${error.message}`);
     }
     
-    console.log("📊 [DEBUG] Raw generation status data:", data);
+    console.log("📊 [STATUS CHECK] Raw package data received:", data);
     
     if (!data) {
-      console.log("ℹ️ [DEBUG] No mystery package found, returning default not_started status");
+      console.log("ℹ️ [STATUS CHECK] No mystery package found, returning default not_started status");
       const defaultStatus = {
         status: 'not_started' as const,
         progress: 0,
         currentStep: 'Not started',
         sections: {}
       };
-      console.log("📊 [DEBUG] Returning default status:", defaultStatus);
+      console.log("📊 [STATUS CHECK] Returning default status:", defaultStatus);
       return defaultStatus;
     }
     
-    // Check if generation_status exists and is valid
-    if (!data.generation_status || typeof data.generation_status !== 'object') {
-      console.log("ℹ️ [DEBUG] No valid generation_status found, checking completion dates");
+    // Content-based completion detection
+    const hasContent = !!(data.title && data.host_guide);
+    const hasCharacters = !!(data.characters && data.characters.length > 0);
+    const contentComplete = hasContent && hasCharacters;
+    
+    console.log("🔍 [STATUS CHECK] Content check results:");
+    console.log("  - Has title and host_guide:", hasContent);
+    console.log("  - Has characters:", hasCharacters, `(count: ${data.characters?.length || 0})`);
+    console.log("  - Content complete:", contentComplete);
+    
+    // Check current status in database
+    let currentStatus = data.generation_status;
+    console.log("📊 [STATUS CHECK] Current database status:", currentStatus);
+    
+    // Auto-correction logic: if content exists but status is wrong, correct it
+    if (contentComplete && currentStatus && currentStatus.status !== 'completed') {
+      console.log("🔧 [STATUS CHECK] Content exists but status is not 'completed', auto-correcting...");
       
-      // Fallback: check completion dates to determine status
-      if (data.generation_completed_at) {
+      const completedStatus = {
+        status: 'completed' as const,
+        progress: 100,
+        currentStep: 'Package generation completed',
+        sections: {
+          hostGuide: true,
+          characters: true,
+          clues: true,
+          inspectorScript: true,
+          characterMatrix: true
+        }
+      };
+      
+      // Update the database with corrected status
+      const { error: updateError } = await supabase
+        .from("mystery_packages")
+        .update({
+          generation_status: completedStatus,
+          generation_completed_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .eq("conversation_id", mysteryId);
+      
+      if (updateError) {
+        console.error("❌ [STATUS CHECK] Error updating corrected status:", updateError);
+      } else {
+        console.log("✅ [STATUS CHECK] Status auto-corrected to 'completed'");
+        currentStatus = completedStatus;
+      }
+    }
+    
+    // Check if generation_status exists and is valid
+    if (!currentStatus || typeof currentStatus !== 'object') {
+      console.log("ℹ️ [STATUS CHECK] No valid generation_status found, checking completion dates and content");
+      
+      // Fallback: check completion dates and content to determine status
+      if (data.generation_completed_at || contentComplete) {
         const completedStatus = {
           status: 'completed' as const,
           progress: 100,
@@ -556,7 +613,7 @@ export async function getPackageGenerationStatus(mysteryId: string): Promise<Gen
             characterMatrix: true
           }
         };
-        console.log("✅ [DEBUG] Inferring completed status from completion date:", completedStatus);
+        console.log("✅ [STATUS CHECK] Inferring completed status from completion date or content:", completedStatus);
         return completedStatus;
       } else if (data.generation_started_at) {
         const inProgressStatus = {
@@ -565,7 +622,7 @@ export async function getPackageGenerationStatus(mysteryId: string): Promise<Gen
           currentStep: 'Package generation in progress...',
           sections: {}
         };
-        console.log("🔄 [DEBUG] Inferring in_progress status from start date:", inProgressStatus);
+        console.log("🔄 [STATUS CHECK] Inferring in_progress status from start date:", inProgressStatus);
         return inProgressStatus;
       }
       
@@ -576,12 +633,12 @@ export async function getPackageGenerationStatus(mysteryId: string): Promise<Gen
         currentStep: 'Not started',
         sections: {}
       };
-      console.log("📊 [DEBUG] No dates found, returning not_started:", notStartedStatus);
+      console.log("📊 [STATUS CHECK] No dates found, returning not_started:", notStartedStatus);
       return notStartedStatus;
     }
     
-    const status = data.generation_status as GenerationStatus;
-    console.log("✅ [DEBUG] Returning generation status:", status);
+    const status = currentStatus as GenerationStatus;
+    console.log("✅ [STATUS CHECK] Returning generation status:", status);
     
     // Ensure status has all required fields
     const normalizedStatus: GenerationStatus = {
@@ -592,10 +649,10 @@ export async function getPackageGenerationStatus(mysteryId: string): Promise<Gen
       sections: status.sections || {}
     };
     
-    console.log("📊 [DEBUG] Normalized status:", normalizedStatus);
+    console.log("📊 [STATUS CHECK] Normalized status:", normalizedStatus);
     return normalizedStatus;
   } catch (error) {
-    console.error("❌ [DEBUG] Error in getPackageGenerationStatus:", error);
+    console.error("❌ [STATUS CHECK] Error in getPackageGenerationStatus:", error);
     
     // Return a safe fallback status on error
     const errorStatus = {
@@ -604,7 +661,7 @@ export async function getPackageGenerationStatus(mysteryId: string): Promise<Gen
       currentStep: 'Error checking status',
       sections: {}
     };
-    console.log("📊 [DEBUG] Returning error fallback status:", errorStatus);
+    console.log("📊 [STATUS CHECK] Returning error fallback status:", errorStatus);
     return errorStatus;
   }
 }
