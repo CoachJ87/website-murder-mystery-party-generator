@@ -471,6 +471,44 @@ const MysteryView = () => {
     };
   }, [id, generationStatus?.status, generating, checkGenerationStatus]);
 
+  // NEW: Realtime subscription for instant updates
+  useEffect(() => {
+    if (!id) return;
+
+    console.log("🔔 [REALTIME] Setting up Supabase Realtime subscription for mystery_packages");
+    
+    const subscription = supabase
+      .channel('mystery_packages')
+      .on('postgres_changes', 
+        { 
+          event: 'UPDATE', 
+          schema: 'public', 
+          table: 'mystery_packages',
+          filter: `conversation_id=eq.${id}`
+        }, 
+        async (payload) => {
+          console.log("🔔 [REALTIME] Real-time update received:", payload);
+          
+          // Trigger immediate status check when update is received
+          try {
+            await checkGenerationStatus();
+            console.log("🔔 [REALTIME] Status check triggered by real-time update");
+          } catch (error) {
+            console.error("🔔 [REALTIME] Error during real-time triggered status check:", error);
+          }
+        }
+      )
+      .subscribe((status) => {
+        console.log("🔔 [REALTIME] Subscription status:", status);
+      });
+
+    // Cleanup function
+    return () => {
+      console.log("🔔 [REALTIME] Unsubscribing from real-time updates");
+      subscription.unsubscribe();
+    };
+  }, [id, checkGenerationStatus]);
+
   // Initial data loading
   useEffect(() => {
     const fetchMystery = async () => {
