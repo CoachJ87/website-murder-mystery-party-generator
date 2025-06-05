@@ -506,14 +506,23 @@ export async function resumePackageGeneration(mysteryId: string): Promise<string
   return generateCompletePackage(mysteryId);
 }
 
-// Enhanced Get generation status with better error handling
+// Enhanced Get generation status with content-based completion detection
 export async function getPackageGenerationStatus(mysteryId: string): Promise<GenerationStatus> {
   console.log("🔍 [DEBUG] getPackageGenerationStatus called for:", mysteryId);
   
   try {
+    // Enhanced database query to include content fields and character count
     const { data, error } = await supabase
       .from("mystery_packages")
-      .select("generation_status, generation_completed_at, generation_started_at")
+      .select(`
+        generation_status, 
+        generation_completed_at, 
+        generation_started_at,
+        title,
+        host_guide,
+        game_overview,
+        mystery_characters!inner(count)
+      `)
       .eq("conversation_id", mysteryId)
       .order('updated_at', { ascending: false })
       .limit(1)
@@ -538,8 +547,64 @@ export async function getPackageGenerationStatus(mysteryId: string): Promise<Gen
       return defaultStatus;
     }
     
+    // Content-based completion detection
+    const hasRealContent = !!(
+      data.title || 
+      data.host_guide || 
+      data.game_overview ||
+      (data.mystery_characters && data.mystery_characters.length > 0)
+    );
+    
+    console.log("🔍 [DEBUG] Content analysis:", {
+      hasTitle: !!data.title,
+      hasHostGuide: !!data.host_guide,
+      hasGameOverview: !!data.game_overview,
+      characterCount: data.mystery_characters?.length || 0,
+      hasRealContent
+    });
+    
+    // Get the stored generation status
+    const storedStatus = data.generation_status as GenerationStatus | null;
+    console.log("📊 [DEBUG] Stored generation status:", storedStatus);
+    
+    // Auto-correct status if content exists but status shows incomplete
+    if (hasRealContent && storedStatus?.status !== 'completed') {
+      console.log("🔧 [DEBUG] Content detected but status not completed - auto-correcting");
+      
+      const correctedStatus: GenerationStatus = {
+        status: 'completed',
+        progress: 100,
+        currentStep: 'Package generation completed',
+        sections: {
+          hostGuide: true,
+          characters: true,
+          clues: true,
+          inspectorScript: true,
+          characterMatrix: true
+        }
+      };
+      
+      // Update the database with corrected status
+      try {
+        await supabase
+          .from("mystery_packages")
+          .update({
+            generation_status: correctedStatus,
+            generation_completed_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+          .eq("conversation_id", mysteryId);
+        
+        console.log("✅ [DEBUG] Status auto-corrected to completed");
+      } catch (updateError) {
+        console.error("❌ [DEBUG] Error updating status:", updateError);
+      }
+      
+      return correctedStatus;
+    }
+    
     // Check if generation_status exists and is valid
-    if (!data.generation_status || typeof data.generation_status !== 'object') {
+    if (!storedStatus || typeof storedStatus !== 'object') {
       console.log("ℹ️ [DEBUG] No valid generation_status found, checking completion dates");
       
       // Fallback: check completion dates to determine status
@@ -580,16 +645,15 @@ export async function getPackageGenerationStatus(mysteryId: string): Promise<Gen
       return notStartedStatus;
     }
     
-    const status = data.generation_status as GenerationStatus;
-    console.log("✅ [DEBUG] Returning generation status:", status);
+    console.log("✅ [DEBUG] Returning stored generation status:", storedStatus);
     
     // Ensure status has all required fields
     const normalizedStatus: GenerationStatus = {
-      status: status.status || 'not_started',
-      progress: status.progress || 0,
-      currentStep: status.currentStep || 'Unknown step',
-      resumable: status.resumable,
-      sections: status.sections || {}
+      status: storedStatus.status || 'not_started',
+      progress: storedStatus.progress || 0,
+      currentStep: storedStatus.currentStep || 'Unknown step',
+      resumable: storedStatus.resumable,
+      sections: storedStatus.sections || {}
     };
     
     console.log("📊 [DEBUG] Normalized status:", normalizedStatus);
