@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -106,9 +107,9 @@ const MysteryChatPage = () => {
             <div className="min-h-screen flex flex-col">
                 <Header />
                 <main className="flex-1 flex items-center justify-center">
-                    <div className="text-center">
-                        <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-                        <p className="text-muted-foreground">Loading conversation...</p>
+                    <div className="text-center px-4">
+                        <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin mx-auto mb-4" />
+                        <p className="text-sm sm:text-base text-muted-foreground">Loading conversation...</p>
                     </div>
                 </main>
                 <Footer />
@@ -119,23 +120,56 @@ const MysteryChatPage = () => {
     return (
         <div className="min-h-screen flex flex-col">
             <Header />
-            <main className={cn("flex-1", isMobile ? "py-4 px-2" : "py-12 px-4")}>
-                <div className={cn("container mx-auto", isMobile ? "max-w-full" : "max-w-4xl")}>
-                    <div className={cn("mb-8", isMobile && "mb-4")}>
-                        <div className="flex items-center gap-4 mb-4">
+            <main className={cn(
+                "flex-1",
+                isMobile ? "py-2 px-3" : "py-8 px-4 sm:py-12"
+            )}>
+                <div className={cn(
+                    "container mx-auto",
+                    isMobile ? "max-w-full" : "max-w-4xl"
+                )}>
+                    {/* Header Section - Mobile Optimized */}
+                    <div className={cn("mb-4 sm:mb-8", isMobile && "mb-3")}>
+                        <div className="flex items-center gap-2 sm:gap-4 mb-3 sm:mb-4">
                             <Button
                                 variant="outline"
-                                size="sm"
+                                size={isMobile ? "sm" : "default"}
                                 onClick={() => navigate("/dashboard")}
+                                className={cn(
+                                    "flex items-center gap-2",
+                                    isMobile && "h-9 px-3 text-sm"
+                                )}
                             >
-                                <ArrowLeft className="h-4 w-4 mr-2" />
-                                Back to Dashboard
+                                <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" />
+                                <span className={isMobile ? "hidden" : "inline"}>Back to</span>
+                                Dashboard
                             </Button>
+                        </div>
+                        
+                        {/* Page Title - Mobile Responsive */}
+                        <div className="text-center sm:text-left">
+                            <h1 className={cn(
+                                "font-bold text-foreground mb-1 sm:mb-2",
+                                isMobile ? "text-lg" : "text-2xl sm:text-3xl"
+                            )}>
+                                Mystery Creation Chat
+                            </h1>
+                            <p className={cn(
+                                "text-muted-foreground",
+                                isMobile ? "text-sm" : "text-base"
+                            )}>
+                                Collaborate with AI to create your perfect murder mystery
+                            </p>
                         </div>
                     </div>
 
-                    <Card className={isMobile ? "border-0 shadow-none bg-transparent" : ""}>
-                        <CardContent className={cn("p-6", isMobile && "p-0")}>
+                    {/* Chat Interface - Mobile Optimized Card */}
+                    <Card className={cn(
+                        isMobile ? "border-0 shadow-none bg-transparent" : "shadow-sm"
+                    )}>
+                        <CardContent className={cn(
+                            isMobile ? "p-0" : "p-4 sm:p-6"
+                        )}>
                             <MysteryChat
                                 initialTheme={conversationData?.mystery_data?.theme || ""}
                                 initialPlayerCount={conversationData?.mystery_data?.playerCount}
@@ -152,20 +186,30 @@ const MysteryChatPage = () => {
                         </CardContent>
                     </Card>
 
-                    <div className={cn("mt-8 flex flex-col gap-4", isMobile && "mt-4")}>
+                    {/* Action Section - Mobile Enhanced */}
+                    <div className={cn(
+                        "flex flex-col gap-3 sm:gap-4",
+                        isMobile ? "mt-4" : "mt-6 sm:mt-8"
+                    )}>
                         <div className="flex justify-center">
                             <Button
                                 onClick={handleGenerateFullMystery}
                                 disabled={!hasAIResponse}
-                                size="lg"
-                                className="bg-blue-600 hover:bg-blue-700"
+                                size={isMobile ? "default" : "lg"}
+                                className={cn(
+                                    "bg-blue-600 hover:bg-blue-700 text-white font-medium",
+                                    isMobile ? "w-full h-12 text-base" : "px-6"
+                                )}
                             >
                                 <Zap className="h-4 w-4 mr-2" />
                                 Generate Full Mystery
                             </Button>
                         </div>
                         
-                        <p className="text-center text-sm text-muted-foreground">
+                        <p className={cn(
+                            "text-center text-muted-foreground leading-relaxed",
+                            isMobile ? "text-sm px-2" : "text-sm"
+                        )}>
                             Ready to see your mystery preview? Click above to view and purchase the complete package.
                         </p>
                     </div>

@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -432,16 +433,19 @@ export default function MysteryChat({
   };
 
   return (
-    <div className="flex flex-col h-full space-y-6">
-      {/* Chat Container */}
-      <div className="border rounded-lg bg-background">
-        {/* Chat Messages Area */}
-        <div className="h-96 overflow-y-auto p-4 space-y-3">
+    <div className="flex flex-col h-full space-y-4 sm:space-y-6">
+      {/* Chat Container - Mobile Optimized */}
+      <div className="border rounded-lg bg-background overflow-hidden">
+        {/* Chat Messages Area - Enhanced Mobile Experience */}
+        <div className={cn(
+          "overflow-y-auto space-y-3 sm:space-y-4",
+          isMobile ? "h-80 p-3" : "h-96 p-4"
+        )}>
           {/* Loading History */}
           {isLoadingHistory && (
-            <div className="text-center text-muted-foreground">
-              <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" />
-              Loading previous messages...
+            <div className="text-center text-muted-foreground py-4">
+              <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin mx-auto mb-2" />
+              <p className="text-sm sm:text-base">Loading previous messages...</p>
             </div>
           )}
           
@@ -455,43 +459,64 @@ export default function MysteryChat({
             >
               <div
                 className={cn(
-                  "max-w-[80%] rounded-lg px-4 py-2",
+                  "rounded-lg px-3 py-2 sm:px-4 sm:py-3 max-w-[85%] sm:max-w-[80%]",
                   message.is_ai
                     ? "bg-muted border overflow-auto"
                     : "bg-primary text-primary-foreground"
                 )}
               >
                 {message.is_ai ? (
-                  <div className="prose prose-sm dark:prose-invert max-w-none">
+                  <div className={cn(
+                    "prose prose-sm dark:prose-invert max-w-none",
+                    isMobile && "text-sm leading-relaxed"
+                  )}>
                     <ReactMarkdown 
                       rehypePlugins={[rehypeRaw]}
                       components={{
-                        h1: ({node, ...props}) => <h1 className="text-2xl font-bold mt-4 mb-2" {...props} />,
-                        h2: ({node, ...props}) => <h2 className="text-xl font-semibold mt-3 mb-2" {...props} />,
-                        h3: ({node, ...props}) => <h3 className="text-lg font-medium mt-2 mb-1" {...props} />,
-                        p: ({node, ...props}) => <p className="my-1" {...props} />,
-                        ul: ({node, ...props}) => <ul className="list-disc pl-6 my-2" {...props} />,
-                        ol: ({node, ...props}) => <ol className="list-decimal pl-6 my-2" {...props} />,
+                        h1: ({node, ...props}) => <h1 className={cn(
+                          "font-bold mt-3 mb-2",
+                          isMobile ? "text-lg" : "text-2xl"
+                        )} {...props} />,
+                        h2: ({node, ...props}) => <h2 className={cn(
+                          "font-semibold mt-2 mb-1",
+                          isMobile ? "text-base" : "text-xl"
+                        )} {...props} />,
+                        h3: ({node, ...props}) => <h3 className={cn(
+                          "font-medium mt-2 mb-1",
+                          isMobile ? "text-sm" : "text-lg"
+                        )} {...props} />,
+                        p: ({node, ...props}) => <p className="my-1 leading-relaxed" {...props} />,
+                        ul: ({node, ...props}) => <ul className={cn(
+                          "list-disc my-2",
+                          isMobile ? "pl-4" : "pl-6"
+                        )} {...props} />,
+                        ol: ({node, ...props}) => <ol className={cn(
+                          "list-decimal my-2",
+                          isMobile ? "pl-4" : "pl-6"
+                        )} {...props} />,
                         li: ({node, ...props}) => <li className="my-1" {...props} />,
                         strong: ({node, ...props}) => <strong className="font-bold" {...props} />,
                         em: ({node, ...props}) => <em className="italic" {...props} />,
-                        blockquote: ({node, ...props}) => <blockquote className="pl-4 border-l-4 border-gray-300 italic my-2" {...props} />
+                        blockquote: ({node, ...props}) => <blockquote className="pl-3 border-l-3 border-gray-300 italic my-2" {...props} />
                       }}
                     >
                       {message.content}
                     </ReactMarkdown>
                   </div>
                 ) : (
-                  <p className="text-sm whitespace-pre-line">{message.content}</p>
+                  <p className={cn(
+                    "whitespace-pre-line leading-relaxed",
+                    isMobile ? "text-sm" : "text-sm"
+                  )}>{message.content}</p>
                 )}
               </div>
             </div>
           ))}
           
-          {/* AI Typing Indicator */}
+          {/* AI Typing Indicator - Mobile Optimized */}
           {isAiTyping && (
             <div className="flex justify-start">
-              <div className="bg-muted border rounded-lg px-4 py-2 max-w-[80%]">
+              <div className="bg-muted border rounded-lg px-3 py-2 sm:px-4 sm:py-3 max-w-[85%] sm:max-w-[80%]">
                 <div className="flex space-x-1">
                   <div className="h-2 w-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
                   <div className="h-2 w-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
@@ -503,32 +528,52 @@ export default function MysteryChat({
           <div ref={bottomRef} />
         </div>
 
-        {/* Chat Input Area */}
-        <div className="border-t p-4">
-          <div className="flex items-center space-x-2">
-            <Input
-              type="text"
-              placeholder="Type your message..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSendMessage(input);
-                }
-              }}
-              disabled={isAiTyping}
-              className="flex-grow"
-            />
+        {/* Chat Input Area - Mobile Enhanced */}
+        <div className="border-t p-3 sm:p-4">
+          <div className="flex items-end space-x-2 sm:space-x-3">
+            <div className="flex-grow">
+              <Textarea
+                placeholder="Share your ideas for the mystery..."
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendMessage(input);
+                  }
+                }}
+                disabled={isAiTyping}
+                className={cn(
+                  "resize-none border-0 shadow-none focus-visible:ring-1 focus-visible:ring-ring",
+                  isMobile ? "min-h-[44px] text-base" : "min-h-[48px] text-sm"
+                )}
+                rows={isMobile ? 2 : 1}
+              />
+            </div>
             <Button 
               type="submit" 
               onClick={() => handleSendMessage(input)} 
-              disabled={isAiTyping}
-              size="icon"
+              disabled={isAiTyping || !input.trim()}
+              size={isMobile ? "default" : "icon"}
+              className={cn(
+                "shrink-0",
+                isMobile ? "h-11 w-11" : "h-9 w-9"
+              )}
             >
-              {isAiTyping ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+              {isAiTyping ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
             </Button>
           </div>
+          
+          {/* Mobile Helper Text */}
+          {isMobile && (
+            <p className="text-xs text-muted-foreground mt-2 text-center">
+              Tap Enter to send • Shift+Enter for new line
+            </p>
+          )}
         </div>
       </div>
     </div>
