@@ -112,7 +112,7 @@ const MysteryCreation = () => {
         if (data.additionalDetails && data.additionalDetails.trim() !== "") {
             message += `. Additional details include: ${data.additionalDetails}`;
         }
-        
+        message += `.`
         return message;
     };
 
