@@ -19,16 +19,6 @@ export default {
 			}
 		},
 		extend: {
-			fontFamily: {
-				/* Sophisticated Typography System */
-				'playfair': ['Playfair Display', 'Georgia', 'serif'],
-				'inter': ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-				/* Legacy aliases for smooth transition */
-				'heading': ['Playfair Display', 'Georgia', 'serif'],
-				'body': ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-				'sans': ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-				'serif': ['Playfair Display', 'Georgia', 'serif'],
-			},
 			colors: {
 				/* Mystery Maker Color System - Sophisticated & Premium */
 				primary: {
@@ -130,7 +120,6 @@ export default {
                 DEFAULT: {
                     css: {
                         maxWidth: '100%',
-                        fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
                         color: 'hsl(var(--color-surface-foreground))',
                         a: {
                             color: 'hsl(var(--color-primary))',
@@ -145,18 +134,8 @@ export default {
                             marginBottom: '0.75em',
                             lineHeight: '1.6',
                             color: 'hsl(var(--color-surface-foreground))',
-                            fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
                         },
-                        'h1, h2, h3': {
-                            fontFamily: 'Playfair Display, Georgia, serif',
-                            color: 'hsl(var(--color-primary))',
-                            marginTop: '1.25em',
-                            marginBottom: '0.75em',
-                            lineHeight: '1.2',
-                            fontWeight: '600',
-                        },
-                        'h4, h5, h6': {
-                            fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+                        'h1, h2, h3, h4': {
                             color: 'hsl(var(--color-primary))',
                             marginTop: '1.25em',
                             marginBottom: '0.75em',
@@ -165,15 +144,12 @@ export default {
                         },
                         h1: {
                             fontSize: '1.875rem',
-                            fontWeight: '700',
                         },
                         h2: {
                             fontSize: '1.5rem',
-                            fontWeight: '600',
                         },
                         h3: {
                             fontSize: '1.25rem',
-                            fontWeight: '500',
                         },
                         h4: {
                             fontSize: '1.125rem',
@@ -195,7 +171,6 @@ export default {
                             marginBottom: '0.375em',
                             display: 'list-item',
                             color: 'hsl(var(--color-surface-foreground))',
-                            fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
                         },
                         blockquote: {
                             fontStyle: 'italic',
@@ -208,7 +183,6 @@ export default {
                             marginLeft: '0',
                             marginRight: '0',
                             color: 'hsl(var(--color-surface-foreground))',
-                            fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
                         },
                         code: {
                             color: 'hsl(var(--color-secondary))',
@@ -218,7 +192,7 @@ export default {
                             fontWeight: '400',
                         },
                         strong: {
-                            fontWeight: '600',
+                            fontWeight: '700',
                             color: 'hsl(var(--color-secondary))',
                         },
                         em: {
@@ -233,14 +207,12 @@ export default {
                           borderBottomWidth: '1px',
                           backgroundColor: 'hsl(var(--color-primary) / 0.1)',
                           color: 'hsl(var(--color-primary))',
-                          fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
                         },
                         'tbody td, tfoot td': {
                           padding: '0.75em',
                           borderBottomWidth: '1px',
                           borderBottomColor: 'hsl(var(--border))',
                           color: 'hsl(var(--color-surface-foreground))',
-                          fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
                         }
                     },
                 },
