@@ -113,7 +113,6 @@ const MysteryCreation = () => {
             message += `. Additional details include: ${data.additionalDetails}`;
         }
         
-        message += ".";
         return message;
     };
 
