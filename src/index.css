@@ -108,7 +108,40 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-inter;
+  }
+
+  /* Sophisticated Typography Hierarchy */
+  h1, .h1 {
+    @apply font-playfair font-bold text-primary;
+  }
+  
+  h2, .h2 {
+    @apply font-playfair font-semibold text-primary;
+  }
+  
+  h3, .h3 {
+    @apply font-playfair font-medium text-primary;
+  }
+  
+  h4, h5, h6, .h4, .h5, .h6 {
+    @apply font-inter font-semibold text-foreground;
+  }
+  
+  p, .body-text {
+    @apply font-inter font-normal text-foreground;
+  }
+  
+  button, .button-text {
+    @apply font-inter font-medium;
+  }
+  
+  nav a, .nav-text {
+    @apply font-inter font-medium;
+  }
+  
+  .small-text {
+    @apply font-inter font-normal text-sm;
   }
 
   a {
@@ -122,10 +155,28 @@
   button a {
     text-decoration: none !important;
   }
+  
+  /* Brand/Logo specific styling */
+  .brand-text {
+    @apply font-playfair font-bold;
+  }
+  
+  .gradient-text {
+    @apply font-playfair font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary;
+  }
 }
 
 /* Mystery Maker Utility Classes - Refined */
 @layer utilities {
+  /* Typography Utilities */
+  .font-heading {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+  
+  .font-body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+  
   /* Background Utilities */
   .bg-primary-soft {
     @apply bg-primary/10;
@@ -223,12 +274,8 @@
 }
 
 /* Legacy gradient and chat styles for existing components */
-.gradient-text {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary;
-}
-
 .chat-bubble {
-  @apply p-4 rounded-lg max-w-[80%];
+  @apply p-4 rounded-lg max-w-[80%] font-inter;
 }
 
 .user-bubble {

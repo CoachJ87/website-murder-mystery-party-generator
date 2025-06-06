@@ -19,14 +19,14 @@ const Header = () => {
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex items-center">
           <Link to="/" className="flex items-center space-x-2 mr-4 md:mr-8 no-underline">
-            <span className="text-lg md:text-2xl font-bold gradient-text">
-              <span className="hidden sm:inline">Murder Maker</span>
-              <span className="sm:hidden">MMG</span>
+            <span className="text-lg md:text-2xl font-playfair font-bold gradient-text">
+              <span className="hidden sm:inline">Murder Mystery Creator</span>
+              <span className="sm:hidden">MMC</span>
             </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
+          <nav className="hidden md:flex items-center space-x-6 font-inter font-medium">
             {/* Navigation items can be added here if needed */}
           </nav>
         </div>
@@ -43,21 +43,21 @@ const Header = () => {
                     className="w-8 h-8 rounded-full"
                   />
                 )}
-                <span className="font-medium">{user?.name}</span>
+                <span className="font-inter font-medium">{user?.name}</span>
               </div>
-              <Button variant="outline" onClick={signOut} className="no-underline">
+              <Button variant="outline" onClick={signOut} className="no-underline font-inter font-medium">
                 Sign Out
               </Button>
-              <Button asChild className="no-underline">
+              <Button asChild className="no-underline font-inter font-medium">
                 <Link to="/dashboard">Dashboard</Link>
               </Button>
             </div>
           ) : (
             <>
-              <Button asChild variant="outline" className="no-underline">
+              <Button asChild variant="outline" className="no-underline font-inter font-medium">
                 <Link to="/sign-in">Sign In</Link>
               </Button>
-              <Button asChild className="no-underline">
+              <Button asChild className="no-underline font-inter font-medium">
                 <Link to="/sign-up">Sign Up</Link>
               </Button>
             </>
@@ -89,18 +89,18 @@ const Header = () => {
                       className="w-8 h-8 rounded-full"
                     />
                   )}
-                  <span className="font-medium text-sm">{user?.name}</span>
+                  <span className="font-inter font-medium text-sm">{user?.name}</span>
                 </div>
                 <Button 
                   asChild 
-                  className="w-full h-12 no-underline text-base" 
+                  className="w-full h-12 no-underline text-base font-inter font-medium" 
                   onClick={toggleMenu}
                 >
                   <Link to="/dashboard">Dashboard</Link>
                 </Button>
                 <Button 
                   variant="outline" 
-                  className="w-full h-12 no-underline text-base" 
+                  className="w-full h-12 no-underline text-base font-inter font-medium" 
                   onClick={() => {
                     signOut();
                     toggleMenu();
@@ -114,14 +114,14 @@ const Header = () => {
                 <Button 
                   asChild 
                   variant="outline" 
-                  className="w-full h-12 no-underline text-base" 
+                  className="w-full h-12 no-underline text-base font-inter font-medium" 
                   onClick={toggleMenu}
                 >
                   <Link to="/sign-in">Sign In</Link>
                 </Button>
                 <Button 
                   asChild 
-                  className="w-full h-12 no-underline text-base" 
+                  className="w-full h-12 no-underline text-base font-inter font-medium" 
                   onClick={toggleMenu}
                 >
                   <Link to="/sign-up">Sign Up</Link>
