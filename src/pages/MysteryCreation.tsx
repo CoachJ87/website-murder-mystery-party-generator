@@ -91,30 +91,33 @@ const MysteryCreation = () => {
         return 'full';
     };
     
-    const createFormattedInitialMessage = (data: any) => {
-        let message = "";
-        
-        // Start with original request if available
-        if (data.userRequest) {
-            message = data.userRequest;
-        } else {
-            message = "I want to create a murder mystery";
-        }
-        
-        // Add theme/setting if provided
-        if (data.theme && data.theme.trim() !== "") {
-            message += `. The theme/setting should be ${data.theme} for ${data.playerCount} players with ${data.scriptType} scripts`;
-        } else {
-            message += `. This is for ${data.playerCount} players with ${getScriptTypeDisplayText(data.scriptType)} scripts`;
-        }
-        
-        // Add additional details if provided
-        if (data.additionalDetails && data.additionalDetails.trim() !== "") {
-            message += `. Additional details include: ${data.additionalDetails}`;
-        }
-        message += `.`
-        return message;
-    };
+        const createFormattedInitialMessage = (data: any) => {
+            let message = "";
+            
+            // Start with original request if available
+            if (data.userRequest) {
+                message = data.userRequest.trim();
+            } else {
+                message = "I want to create a murder mystery";
+            }
+            
+            // Add theme/setting if provided
+            if (data.theme && data.theme.trim() !== "") {
+                message += ` The theme/setting should be ${data.theme} for ${data.playerCount} players with ${data.scriptType} scripts`;
+            } else {
+                message += ` This is for ${data.playerCount} players with ${getScriptTypeDisplayText(data.scriptType)} scripts`;
+            }
+            
+            // Add additional details if provided
+            if (data.additionalDetails && data.additionalDetails.trim() !== "") {
+                message += ` Additional details include: ${data.additionalDetails}`;
+            }
+            
+            // Clean up: remove any trailing punctuation, then add exactly one period
+            message = message.replace(/[.!?]+$/, '') + '.';
+            
+            return message;
+        };
 
     const handleSave = async (data: any) => {
         console.log("handleSave called with data:", data);
