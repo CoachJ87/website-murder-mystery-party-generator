@@ -71,6 +71,21 @@ const MysteryPackageTabView = React.memo(({
     }
   }, [generationStatus]);
 
+  // Markdown cleaning function to handle malformed table data
+  const cleanMarkdownTable = useCallback((content: string) => {
+    if (!content) return '';
+    
+    return content
+      // Replace escaped newlines with actual newlines
+      .replace(/\\n/g, '\n')
+      // Remove any escaped quotes
+      .replace(/\\"/g, '"')
+      // Ensure proper table spacing
+      .replace(/\n\s*\n/g, '\n\n')
+      // Clean up any extra whitespace in table cells
+      .replace(/\|\s+([^|]+)\s+\|/g, '| $1 |');
+  }, []);
+
   // Helper function to safely get relationships as an array
   const getRelationshipsArray = useCallback((relationships: any): Array<{character: string, description: string}> => {
     if (!relationships) return [];
@@ -376,8 +391,9 @@ const MysteryPackageTabView = React.memo(({
   }, [packageData?.detectiveScript, extractInspectorScript]);
 
   const relationshipMatrix = useMemo(() => {
-    return packageData?.relationshipMatrix || extractCharacterMatrix();
-  }, [packageData?.relationshipMatrix, extractCharacterMatrix]);
+    const rawMatrix = packageData?.relationshipMatrix || extractCharacterMatrix();
+    return cleanMarkdownTable(rawMatrix);
+  }, [packageData?.relationshipMatrix, extractCharacterMatrix, cleanMarkdownTable]);
 
   const charactersList = useMemo(() => {
     // Priority 1: Use characters prop from database
