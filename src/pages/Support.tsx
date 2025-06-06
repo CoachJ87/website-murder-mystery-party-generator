@@ -27,7 +27,7 @@ const Support = () => {
         },
         {
           question: "How does the creation and purchase process work?",
-          answer: "The process is simple: First, create your murder mystery story by answering a few questions about theme and player count. You'll get a preview of your story and characters for free. When you're satisfied with your creation, you can purchase the complete package for $4.99. This one-time purchase gives you instant access to downloadable PDFs including a comprehensive host guide and detailed character profiles for every player."
+          answer: "The process is simple: First, create your murder mystery story by answering a few questions about theme and player count. You'll get a preview of your story and characters for free. When you're satisfied with your creation, you can purchase the complete package for $11.99. This one-time purchase gives you instant access to downloadable PDFs including a comprehensive host guide and detailed character profiles for every player."
         },
         {
           question: "Can I save my work and come back to it later?",
@@ -82,7 +82,7 @@ const Support = () => {
         },
         {
           question: "What do I get when I purchase a mystery?",
-          answer: "For $4.99 per mystery, you receive a complete downloadable package including: a comprehensive host guide with step-by-step instructions, detailed character guides for each player, all necessary clues and evidence materials, and a PDF that's ready to print and play."
+          answer: "For $11.99 per mystery, you receive a complete downloadable package including: a comprehensive host guide with step-by-step instructions, detailed character guides for each player, all necessary clues and evidence materials, and a PDF that's ready to print and play."
         },
         {
           question: "Can I get a refund if I'm not satisfied?",
