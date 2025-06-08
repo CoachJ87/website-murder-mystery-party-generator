@@ -533,7 +533,7 @@ export default function MysteryChat({
           <div className="flex items-end space-x-2 sm:space-x-3">
             <div className="flex-grow">
               <Textarea
-                placeholder="Share your ideas for the mystery..."
+                placeholder="Anything you would like to change?"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => {
