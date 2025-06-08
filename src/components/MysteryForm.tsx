@@ -91,13 +91,10 @@ const MysteryForm = ({
             name="userRequest"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm sm:text-base font-medium">What you want to create</FormLabel>
+                <FormLabel className="text-sm sm:text-base font-medium">Your original request</FormLabel>
                 <FormControl>
                   <Input {...field} disabled className="bg-muted text-sm sm:text-base h-10 sm:h-auto" />
                 </FormControl>
-                <FormDescription className="text-xs sm:text-sm">
-                  Your original request from the homepage
-                </FormDescription>
               </FormItem>
             )}
           />
