@@ -5,58 +5,42 @@
 
 @layer base {
   :root {
-    /* Mystery Maker Color System - Sophisticated & Premium */
-    /* Primary Colors */
-    --color-primary: 183 48% 20%;        /* Deep Teal #1D4B47 */
+    /* Mystery Maker Color System - Sophisticated 3-Color Palette */
+    /* Primary Color - Rich Burgundy */
+    --color-primary: 343 74% 32%;        /* Rich Burgundy #8B1538 */
     --color-primary-foreground: 0 0% 100%;
-    --color-primary-hover: 183 48% 15%;
-    --color-primary-light: 183 48% 35%;
+    --color-primary-hover: 343 74% 25%;  /* Darkened 10% for hover */
+    --color-primary-active: 343 74% 20%; /* Darkened 15% for active */
     
-    --color-secondary: 343 74% 32%;      /* Rich Burgundy #8B1538 */
-    --color-secondary-foreground: 0 0% 100%;
-    --color-secondary-hover: 343 74% 25%;
-    --color-secondary-light: 343 74% 45%;
+    /* Background System - Warm Cream Tones */
+    --color-surface: 45 40% 96%;         /* Warm Cream #F7F3E9 */
+    --color-surface-foreground: 0 0% 16%; /* Charcoal Black #2A2A2A */
+    --color-surface-hover: 42 45% 97%;   /* Slightly lighter cream */
     
-    /* Accent Colors */
-    --color-accent: 172 76% 64%;         /* Bright Teal #2DD4BF */
-    --color-accent-foreground: 183 48% 20%;
-    --color-accent-hover: 172 76% 55%;
-    --color-accent-light: 172 76% 75%;
-    
-    --color-danger: 0 84% 49%;           /* Soft Red #DC2626 */
-    --color-danger-foreground: 0 0% 100%;
-    --color-danger-hover: 0 84% 40%;
-    --color-danger-light: 0 84% 65%;
-    
-    /* Background System - Sophisticated & Clean */
-    --color-surface: 0 0% 100%;          /* Pure White #FFFFFF */
-    --color-surface-foreground: 215 25% 13%; /* Charcoal Black #1F2937 */
-    --color-surface-hover: 210 20% 98%;  /* Very subtle gray */
-    
-    --color-muted: 210 20% 98%;          /* Cool Gray #F8F9FA */
+    --color-muted: 45 50% 98%;           /* Creamy White #FDF8F3 */
     --color-muted-foreground: 215 16% 47%; /* Medium Gray #6B7280 */
     
-    --color-subtle: 220 14% 96%;         /* Light Gray #F3F4F6 */
-    --color-subtle-foreground: 215 25% 13%;
+    --color-subtle: 45 40% 94%;          /* Slightly darker cream for borders */
+    --color-subtle-foreground: 0 0% 16%;
     
-    --color-tertiary: 220 9% 68%;        /* Light Gray text #9CA3AF */
+    --color-tertiary: 220 9% 68%;        /* Light Gray #9CA3AF */
     
     /* Semantic Tokens */
     --background: var(--color-surface);
     --foreground: var(--color-surface-foreground);
     
-    --card: 0 0% 100%;
+    --card: var(--color-muted);
     --card-foreground: var(--color-surface-foreground);
     
-    --popover: 0 0% 100%;
+    --popover: var(--color-muted);
     --popover-foreground: var(--color-surface-foreground);
     
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
+    --border: var(--color-subtle);
+    --input: var(--color-muted);
     --ring: var(--color-primary);
     
-    --destructive: var(--color-danger);
-    --destructive-foreground: var(--color-danger-foreground);
+    --destructive: var(--color-primary);
+    --destructive-foreground: var(--color-primary-foreground);
     
     --radius: 0.5rem;
     
@@ -71,28 +55,28 @@
     --sidebar-ring: var(--color-primary);
   }
   
-  /* Dark mode variants for future implementation */
+  /* Dark mode variants - maintaining burgundy theme */
   .dark {
-    --color-surface: 215 25% 13%;        /* Charcoal Black */
-    --color-surface-foreground: 0 0% 100%; /* Pure White */
-    --color-surface-hover: 215 25% 18%;
+    --color-surface: 0 0% 16%;           /* Charcoal Black */
+    --color-surface-foreground: 45 40% 96%; /* Warm Cream */
+    --color-surface-hover: 0 0% 20%;
     
-    --color-muted: 215 25% 18%;          /* Dark surface */
-    --color-muted-foreground: 215 16% 65%; /* Lighter Medium Gray */
+    --color-muted: 0 0% 20%;             /* Dark surface */
+    --color-muted-foreground: 220 9% 68%; /* Light Gray */
     
-    --color-subtle: 215 25% 23%;         /* Darker surface */
+    --color-subtle: 0 0% 25%;            /* Darker surface */
     
     --background: var(--color-surface);
     --foreground: var(--color-surface-foreground);
     
-    --card: 215 25% 18%;
+    --card: 0 0% 20%;
     --card-foreground: var(--color-surface-foreground);
     
-    --popover: 215 25% 18%;
+    --popover: 0 0% 20%;
     --popover-foreground: var(--color-surface-foreground);
     
-    --border: 215 25% 25%;
-    --input: 215 25% 25%;
+    --border: 0 0% 25%;
+    --input: 0 0% 25%;
     
     --sidebar-background: var(--color-surface);
     --sidebar-foreground: var(--color-surface-foreground);
@@ -108,7 +92,7 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-body;
   }
 
   a {
@@ -124,19 +108,11 @@
   }
 }
 
-/* Mystery Maker Utility Classes - Refined */
+/* Mystery Maker Utility Classes - Sophisticated 3-Color System */
 @layer utilities {
   /* Background Utilities */
   .bg-primary-soft {
     @apply bg-primary/10;
-  }
-  
-  .bg-secondary-soft {
-    @apply bg-secondary/10;
-  }
-  
-  .bg-accent-soft {
-    @apply bg-accent/10;
   }
   
   .bg-section {
@@ -149,11 +125,7 @@
   
   /* Text Utilities */
   .text-primary-light {
-    color: hsl(var(--color-primary-light));
-  }
-  
-  .text-secondary-light {
-    color: hsl(var(--color-secondary-light));
+    color: hsl(var(--color-primary) / 0.8);
   }
   
   .text-tertiary {
@@ -162,33 +134,25 @@
   
   /* Border Utilities */
   .border-primary-light {
-    border-color: hsl(var(--color-primary-light));
+    border-color: hsl(var(--color-primary) / 0.3);
   }
   
   /* Hover States */
   .hover-primary {
-    @apply hover:bg-primary/90 hover:text-primary-foreground transition-colors;
+    @apply hover:bg-primary hover:text-primary-foreground transition-colors;
   }
   
-  .hover-secondary {
-    @apply hover:bg-secondary/90 hover:text-secondary-foreground transition-colors;
-  }
-  
-  .hover-accent {
-    @apply hover:bg-accent/90 hover:text-accent-foreground transition-colors;
-  }
-  
-  /* Status Colors */
+  /* Status Colors - Using burgundy variants */
   .status-success {
-    @apply bg-accent/10 text-accent border-accent/20;
+    @apply bg-primary/10 text-primary border-primary/20;
   }
   
   .status-warning {
-    @apply bg-yellow-50 text-yellow-800 border-yellow-200;
+    @apply bg-primary/5 text-primary/80 border-primary/10;
   }
   
   .status-error {
-    @apply bg-danger/10 text-danger border-danger/20;
+    @apply bg-primary/15 text-primary border-primary/25;
   }
   
   /* Interactive Elements */
@@ -204,14 +168,6 @@
     @apply bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-2 focus:ring-primary/20 transition-all;
   }
   
-  .mystery-button-secondary {
-    @apply bg-secondary text-secondary-foreground hover:bg-secondary/90 focus:ring-2 focus:ring-secondary/20 transition-all;
-  }
-  
-  .mystery-button-accent {
-    @apply bg-accent text-accent-foreground hover:bg-accent/90 focus:ring-2 focus:ring-accent/20 transition-all;
-  }
-  
   /* Premium surface styling */
   .premium-surface {
     @apply bg-card border border-border/30 rounded-lg shadow-sm;
@@ -222,9 +178,9 @@
   }
 }
 
-/* Legacy gradient and chat styles for existing components */
+/* Legacy gradient and chat styles - updated to burgundy theme */
 .gradient-text {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary;
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70;
 }
 
 .chat-bubble {

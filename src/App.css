@@ -1,11 +1,12 @@
+
 #root {
   width: 100%;
   text-align: center;
 }
 
 body {
-  background-color: #FFFFFF;
-  color: #1F2937;
+  background-color: #F7F3E9;
+  color: #2A2A2A;
 }
 
 .logo {
@@ -15,10 +16,10 @@ body {
   transition: filter 300ms;
 }
 .logo:hover {
-  filter: drop-shadow(0 0 2em #2DD4BF);
+  filter: drop-shadow(0 0 2em #8B1538);
 }
 .logo.react:hover {
-  filter: drop-shadow(0 0 2em #2DD4BF);
+  filter: drop-shadow(0 0 2em #8B1538);
 }
 
 @keyframes logo-spin {
@@ -38,61 +39,62 @@ body {
 
 .card {
   padding: 2em;
-  background-color: #F8F9FA;
+  background-color: #FDF8F3;
   border-radius: 0.5rem;
-  border: 1px solid #E5E7EB;
+  border: 1px solid #F7F3E9;
 }
 
 .read-the-docs {
-  color: #1F2937;
+  color: #2A2A2A;
 }
 
-/* Custom button styles - Sophisticated */
+/* Custom button styles - Sophisticated Burgundy */
 .custom-button {
-  background-color: #1D4B47;
+  background-color: #8B1538;
   color: white;
   transition: all 0.3s ease;
 }
 
 .custom-button:hover {
-  background-color: #8B1538;
+  background-color: #6d0f2a;
   color: white;
 }
 
 /* Custom link styles */
 .custom-link {
-  color: #1F2937;
+  color: #2A2A2A;
   text-decoration: underline;
   transition: color 0.3s ease;
 }
 
 .custom-link:hover {
-  color: #1D4B47;
+  color: #8B1538;
 }
 
 /* Section styles - Clean and sophisticated */
 .content-section {
-  background-color: #F8F9FA;
+  background-color: #FDF8F3;
   padding: 2rem;
   border-radius: 0.5rem;
   margin-bottom: 1.5rem;
-  border: 1px solid #E5E7EB;
+  border: 1px solid #F7F3E9;
 }
 
 .divider {
   height: 2px;
-  background: linear-gradient(90deg, transparent, #1D4B47, transparent);
+  background: linear-gradient(90deg, transparent, #8B1538, transparent);
   margin: 2rem 0;
 }
 
-/* Mystery content styles - Refined typography */
+/* Mystery content styles - Refined typography with burgundy accents */
 .mystery-prose h1 {
   font-size: 1.875rem;
   line-height: 2.25rem;
   font-weight: 700;
   margin-top: 1.5em;
   margin-bottom: 0.75em;
-  color: #1D4B47;
+  color: #8B1538;
+  font-family: 'Playfair Display', serif;
 }
 
 .mystery-prose h2 {
@@ -102,22 +104,24 @@ body {
   margin-top: 1.25em;
   margin-bottom: 0.6em;
   color: #8B1538;
+  font-family: 'Playfair Display', serif;
 }
 
 .mystery-prose h3 {
   font-size: 1.25rem;
   line-height: 1.75rem;
-  font-weight: 600;
+  font-weight: 500;
   margin-top: 1em;
   margin-bottom: 0.5em;
-  color: #1D4B47;
+  color: #8B1538;
+  font-family: 'Playfair Display', serif;
 }
 
 .mystery-prose p {
   margin-top: 0.75em;
   margin-bottom: 0.75em;
   line-height: 1.6;
-  color: #1F2937;
+  color: #2A2A2A;
 }
 
 .mystery-prose ul,
@@ -138,7 +142,7 @@ body {
 .mystery-prose li {
   margin-top: 0.375em;
   margin-bottom: 0.375em;
-  color: #1F2937;
+  color: #2A2A2A;
 }
 
 .mystery-prose table {
@@ -146,7 +150,7 @@ body {
   margin-top: 1.25em;
   margin-bottom: 1.25em;
   border-collapse: collapse;
-  background-color: white;
+  background-color: #FDF8F3;
   border-radius: 0.5rem;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -156,41 +160,41 @@ body {
   font-weight: 600;
   padding: 0.75em;
   text-align: left;
-  background-color: #1D4B47;
+  background-color: #8B1538;
   color: white;
   border: none;
 }
 
 .mystery-prose td {
   padding: 0.75em;
-  border-bottom: 1px solid #E5E7EB;
-  color: #1F2937;
+  border-bottom: 1px solid #F7F3E9;
+  color: #2A2A2A;
 }
 
 .mystery-prose tr:nth-child(even) td {
-  background-color: #F8F9FA;
+  background-color: #F7F3E9;
 }
 
 .mystery-prose blockquote {
   margin: 1em 0;
   padding: 1em;
-  border-left: 4px solid #2DD4BF;
+  border-left: 4px solid #8B1538;
   font-style: italic;
-  background-color: #F8F9FA;
+  background-color: #FDF8F3;
   border-radius: 0.25rem;
-  color: #1F2937;
+  color: #2A2A2A;
 }
 
 .mystery-prose code {
   font-family: monospace;
-  background-color: #F3F4F6;
+  background-color: #F7F3E9;
   color: #8B1538;
   padding: 0.2em 0.4em;
   border-radius: 0.25rem;
 }
 
 .mystery-prose pre {
-  background-color: #F3F4F6;
+  background-color: #F7F3E9;
   padding: 1em;
   border-radius: 0.5rem;
   overflow-x: auto;
@@ -200,7 +204,7 @@ body {
   margin: 2em 0;
   border: none;
   height: 2px;
-  background: linear-gradient(90deg, transparent, #2DD4BF, transparent);
+  background: linear-gradient(90deg, transparent, #8B1538, transparent);
 }
 
 .mystery-prose img {
@@ -218,35 +222,38 @@ body {
   font-style: italic;
 }
 
-/* Tab-specific styling - Sophisticated sections */
+/* Tab-specific styling - Sophisticated burgundy sections */
 .host-guide-content {
-  background-color: #FFFFFF;
+  background-color: #FDF8F3;
   border-radius: 0.5rem;
-  border: 1px solid #E5E7EB;
+  border: 1px solid #F7F3E9;
 }
 
 .host-guide-content h1 {
-  color: #1D4B47;
-  border-bottom: 2px solid #2DD4BF;
+  color: #8B1538;
+  border-bottom: 2px solid #8B1538;
   padding-bottom: 0.5rem;
   margin-bottom: 1rem;
   font-size: 1.75rem;
+  font-family: 'Playfair Display', serif;
 }
 
 .host-guide-content h2 {
-  background-color: rgba(29, 75, 71, 0.1);
+  background-color: rgba(139, 21, 56, 0.1);
   padding: 0.5rem;
   border-radius: 0.25rem;
-  color: #1D4B47;
+  color: #8B1538;
   font-size: 1.5rem;
   margin-top: 1.5rem;
+  font-family: 'Playfair Display', serif;
 }
 
 .host-guide-content h3 {
   color: #8B1538;
-  font-weight: 600;
+  font-weight: 500;
   margin-top: 1.25rem;
   font-size: 1.25rem;
+  font-family: 'Playfair Display', serif;
 }
 
 .host-guide-content p {
@@ -259,33 +266,36 @@ body {
 }
 
 .detective-script-content {
-  background-color: #FFFFFF;
+  background-color: #FDF8F3;
   border-radius: 0.5rem;
-  border: 1px solid #E5E7EB;
+  border: 1px solid #F7F3E9;
 }
 
 .detective-script-content h1 {
-  color: #1D4B47;
-  border-bottom: 2px solid #2DD4BF;
+  color: #8B1538;
+  border-bottom: 2px solid #8B1538;
   padding-bottom: 0.5rem;
   margin-bottom: 1rem;
   font-size: 1.75rem;
+  font-family: 'Playfair Display', serif;
 }
 
 .detective-script-content h2 {
-  background-color: rgba(45, 212, 191, 0.1);
+  background-color: rgba(139, 21, 56, 0.1);
   padding: 0.5rem;
   border-radius: 0.25rem;
-  color: #1D4B47;
+  color: #8B1538;
   font-size: 1.5rem;
   margin-top: 1.5rem;
+  font-family: 'Playfair Display', serif;
 }
 
 .detective-script-content h3 {
   color: #8B1538;
-  font-weight: 600;
+  font-weight: 500;
   margin-top: 1.25rem;
   font-size: 1.25rem;
+  font-family: 'Playfair Display', serif;
 }
 
 .detective-script-content p {
@@ -293,49 +303,49 @@ body {
 }
 
 .detective-script-content blockquote {
-  border-left-color: #2DD4BF;
-  background-color: rgba(45, 212, 191, 0.1);
+  border-left-color: #8B1538;
+  background-color: rgba(139, 21, 56, 0.1);
 }
 
 .character-matrix-content {
-  background-color: #FFFFFF;
+  background-color: #FDF8F3;
   border-radius: 0.5rem;
-  border: 1px solid #E5E7EB;
+  border: 1px solid #F7F3E9;
 }
 
 .character-matrix-content table {
-  border: 1px solid #E5E7EB;
+  border: 1px solid #F7F3E9;
 }
 
 .character-matrix-content th {
-  background-color: #1D4B47;
+  background-color: #8B1538;
   color: white;
 }
 
 .character-matrix-content td {
-  background-color: #FFFFFF;
+  background-color: #FDF8F3;
 }
 
 .clues-content {
-  background-color: #FFFFFF;
+  background-color: #FDF8F3;
   border-radius: 0.5rem;
-  border: 1px solid #E5E7EB;
+  border: 1px solid #F7F3E9;
 }
 
 .characters-content {
-  background-color: #FFFFFF;
+  background-color: #FDF8F3;
   border-radius: 0.5rem;
-  border: 1px solid #E5E7EB;
+  border: 1px solid #F7F3E9;
 }
 
-/* Mystery tabs navigation - Clean and professional */
+/* Mystery tabs navigation - Clean and professional with burgundy */
 .mystery-tabs-header {
   position: sticky;
   top: 0;
   z-index: 10;
-  background-color: #FFFFFF;
+  background-color: #FDF8F3;
   padding: 1rem;
-  border-bottom: 1px solid #E5E7EB;
+  border-bottom: 1px solid #F7F3E9;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
@@ -361,32 +371,32 @@ body {
   }
 }
 
-/* Section-specific Cards styling - Premium feel */
+/* Section-specific Cards styling - Premium burgundy feel */
 .section-card {
   margin-bottom: 1.5rem;
-  border: 1px solid #E5E7EB;
+  border: 1px solid #F7F3E9;
   border-radius: 0.5rem;
   overflow: hidden;
-  background-color: #FFFFFF;
+  background-color: #FDF8F3;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .section-card-header {
   padding: 1rem;
-  border-bottom: 1px solid #E5E7EB;
+  border-bottom: 1px solid #F7F3E9;
 }
 
 .host-guide-card .section-card-header {
-  background-color: rgba(29, 75, 71, 0.1);
+  background-color: rgba(139, 21, 56, 0.1);
 }
 
 .detective-script-card .section-card-header {
-  background-color: rgba(45, 212, 191, 0.1);
+  background-color: rgba(139, 21, 56, 0.05);
 }
 
 .section-card-content {
   padding: 1.5rem;
-  background-color: #FFFFFF;
+  background-color: #FDF8F3;
 }
 
 /* Mobile-friendly tab and content styling */
