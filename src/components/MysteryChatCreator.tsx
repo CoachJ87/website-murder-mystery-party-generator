@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import Header from "@/components/Header";
@@ -7,9 +7,9 @@ import { supabase } from "@/lib/supabase";
 import MysteryForm from "@/components/MysteryForm";
 import MysteryChat from "@/components/MysteryChat";
 import { useAuth } from "@/context/AuthContext";
-import { Message, FormValues } from "@/components/types";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
+import { Message, FormValues } from "@/components/types";
 
 const MysteryChatCreator = () => {
     const [saving, setSaving] = useState(false);
@@ -74,51 +74,57 @@ const MysteryChatCreator = () => {
                 let newConversationId = id;
 
                 if (!isEditing) {
-                    const { data: newConversation, error } = await supabase
+                    // Create new conversation with individual columns
+                    const { data: conversation, error: convError } = await supabase
                         .from("conversations")
                         .insert({
-                            title: data.title || `${data.theme} Mystery`,
-                            mystery_data: data,
                             user_id: user.id,
-                            status: "draft",
-                            // Initialize these fields to avoid update errors later
-                            has_complete_package: false,
-                            needs_package_generation: false,
-                            is_paid: false,
+                            title: `${data.theme || 'Mystery'} - ${data.playerCount} Players`,
+                            theme: data.theme || null,
+                            player_count: data.playerCount || 6,
+                            script_type: data.scriptType || 'full',
+                            has_accomplice: data.hasAccomplice || false,
+                            additional_details: data.additionalDetails || null,
+                            system_instruction: systemInstruction,
+                            display_status: "draft",
                             is_completed: false
                         })
                         .select()
                         .single();
 
-                    if (error) {
-                        console.error("Error saving mystery:", error);
-                        toast.error("Failed to save mystery data");
-                        return;
-                    } else if (newConversation) {
-                        newConversationId = newConversation.id;
-                        setConversationId(newConversationId);
+                    if (convError) {
+                        console.error("Error creating conversation:", convError);
+                        throw convError;
                     }
+                    conversationId = conversation.id;
+
+                    // Save initial user message
+                    await supabase.from("messages").insert({
+                        conversation_id: conversationId,
+                        content: initialMessage,
+                        role: "user",
+                        is_ai: false
+                    });
                 } else {
-                    const { error } = await supabase
+                    // Update existing conversation with individual columns
+                    await supabase
                         .from("conversations")
                         .update({
-                            title: data.title || `${data.theme} Mystery`,
-                            mystery_data: data,
-                            updated_at: new Date().toISOString(),
+                            theme: data.theme || null,
+                            player_count: data.playerCount || 6,
+                            script_type: data.scriptType || 'full',
+                            has_accomplice: data.hasAccomplice || false,
+                            additional_details: data.additionalDetails || null,
+                            system_instruction: systemInstruction,
+                            updated_at: new Date().toISOString()
                         })
-                        .eq("id", id);
-
-                    if (error) {
-                        console.error("Error updating mystery:", error);
-                        toast.error("Failed to update mystery data");
-                        return;
-                    }
+                        .eq("id", conversationId);
                 }
 
-                setShowChatUI(true);
-                if (newConversationId && newConversationId !== id) {
-                    navigate(`/mystery/edit/${newConversationId}`, { replace: true });
-                }
+                toast.success("Mystery setup complete! Starting chat...");
+                // Navigate immediately to chat with needsInitialAIResponse flag
+                navigate(`/mystery/chat/${conversationId}?initial=true`);
+
             } else {
                 setShowChatUI(true);
             }
@@ -202,11 +208,35 @@ const MysteryChatCreator = () => {
         }
     };
 
+    // Create system instruction for AI
+    const systemInstruction = `You are a murder mystery creator. The user has provided the necessary information. Create a complete mystery with this format:
+
+# "[CREATIVE TITLE]" - A MURDER MYSTERY
+
+## PREMISE
+[2-3 paragraphs setting the scene, describing the event where the murder takes place, and creating dramatic tension]
+
+## VICTIM
+**[Victim Name]** - [Vivid description of the victim, their role in the story, personality traits, and why they might have made enemies]
+
+## CHARACTER LIST (${formData?.playerCount || 6} PLAYERS)
+1. **[Character 1 Name]** - [Engaging one-sentence description including profession and connection to victim]
+2. **[Character 2 Name]** - [Engaging one-sentence description including profession and connection to victim]
+[Continue for all ${formData?.playerCount || 6} characters]
+
+## MURDER METHOD
+[Paragraph describing how the murder was committed, interesting details about the method, and what clues might be found]
+
+IMPORTANT: Always end your response with: "Does this ${formData?.theme || 'murder mystery'} concept work for you? We can adjust any elements you'd like to change. Once you're satisfied with the concept, you can generate the complete mystery package with detailed character guides, host instructions, and game materials."`;
+
+    // Create formatted initial message
+    const initialMessage = `Let's create a murder mystery${formData?.theme ? ` with a ${formData.theme} theme` : ''} for ${formData?.playerCount || 6} players with ${formData?.scriptType === 'pointForm' ? 'point form' : formData?.scriptType === 'both' ? 'both full and point form' : 'full'} scripts${formData?.additionalDetails ? `. Additional details: ${formData.additionalDetails}` : ''}.`;
+
     return (
-        <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen flex flex-col bg-[#F7F3E9]">
             <Header />
-            <main className={cn("flex-1", isMobile ? "py-4 px-2" : "py-12 px-4")}>
-                <div className={cn("container mx-auto", isMobile ? "max-w-full" : "max-w-4xl")}>
+            <main className="flex-1">
+                <div className="container mx-auto max-w-4xl px-3 sm:px-4 py-4 sm:py-8">
                     {!showChatUI && (
                         <div className={cn("mb-8", isMobile && "mb-4")}>
                             <h1 className={cn("text-3xl font-bold mb-2", isMobile && "text-2xl mb-1")}>
@@ -233,10 +263,12 @@ const MysteryChatCreator = () => {
                             />
                         </div>
                     ) : (
-                        <MysteryForm
-                            onSave={handleSave}
-                            isSaving={saving}
-                        />
+                        <div className="bg-white rounded-2xl shadow-sm border border-gray-200/50 p-6">
+                            <MysteryForm
+                                onSave={handleSave}
+                                isSaving={saving}
+                            />
+                        </div>
                     )}
 
                     {!showChatUI && (
@@ -245,6 +277,7 @@ const MysteryChatCreator = () => {
                                 variant="outline" 
                                 onClick={() => navigate("/dashboard")}
                                 size={isMobile ? "sm" : "default"}
+                                className="bg-white/80 hover:bg-white shadow-sm"
                             >
                                 Back to Dashboard
                             </Button>

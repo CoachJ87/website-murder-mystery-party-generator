@@ -394,7 +394,7 @@ export default function MysteryChat({
   return (
     <div className="flex flex-col space-y-4 sm:space-y-6 w-full">
       {/* Chat Messages Area */}
-      <div className="space-y-3 sm:space-y-4 w-full">
+      <div className="space-y-4 w-full">
         {/* Loading History */}
         {isLoadingHistory && (
           <div className="text-center text-muted-foreground py-4">
@@ -413,10 +413,10 @@ export default function MysteryChat({
           >
             <div
               className={cn(
-                "rounded-lg px-3 py-2 sm:px-4 sm:py-3 max-w-[85%] sm:max-w-[80%]",
+                "rounded-2xl px-4 py-3 max-w-[85%] sm:max-w-[80%]",
                 message.is_ai
-                  ? "bg-muted border overflow-auto"
-                  : "bg-primary text-primary-foreground"
+                  ? "claude-message-ai"
+                  : "claude-message-user"
               )}
             >
               {message.is_ai ? (
@@ -470,11 +470,11 @@ export default function MysteryChat({
         {/* AI Typing Indicator */}
         {isAiTyping && (
           <div className="flex justify-start">
-            <div className="bg-muted border rounded-lg px-3 py-2 sm:px-4 sm:py-3 max-w-[85%] sm:max-w-[80%]">
-              <div className="flex space-x-1">
-                <div className="h-2 w-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                <div className="h-2 w-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                <div className="h-2 w-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
+            <div className="claude-message-ai">
+              <div className="claude-typing-indicator">
+                <div className="claude-typing-dot" style={{ animationDelay: "0ms" }}></div>
+                <div className="claude-typing-dot" style={{ animationDelay: "150ms" }}></div>
+                <div className="claude-typing-dot" style={{ animationDelay: "300ms" }}></div>
               </div>
             </div>
           </div>
@@ -483,52 +483,35 @@ export default function MysteryChat({
       </div>
 
       {/* Chat Input Area */}
-      <div className="border-t p-3 sm:p-4 bg-background">
-        <div className="flex items-end space-x-2 sm:space-x-3">
-          <div className="flex-grow">
-            <Textarea
-              ref={textareaRef}
-              placeholder="Anything you would like to change?"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSendMessage(input);
-                }
-              }}
-              disabled={isAiTyping}
-              className={cn(
-                "resize-none border-0 shadow-none focus-visible:ring-1 focus-visible:ring-ring",
-                isMobile ? "min-h-[44px] text-base" : "min-h-[48px] text-sm"
-              )}
-              rows={isMobile ? 2 : 1}
-            />
-          </div>
-          <Button 
-            type="submit" 
-            onClick={() => handleSendMessage(input)} 
-            disabled={isAiTyping || !input.trim()}
-            size={isMobile ? "default" : "icon"}
-            className={cn(
-              "shrink-0",
-              isMobile ? "h-11 w-11" : "h-9 w-9"
-            )}
-          >
-            {isAiTyping ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Send className="h-4 w-4" />
-            )}
-          </Button>
-        </div>
-        
-        {/* Mobile Helper Text */}
-        {isMobile && (
-          <p className="text-xs text-muted-foreground mt-2 text-center">
-            Tap Enter to send • Shift+Enter for new line
-          </p>
-        )}
+      <div className="claude-input-container">
+        <Textarea
+          ref={textareaRef}
+          placeholder="Anything you would like to change?"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              handleSendMessage(input);
+            }
+          }}
+          disabled={isAiTyping}
+          className="claude-input"
+          rows={1}
+        />
+        <Button 
+          type="submit" 
+          onClick={() => handleSendMessage(input)} 
+          disabled={isAiTyping || !input.trim()}
+          className="claude-send-button"
+        >
+          {isAiTyping ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Send className="h-4 w-4" />
+          )}
+          <span className="sr-only">Send</span>
+        </Button>
       </div>
     </div>
   );

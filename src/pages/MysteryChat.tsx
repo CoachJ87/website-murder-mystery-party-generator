@@ -114,12 +114,12 @@ const MysteryChatPage = () => {
     }
 
     return (
-        <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen flex flex-col bg-[#F7F3E9]">
             <Header />
             <main className="flex-1 flex flex-col relative pb-32">
                 {/* Back button - only visible at top of page */}
                 <div className={cn(
-                    "sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b",
+                    "sticky top-0 z-10 bg-[#F7F3E9]/95 backdrop-blur-sm border-b border-gray-200/50",
                     isMobile ? "py-2 px-3" : "py-4 px-4"
                 )}>
                     <div className="container mx-auto max-w-4xl">
@@ -128,7 +128,7 @@ const MysteryChatPage = () => {
                             size={isMobile ? "sm" : "default"}
                             onClick={() => navigate("/dashboard")}
                             className={cn(
-                                "flex items-center gap-2",
+                                "flex items-center gap-2 bg-white/80 hover:bg-white shadow-sm",
                                 isMobile && "h-9 px-3 text-sm"
                             )}
                         >
@@ -157,7 +157,7 @@ const MysteryChatPage = () => {
 
                 {/* Fixed bottom action button */}
                 <div className={cn(
-                    "fixed bottom-0 left-0 right-0 z-20 bg-background border-t py-4 px-4",
+                    "fixed bottom-0 left-0 right-0 z-20 bg-[#F7F3E9] border-t border-gray-200/50 py-4 px-4",
                     isMobile ? "py-3" : "py-4"
                 )}>
                     <div className="container mx-auto max-w-4xl flex justify-center">
@@ -166,8 +166,8 @@ const MysteryChatPage = () => {
                             disabled={!hasAIResponse}
                             size={isMobile ? "default" : "lg"}
                             className={cn(
-                                "bg-blue-600 hover:bg-blue-700 text-white font-medium",
-                                isMobile ? "w-full h-12 text-base" : "px-6"
+                                "bg-[#8B1538] hover:bg-[#6B0F28] text-white font-medium shadow-md",
+                                isMobile ? "w-full h-12 text-base" : "px-6 h-12"
                             )}
                         >
                             <Zap className="h-4 w-4 mr-2" />
