@@ -1,4 +1,4 @@
-
+import React, { useEffect } from "react";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Footer from "@/components/Footer";
@@ -11,10 +11,18 @@ import { HowItWorks } from "@/components/ui/how-it-works";
 import { useAuth } from "@/context/AuthContext";
 import { HomeDashboard } from "@/components/dashboard/HomeDashboard";
 import { useNavigate } from "react-router-dom";
+import { isBrowser, addSsgMetadata } from "@/utils/ssg-helpers";
 
 const Index = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  
+  // Add SEO metadata for SSG
+  useEffect(() => {
+    if (isBrowser()) {
+      addSsgMetadata('/');
+    }
+  }, []);
   
   // Feature Steps data
   const features = [

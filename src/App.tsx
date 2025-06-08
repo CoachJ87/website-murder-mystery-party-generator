@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { HelmetProvider } from "react-helmet-async";
 import LoadingBoundary from "@/components/LoadingBoundary";
+import { useEffect } from "react";
+import { addSsgMetadata, isBrowser, getCurrentRoute } from "@/utils/ssg-helpers";
 import Index from "./pages/Index";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
@@ -43,21 +45,31 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 // Main App component with simplified structure
-const App = () => (
-  <HelmetProvider>
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AuthProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <AppRoutes />
-          </TooltipProvider>
-        </AuthProvider>
-      </BrowserRouter>
-    </QueryClientProvider>
-  </HelmetProvider>
-);
+const App = () => {
+  // Add SEO metadata for SSG routes
+  useEffect(() => {
+    if (isBrowser()) {
+      const currentRoute = getCurrentRoute();
+      addSsgMetadata(currentRoute);
+    }
+  }, []);
+
+  return (
+    <HelmetProvider>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <AuthProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <AppRoutes />
+            </TooltipProvider>
+          </AuthProvider>
+        </BrowserRouter>
+      </QueryClientProvider>
+    </HelmetProvider>
+  );
+};
 
 const AppRoutes = () => {
   const { loading, isAuthenticated } = useAuth();
