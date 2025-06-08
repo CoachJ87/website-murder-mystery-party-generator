@@ -75,8 +75,8 @@ const ReactApp = ({ initialRoute = '/' }: { initialRoute?: string }) => {
             <Route path="/support" element={<Support />} />
             
             {/* Payment success and cancel routes */}
-            <Route path="/payment-success" element={<Navigate to="/" replace />} />
-            <Route path="/payment-canceled" element={<Navigate to="/" replace />} />
+            <Route path="/payment-success" element={<Navigate to="/\" replace />} />
+            <Route path="/payment-canceled" element={<Navigate to="/\" replace />} />
             
             {/* Protected routes */}
             <Route 
