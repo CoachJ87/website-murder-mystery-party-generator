@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -20,8 +21,6 @@ type AuthContextType = {
   setIsPublic: (value: boolean) => void;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (name: string, email: string, password: string) => Promise<void>;
-  // TODO: Re-enable Google auth when OAuth issues are resolved
-  // signInWithGoogle: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   signOut: () => Promise<void>;
 };
@@ -30,14 +29,12 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   session: null,
-  loading: true,
+  loading: false,
   isAuthenticated: false,
   isPublic: false,
   setIsPublic: () => {},
   signIn: async () => {},
   signUp: async () => {},
-  // TODO: Re-enable Google auth when OAuth issues are resolved
-  // signInWithGoogle: async () => {},
   resetPassword: async () => {},
   signOut: async () => {},
 });
@@ -50,16 +47,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isPublic, setIsPublic] = useState(false);
   const navigate = useNavigate();
 
-  // Improved auth state handling with proper initialization order
+  // Simplified auth state handling with timeout protection
   useEffect(() => {
-    console.log("Setting up auth state listener");
+    let mounted = true;
     
-    // 1. Set up the auth state listener FIRST
+    // Set loading timeout to prevent infinite loading
+    const loadingTimeout = setTimeout(() => {
+      if (mounted) {
+        setLoading(false);
+      }
+    }, 3000);
+
+    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, currentSession) => {
-        console.log("Auth state changed:", event, currentSession?.user?.id);
+        if (!mounted) return;
         
-        // Only use synchronous state updates here
         setSession(currentSession);
         
         if (currentSession?.user) {
@@ -76,37 +79,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
         
         setLoading(false);
+        clearTimeout(loadingTimeout);
       }
     );
     
-    // 2. THEN check for existing session
+    // Check for existing session with error handling
     const checkSession = async () => {
       try {
-        console.log("Checking for existing session");
-        const { data: { session: existingSession }, error } = await supabase.auth.getSession();
+        const { data: { session: existingSession } } = await supabase.auth.getSession();
         
-        if (error) {
-          console.error("Error checking session:", error);
-          return;
+        if (mounted && !existingSession) {
+          setLoading(false);
+          clearTimeout(loadingTimeout);
         }
-        
-        if (existingSession?.user) {
-          console.log("Found existing session:", existingSession.user.id);
-        } else {
-          console.log("No existing session found");
-        }
-        
-        // Don't set state here, the onAuthStateChange listener will handle it
       } catch (error) {
         console.error("Session check error:", error);
+        if (mounted) {
+          setLoading(false);
+          clearTimeout(loadingTimeout);
+        }
       }
     };
     
     checkSession();
     
-    // Clean up subscription on unmount
     return () => {
-      console.log("Cleaning up auth subscription");
+      mounted = false;
+      clearTimeout(loadingTimeout);
       subscription.unsubscribe();
     };
   }, []);
@@ -114,18 +113,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Sign in with email and password
   const signIn = async (email: string, password: string) => {
     try {
-      console.log("Attempting to sign in with:", email);
       setLoading(true);
       
-      // Sign in directly without workarounds
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       
       if (error) {
-        console.error("Sign-in error:", error);
-        
         if (error.message.includes('Invalid login credentials')) {
           toast.error("The email or password you entered is incorrect. Please try again.");
         } else if (error.message.includes('Email not confirmed')) {
@@ -134,19 +129,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         } else {
           toast.error(`Failed to sign in: ${error.message}`);
         }
-        
         throw error;
       }
       
-      // If successful, navigate to dashboard
       if (data?.user) {
-        console.log("Sign in successful:", data.user.id);
         toast.success("Signed in successfully!");
         navigate("/dashboard");
       }
     } catch (error: any) {
-      // Error is already handled above
-      console.error("Sign-in catch block:", error);
+      console.error("Sign-in error:", error);
     } finally {
       setLoading(false);
     }
@@ -155,127 +146,65 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Sign up with email and password
   const signUp = async (name: string, email: string, password: string) => {
     try {
-      console.log("Attempting to sign up:", email);
       setLoading(true);
       
-      // Validate email format
       if (!email.includes('@') || !email.includes('.')) {
         toast.error("Please enter a valid email address.");
         return;
       }
       
-      // Sign up with user metadata for name
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: { name },
-          // For automatic sign-in without email verification (optional)
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
       
       if (error) {
-        console.error("Sign-up error:", error);
-        
         if (error.message.includes("already registered")) {
           toast.error("This email is already registered. Try signing in instead.");
         } else {
           toast.error(`Failed to create account: ${error.message}`);
         }
-        
         throw error;
       }
       
-      // If email confirmation is required
       if (data.user && !data.session) {
-        console.log("Sign up successful, email confirmation required");
         toast.success("Account created! Please check your email to confirm your account.");
         navigate("/check-email");
         return;
       }
       
-      // If auto sign-in is enabled
       if (data.user && data.session) {
-        console.log("Sign up and auto sign-in successful:", data.user.id);
         toast.success("Account created successfully! You're now logged in.");
         navigate("/dashboard");
       }
     } catch (error: any) {
-      // Error is already handled above
-      console.error("Sign-up catch block:", error);
+      console.error("Sign-up error:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  // TODO: Re-enable Google auth when OAuth issues are resolved
-  // Sign in with Google - Enhanced with detailed debugging
-  // const signInWithGoogle = async () => {
-  //   try {
-  //     console.log("=== Starting Google OAuth Flow ===");
-  //     console.log("Current origin:", window.location.origin);
-  //     
-  //     const redirectUrl = `${window.location.origin}/auth/callback`;
-  //     console.log("Redirect URL:", redirectUrl);
-  //     
-  //     const oauthConfig = {
-  //       provider: "google" as const,
-  //       options: {
-  //         redirectTo: redirectUrl,
-  //         queryParams: {
-  //           access_type: 'offline',
-  //           prompt: 'consent',
-  //         },
-  //       },
-  //     };
-  //     
-  //     console.log("OAuth config:", oauthConfig);
-  //     
-  //     const { data, error } = await supabase.auth.signInWithOAuth(oauthConfig);
-  //     
-  //     console.log("signInWithOAuth result:", { data, error });
-  //     
-  //     if (error) {
-  //       console.error("Google sign-in error:", error);
-  //       toast.error(`Failed to sign in with Google: ${error.message}`);
-  //       throw error;
-  //     }
-  //     
-  //     if (data.url) {
-  //       console.log("OAuth redirect URL generated:", data.url);
-  //       console.log("Redirecting to Google...");
-  //       // The redirect will happen automatically
-  //     } else {
-  //       console.warn("No redirect URL returned from signInWithOAuth");
-  //     }
-  //     
-  //   } catch (error: any) {
-  //     console.error("Google sign-in catch block:", error);
-  //     toast.error("Failed to initiate Google sign-in. Please try again.");
-  //   }
-  // };
-
   // Reset password
   const resetPassword = async (email: string) => {
     try {
       setLoading(true);
-      console.log("Attempting to reset password for:", email);
       
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/reset-password`,
       });
       
       if (error) {
-        console.error("Password reset error:", error);
         toast.error(`Failed to reset password: ${error.message}`);
         throw error;
       }
       
       toast.success("Password reset instructions sent to your email.");
     } catch (error: any) {
-      // Error is already handled above
-      console.error("Password reset catch block:", error);
+      console.error("Password reset error:", error);
     } finally {
       setLoading(false);
     }
@@ -285,12 +214,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signOut = async () => {
     try {
       setLoading(true);
-      console.log("Signing out");
       
       const { error } = await supabase.auth.signOut();
       
       if (error) {
-        console.error("Sign-out error:", error);
         toast.error(`Failed to sign out: ${error.message}`);
         throw error;
       }
@@ -298,14 +225,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       navigate("/");
       toast.success("Signed out successfully.");
     } catch (error: any) {
-      // Error is already handled above
-      console.error("Sign-out catch block:", error);
+      console.error("Sign-out error:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Provide context value
   const value = {
     user,
     session,
@@ -315,8 +240,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsPublic,
     signIn,
     signUp,
-    // TODO: Re-enable Google auth when OAuth issues are resolved
-    // signInWithGoogle,
     resetPassword,
     signOut,
   };
@@ -328,5 +251,4 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// Custom hook to use the auth context
 export const useAuth = () => useContext(AuthContext);

@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -5,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { HelmetProvider } from "react-helmet-async";
+import LoadingBoundary from "@/components/LoadingBoundary";
 import Index from "./pages/Index";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
@@ -30,20 +32,18 @@ const queryClient = new QueryClient();
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, loading } = useAuth();
   
-  if (loading) {
-    return <div className="h-screen w-full flex items-center justify-center">
-      <div className="h-8 w-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-    </div>;
-  }
-  
-  return isAuthenticated ? (
-    <>{children}</>
-  ) : (
-    <Navigate to="/sign-in" replace />
+  return (
+    <LoadingBoundary loading={loading}>
+      {isAuthenticated ? (
+        <>{children}</>
+      ) : (
+        <Navigate to="/sign-in" replace />
+      )}
+    </LoadingBoundary>
   );
 };
 
-// Fixed App component - Now with HelmetProvider
+// Main App component with simplified structure
 const App = () => (
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
@@ -60,71 +60,75 @@ const App = () => (
   </HelmetProvider>
 );
 
-const AppRoutes = () => (
-  <Routes>
-    <Route path="/" element={<Index />} />
-    <Route path="/sign-in" element={<SignIn />} />
-    <Route path="/sign-up" element={<SignUp />} />
-    <Route path="/forgot-password" element={<ForgotPassword />} />
-    <Route path="/reset-password" element={<ResetPassword />} />
-    <Route path="/check-email" element={<CheckEmail />} />
-    <Route path="/auth/callback" element={<AuthCallback />} />
-    <Route path="/showcase" element={<Showcase />} />
-    <Route path="/contact" element={<Contact />} />
-    <Route path="/privacy" element={<Privacy />} />
-    <Route path="/support" element={<Support />} />
-    
-    {/* Payment success and cancel routes */}
-    <Route path="/payment-success" element={<Navigate to="/" replace />} />
-    <Route path="/payment-canceled" element={<Navigate to="/" replace />} />
-    
-    {/* Protected routes */}
-    <Route 
-      path="/dashboard" 
-      element={
-        <ProtectedRoute>
-          <Index />
-        </ProtectedRoute>
-      } 
-    />
-    <Route 
-      path="/account" 
-      element={
-        <ProtectedRoute>
-          <AccountSettings />
-        </ProtectedRoute>
-      } 
-    />
-    <Route 
-      path="/mystery/create" 
-      element={<MysteryCreation />} 
-    />
-    <Route 
-      path="/mystery/edit/:id" 
-      element={
-        <ProtectedRoute>
-          <MysteryChatPage />
-        </ProtectedRoute>
-      } 
-    />
-    <Route 
-      path="/mystery/chat/:id" 
-      element={
-        <ProtectedRoute>
-          <MysteryChatPage />
-        </ProtectedRoute>
-      } 
-    />
-    <Route 
-      path="/mystery/purchase/:id" 
-      element={<MysteryPurchase />} 
-    />
-    {/* Main mystery view - allow both auth and non-auth users for preview vs purchased states */}
-    <Route path="/mystery/:id" element={<MysteryView />} />
-    
-    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-    <Route path="*" element={<NotFound />} />
-  </Routes>
-);
+const AppRoutes = () => {
+  const { loading } = useAuth();
+  
+  return (
+    <LoadingBoundary loading={loading}>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/sign-in" element={<SignIn />} />
+        <Route path="/sign-up" element={<SignUp />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/check-email" element={<CheckEmail />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="/showcase" element={<Showcase />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/support" element={<Support />} />
+        
+        {/* Payment success and cancel routes */}
+        <Route path="/payment-success" element={<Navigate to="/" replace />} />
+        <Route path="/payment-canceled" element={<Navigate to="/" replace />} />
+        
+        {/* Protected routes */}
+        <Route 
+          path="/dashboard" 
+          element={
+            <ProtectedRoute>
+              <Index />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/account" 
+          element={
+            <ProtectedRoute>
+              <AccountSettings />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/mystery/create" 
+          element={<MysteryCreation />} 
+        />
+        <Route 
+          path="/mystery/edit/:id" 
+          element={
+            <ProtectedRoute>
+              <MysteryChatPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/mystery/chat/:id" 
+          element={
+            <ProtectedRoute>
+              <MysteryChatPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/mystery/purchase/:id" 
+          element={<MysteryPurchase />} 
+        />
+        <Route path="/mystery/:id" element={<MysteryView />} />
+        
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </LoadingBoundary>
+  );
+};
 
 export default App;
