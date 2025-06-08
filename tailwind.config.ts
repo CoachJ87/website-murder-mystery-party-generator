@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -20,7 +19,7 @@ export default {
 		},
 		extend: {
 			colors: {
-				/* Mystery Maker Color System - Sophisticated & Premium */
+				/* Mystery Maker Color System - Sophisticated Burgundy & Cream */
 				primary: {
 					DEFAULT: 'hsl(var(--color-primary))',
 					foreground: 'hsl(var(--color-primary-foreground))',

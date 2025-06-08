@@ -1,14 +1,14 @@
 
 /* Mystery Package Custom Styles - Sophisticated & Premium */
 :root {
-  --mystery-primary: #1d4b47;
-  --mystery-secondary: #8b1538;
-  --mystery-accent: #2dd4bf;
-  --mystery-text: #1f2937;
-  --mystery-bg-light: #ffffff;
-  --mystery-bg-card: #f8f9fa;
-  --mystery-bg-section: #f3f4f6;
-  --mystery-border: #e5e7eb;
+  --mystery-primary: #8B1538;
+  --mystery-secondary: #8B1538;
+  --mystery-accent: #8B1538;
+  --mystery-text: #2A2A2A;
+  --mystery-bg-light: #FEFCF8;
+  --mystery-bg-card: #F7F3E9;
+  --mystery-bg-section: #F7F3E9;
+  --mystery-border: #9CA3AF;
   --mystery-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   --mystery-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.15);
 }

@@ -5,12 +5,12 @@
 
 @layer base {
   :root {
-    /* Mystery Maker Color System - Sophisticated & Premium */
+    /* Mystery Maker Color System - Sophisticated Burgundy & Cream */
     /* Primary Colors */
-    --color-primary: 183 48% 20%;        /* Deep Teal #1D4B47 */
+    --color-primary: 343 74% 32%;        /* Rich Burgundy #8B1538 */
     --color-primary-foreground: 0 0% 100%;
-    --color-primary-hover: 183 48% 15%;
-    --color-primary-light: 183 48% 35%;
+    --color-primary-hover: 343 74% 25%;
+    --color-primary-light: 343 74% 45%;
     
     --color-secondary: 343 74% 32%;      /* Rich Burgundy #8B1538 */
     --color-secondary-foreground: 0 0% 100%;
@@ -18,10 +18,10 @@
     --color-secondary-light: 343 74% 45%;
     
     /* Accent Colors */
-    --color-accent: 172 76% 64%;         /* Bright Teal #2DD4BF */
-    --color-accent-foreground: 183 48% 20%;
-    --color-accent-hover: 172 76% 55%;
-    --color-accent-light: 172 76% 75%;
+    --color-accent: 343 74% 32%;         /* Rich Burgundy #8B1538 */
+    --color-accent-foreground: 0 0% 100%;
+    --color-accent-hover: 343 74% 25%;
+    --color-accent-light: 343 74% 45%;
     
     --color-danger: 0 84% 49%;           /* Soft Red #DC2626 */
     --color-danger-foreground: 0 0% 100%;
@@ -29,26 +29,26 @@
     --color-danger-light: 0 84% 65%;
     
     /* Background System - Sophisticated & Clean */
-    --color-surface: 0 0% 100%;          /* Pure White #FFFFFF */
-    --color-surface-foreground: 215 25% 13%; /* Charcoal Black #1F2937 */
-    --color-surface-hover: 210 20% 98%;  /* Very subtle gray */
+    --color-surface: 35 27% 97%;         /* Soft Off-White #FEFCF8 */
+    --color-surface-foreground: 0 0% 17%; /* Charcoal Black #2A2A2A */
+    --color-surface-hover: 35 27% 95%;   /* Slightly darker off-white */
     
-    --color-muted: 210 20% 98%;          /* Cool Gray #F8F9FA */
+    --color-muted: 35 27% 97%;           /* Warm Cream #F7F3E9 */
     --color-muted-foreground: 215 16% 47%; /* Medium Gray #6B7280 */
     
-    --color-subtle: 220 14% 96%;         /* Light Gray #F3F4F6 */
-    --color-subtle-foreground: 215 25% 13%;
+    --color-subtle: 35 27% 95%;          /* Darker Warm Cream #F7F3E9 */
+    --color-subtle-foreground: 0 0% 17%;
     
-    --color-tertiary: 220 9% 68%;        /* Light Gray text #9CA3AF */
+    --color-tertiary: 220 9% 68%;        /* Light Gray #9CA3AF */
     
     /* Semantic Tokens */
     --background: var(--color-surface);
     --foreground: var(--color-surface-foreground);
     
-    --card: 0 0% 100%;
+    --card: 35 27% 97%;
     --card-foreground: var(--color-surface-foreground);
     
-    --popover: 0 0% 100%;
+    --popover: 35 27% 97%;
     --popover-foreground: var(--color-surface-foreground);
     
     --border: 220 13% 91%;
@@ -73,26 +73,26 @@
   
   /* Dark mode variants for future implementation */
   .dark {
-    --color-surface: 215 25% 13%;        /* Charcoal Black */
+    --color-surface: 0 0% 17%;           /* Charcoal Black */
     --color-surface-foreground: 0 0% 100%; /* Pure White */
-    --color-surface-hover: 215 25% 18%;
+    --color-surface-hover: 0 0% 20%;
     
-    --color-muted: 215 25% 18%;          /* Dark surface */
+    --color-muted: 0 0% 20%;             /* Dark surface */
     --color-muted-foreground: 215 16% 65%; /* Lighter Medium Gray */
     
-    --color-subtle: 215 25% 23%;         /* Darker surface */
+    --color-subtle: 0 0% 23%;            /* Darker surface */
     
     --background: var(--color-surface);
     --foreground: var(--color-surface-foreground);
     
-    --card: 215 25% 18%;
+    --card: 0 0% 20%;
     --card-foreground: var(--color-surface-foreground);
     
-    --popover: 215 25% 18%;
+    --popover: 0 0% 20%;
     --popover-foreground: var(--color-surface-foreground);
     
-    --border: 215 25% 25%;
-    --input: 215 25% 25%;
+    --border: 0 0% 25%;
+    --input: 0 0% 25%;
     
     --sidebar-background: var(--color-surface);
     --sidebar-foreground: var(--color-surface-foreground);
