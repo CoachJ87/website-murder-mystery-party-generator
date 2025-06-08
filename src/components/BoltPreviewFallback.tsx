@@ -16,7 +16,7 @@ const BoltPreviewFallback: React.FC<{ children: React.ReactNode }> = ({ children
   // In Bolt preview, render a simplified version
   if (isBoltPreview()) {
     return (
-      <div className="bolt-preview-content" style={{ padding: '20px' }}>
+      <div className="bolt-preview-content\" style={{ padding: '20px' }}>
         <h1 style={{ 
           fontFamily: 'Playfair Display, serif', 
           fontSize: '28px', 
