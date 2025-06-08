@@ -1,38 +1,12 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Card, CardHeader, CardContent, CardDescription } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Send, Loader2 } from "lucide-react";
-import { useIsMobile } from "@/hooks/use-mobile";
 import ReactMarkdown from 'react-markdown';
-import rehypeRaw from 'rehype-raw';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Separator } from "@/components/ui/separator";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import { Loader2, Send } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
+import rehypeRaw from 'rehype-raw';
 import { useAuth } from "@/context/AuthContext";
 import { Message } from "@/components/types";
 import { supabase } from "@/lib/supabase";
@@ -53,22 +27,6 @@ interface MysteryChatProps {
   skipForm?: boolean;
   needsInitialAIResponse?: boolean;
 }
-
-const formSchema = z.object({
-  theme: z.string().min(2, {
-    message: "Theme must be at least 2 characters.",
-  }).max(50, {
-    message: "Theme must not be longer than 50 characters.",
-  }),
-  playerCount: z.number().min(4, {
-    message: "Must have at least 4 players"
-  }).max(32, {
-    message: "Must not have more than 32 players"
-  }),
-  hasAccomplice: z.boolean().default(false),
-  scriptType: z.enum(['full', 'pointForm']).default('full'),
-  additionalDetails: z.string().max(500).optional(),
-});
 
 export default function MysteryChat({
   initialTheme,
@@ -98,17 +56,7 @@ export default function MysteryChat({
   const { isAuthenticated } = useAuth();
   const isMobile = useIsMobile();
   const bottomRef = useRef<HTMLDivElement>(null);
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      theme: initialTheme || "",
-      playerCount: initialPlayerCount || 4,
-      hasAccomplice: initialHasAccomplice || false,
-      additionalDetails: initialAdditionalDetails || "",
-    },
-    mode: "onChange"
-  });
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Helper function to ensure proper timestamp handling
   const ensureValidTimestamp = (message: any): Message => {
@@ -152,6 +100,14 @@ export default function MysteryChat({
       }
     }
   }, [needsInitialAIResponse, hasTriggeredInitialResponse, messages, isLoadingHistory]);
+
+  // Auto-resize textarea
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [input]);
 
   // FIXED: Enhanced function to properly detect if we have player count info
   const hasPlayerCountInfo = () => {
@@ -215,10 +171,13 @@ export default function MysteryChat({
     if (initialAdditionalDetails) {
       setCurrentAdditionalDetails(initialAdditionalDetails);
     }
-  }, [initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails, form]);
+  }, [initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    // Scroll to bottom when new messages arrive or AI is typing
+    if (bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages, isAiTyping]);
 
   const createSystemMessage = (data: any) => {
@@ -433,148 +392,143 @@ export default function MysteryChat({
   };
 
   return (
-    <div className="flex flex-col h-full space-y-4 sm:space-y-6">
-      {/* Chat Container - Mobile Optimized */}
-      <div className="border rounded-lg bg-background overflow-hidden">
-        {/* Chat Messages Area - Enhanced Mobile Experience */}
-        <div className={cn(
-          "overflow-y-auto space-y-3 sm:space-y-4",
-          isMobile ? "h-80 p-3" : "h-96 p-4"
-        )}>
-          {/* Loading History */}
-          {isLoadingHistory && (
-            <div className="text-center text-muted-foreground py-4">
-              <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin mx-auto mb-2" />
-              <p className="text-sm sm:text-base">Loading previous messages...</p>
-            </div>
-          )}
-          
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={cn(
-                "flex",
-                message.is_ai ? "justify-start" : "justify-end"
-              )}
-            >
-              <div
-                className={cn(
-                  "rounded-lg px-3 py-2 sm:px-4 sm:py-3 max-w-[85%] sm:max-w-[80%]",
-                  message.is_ai
-                    ? "bg-muted border overflow-auto"
-                    : "bg-primary text-primary-foreground"
-                )}
-              >
-                {message.is_ai ? (
-                  <div className={cn(
-                    "prose prose-sm dark:prose-invert max-w-none",
-                    isMobile && "text-sm leading-relaxed"
-                  )}>
-                    <ReactMarkdown 
-                      rehypePlugins={[rehypeRaw]}
-                      components={{
-                        h1: ({node, ...props}) => <h1 className={cn(
-                          "font-bold mt-3 mb-2",
-                          isMobile ? "text-lg" : "text-2xl"
-                        )} {...props} />,
-                        h2: ({node, ...props}) => <h2 className={cn(
-                          "font-semibold mt-2 mb-1",
-                          isMobile ? "text-base" : "text-xl"
-                        )} {...props} />,
-                        h3: ({node, ...props}) => <h3 className={cn(
-                          "font-medium mt-2 mb-1",
-                          isMobile ? "text-sm" : "text-lg"
-                        )} {...props} />,
-                        p: ({node, ...props}) => <p className="my-1 leading-relaxed" {...props} />,
-                        ul: ({node, ...props}) => <ul className={cn(
-                          "list-disc my-2",
-                          isMobile ? "pl-4" : "pl-6"
-                        )} {...props} />,
-                        ol: ({node, ...props}) => <ol className={cn(
-                          "list-decimal my-2",
-                          isMobile ? "pl-4" : "pl-6"
-                        )} {...props} />,
-                        li: ({node, ...props}) => <li className="my-1" {...props} />,
-                        strong: ({node, ...props}) => <strong className="font-bold" {...props} />,
-                        em: ({node, ...props}) => <em className="italic" {...props} />,
-                        blockquote: ({node, ...props}) => <blockquote className="pl-3 border-l-3 border-gray-300 italic my-2" {...props} />
-                      }}
-                    >
-                      {message.content}
-                    </ReactMarkdown>
-                  </div>
-                ) : (
-                  <p className={cn(
-                    "whitespace-pre-line leading-relaxed",
-                    isMobile ? "text-sm" : "text-sm"
-                  )}>{message.content}</p>
-                )}
-              </div>
-            </div>
-          ))}
-          
-          {/* AI Typing Indicator - Mobile Optimized */}
-          {isAiTyping && (
-            <div className="flex justify-start">
-              <div className="bg-muted border rounded-lg px-3 py-2 sm:px-4 sm:py-3 max-w-[85%] sm:max-w-[80%]">
-                <div className="flex space-x-1">
-                  <div className="h-2 w-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                  <div className="h-2 w-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                  <div className="h-2 w-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
-                </div>
-              </div>
-            </div>
-          )}
-          <div ref={bottomRef} />
-        </div>
-
-        {/* Chat Input Area - Mobile Enhanced */}
-        <div className="border-t p-3 sm:p-4">
-          <div className="flex items-end space-x-2 sm:space-x-3">
-            <div className="flex-grow">
-              <Textarea
-                placeholder="Anything you would like to change?"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSendMessage(input);
-                  }
-                }}
-                disabled={isAiTyping}
-                className={cn(
-                  "resize-none border-0 shadow-none focus-visible:ring-1 focus-visible:ring-ring",
-                  isMobile ? "min-h-[44px] text-base" : "min-h-[48px] text-sm"
-                )}
-                rows={isMobile ? 2 : 1}
-              />
-            </div>
-            <Button 
-              type="submit" 
-              onClick={() => handleSendMessage(input)} 
-              disabled={isAiTyping || !input.trim()}
-              size={isMobile ? "default" : "icon"}
-              className={cn(
-                "shrink-0",
-                isMobile ? "h-11 w-11" : "h-9 w-9"
-              )}
-            >
-              {isAiTyping ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Send className="h-4 w-4" />
-              )}
-            </Button>
+    <div className="flex flex-col space-y-4 sm:space-y-6 w-full">
+      {/* Chat Messages Area */}
+      <div className="space-y-3 sm:space-y-4 w-full">
+        {/* Loading History */}
+        {isLoadingHistory && (
+          <div className="text-center text-muted-foreground py-4">
+            <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin mx-auto mb-2" />
+            <p className="text-sm sm:text-base">Loading previous messages...</p>
           </div>
-          
-          {/* Mobile Helper Text */}
-          {isMobile && (
-            <p className="text-xs text-muted-foreground mt-2 text-center">
-              Tap Enter to send • Shift+Enter for new line
-            </p>
-          )}
+        )}
+        
+        {messages.map((message) => (
+          <div
+            key={message.id}
+            className={cn(
+              "flex",
+              message.is_ai ? "justify-start" : "justify-end"
+            )}
+          >
+            <div
+              className={cn(
+                "rounded-lg px-3 py-2 sm:px-4 sm:py-3 max-w-[85%] sm:max-w-[80%]",
+                message.is_ai
+                  ? "bg-muted border overflow-auto"
+                  : "bg-primary text-primary-foreground"
+              )}
+            >
+              {message.is_ai ? (
+                <div className={cn(
+                  "prose prose-sm dark:prose-invert max-w-none",
+                  isMobile && "text-sm leading-relaxed"
+                )}>
+                  <ReactMarkdown 
+                    rehypePlugins={[rehypeRaw]}
+                    components={{
+                      h1: ({node, ...props}) => <h1 className={cn(
+                        "font-bold mt-3 mb-2",
+                        isMobile ? "text-lg" : "text-2xl"
+                      )} {...props} />,
+                      h2: ({node, ...props}) => <h2 className={cn(
+                        "font-semibold mt-2 mb-1",
+                        isMobile ? "text-base" : "text-xl"
+                      )} {...props} />,
+                      h3: ({node, ...props}) => <h3 className={cn(
+                        "font-medium mt-2 mb-1",
+                        isMobile ? "text-sm" : "text-lg"
+                      )} {...props} />,
+                      p: ({node, ...props}) => <p className="my-1 leading-relaxed" {...props} />,
+                      ul: ({node, ...props}) => <ul className={cn(
+                        "list-disc my-2",
+                        isMobile ? "pl-4" : "pl-6"
+                      )} {...props} />,
+                      ol: ({node, ...props}) => <ol className={cn(
+                        "list-decimal my-2",
+                        isMobile ? "pl-4" : "pl-6"
+                      )} {...props} />,
+                      li: ({node, ...props}) => <li className="my-1" {...props} />,
+                      strong: ({node, ...props}) => <strong className="font-bold" {...props} />,
+                      em: ({node, ...props}) => <em className="italic" {...props} />,
+                      blockquote: ({node, ...props}) => <blockquote className="pl-3 border-l-3 border-gray-300 italic my-2" {...props} />
+                    }}
+                  >
+                    {message.content}
+                  </ReactMarkdown>
+                </div>
+              ) : (
+                <p className={cn(
+                  "whitespace-pre-line leading-relaxed",
+                  isMobile ? "text-sm" : "text-sm"
+                )}>{message.content}</p>
+              )}
+            </div>
+          </div>
+        ))}
+        
+        {/* AI Typing Indicator */}
+        {isAiTyping && (
+          <div className="flex justify-start">
+            <div className="bg-muted border rounded-lg px-3 py-2 sm:px-4 sm:py-3 max-w-[85%] sm:max-w-[80%]">
+              <div className="flex space-x-1">
+                <div className="h-2 w-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                <div className="h-2 w-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                <div className="h-2 w-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
+              </div>
+            </div>
+          </div>
+        )}
+        <div ref={bottomRef} />
+      </div>
+
+      {/* Chat Input Area */}
+      <div className="border-t p-3 sm:p-4 bg-background">
+        <div className="flex items-end space-x-2 sm:space-x-3">
+          <div className="flex-grow">
+            <Textarea
+              ref={textareaRef}
+              placeholder="Anything you would like to change?"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendMessage(input);
+                }
+              }}
+              disabled={isAiTyping}
+              className={cn(
+                "resize-none border-0 shadow-none focus-visible:ring-1 focus-visible:ring-ring",
+                isMobile ? "min-h-[44px] text-base" : "min-h-[48px] text-sm"
+              )}
+              rows={isMobile ? 2 : 1}
+            />
+          </div>
+          <Button 
+            type="submit" 
+            onClick={() => handleSendMessage(input)} 
+            disabled={isAiTyping || !input.trim()}
+            size={isMobile ? "default" : "icon"}
+            className={cn(
+              "shrink-0",
+              isMobile ? "h-11 w-11" : "h-9 w-9"
+            )}
+          >
+            {isAiTyping ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="h-4 w-4" />
+            )}
+          </Button>
         </div>
+        
+        {/* Mobile Helper Text */}
+        {isMobile && (
+          <p className="text-xs text-muted-foreground mt-2 text-center">
+            Tap Enter to send • Shift+Enter for new line
+          </p>
+        )}
       </div>
     </div>
   );

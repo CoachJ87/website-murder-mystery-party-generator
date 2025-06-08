@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { supabase } from "@/lib/supabase";
 import MysteryForm from "@/components/MysteryForm";
 import MysteryChat from "@/components/MysteryChat";
@@ -209,64 +207,51 @@ const MysteryChatCreator = () => {
             <Header />
             <main className={cn("flex-1", isMobile ? "py-4 px-2" : "py-12 px-4")}>
                 <div className={cn("container mx-auto", isMobile ? "max-w-full" : "max-w-4xl")}>
-                    <div className={cn("mb-8", isMobile && "mb-4")}>
-                        <h1 className={cn("text-3xl font-bold mb-2", isMobile && "text-2xl mb-1")}>
-                            {isEditing ? "Edit Mystery" : "Create New Mystery"}
-                        </h1>
-                        <p className="text-muted-foreground">
-                            {showChatUI
-                                ? "Chat with our AI to refine your murder mystery"
-                                : "Start your new mystery by selecting from the options below."}
-                        </p>
-                    </div>
+                    {!showChatUI && (
+                        <div className={cn("mb-8", isMobile && "mb-4")}>
+                            <h1 className={cn("text-3xl font-bold mb-2", isMobile && "text-2xl mb-1")}>
+                                {isEditing ? "Edit Mystery" : "Create New Mystery"}
+                            </h1>
+                            <p className="text-muted-foreground">
+                                Start your new mystery by selecting from the options below.
+                            </p>
+                        </div>
+                    )}
 
-                    <Card className={isMobile ? "border-0 shadow-none bg-transparent" : ""}>
-                        <CardContent className={cn("p-6", isMobile && "p-0")}>
-                            {showChatUI ? (
-                                <div className="w-full h-full">
-                                    <MysteryChat
-                                        initialTheme={formData?.theme || ""}
-                                        initialPlayerCount={formData?.playerCount}
-                                        initialHasAccomplice={formData?.hasAccomplice}
-                                        initialScriptType={formData?.scriptType as 'full' | 'pointForm'}
-                                        initialAdditionalDetails={formData?.additionalDetails}
-                                        savedMysteryId={id}
-                                        onSave={handleSaveChatMessage}
-                                        onGenerateFinal={handleGenerateMystery}
-                                        initialMessages={chatMessages}
-                                    />
-                                </div>
-                            ) : (
-                                <MysteryForm
-                                    onSave={handleSave}
-                                    isSaving={saving}
-                                />
-                            )}
-                        </CardContent>
-                    </Card>
+                    {showChatUI ? (
+                        <div className="w-full h-full">
+                            <MysteryChat
+                                initialTheme={formData?.theme || ""}
+                                initialPlayerCount={formData?.playerCount}
+                                initialHasAccomplice={formData?.hasAccomplice}
+                                initialScriptType={formData?.scriptType as 'full' | 'pointForm'}
+                                initialAdditionalDetails={formData?.additionalDetails}
+                                savedMysteryId={id}
+                                onSave={handleSaveChatMessage}
+                                onGenerateFinal={handleGenerateMystery}
+                                initialMessages={chatMessages}
+                            />
+                        </div>
+                    ) : (
+                        <MysteryForm
+                            onSave={handleSave}
+                            isSaving={saving}
+                        />
+                    )}
 
-                    <div className={cn("mt-8 flex justify-center gap-4", isMobile && "mt-4")}>
-                      {showChatUI ? (
-                        <Button
-                          variant="outline"
-                          onClick={() => navigate("/dashboard")}
-                          size={isMobile ? "sm" : "default"}
-                        >
-                          Back to Dashboard
-                        </Button>
-                      ) : (
-                        <Button 
-                            variant="outline" 
-                            onClick={() => navigate("/dashboard")}
-                            size={isMobile ? "sm" : "default"}
-                        >
-                          Back to Dashboard
-                        </Button>
-                      )}
-                    </div>
+                    {!showChatUI && (
+                        <div className={cn("mt-8 flex justify-center gap-4", isMobile && "mt-4")}>
+                            <Button 
+                                variant="outline" 
+                                onClick={() => navigate("/dashboard")}
+                                size={isMobile ? "sm" : "default"}
+                            >
+                                Back to Dashboard
+                            </Button>
+                        </div>
+                    )}
                 </div>
             </main>
-            <Footer />
         </div>
     );
 };

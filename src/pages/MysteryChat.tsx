@@ -1,11 +1,8 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { supabase } from "@/lib/supabase";
 import MysteryChat from "@/components/MysteryChat";
 import { useAuth } from "@/context/AuthContext";
@@ -112,7 +109,6 @@ const MysteryChatPage = () => {
                         <p className="text-sm sm:text-base text-muted-foreground">Loading conversation...</p>
                     </div>
                 </main>
-                <Footer />
             </div>
         );
     }
@@ -120,102 +116,66 @@ const MysteryChatPage = () => {
     return (
         <div className="min-h-screen flex flex-col">
             <Header />
-            <main className={cn(
-                "flex-1",
-                isMobile ? "py-2 px-3" : "py-8 px-4 sm:py-12"
-            )}>
+            <main className="flex-1 flex flex-col relative pb-32">
+                {/* Back button - only visible at top of page */}
                 <div className={cn(
-                    "container mx-auto",
-                    isMobile ? "max-w-full" : "max-w-4xl"
+                    "sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b",
+                    isMobile ? "py-2 px-3" : "py-4 px-4"
                 )}>
-                    {/* Header Section - Mobile Optimized */}
-                    <div className={cn("mb-4 sm:mb-8", isMobile && "mb-3")}>
-                        <div className="flex items-center gap-2 sm:gap-4 mb-3 sm:mb-4">
-                            <Button
-                                variant="outline"
-                                size={isMobile ? "sm" : "default"}
-                                onClick={() => navigate("/dashboard")}
-                                className={cn(
-                                    "flex items-center gap-2",
-                                    isMobile && "h-9 px-3 text-sm"
-                                )}
-                            >
-                                <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" />
-                                <span className={isMobile ? "hidden" : "inline"}>Back to</span>
-                                Dashboard
-                            </Button>
-                        </div>
-                        
-                        {/* Page Title - Mobile Responsive */}
-                        <div className="text-center sm:text-left">
-                            <h1 className={cn(
-                                "font-bold text-foreground mb-1 sm:mb-2",
-                                isMobile ? "text-lg" : "text-2xl sm:text-3xl"
-                            )}>
-                                Mystery Creation Chat
-                            </h1>
-                            <p className={cn(
-                                "text-muted-foreground",
-                                isMobile ? "text-sm" : "text-base"
-                            )}>
-                                Collaborate with AI to create your perfect murder mystery
-                            </p>
-                        </div>
+                    <div className="container mx-auto max-w-4xl">
+                        <Button
+                            variant="outline"
+                            size={isMobile ? "sm" : "default"}
+                            onClick={() => navigate("/dashboard")}
+                            className={cn(
+                                "flex items-center gap-2",
+                                isMobile && "h-9 px-3 text-sm"
+                            )}
+                        >
+                            <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" />
+                            <span>Dashboard</span>
+                        </Button>
                     </div>
+                </div>
 
-                    {/* Chat Interface - Mobile Optimized Card */}
-                    <Card className={cn(
-                        isMobile ? "border-0 shadow-none bg-transparent" : "shadow-sm"
-                    )}>
-                        <CardContent className={cn(
-                            isMobile ? "p-0" : "p-4 sm:p-6"
-                        )}>
-                            <MysteryChat
-                                initialTheme={conversationData?.mystery_data?.theme || ""}
-                                initialPlayerCount={conversationData?.mystery_data?.playerCount}
-                                initialScriptType={conversationData?.mystery_data?.scriptType as 'full' | 'pointForm'}
-                                initialAdditionalDetails={conversationData?.mystery_data?.additionalDetails}
-                                savedMysteryId={id}
-                                onSave={handleSaveMessage}
-                                initialMessages={messages}
-                                isLoadingHistory={false}
-                                systemInstruction={conversationData?.system_instruction}
-                                skipForm={true}
-                                needsInitialAIResponse={isInitial}
-                            />
-                        </CardContent>
-                    </Card>
+                {/* Chat content - takes full page height */}
+                <div className="flex-1 w-full max-w-4xl mx-auto px-3 sm:px-4 pt-4">
+                    <MysteryChat
+                        initialTheme={conversationData?.mystery_data?.theme || ""}
+                        initialPlayerCount={conversationData?.mystery_data?.playerCount}
+                        initialScriptType={conversationData?.mystery_data?.scriptType as 'full' | 'pointForm'}
+                        initialAdditionalDetails={conversationData?.mystery_data?.additionalDetails}
+                        savedMysteryId={id}
+                        onSave={handleSaveMessage}
+                        initialMessages={messages}
+                        isLoadingHistory={false}
+                        systemInstruction={conversationData?.system_instruction}
+                        skipForm={true}
+                        needsInitialAIResponse={isInitial}
+                    />
+                </div>
 
-                    {/* Action Section - Mobile Enhanced */}
-                    <div className={cn(
-                        "flex flex-col gap-3 sm:gap-4",
-                        isMobile ? "mt-4" : "mt-6 sm:mt-8"
-                    )}>
-                        <div className="flex justify-center">
-                            <Button
-                                onClick={handleGenerateFullMystery}
-                                disabled={!hasAIResponse}
-                                size={isMobile ? "default" : "lg"}
-                                className={cn(
-                                    "bg-blue-600 hover:bg-blue-700 text-white font-medium",
-                                    isMobile ? "w-full h-12 text-base" : "px-6"
-                                )}
-                            >
-                                <Zap className="h-4 w-4 mr-2" />
-                                Generate Full Mystery
-                            </Button>
-                        </div>
-                        
-                        <p className={cn(
-                            "text-center text-muted-foreground leading-relaxed",
-                            isMobile ? "text-sm px-2" : "text-sm"
-                        )}>
-                            Ready to see your mystery preview? Click above to view and purchase the complete package.
-                        </p>
+                {/* Fixed bottom action button */}
+                <div className={cn(
+                    "fixed bottom-0 left-0 right-0 z-20 bg-background border-t py-4 px-4",
+                    isMobile ? "py-3" : "py-4"
+                )}>
+                    <div className="container mx-auto max-w-4xl flex justify-center">
+                        <Button
+                            onClick={handleGenerateFullMystery}
+                            disabled={!hasAIResponse}
+                            size={isMobile ? "default" : "lg"}
+                            className={cn(
+                                "bg-blue-600 hover:bg-blue-700 text-white font-medium",
+                                isMobile ? "w-full h-12 text-base" : "px-6"
+                            )}
+                        >
+                            <Zap className="h-4 w-4 mr-2" />
+                            Generate Full Mystery
+                        </Button>
                     </div>
                 </div>
             </main>
-            <Footer />
         </div>
     );
 };
