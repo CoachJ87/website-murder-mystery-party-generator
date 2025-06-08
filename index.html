@@ -24,12 +24,80 @@
     <!-- Preload critical assets -->
     <link rel="preload" href="/src/index.css" as="style">
     
-    <!-- Flag for SSG detection -->
-    <script>window.__SSG__ = true;</script>
+    <!-- Bolt preview compatibility -->
+    <style>
+      /* Ensure content is visible in Bolt preview */
+      #root {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+      }
+      
+      /* Bolt preview loading indicator */
+      .bolt-preview-loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        width: 100%;
+        background-color: #F7F3E9;
+        color: #8B1538;
+        font-family: 'Inter', sans-serif;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 9999;
+      }
+      
+      .bolt-preview-loading-content {
+        text-align: center;
+      }
+      
+      .bolt-preview-spinner {
+        border: 3px solid rgba(139, 21, 56, 0.3);
+        border-radius: 50%;
+        border-top: 3px solid #8B1538;
+        width: 40px;
+        height: 40px;
+        animation: bolt-spin 1s linear infinite;
+        margin: 0 auto 20px;
+      }
+      
+      @keyframes bolt-spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
   </head>
 
   <body>
+    <!-- Bolt preview loading indicator -->
+    <div id="bolt-preview-loading" class="bolt-preview-loading">
+      <div class="bolt-preview-loading-content">
+        <div class="bolt-preview-spinner"></div>
+        <p>Loading Murder Mystery Generator...</p>
+      </div>
+    </div>
+    
     <div id="root"></div>
+    
+    <!-- Script to remove loading indicator once app is loaded -->
+    <script>
+      window.addEventListener('load', function() {
+        // Hide loading indicator after a short delay
+        setTimeout(function() {
+          const loadingEl = document.getElementById('bolt-preview-loading');
+          if (loadingEl) {
+            loadingEl.style.opacity = '0';
+            loadingEl.style.transition = 'opacity 0.5s ease';
+            setTimeout(function() {
+              loadingEl.style.display = 'none';
+            }, 500);
+          }
+        }, 1000);
+      });
+    </script>
+    
     <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>
