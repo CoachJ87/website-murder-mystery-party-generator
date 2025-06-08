@@ -87,7 +87,7 @@ const Index = () => {
           // Content for non-logged-in users
           <>
             {/* How It Works Section */}
-            <section className="py-6 sm:py-8 px-2 sm:px-4 md:px-6 lg:px-8">
+            <section className="py-6 sm:py-8 px-2 sm:px-4 md:px-6 lg:px-8" style={{ backgroundColor: '#FAF9F6' }}>
               <div className="w-full max-w-7xl mx-auto">
                 <HowItWorks steps={howItWorksSteps} />
               </div>
