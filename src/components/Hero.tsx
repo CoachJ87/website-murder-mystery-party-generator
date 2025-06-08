@@ -1,3 +1,4 @@
+'use client';
 
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -5,7 +6,7 @@ import { useState, useEffect } from "react";
 import { AIInputWithLoading } from "@/components/ui/ai-input-with-loading";
 import SignInPrompt from "@/components/SignInPrompt";
 import { useAuth } from "@/context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 // Define all possible mystery themes with their corresponding prompts
@@ -57,7 +58,7 @@ const Hero = () => {
   const [showSignInPrompt, setShowSignInPrompt] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const { isAuthenticated, user } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   // Function to randomly select themes
   const getRandomThemes = () => {
@@ -120,7 +121,7 @@ const Hero = () => {
         console.log("Navigating to create page with theme:", theme);
         
         // Navigate to mystery creation with theme as URL parameter
-        navigate(`/mystery/create?input=${encodeURIComponent(value)}`);
+        router.push(`/mystery/create?input=${encodeURIComponent(value)}`);
         
       } catch (error) {
         console.error("Error:", error);
