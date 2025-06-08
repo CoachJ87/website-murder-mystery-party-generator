@@ -19,31 +19,17 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				'heading': ['Playfair Display', 'serif'],
+				'body': ['Inter', 'sans-serif'],
+			},
 			colors: {
-				/* Mystery Maker Color System - Sophisticated & Premium */
+				/* Mystery Maker Color System - Sophisticated 3-Color Palette */
 				primary: {
 					DEFAULT: 'hsl(var(--color-primary))',
 					foreground: 'hsl(var(--color-primary-foreground))',
 					hover: 'hsl(var(--color-primary-hover))',
-					light: 'hsl(var(--color-primary-light))',
-				},
-				secondary: {
-					DEFAULT: 'hsl(var(--color-secondary))',
-					foreground: 'hsl(var(--color-secondary-foreground))',
-					hover: 'hsl(var(--color-secondary-hover))',
-					light: 'hsl(var(--color-secondary-light))',
-				},
-				accent: {
-					DEFAULT: 'hsl(var(--color-accent))',
-					foreground: 'hsl(var(--color-accent-foreground))',
-					hover: 'hsl(var(--color-accent-hover))',
-					light: 'hsl(var(--color-accent-light))',
-				},
-				danger: {
-					DEFAULT: 'hsl(var(--color-danger))',
-					foreground: 'hsl(var(--color-danger-foreground))',
-					hover: 'hsl(var(--color-danger-hover))',
-					light: 'hsl(var(--color-danger-light))',
+					active: 'hsl(var(--color-primary-active))',
 				},
 				surface: {
 					DEFAULT: 'hsl(var(--color-surface))',
@@ -141,18 +127,24 @@ export default {
                             marginBottom: '0.75em',
                             lineHeight: '1.3',
                             fontWeight: '600',
+                            fontFamily: 'Playfair Display, serif',
                         },
                         h1: {
                             fontSize: '1.875rem',
+                            fontWeight: '700',
                         },
                         h2: {
                             fontSize: '1.5rem',
+                            fontWeight: '600',
                         },
                         h3: {
                             fontSize: '1.25rem',
+                            fontWeight: '500',
                         },
                         h4: {
                             fontSize: '1.125rem',
+                            fontWeight: '600',
+                            fontFamily: 'Inter, sans-serif',
                         },
                         ul: {
                             paddingLeft: '1.5em',
@@ -175,8 +167,8 @@ export default {
                         blockquote: {
                             fontStyle: 'italic',
                             borderLeftWidth: '4px',
-                            borderLeftColor: 'hsl(var(--color-accent))',
-                            backgroundColor: 'hsl(var(--color-accent) / 0.1)',
+                            borderLeftColor: 'hsl(var(--color-primary))',
+                            backgroundColor: 'hsl(var(--color-primary) / 0.1)',
                             paddingLeft: '1em',
                             paddingTop: '0.5em',
                             paddingBottom: '0.5em',
@@ -185,7 +177,7 @@ export default {
                             color: 'hsl(var(--color-surface-foreground))',
                         },
                         code: {
-                            color: 'hsl(var(--color-secondary))',
+                            color: 'hsl(var(--color-primary))',
                             backgroundColor: 'hsl(var(--color-muted))',
                             padding: '0.2em 0.4em',
                             borderRadius: '0.25em',
@@ -193,7 +185,7 @@ export default {
                         },
                         strong: {
                             fontWeight: '700',
-                            color: 'hsl(var(--color-secondary))',
+                            color: 'hsl(var(--color-primary))',
                         },
                         em: {
                             fontStyle: 'italic',
