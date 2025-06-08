@@ -1,4 +1,3 @@
-
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
@@ -11,7 +10,14 @@ if (isClient) {
   const container = document.getElementById("root");
   
   if (container) {
-    createRoot(container).render(<App />);
+    // Check if the container has server-rendered content
+    if (container.innerHTML !== '') {
+      // Hydrate the existing server-rendered content
+      createRoot(container).render(<App />);
+    } else {
+      // Regular client-side rendering if no server-rendered content
+      createRoot(container).render(<App />);
+    }
   }
 }
 
