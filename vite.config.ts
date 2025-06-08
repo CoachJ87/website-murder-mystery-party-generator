@@ -1,7 +1,20 @@
+
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
+
+// List of routes to prerender for SEO
+const routesToPrerender = [
+  "/",
+  "/showcase",
+  "/contact",
+  "/privacy",
+  "/support",
+  "/sign-in",
+  "/sign-up",
+  "/forgot-password",
+];
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -11,7 +24,8 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react(),
-    mode === 'development' && componentTagger(),
+    mode === 'development' &&
+    componentTagger(),
   ].filter(Boolean),
   resolve: {
     alias: {
@@ -21,9 +35,7 @@ export default defineConfig(({ mode }) => ({
   // Define environment variables for client-side code
   define: {
     // Ensure process.env is defined for libraries that expect it
-    'process.env': {},
-    // Add a global flag for Bolt preview detection
-    '__BOLT_PREVIEW__': JSON.stringify(true),
+    'process.env': {}
   },
   optimizeDeps: {
     include: ['react-markdown', 'rehype-raw']

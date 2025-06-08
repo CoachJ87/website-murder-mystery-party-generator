@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { User, Session } from "@supabase/supabase-js";
@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [isPublic, setIsPublic] = useState(false);
-  const router = useRouter();
+  const navigate = useNavigate();
 
   // Simplified auth state handling with timeout protection
   useEffect(() => {
@@ -126,7 +126,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           toast.error("The email or password you entered is incorrect. Please try again.");
         } else if (error.message.includes('Email not confirmed')) {
           toast.error("Please confirm your email before logging in. Check your inbox.");
-          router.push("/check-email");
+          navigate("/check-email");
         } else {
           toast.error(`Failed to sign in: ${error.message}`);
         }
@@ -135,7 +135,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       if (data?.user) {
         toast.success("Signed in successfully!");
-        router.push("/dashboard");
+        navigate("/dashboard");
       }
     } catch (error: any) {
       console.error("Sign-in error:", error);
@@ -174,13 +174,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       if (data.user && !data.session) {
         toast.success("Account created! Please check your email to confirm your account.");
-        router.push("/check-email");
+        navigate("/check-email");
         return;
       }
       
       if (data.user && data.session) {
         toast.success("Account created successfully! You're now logged in.");
-        router.push("/dashboard");
+        navigate("/dashboard");
       }
     } catch (error: any) {
       console.error("Sign-up error:", error);
@@ -223,7 +223,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         throw error;
       }
       
-      router.push("/");
+      navigate("/");
       toast.success("Signed out successfully.");
     } catch (error: any) {
       console.error("Sign-out error:", error);

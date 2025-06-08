@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
@@ -10,7 +10,7 @@ import { Menu, X } from "lucide-react";
 const Header = () => {
   const { isAuthenticated, user, signOut } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const router = useRouter();
+  const navigate = useNavigate();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -20,7 +20,7 @@ const Header = () => {
     <header className="py-3 px-3 md:py-4 md:px-8 border-b sticky top-0 bg-background/95 backdrop-blur-sm z-50">
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex items-center">
-          <Link href="/" className="flex items-center space-x-2 mr-4 md:mr-8 no-underline">
+          <Link to="/" className="flex items-center space-x-2 mr-4 md:mr-8 no-underline">
             <span className="text-lg md:text-2xl font-bold gradient-text font-playfair">
               <span className="hidden sm:inline">Mystery Maker</span>
               <span className="sm:hidden">MMG</span>
@@ -51,16 +51,16 @@ const Header = () => {
                 Sign Out
               </Button>
               <Button asChild className="no-underline font-inter">
-                <Link href="/dashboard">Dashboard</Link>
+                <Link to="/dashboard">Dashboard</Link>
               </Button>
             </div>
           ) : (
             <>
               <Button asChild variant="outline" className="no-underline font-inter">
-                <Link href="/sign-in">Sign In</Link>
+                <Link to="/sign-in">Sign In</Link>
               </Button>
               <Button asChild className="no-underline font-inter">
-                <Link href="/sign-up">Sign Up</Link>
+                <Link to="/sign-up">Sign Up</Link>
               </Button>
             </>
           )}
@@ -98,7 +98,7 @@ const Header = () => {
                   className="w-full h-12 no-underline text-base font-inter" 
                   onClick={toggleMenu}
                 >
-                  <Link href="/dashboard">Dashboard</Link>
+                  <Link to="/dashboard">Dashboard</Link>
                 </Button>
                 <Button 
                   variant="outline" 
@@ -119,14 +119,14 @@ const Header = () => {
                   className="w-full h-12 no-underline text-base font-inter" 
                   onClick={toggleMenu}
                 >
-                  <Link href="/sign-in">Sign In</Link>
+                  <Link to="/sign-in">Sign In</Link>
                 </Button>
                 <Button 
                   asChild 
                   className="w-full h-12 no-underline text-base font-inter" 
                   onClick={toggleMenu}
                 >
-                  <Link href="/sign-up">Sign Up</Link>
+                  <Link to="/sign-up">Sign Up</Link>
                 </Button>
               </>
             )}
