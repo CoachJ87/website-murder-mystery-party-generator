@@ -108,7 +108,7 @@ const MysteryForm = ({
           name="theme"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-sm sm:text-base font-medium">Theme/Setting Details (Optional)</FormLabel>
+              <FormLabel className="text-sm sm:text-base font-medium">Additional theme/setting details (Optional)</FormLabel>
               <FormControl>
                 <Input 
                   placeholder="e.g., time period, setting specifics, must-have's, etc." 
@@ -116,9 +116,6 @@ const MysteryForm = ({
                   {...field} 
                 />
               </FormControl>
-              <FormDescription className="text-xs sm:text-sm">
-                Choose a specific theme or setting for your murder mystery
-              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -132,6 +129,9 @@ const MysteryForm = ({
               <FormLabel className="text-sm sm:text-base font-medium">
                 How many players will participate?
               </FormLabel>
+              <FormDescription className="text-xs sm:text-sm">
+              Detective does not count as a player. Host can choose to play as a suspect or as the detective. If host chooses to play as a suspect, game rules will change to accomodate this.
+              </FormDescription>
               <FormControl>
                 <Select 
                   onValueChange={(value) => field.onChange(parseInt(value))} 
@@ -149,9 +149,6 @@ const MysteryForm = ({
                   </SelectContent>
                 </Select>
               </FormControl>
-              <FormDescription className="text-xs sm:text-sm">
-                Choose between 4 and 32 players for your murder mystery.
-              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -167,7 +164,7 @@ const MysteryForm = ({
                   Include Accomplice Mechanism
                 </FormLabel>
                 <FormDescription className="text-xs sm:text-sm">
-                  Best for games with 10 or more players
+                  Creates an "accomplice" to the murderer. Best for games with 10 or more players.
                 </FormDescription>
               </div>
               <FormControl>
@@ -187,6 +184,9 @@ const MysteryForm = ({
           render={({ field }) => (
             <FormItem className="space-y-3">
               <FormLabel className="text-sm sm:text-base font-medium">Script Detail Level</FormLabel>
+              <FormDescription className="text-xs sm:text-sm">
+                  Defines how character responses should be formatted in the character guides.
+                </FormDescription>
               <FormControl>
                 <RadioGroup 
                   onValueChange={field.onChange} 
@@ -196,13 +196,13 @@ const MysteryForm = ({
                   <div className="flex items-start space-x-3 py-2">
                     <RadioGroupItem value="full" id="full" className="mt-0.5 shrink-0" />
                     <Label htmlFor="full" className="text-sm sm:text-base leading-5 cursor-pointer">
-                      Full Scripts - Complete dialogue and detailed instructions
+                      Full Scripts - Complete dialogue (great for those who want more guidance)
                     </Label>
                   </div>
                   <div className="flex items-start space-x-3 py-2">
                     <RadioGroupItem value="pointForm" id="pointForm" className="mt-0.5 shrink-0" />
                     <Label htmlFor="pointForm" className="text-sm sm:text-base leading-5 cursor-pointer">
-                      Point Form - Key points and bullet summaries
+                      Point Form - Bullet summaries (great for those who love to improvise)
                     </Label>
                   </div>
                   <div className="flex items-start space-x-3 py-2">
@@ -231,9 +231,6 @@ const MysteryForm = ({
                   {...field} 
                 />
               </FormControl>
-              <FormDescription className="text-xs sm:text-sm">
-                Provide any extra details or special requests for your mystery
-              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -244,7 +241,7 @@ const MysteryForm = ({
           disabled={isSaving} 
           className="w-full h-12 text-base font-medium"
         >
-          {isSaving ? "Starting Chat..." : "Start AI Chat"}
+          {isSaving ? "Starting Chat..." : "Generate Mystery Outline"}
         </Button>
       </form>
     </Form>
