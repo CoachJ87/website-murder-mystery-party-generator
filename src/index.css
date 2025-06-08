@@ -108,7 +108,11 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-inter;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-playfair;
   }
 
   a {
@@ -224,11 +228,11 @@
 
 /* Legacy gradient and chat styles for existing components */
 .gradient-text {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary;
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary font-playfair;
 }
 
 .chat-bubble {
-  @apply p-4 rounded-lg max-w-[80%];
+  @apply p-4 rounded-lg max-w-[80%] font-inter;
 }
 
 .user-bubble {

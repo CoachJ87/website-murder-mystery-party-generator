@@ -19,7 +19,7 @@ const Header = () => {
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex items-center">
           <Link to="/" className="flex items-center space-x-2 mr-4 md:mr-8 no-underline">
-            <span className="text-lg md:text-2xl font-bold gradient-text">
+            <span className="text-lg md:text-2xl font-bold gradient-text font-playfair">
               <span className="hidden sm:inline">Murder Maker</span>
               <span className="sm:hidden">MMG</span>
             </span>
@@ -43,21 +43,21 @@ const Header = () => {
                     className="w-8 h-8 rounded-full"
                   />
                 )}
-                <span className="font-medium">{user?.name}</span>
+                <span className="font-medium font-inter">{user?.name}</span>
               </div>
-              <Button variant="outline" onClick={signOut} className="no-underline">
+              <Button variant="outline" onClick={signOut} className="no-underline font-inter">
                 Sign Out
               </Button>
-              <Button asChild className="no-underline">
+              <Button asChild className="no-underline font-inter">
                 <Link to="/dashboard">Dashboard</Link>
               </Button>
             </div>
           ) : (
             <>
-              <Button asChild variant="outline" className="no-underline">
+              <Button asChild variant="outline" className="no-underline font-inter">
                 <Link to="/sign-in">Sign In</Link>
               </Button>
-              <Button asChild className="no-underline">
+              <Button asChild className="no-underline font-inter">
                 <Link to="/sign-up">Sign Up</Link>
               </Button>
             </>
@@ -89,18 +89,18 @@ const Header = () => {
                       className="w-8 h-8 rounded-full"
                     />
                   )}
-                  <span className="font-medium text-sm">{user?.name}</span>
+                  <span className="font-medium text-sm font-inter">{user?.name}</span>
                 </div>
                 <Button 
                   asChild 
-                  className="w-full h-12 no-underline text-base" 
+                  className="w-full h-12 no-underline text-base font-inter" 
                   onClick={toggleMenu}
                 >
                   <Link to="/dashboard">Dashboard</Link>
                 </Button>
                 <Button 
                   variant="outline" 
-                  className="w-full h-12 no-underline text-base" 
+                  className="w-full h-12 no-underline text-base font-inter" 
                   onClick={() => {
                     signOut();
                     toggleMenu();
@@ -114,14 +114,14 @@ const Header = () => {
                 <Button 
                   asChild 
                   variant="outline" 
-                  className="w-full h-12 no-underline text-base" 
+                  className="w-full h-12 no-underline text-base font-inter" 
                   onClick={toggleMenu}
                 >
                   <Link to="/sign-in">Sign In</Link>
                 </Button>
                 <Button 
                   asChild 
-                  className="w-full h-12 no-underline text-base" 
+                  className="w-full h-12 no-underline text-base font-inter" 
                   onClick={toggleMenu}
                 >
                   <Link to="/sign-up">Sign Up</Link>

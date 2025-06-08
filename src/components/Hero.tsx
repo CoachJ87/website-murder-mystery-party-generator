@@ -1,3 +1,4 @@
+
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -139,10 +140,10 @@ const Hero = () => {
           <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-r from-primary to-secondary opacity-90 blur-sm"></div>
         </div>
         
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold mb-3 sm:mb-4 tracking-tight leading-tight">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold mb-3 sm:mb-4 tracking-tight leading-tight font-playfair">
           Host a Killer Party Tonight.
         </h1>
-        <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-4 sm:mb-5 px-2">
+        <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-4 sm:mb-5 px-2 font-inter">
           {isAuthenticated 
             ? "Tell us what you'd like to create and we'll make it happen."
             : "Generate custom murder mysteries with characters, clues, and everything you need."}
@@ -165,7 +166,7 @@ const Hero = () => {
             <Button 
               key={theme.name} 
               variant="outline" 
-              className="rounded-full px-3 sm:px-4 md:px-6 border-border/50 bg-card/30 backdrop-blur-sm text-xs sm:text-sm h-8 sm:h-9 md:h-10"
+              className="rounded-full px-3 sm:px-4 md:px-6 border-border/50 bg-card/30 backdrop-blur-sm text-xs sm:text-sm h-8 sm:h-9 md:h-10 font-inter"
               onClick={() => handleThemeSelect(theme.prompt)}
             >
               <span className="truncate max-w-[120px] sm:max-w-none">{theme.name}</span>

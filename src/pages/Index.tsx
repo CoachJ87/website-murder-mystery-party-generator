@@ -67,7 +67,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col font-inter">
       <Head 
         title="Create Custom Murder Mystery Parties" 
         description="Generate unique murder mystery party scenarios with our AI-powered tool. Customize themes, characters, and plots for unforgettable events."
@@ -108,7 +108,7 @@ const Index = () => {
             {/* Testimonials */}
             <section className="py-12 sm:py-16 lg:py-20 px-2 sm:px-4 md:px-6 lg:px-8">
               <div className="w-full max-w-7xl mx-auto">
-                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 sm:mb-12 text-black">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 sm:mb-12 text-black font-playfair">
                   What Others Are Saying
                 </h2>
                 
@@ -122,22 +122,22 @@ const Index = () => {
                           </svg>
                         ))}
                       </div>
-                      <p className="text-gray-300 mb-4 text-sm sm:text-base">
+                      <p className="text-gray-300 mb-4 text-sm sm:text-base font-inter">
                         {["My friends still talk about our murder mystery night. The characters were so detailed and the plot twists were perfect!",
                           "So easy to set up! I was worried about hosting for 12 people, but the materials made it simple and everyone had a blast.",
                           "Third murder mystery party using this service and they keep getting better. The customization options are amazing."][i-1]}
                       </p>
                       <div className="flex items-center">
                         <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#E6A73E] flex items-center justify-center mr-3">
-                          <span className="font-medium text-xs sm:text-sm text-[#1D2B35]">
+                          <span className="font-medium text-xs sm:text-sm text-[#1D2B35] font-inter">
                             {["JD", "MK", "AS"][i-1]}
                           </span>
                         </div>
                         <div>
-                          <p className="font-medium text-sm sm:text-base">
+                          <p className="font-medium text-sm sm:text-base font-inter">
                             {["Jessica Davis", "Mark Klein", "Amanda Smith"][i-1]}
                           </p>
-                          <p className="text-xs sm:text-sm text-gray-400">
+                          <p className="text-xs sm:text-sm text-gray-400 font-inter">
                             {["Party Host", "Corporate Event Planner", "Birthday Celebrant"][i-1]}
                           </p>
                         </div>
@@ -158,11 +158,11 @@ const Index = () => {
             {/* Support Link Section */}
             <section className="py-8 sm:py-12 px-2 sm:px-4 md:px-6 lg:px-8">
               <div className="w-full max-w-7xl mx-auto text-center">
-                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 text-black">Need More Help?</h2>
-                <p className="text-muted-foreground mb-6 max-w-2xl mx-auto text-sm sm:text-base">
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 text-black font-playfair">Need More Help?</h2>
+                <p className="text-muted-foreground mb-6 max-w-2xl mx-auto text-sm sm:text-base font-inter">
                   Visit our comprehensive support center for FAQs, hosting tips, and more information about using our Murder Mystery Generator.
                 </p>
-                <Button asChild size="lg" className="bg-[#E6A73E] text-[#1D2B35] hover:bg-[#C26E3E] hover:text-white no-underline h-12 px-6 text-base">
+                <Button asChild size="lg" className="bg-[#E6A73E] text-[#1D2B35] hover:bg-[#C26E3E] hover:text-white no-underline h-12 px-6 text-base font-inter">
                   <Link to="/support" className="no-underline">Visit Support Center</Link>
                 </Button>
               </div>

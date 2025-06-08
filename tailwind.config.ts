@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -18,6 +19,12 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				'playfair': ['Playfair Display', 'serif'],
+				'inter': ['Inter', 'sans-serif'],
+				'sans': ['Inter', 'sans-serif'],
+				'serif': ['Playfair Display', 'serif'],
+			},
 			colors: {
 				/* Mystery Maker Color System - Sophisticated Burgundy & Cream */
 				primary: {
@@ -120,6 +127,7 @@ export default {
                     css: {
                         maxWidth: '100%',
                         color: 'hsl(var(--color-surface-foreground))',
+                        fontFamily: 'Inter, sans-serif',
                         a: {
                             color: 'hsl(var(--color-primary))',
                             textDecoration: 'underline',
@@ -133,6 +141,7 @@ export default {
                             marginBottom: '0.75em',
                             lineHeight: '1.6',
                             color: 'hsl(var(--color-surface-foreground))',
+                            fontFamily: 'Inter, sans-serif',
                         },
                         'h1, h2, h3, h4': {
                             color: 'hsl(var(--color-primary))',
@@ -140,6 +149,7 @@ export default {
                             marginBottom: '0.75em',
                             lineHeight: '1.3',
                             fontWeight: '600',
+                            fontFamily: 'Playfair Display, serif',
                         },
                         h1: {
                             fontSize: '1.875rem',
@@ -170,6 +180,7 @@ export default {
                             marginBottom: '0.375em',
                             display: 'list-item',
                             color: 'hsl(var(--color-surface-foreground))',
+                            fontFamily: 'Inter, sans-serif',
                         },
                         blockquote: {
                             fontStyle: 'italic',
@@ -182,6 +193,7 @@ export default {
                             marginLeft: '0',
                             marginRight: '0',
                             color: 'hsl(var(--color-surface-foreground))',
+                            fontFamily: 'Inter, sans-serif',
                         },
                         code: {
                             color: 'hsl(var(--color-secondary))',
@@ -193,6 +205,7 @@ export default {
                         strong: {
                             fontWeight: '700',
                             color: 'hsl(var(--color-secondary))',
+                            fontFamily: 'Inter, sans-serif',
                         },
                         em: {
                             fontStyle: 'italic',
@@ -206,12 +219,14 @@ export default {
                           borderBottomWidth: '1px',
                           backgroundColor: 'hsl(var(--color-primary) / 0.1)',
                           color: 'hsl(var(--color-primary))',
+                          fontFamily: 'Inter, sans-serif',
                         },
                         'tbody td, tfoot td': {
                           padding: '0.75em',
                           borderBottomWidth: '1px',
                           borderBottomColor: 'hsl(var(--border))',
                           color: 'hsl(var(--color-surface-foreground))',
+                          fontFamily: 'Inter, sans-serif',
                         }
                     },
                 },
