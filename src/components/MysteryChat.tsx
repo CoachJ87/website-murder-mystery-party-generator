@@ -407,13 +407,13 @@ export default function MysteryChat({
 
   return (
     <div className={cn(
-      "flex flex-col bg-muted",
+      "flex flex-col bg-[#F7F3E9]",
       usePageScroll ? "h-full" : "h-full space-y-4 sm:space-y-6"
     )}>
       {/* Chat Messages Area */}
       <div className={cn(
-        "space-y-4 sm:space-y-6",
-        usePageScroll ? "pb-4" : "overflow-y-auto h-80 p-3 sm:h-96 sm:p-4"
+        "space-y-4 sm:space-y-6 bg-[#F7F3E9]",
+        usePageScroll ? "pb-32" : "overflow-y-auto h-80 p-3 sm:h-96 sm:p-4"
       )}>
         {/* Loading History */}
         {isLoadingHistory && (
@@ -502,52 +502,70 @@ export default function MysteryChat({
         <div ref={bottomRef} />
       </div>
 
-      {/* Chat Input and Actions Area */}
+      {/* Fixed Bottom Input and Generate Button */}
       <div className={cn(
-        "p-3 sm:p-4 bg-[#FEFCF8] shadow-md space-y-4",
-        usePageScroll ? "fixed bottom-0 left-0 right-0 z-20 border-t-0" : "border-t"
+        "fixed bottom-0 left-0 right-0 z-20 bg-[#F7F3E9] border-t border-gray-200",
+        isMobile ? "px-3 py-2" : "px-4 py-3"
       )}>
-        {/* Text Input */}
         <div className={cn(
-          "flex items-end space-x-2 sm:space-x-3 mx-auto rounded-xl bg-white shadow-sm p-1",
-          usePageScroll ? "max-w-4xl" : ""
+          "mx-auto space-y-3",
+          isMobile ? "max-w-full" : "max-w-4xl"
         )}>
-          <div className="flex-grow">
-            <Textarea
-              ref={inputRef}
-              placeholder="Share your ideas for the mystery..."
-              value={input}
-              onChange={handleTextareaChange}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSendMessage(input);
-                }
-              }}
-              disabled={isAiTyping}
+          {/* Text Input */}
+          <div className="flex items-end space-x-2 sm:space-x-3 rounded-xl bg-white shadow-sm p-1">
+            <div className="flex-grow">
+              <Textarea
+                ref={inputRef}
+                placeholder="Share your ideas for the mystery..."
+                value={input}
+                onChange={handleTextareaChange}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendMessage(input);
+                  }
+                }}
+                disabled={isAiTyping}
+                className={cn(
+                  "resize-none border-0 shadow-none focus-visible:ring-0 min-h-[44px] bg-transparent",
+                  isMobile ? "text-base" : "text-sm"
+                )}
+                rows={1}
+              />
+            </div>
+            <Button 
+              type="submit" 
+              onClick={() => handleSendMessage(input)} 
+              disabled={isAiTyping || !input.trim()}
+              size={isMobile ? "default" : "icon"}
               className={cn(
-                "resize-none border-0 shadow-none focus-visible:ring-0 min-h-[44px] bg-transparent",
-                isMobile ? "text-base" : "text-sm"
+                "shrink-0 bg-[#8B1538] hover:bg-[#6B0F28] text-white rounded-lg",
+                isMobile ? "h-11 w-11" : "h-9 w-9"
               )}
-              rows={1}
-            />
+            >
+              {isAiTyping ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
+            </Button>
           </div>
-          <Button 
-            type="submit" 
-            onClick={() => handleSendMessage(input)} 
-            disabled={isAiTyping || !input.trim()}
-            size={isMobile ? "default" : "icon"}
-            className={cn(
-              "shrink-0 bg-[#8B1538] hover:bg-[#6B0F28] text-white rounded-lg",
-              isMobile ? "h-11 w-11" : "h-9 w-9"
-            )}
-          >
-            {isAiTyping ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Send className="h-4 w-4" />
-            )}
-          </Button>
+          
+          {/* Generate Full Mystery Button */}
+          {onGenerateFinal && (
+            <Button
+              onClick={() => onGenerateFinal(messages)}
+              disabled={!hasAIResponse}
+              size={isMobile ? "default" : "lg"}
+              className={cn(
+                "w-full bg-[#8B1538] hover:bg-[#6B0F28] text-white font-medium shadow-sm rounded-xl",
+                isMobile ? "h-12 text-base" : "px-6"
+              )}
+            >
+              <Zap className="h-4 w-4 mr-2" />
+              Generate Full Mystery
+            </Button>
+          )}
         </div>
       </div>
     </div>
