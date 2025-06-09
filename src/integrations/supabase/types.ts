@@ -46,7 +46,15 @@ export type Database = {
           sent_at?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_character_assignments_character_id"
+            columns: ["character_id"]
+            isOneToOne: false
+            referencedRelation: "mystery_characters"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       conversations: {
         Row: {

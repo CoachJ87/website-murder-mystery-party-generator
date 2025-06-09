@@ -63,7 +63,7 @@ const CharacterAccess: React.FC = () => {
           id,
           guest_name,
           guest_email,
-          mystery_characters (
+          mystery_characters!inner (
             character_name,
             description,
             background,
