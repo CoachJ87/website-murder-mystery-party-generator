@@ -115,22 +115,22 @@ const Index = () => {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                   {[1, 2, 3].map((i) => (
-                    <div key={i} className="bg-[#1D2B35] text-white rounded-xl p-4 sm:p-6 shadow-sm">
+                    <div key={i} className="bg-muted text-foreground rounded-xl p-4 sm:p-6 shadow-sm">
                       <div className="flex items-center space-x-1 mb-4">
                         {[1, 2, 3, 4, 5].map((star) => (
-                          <svg key={star} className="w-4 h-4 sm:w-5 sm:h-5 text-[#E6A73E]" fill="currentColor" viewBox="0 0 20 20">
+                          <svg key={star} className="w-4 h-4 sm:w-5 sm:h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                           </svg>
                         ))}
                       </div>
-                      <p className="text-gray-300 mb-4 text-sm sm:text-base font-inter">
+                      <p className="text-foreground mb-4 text-sm sm:text-base font-inter">
                         {["My friends still talk about our murder mystery night. The characters were so detailed and the plot twists were perfect!",
                           "So easy to set up! I was worried about hosting for 12 people, but the materials made it simple and everyone had a blast.",
                           "Third murder mystery party using this service and they keep getting better. The customization options are amazing."][i-1]}
                       </p>
                       <div className="flex items-center">
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#E6A73E] flex items-center justify-center mr-3">
-                          <span className="font-medium text-xs sm:text-sm text-[#1D2B35] font-inter">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary flex items-center justify-center mr-3">
+                          <span className="font-medium text-xs sm:text-sm text-primary-foreground font-inter">
                             {["JD", "MK", "AS"][i-1]}
                           </span>
                         </div>
@@ -138,7 +138,7 @@ const Index = () => {
                           <p className="font-medium text-sm sm:text-base font-inter">
                             {["Jessica Davis", "Mark Klein", "Amanda Smith"][i-1]}
                           </p>
-                          <p className="text-xs sm:text-sm text-gray-400 font-inter">
+                          <p className="text-xs sm:text-sm text-muted-foreground font-inter">
                             {["Party Host", "Corporate Event Planner", "Birthday Celebrant"][i-1]}
                           </p>
                         </div>
