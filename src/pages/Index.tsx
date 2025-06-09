@@ -1,4 +1,3 @@
-
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Footer from "@/components/Footer";
@@ -76,7 +75,9 @@ const Index = () => {
       
       <main className="flex-1 w-full overflow-x-hidden">
         {/* Hero section is shown for all users */}
-        <Hero />
+        <div className="bg-card">
+          <Hero />
+        </div>
         
         {isAuthenticated ? (
           // Content for logged-in users
