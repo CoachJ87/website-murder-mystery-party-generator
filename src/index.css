@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -222,39 +223,6 @@
   
   .sophisticated-gradient {
     background: linear-gradient(135deg, hsl(var(--color-surface)) 0%, hsl(var(--color-muted)) 100%);
-  }
-
-  /* Claude-style chat interface */
-  .claude-chat-container {
-    @apply bg-[#F7F3E9] rounded-2xl border-0 shadow-none;
-  }
-
-  .claude-message-ai {
-    @apply bg-white rounded-2xl border border-gray-200/50 shadow-sm px-4 py-3;
-  }
-
-  .claude-message-user {
-    @apply bg-[#8B1538] text-white rounded-2xl px-4 py-3;
-  }
-
-  .claude-input-container {
-    @apply bg-[#FEFCF8] rounded-2xl border border-gray-200/50 shadow-sm p-3 flex items-end gap-2;
-  }
-
-  .claude-input {
-    @apply bg-transparent border-0 focus:ring-0 resize-none text-base;
-  }
-
-  .claude-send-button {
-    @apply rounded-full p-2 bg-[#8B1538] text-white hover:bg-[#6B0F28] transition-colors;
-  }
-
-  .claude-typing-indicator {
-    @apply flex space-x-1 p-2;
-  }
-
-  .claude-typing-dot {
-    @apply h-2 w-2 bg-gray-400 rounded-full animate-bounce;
   }
 }
 

@@ -1,8 +1,6 @@
-'use client';
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
@@ -22,7 +20,7 @@ const Header = () => {
         <div className="flex items-center">
           <Link to="/" className="flex items-center space-x-2 mr-4 md:mr-8 no-underline">
             <span className="text-lg md:text-2xl font-bold gradient-text font-playfair">
-              <span className="hidden sm:inline">Mystery Maker</span>
+              <span className="hidden sm:inline">Murder Maker</span>
               <span className="sm:hidden">MMG</span>
             </span>
           </Link>

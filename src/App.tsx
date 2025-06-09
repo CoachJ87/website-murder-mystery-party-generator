@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -60,7 +61,7 @@ const App = () => (
 );
 
 const AppRoutes = () => {
-  const { loading, isAuthenticated } = useAuth();
+  const { loading } = useAuth();
   
   return (
     <LoadingBoundary loading={loading}>
@@ -78,8 +79,8 @@ const AppRoutes = () => {
         <Route path="/support" element={<Support />} />
         
         {/* Payment success and cancel routes */}
-        <Route path="/payment-success" element={<Navigate to="/\" replace />} />
-        <Route path="/payment-canceled" element={<Navigate to="/\" replace />} />
+        <Route path="/payment-success" element={<Navigate to="/" replace />} />
+        <Route path="/payment-canceled" element={<Navigate to="/" replace />} />
         
         {/* Protected routes */}
         <Route 
