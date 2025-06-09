@@ -82,8 +82,8 @@ const AppRoutes = () => {
         <Route path="/character/:token" element={<CharacterAccess />} />
         
         {/* Payment success and cancel routes */}
-        <Route path="/payment-success" element={<Navigate to="/" replace />} />
-        <Route path="/payment-canceled" element={<Navigate to="/" replace />} />
+        <Route path="/payment-success" element={<Navigate to="/\" replace />} />
+        <Route path="/payment-canceled" element={<Navigate to="/\" replace />} />
         
         {/* Protected routes */}
         <Route 
