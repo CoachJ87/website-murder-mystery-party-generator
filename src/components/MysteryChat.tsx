@@ -407,37 +407,13 @@ export default function MysteryChat({
 
   return (
     <div className={cn(
-      "flex flex-col bg-[#F7F3E9]",
+      "flex flex-col bg-muted",
       usePageScroll ? "h-full" : "h-full space-y-4 sm:space-y-6"
     )}>
-      {/* Generate Full Mystery Button - Moved to top */}
-      <div className={cn(
-        "px-4 py-3 bg-[#FEFCF8] shadow-md border-b-0 z-20",
-        usePageScroll ? "mb-4" : "mb-2"
-      )}>
-        <div className={cn(
-          "mx-auto flex justify-center",
-          isMobile ? "max-w-full" : "max-w-4xl"
-        )}>
-          <Button
-            onClick={() => onGenerateFinal && onGenerateFinal(messages)}
-            disabled={!hasAIResponse}
-            size={isMobile ? "default" : "lg"}
-            className={cn(
-              "bg-[#8B1538] hover:bg-[#6B0F28] text-white font-medium shadow-sm rounded-xl",
-              isMobile ? "w-full h-12 text-base" : "px-6"
-            )}
-          >
-            <Zap className="h-4 w-4 mr-2" />
-            Generate Full Mystery
-          </Button>
-        </div>
-      </div>
-
       {/* Chat Messages Area - Page Level Scrolling */}
       <div className={cn(
-        "space-y-4 sm:space-y-6 bg-[#F7F3E9]",
-        usePageScroll ? "pb-32" : "overflow-y-auto h-80 p-3 sm:h-96 sm:p-4"
+        "space-y-4 sm:space-y-6",
+        usePageScroll ? "pb-4" : "overflow-y-auto h-80 p-3 sm:h-96 sm:p-4"
       )}>
         {/* Loading History */}
         {isLoadingHistory && (
@@ -528,7 +504,7 @@ export default function MysteryChat({
 
       {/* Chat Input Area - Fixed at bottom for page-level scrolling */}
       <div className={cn(
-        "p-3 sm:p-4 bg-[#FEFCF8] shadow-md",
+        "p-3 sm:p-4 bg-[#FEFCF8] shadow-md space-y-4",
         usePageScroll ? "fixed bottom-0 left-0 right-0 z-20 border-t-0" : "border-t"
       )}>
         <div className={cn(
@@ -572,6 +548,22 @@ export default function MysteryChat({
             )}
           </Button>
         </div>
+        
+        {/* Generate Full Mystery Button */}
+        {onGenerateFinal && (
+          <Button
+            onClick={() => onGenerateFinal(messages)}
+            disabled={!hasAIResponse}
+            size={isMobile ? "default" : "lg"}
+            className={cn(
+              "w-full bg-[#8B1538] hover:bg-[#6B0F28] text-white font-medium shadow-sm rounded-xl",
+              isMobile ? "h-12 text-base" : "px-6"
+            )}
+          >
+            <Zap className="h-4 w-4 mr-2" />
+            Generate Full Mystery
+          </Button>
+        )}
       </div>
     </div>
   );
