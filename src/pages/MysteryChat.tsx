@@ -144,7 +144,7 @@ const MysteryChatPage = () => {
 
             {/* Fixed Bottom Action Button */}
             <div className={cn(
-                "fixed bottom-20 left-0 right-0 z-10 px-4 py-2 bg-[#F7F3E9] shadow-md border-t-0",
+                "fixed bottom-20 left-0 right-0 z-10 px-4 py-2 bg-[#F7F3E9] shadow-none border-t-0",
                 isMobile ? "px-3" : "px-4"
             )}>
                 <div className={cn(
