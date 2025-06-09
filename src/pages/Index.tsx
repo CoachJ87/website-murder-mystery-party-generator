@@ -115,7 +115,7 @@ const Index = () => {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                   {[1, 2, 3].map((i) => (
-                    <div key={i} className="bg-muted text-foreground rounded-xl p-4 sm:p-6 shadow-sm">
+                    <div key={i} className="bg-muted text-foreground rounded-xl p-4 sm:p-6 shadow-md">
                       <div className="flex items-center space-x-1 mb-4">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <svg key={star} className="w-4 h-4 sm:w-5 sm:h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
