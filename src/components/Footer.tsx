@@ -1,8 +1,14 @@
-
 import { Link } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 
 const Footer = () => {
+  const { isAuthenticated } = useAuth();
   const currentYear = new Date().getFullYear();
+
+  // Return null when user is authenticated
+  if (isAuthenticated) {
+    return null;
+  }
 
   return (
     <footer className="bg-muted/30 border-t py-12 px-4">
