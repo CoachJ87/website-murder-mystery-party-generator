@@ -1,10 +1,9 @@
-
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from 'react-markdown';
 import { toast } from "sonner";
 
 interface CharacterAssignment {
@@ -57,6 +56,8 @@ const CharacterAccess: React.FC = () => {
     if (!token) return;
 
     try {
+      setLoading(true);
+      
       const { data, error } = await supabase
         .from('character_assignments')
         .select(`
@@ -145,11 +146,10 @@ const CharacterAccess: React.FC = () => {
     
     if (character.round2_statement) {
       content += `## Round 2: Motives\n\n${character.round2_statement}\n\n`;
-    }
     
-    if (character.round2_questions) {
-      content += `### Questions to Ask\n\n${character.round2_questions}\n\n`;
-    }
+      if (character.round2_questions) {
+        content += `### Questions to Ask\n\n${character.round2_questions}\n\n`;
+      }
       
       if (character.round2_innocent) {
         content += `**If You're Innocent:**\n${character.round2_innocent}\n\n`;
@@ -169,20 +169,20 @@ const CharacterAccess: React.FC = () => {
       content += `## Round 3: Method\n\n${character.round3_statement}\n\n`;
     }
       
-      if (character.final_innocent) {
-        content += `**If You're Innocent:**\n${character.final_innocent}\n\n`;
-      }
-      
-      if (character.final_guilty) {
-        content += `**If You're Guilty:**\n${character.final_guilty}\n\n`;
-      }
-      
-      if (character.final_accomplice) {
-        content += `**If You're an Accomplice:**\n${character.final_accomplice}\n\n`;
-      }
+    if (character.final_innocent) {
+      content += `**If You're Innocent:**\n${character.final_innocent}\n\n`;
+    }
+    
+    if (character.final_guilty) {
+      content += `**If You're Guilty:**\n${character.final_guilty}\n\n`;
+    }
+    
+    if (character.final_accomplice) {
+      content += `**If You're an Accomplice:**\n${character.final_accomplice}\n\n`;
+    }
 
-      if (character.accusations) {
-        content += `${character.accusations}\n\n`;
+    if (character.accusations) {
+      content += `${character.accusations}\n\n`;
     }
     
     return content;
