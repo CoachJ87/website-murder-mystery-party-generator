@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
@@ -62,12 +61,12 @@ export function FeatureSteps({
                   className={cn(
                     "w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center border-2",
                     index === currentFeature
-                      ? "bg-[#E6A73E] border-[#E6A73E] text-[#1D2B35] scale-110"
+                      ? "bg-primary border-primary text-primary-foreground scale-110"
                       : "bg-muted border-muted-foreground",
                   )}
                 >
                   {index <= currentFeature ? (
-                    <span className="text-lg font-bold">✓</span>
+                    <span className="text-lg font-bold text-primary-foreground">✓</span>
                   ) : (
                     <span className="text-lg font-semibold">{index + 1}</span>
                   )}
