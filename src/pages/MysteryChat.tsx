@@ -1,18 +1,15 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { supabase } from "@/lib/supabase";
 import MysteryChat from "@/components/MysteryChat";
 import { useAuth } from "@/context/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { Message } from "@/components/types";
-import { Loader2, ArrowLeft, Zap } from "lucide-react";
+import { Loader2, Zap } from "lucide-react";
 
 const MysteryChatPage = () => {
     const [messages, setMessages] = useState<Message[]>([]);
@@ -112,7 +109,6 @@ const MysteryChatPage = () => {
                         <p className="text-sm sm:text-base text-muted-foreground">Loading conversation...</p>
                     </div>
                 </main>
-                <Footer />
             </div>
         );
     }
@@ -121,101 +117,54 @@ const MysteryChatPage = () => {
         <div className="min-h-screen flex flex-col">
             <Header />
             <main className={cn(
-                "flex-1",
-                isMobile ? "py-2 px-3" : "py-8 px-4 sm:py-12"
+                "flex-1 pb-32", // Add padding at the bottom for fixed elements
+                isMobile ? "pt-2 px-3" : "pt-4 px-4"
             )}>
                 <div className={cn(
-                    "container mx-auto",
+                    "mx-auto",
                     isMobile ? "max-w-full" : "max-w-4xl"
                 )}>
-                    {/* Header Section - Mobile Optimized */}
-                    <div className={cn("mb-4 sm:mb-8", isMobile && "mb-3")}>
-                        <div className="flex items-center gap-2 sm:gap-4 mb-3 sm:mb-4">
-                            <Button
-                                variant="outline"
-                                size={isMobile ? "sm" : "default"}
-                                onClick={() => navigate("/dashboard")}
-                                className={cn(
-                                    "flex items-center gap-2",
-                                    isMobile && "h-9 px-3 text-sm"
-                                )}
-                            >
-                                <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" />
-                                <span className={isMobile ? "hidden" : "inline"}>Back to</span>
-                                Dashboard
-                            </Button>
-                        </div>
-                        
-                        {/* Page Title - Mobile Responsive */}
-                        <div className="text-center sm:text-left">
-                            <h1 className={cn(
-                                "font-bold text-foreground mb-1 sm:mb-2",
-                                isMobile ? "text-lg" : "text-2xl sm:text-3xl"
-                            )}>
-                                Mystery Creation Chat
-                            </h1>
-                            <p className={cn(
-                                "text-muted-foreground",
-                                isMobile ? "text-sm" : "text-base"
-                            )}>
-                                Collaborate with AI to create your perfect murder mystery
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* Chat Interface - Mobile Optimized Card */}
-                    <Card className={cn(
-                        isMobile ? "border-0 shadow-none bg-transparent" : "shadow-sm"
-                    )}>
-                        <CardContent className={cn(
-                            isMobile ? "p-0" : "p-4 sm:p-6"
-                        )}>
-                            <MysteryChat
-                                initialTheme={conversationData?.mystery_data?.theme || ""}
-                                initialPlayerCount={conversationData?.mystery_data?.playerCount}
-                                initialScriptType={conversationData?.mystery_data?.scriptType as 'full' | 'pointForm'}
-                                initialAdditionalDetails={conversationData?.mystery_data?.additionalDetails}
-                                savedMysteryId={id}
-                                onSave={handleSaveMessage}
-                                initialMessages={messages}
-                                isLoadingHistory={false}
-                                systemInstruction={conversationData?.system_instruction}
-                                skipForm={true}
-                                needsInitialAIResponse={isInitial}
-                            />
-                        </CardContent>
-                    </Card>
-
-                    {/* Action Section - Mobile Enhanced */}
-                    <div className={cn(
-                        "flex flex-col gap-3 sm:gap-4",
-                        isMobile ? "mt-4" : "mt-6 sm:mt-8"
-                    )}>
-                        <div className="flex justify-center">
-                            <Button
-                                onClick={handleGenerateFullMystery}
-                                disabled={!hasAIResponse}
-                                size={isMobile ? "default" : "lg"}
-                                className={cn(
-                                    "bg-blue-600 hover:bg-blue-700 text-white font-medium",
-                                    isMobile ? "w-full h-12 text-base" : "px-6"
-                                )}
-                            >
-                                <Zap className="h-4 w-4 mr-2" />
-                                Generate Full Mystery
-                            </Button>
-                        </div>
-                        
-                        <p className={cn(
-                            "text-center text-muted-foreground leading-relaxed",
-                            isMobile ? "text-sm px-2" : "text-sm"
-                        )}>
-                            Ready to see your mystery preview? Click above to view and purchase the complete package.
-                        </p>
-                    </div>
+                    {/* Chat Interface - Full Page Scrolling */}
+                    <MysteryChat
+                        initialTheme={conversationData?.mystery_data?.theme || ""}
+                        initialPlayerCount={conversationData?.mystery_data?.playerCount}
+                        initialScriptType={conversationData?.mystery_data?.scriptType as 'full' | 'pointForm'}
+                        initialAdditionalDetails={conversationData?.mystery_data?.additionalDetails}
+                        savedMysteryId={id}
+                        onSave={handleSaveMessage}
+                        initialMessages={messages}
+                        isLoadingHistory={false}
+                        systemInstruction={conversationData?.system_instruction}
+                        skipForm={true}
+                        needsInitialAIResponse={isInitial}
+                        usePageScroll={true} // New prop to enable page-level scrolling
+                    />
                 </div>
             </main>
-            <Footer />
+
+            {/* Fixed Bottom Action Button */}
+            <div className={cn(
+                "fixed bottom-20 left-0 right-0 z-10 px-4 py-2 bg-background/95 backdrop-blur-sm border-t",
+                isMobile ? "px-3" : "px-4"
+            )}>
+                <div className={cn(
+                    "mx-auto flex justify-center",
+                    isMobile ? "max-w-full" : "max-w-4xl"
+                )}>
+                    <Button
+                        onClick={handleGenerateFullMystery}
+                        disabled={!hasAIResponse}
+                        size={isMobile ? "default" : "lg"}
+                        className={cn(
+                            "bg-blue-600 hover:bg-blue-700 text-white font-medium",
+                            isMobile ? "w-full h-12 text-base" : "px-6"
+                        )}
+                    >
+                        <Zap className="h-4 w-4 mr-2" />
+                        Generate Full Mystery
+                    </Button>
+                </div>
+            </div>
         </div>
     );
 };

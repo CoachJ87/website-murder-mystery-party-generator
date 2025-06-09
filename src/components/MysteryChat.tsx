@@ -1,37 +1,11 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Card, CardHeader, CardContent, CardDescription } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Send, Loader2 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Separator } from "@/components/ui/separator";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
 import { Message } from "@/components/types";
@@ -52,23 +26,8 @@ interface MysteryChatProps {
   preventDuplicateMessages?: boolean;
   skipForm?: boolean;
   needsInitialAIResponse?: boolean;
+  usePageScroll?: boolean; // New prop to enable page-level scrolling
 }
-
-const formSchema = z.object({
-  theme: z.string().min(2, {
-    message: "Theme must be at least 2 characters.",
-  }).max(50, {
-    message: "Theme must not be longer than 50 characters.",
-  }),
-  playerCount: z.number().min(4, {
-    message: "Must have at least 4 players"
-  }).max(32, {
-    message: "Must not have more than 32 players"
-  }),
-  hasAccomplice: z.boolean().default(false),
-  scriptType: z.enum(['full', 'pointForm']).default('full'),
-  additionalDetails: z.string().max(500).optional(),
-});
 
 export default function MysteryChat({
   initialTheme,
@@ -84,7 +43,8 @@ export default function MysteryChat({
   systemInstruction,
   preventDuplicateMessages = false,
   skipForm = false,
-  needsInitialAIResponse = false
+  needsInitialAIResponse = false,
+  usePageScroll = false // Default to false for backward compatibility
 }: MysteryChatProps) {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
@@ -98,17 +58,7 @@ export default function MysteryChat({
   const { isAuthenticated } = useAuth();
   const isMobile = useIsMobile();
   const bottomRef = useRef<HTMLDivElement>(null);
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      theme: initialTheme || "",
-      playerCount: initialPlayerCount || 4,
-      hasAccomplice: initialHasAccomplice || false,
-      additionalDetails: initialAdditionalDetails || "",
-    },
-    mode: "onChange"
-  });
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   // Helper function to ensure proper timestamp handling
   const ensureValidTimestamp = (message: any): Message => {
@@ -152,6 +102,37 @@ export default function MysteryChat({
       }
     }
   }, [needsInitialAIResponse, hasTriggeredInitialResponse, messages, isLoadingHistory]);
+
+  // Scroll to bottom when messages change or AI is typing
+  useEffect(() => {
+    if (!usePageScroll) {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    } else {
+      // For page-level scrolling, scroll to bottom of page
+      window.scrollTo({
+        top: document.body.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  }, [messages, isAiTyping, usePageScroll]);
+
+  useEffect(() => {
+    if (initialTheme) {
+      setCurrentTheme(initialTheme);
+    }
+    if (initialPlayerCount) {
+      setCurrentPlayerCount(initialPlayerCount);
+    }
+    if (initialHasAccomplice) {
+      setCurrentHasAccomplice(initialHasAccomplice);
+    }
+    if (initialScriptType) {
+      setCurrentScriptType(initialScriptType);
+    }
+    if (initialAdditionalDetails) {
+      setCurrentAdditionalDetails(initialAdditionalDetails);
+    }
+  }, [initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails]);
 
   // FIXED: Enhanced function to properly detect if we have player count info
   const hasPlayerCountInfo = () => {
@@ -198,28 +179,6 @@ export default function MysteryChat({
     });
     return isNew;
   };
-
-  useEffect(() => {
-    if (initialTheme) {
-      setCurrentTheme(initialTheme);
-    }
-    if (initialPlayerCount) {
-      setCurrentPlayerCount(initialPlayerCount);
-    }
-    if (initialHasAccomplice) {
-      setCurrentHasAccomplice(initialHasAccomplice);
-    }
-    if (initialScriptType) {
-      setCurrentScriptType(initialScriptType);
-    }
-    if (initialAdditionalDetails) {
-      setCurrentAdditionalDetails(initialAdditionalDetails);
-    }
-  }, [initialTheme, initialPlayerCount, initialHasAccomplice, initialScriptType, initialAdditionalDetails, form]);
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isAiTyping]);
 
   const createSystemMessage = (data: any) => {
     // Use provided system instruction if available
@@ -432,149 +391,167 @@ export default function MysteryChat({
     }
   };
 
-  return (
-    <div className="flex flex-col h-full space-y-4 sm:space-y-6">
-      {/* Chat Container - Mobile Optimized */}
-      <div className="border rounded-lg bg-background overflow-hidden">
-        {/* Chat Messages Area - Enhanced Mobile Experience */}
-        <div className={cn(
-          "overflow-y-auto space-y-3 sm:space-y-4",
-          isMobile ? "h-80 p-3" : "h-96 p-4"
-        )}>
-          {/* Loading History */}
-          {isLoadingHistory && (
-            <div className="text-center text-muted-foreground py-4">
-              <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin mx-auto mb-2" />
-              <p className="text-sm sm:text-base">Loading previous messages...</p>
-            </div>
-          )}
-          
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={cn(
-                "flex",
-                message.is_ai ? "justify-start" : "justify-end"
-              )}
-            >
-              <div
-                className={cn(
-                  "rounded-lg px-3 py-2 sm:px-4 sm:py-3 max-w-[85%] sm:max-w-[80%]",
-                  message.is_ai
-                    ? "bg-muted border overflow-auto"
-                    : "bg-primary text-primary-foreground"
-                )}
-              >
-                {message.is_ai ? (
-                  <div className={cn(
-                    "prose prose-sm dark:prose-invert max-w-none",
-                    isMobile && "text-sm leading-relaxed"
-                  )}>
-                    <ReactMarkdown 
-                      rehypePlugins={[rehypeRaw]}
-                      components={{
-                        h1: ({node, ...props}) => <h1 className={cn(
-                          "font-bold mt-3 mb-2",
-                          isMobile ? "text-lg" : "text-2xl"
-                        )} {...props} />,
-                        h2: ({node, ...props}) => <h2 className={cn(
-                          "font-semibold mt-2 mb-1",
-                          isMobile ? "text-base" : "text-xl"
-                        )} {...props} />,
-                        h3: ({node, ...props}) => <h3 className={cn(
-                          "font-medium mt-2 mb-1",
-                          isMobile ? "text-sm" : "text-lg"
-                        )} {...props} />,
-                        p: ({node, ...props}) => <p className="my-1 leading-relaxed" {...props} />,
-                        ul: ({node, ...props}) => <ul className={cn(
-                          "list-disc my-2",
-                          isMobile ? "pl-4" : "pl-6"
-                        )} {...props} />,
-                        ol: ({node, ...props}) => <ol className={cn(
-                          "list-decimal my-2",
-                          isMobile ? "pl-4" : "pl-6"
-                        )} {...props} />,
-                        li: ({node, ...props}) => <li className="my-1" {...props} />,
-                        strong: ({node, ...props}) => <strong className="font-bold" {...props} />,
-                        em: ({node, ...props}) => <em className="italic" {...props} />,
-                        blockquote: ({node, ...props}) => <blockquote className="pl-3 border-l-3 border-gray-300 italic my-2" {...props} />
-                      }}
-                    >
-                      {message.content}
-                    </ReactMarkdown>
-                  </div>
-                ) : (
-                  <p className={cn(
-                    "whitespace-pre-line leading-relaxed",
-                    isMobile ? "text-sm" : "text-sm"
-                  )}>{message.content}</p>
-                )}
-              </div>
-            </div>
-          ))}
-          
-          {/* AI Typing Indicator - Mobile Optimized */}
-          {isAiTyping && (
-            <div className="flex justify-start">
-              <div className="bg-muted border rounded-lg px-3 py-2 sm:px-4 sm:py-3 max-w-[85%] sm:max-w-[80%]">
-                <div className="flex space-x-1">
-                  <div className="h-2 w-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                  <div className="h-2 w-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                  <div className="h-2 w-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
-                </div>
-              </div>
-            </div>
-          )}
-          <div ref={bottomRef} />
-        </div>
+  // Auto-resize textarea
+  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value);
+    
+    // Auto-resize
+    if (inputRef.current) {
+      inputRef.current.style.height = 'auto';
+      inputRef.current.style.height = `${Math.min(inputRef.current.scrollHeight, 150)}px`;
+    }
+  };
 
-        {/* Chat Input Area - Mobile Enhanced */}
-        <div className="border-t p-3 sm:p-4">
-          <div className="flex items-end space-x-2 sm:space-x-3">
-            <div className="flex-grow">
-              <Textarea
-                placeholder="Share your ideas for the mystery..."
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSendMessage(input);
-                  }
-                }}
-                disabled={isAiTyping}
-                className={cn(
-                  "resize-none border-0 shadow-none focus-visible:ring-1 focus-visible:ring-ring",
-                  isMobile ? "min-h-[44px] text-base" : "min-h-[48px] text-sm"
-                )}
-                rows={isMobile ? 2 : 1}
-              />
-            </div>
-            <Button 
-              type="submit" 
-              onClick={() => handleSendMessage(input)} 
-              disabled={isAiTyping || !input.trim()}
-              size={isMobile ? "default" : "icon"}
+  return (
+    <div className={cn(
+      "flex flex-col",
+      usePageScroll ? "h-full" : "h-full space-y-4 sm:space-y-6"
+    )}>
+      {/* Chat Messages Area - Page Level Scrolling */}
+      <div className={cn(
+        "space-y-3 sm:space-y-4",
+        usePageScroll ? "pb-4" : "overflow-y-auto h-80 p-3 sm:h-96 sm:p-4"
+      )}>
+        {/* Loading History */}
+        {isLoadingHistory && (
+          <div className="text-center text-muted-foreground py-4">
+            <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin mx-auto mb-2" />
+            <p className="text-sm sm:text-base">Loading previous messages...</p>
+          </div>
+        )}
+        
+        {messages.map((message) => (
+          <div
+            key={message.id}
+            className={cn(
+              "flex",
+              message.is_ai ? "justify-start" : "justify-end"
+            )}
+          >
+            <div
               className={cn(
-                "shrink-0",
-                isMobile ? "h-11 w-11" : "h-9 w-9"
+                "rounded-lg px-3 py-2 sm:px-4 sm:py-3 max-w-[85%] sm:max-w-[80%]",
+                message.is_ai
+                  ? "bg-muted border overflow-auto"
+                  : "bg-primary text-primary-foreground"
               )}
             >
-              {isAiTyping ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+              {message.is_ai ? (
+                <div className={cn(
+                  "prose prose-sm dark:prose-invert max-w-none",
+                  isMobile && "text-sm leading-relaxed"
+                )}>
+                  <ReactMarkdown 
+                    rehypePlugins={[rehypeRaw]}
+                    components={{
+                      h1: ({node, ...props}) => <h1 className={cn(
+                        "font-bold mt-3 mb-2",
+                        isMobile ? "text-lg" : "text-2xl"
+                      )} {...props} />,
+                      h2: ({node, ...props}) => <h2 className={cn(
+                        "font-semibold mt-2 mb-1",
+                        isMobile ? "text-base" : "text-xl"
+                      )} {...props} />,
+                      h3: ({node, ...props}) => <h3 className={cn(
+                        "font-medium mt-2 mb-1",
+                        isMobile ? "text-sm" : "text-lg"
+                      )} {...props} />,
+                      p: ({node, ...props}) => <p className="my-1 leading-relaxed" {...props} />,
+                      ul: ({node, ...props}) => <ul className={cn(
+                        "list-disc my-2",
+                        isMobile ? "pl-4" : "pl-6"
+                      )} {...props} />,
+                      ol: ({node, ...props}) => <ol className={cn(
+                        "list-decimal my-2",
+                        isMobile ? "pl-4" : "pl-6"
+                      )} {...props} />,
+                      li: ({node, ...props}) => <li className="my-1" {...props} />,
+                      strong: ({node, ...props}) => <strong className="font-bold" {...props} />,
+                      em: ({node, ...props}) => <em className="italic" {...props} />,
+                      blockquote: ({node, ...props}) => <blockquote className="pl-3 border-l-3 border-gray-300 italic my-2" {...props} />
+                    }}
+                  >
+                    {message.content}
+                  </ReactMarkdown>
+                </div>
               ) : (
-                <Send className="h-4 w-4" />
+                <p className={cn(
+                  "whitespace-pre-line leading-relaxed",
+                  isMobile ? "text-sm" : "text-sm"
+                )}>{message.content}</p>
               )}
-            </Button>
+            </div>
           </div>
-          
-          {/* Mobile Helper Text */}
-          {isMobile && (
-            <p className="text-xs text-muted-foreground mt-2 text-center">
-              Tap Enter to send • Shift+Enter for new line
-            </p>
-          )}
+        ))}
+        
+        {/* AI Typing Indicator - Mobile Optimized */}
+        {isAiTyping && (
+          <div className="flex justify-start">
+            <div className="bg-muted border rounded-lg px-3 py-2 sm:px-4 sm:py-3 max-w-[85%] sm:max-w-[80%]">
+              <div className="flex space-x-1">
+                <div className="h-2 w-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                <div className="h-2 w-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                <div className="h-2 w-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
+              </div>
+            </div>
+          </div>
+        )}
+        <div ref={bottomRef} />
+      </div>
+
+      {/* Chat Input Area - Fixed at bottom for page-level scrolling */}
+      <div className={cn(
+        "border-t p-3 sm:p-4 bg-background",
+        usePageScroll ? "fixed bottom-0 left-0 right-0 z-20" : ""
+      )}>
+        <div className={cn(
+          "flex items-end space-x-2 sm:space-x-3 mx-auto",
+          usePageScroll ? "max-w-4xl" : ""
+        )}>
+          <div className="flex-grow">
+            <Textarea
+              ref={inputRef}
+              placeholder="Share your ideas for the mystery..."
+              value={input}
+              onChange={handleTextareaChange}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendMessage(input);
+                }
+              }}
+              disabled={isAiTyping}
+              className={cn(
+                "resize-none border-0 shadow-none focus-visible:ring-1 focus-visible:ring-ring min-h-[44px]",
+                isMobile ? "text-base" : "text-sm"
+              )}
+              rows={1}
+            />
+          </div>
+          <Button 
+            type="submit" 
+            onClick={() => handleSendMessage(input)} 
+            disabled={isAiTyping || !input.trim()}
+            size={isMobile ? "default" : "icon"}
+            className={cn(
+              "shrink-0",
+              isMobile ? "h-11 w-11" : "h-9 w-9"
+            )}
+          >
+            {isAiTyping ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="h-4 w-4" />
+            )}
+          </Button>
         </div>
+        
+        {/* Mobile Helper Text */}
+        {isMobile && (
+          <p className="text-xs text-muted-foreground mt-2 text-center">
+            Tap Enter to send • Shift+Enter for new line
+          </p>
+        )}
       </div>
     </div>
   );
