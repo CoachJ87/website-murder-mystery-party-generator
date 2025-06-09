@@ -22,7 +22,6 @@ const MysteryPackage = ({ mysteryId, title }: MysteryPackageProps) => {
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [generationStatus, setGenerationStatus] = useState<GenerationStatus | null>(null);
-  const [statusCheckInterval, setStatusCheckInterval] = useState<number | null>(null);
   const [testMode, setTestMode] = useState<boolean>(false);
   
   // Add ref to track toast notifications
@@ -40,9 +39,9 @@ const MysteryPackage = ({ mysteryId, title }: MysteryPackageProps) => {
         const status = await getPackageGenerationStatus(mysteryId);
         setGenerationStatus(status);
         
-        // If it's in progress, start polling
+        // If it's in progress, set generating state
         if (status.status === 'in_progress') {
-          startStatusPolling();
+          setGenerating(true);
         }
         
         // Get existing content
@@ -67,74 +66,77 @@ const MysteryPackage = ({ mysteryId, title }: MysteryPackageProps) => {
       }
     };
     
+    // Initial data check
     checkForExistingPackage();
     
-    return () => {
-      if (statusCheckInterval) {
-        clearInterval(statusCheckInterval);
-      }
-    };
-  }, [mysteryId]);
-
-  const startStatusPolling = () => {
-    // Clear any existing interval
-    if (statusCheckInterval) {
-      clearInterval(statusCheckInterval);
-    }
-    
-    // Check status every 5 seconds
-    const intervalId = window.setInterval(async () => {
-      try {
-        const status = await getPackageGenerationStatus(mysteryId);
-        setGenerationStatus(status);
-        
-        console.log("Status check:", status);
-        
-        if (status.status === 'completed') {
-          // Package generation complete, fetch content
-          const { data: packageData } = await supabase
-            .from("mystery_packages")
-            .select("content")
-            .eq("conversation_id", mysteryId)
-            .single();
-            
-          if (packageData) {
-            setPackageContent(packageData.content);
-            clearInterval(intervalId);
-            setStatusCheckInterval(null);
-            setGenerating(false);
-            
-            // Only show notification once
-            if (!packageReadyNotified.current) {
-              toast.success("Your mystery package is ready!");
-              packageReadyNotified.current = true;
-            }
-          }
-        } else if (status.status === 'failed') {
-          clearInterval(intervalId);
-          setStatusCheckInterval(null);
-          setGenerating(false);
-          toast.error("There was an issue generating your package");
+    // Set up real-time subscription
+    console.log("Setting up real-time subscription for mystery_packages");
+    const subscription = supabase
+      .channel('mystery_packages_updates')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'mystery_packages',
+          filter: `conversation_id=eq.${mysteryId}`
+        },
+        async (payload) => {
+          console.log("Real-time update received:", payload);
           
-          // Even if failed, try to get partial content
-          const { data: packageData } = await supabase
-            .from("mystery_packages")
-            .select("content")
-            .eq("conversation_id", mysteryId)
-            .single();
+          try {
+            // Get updated status
+            const status = await getPackageGenerationStatus(mysteryId);
+            setGenerationStatus(status);
             
-          if (packageData && packageData.content) {
-            setPackageContent(packageData.content);
+            if (status.status === 'completed') {
+              // Package generation complete, fetch content
+              const { data: packageData } = await supabase
+                .from("mystery_packages")
+                .select("content")
+                .eq("conversation_id", mysteryId)
+                .single();
+                
+              if (packageData && packageData.content) {
+                setPackageContent(packageData.content);
+                setGenerating(false);
+                
+                // Only show notification once
+                if (!packageReadyNotified.current) {
+                  toast.success("Your mystery package is ready!");
+                  packageReadyNotified.current = true;
+                }
+              }
+            } else if (status.status === 'failed') {
+              setGenerating(false);
+              toast.error("There was an issue generating your package");
+              
+              // Even if failed, try to get partial content
+              const { data: packageData } = await supabase
+                .from("mystery_packages")
+                .select("content")
+                .eq("conversation_id", mysteryId)
+                .single();
+                
+              if (packageData && packageData.content) {
+                setPackageContent(packageData.content);
+              }
+            }
+          } catch (error) {
+            console.error("Error handling real-time update:", error);
           }
         }
-      } catch (error) {
-        console.error("Error checking generation status:", error);
-      }
-    }, 5000);
+      )
+      .subscribe((status) => {
+        console.log("Subscription status:", status);
+      });
     
-    // Store the numeric ID of the interval in state
-    setStatusCheckInterval(intervalId);
-  };
+    // Cleanup subscription
+    return () => {
+      console.log("Cleaning up real-time subscription");
+      subscription.unsubscribe();
+    };
+  }, [mysteryId]);
 
   const handleGeneratePackage = async () => {
     try {
@@ -168,10 +170,9 @@ const MysteryPackage = ({ mysteryId, title }: MysteryPackageProps) => {
           toast.error("There was an issue generating your package. Please try again.");
         });
       
-      // Start polling for status updates
+      // Get initial status after starting generation
       const initialStatus = await getPackageGenerationStatus(mysteryId);
       setGenerationStatus(initialStatus);
-      startStatusPolling();
       
     } catch (error: any) {
       console.error("Error starting package generation:", error);
@@ -261,7 +262,7 @@ const MysteryPackage = ({ mysteryId, title }: MysteryPackageProps) => {
               mysteryTitle={title}
               generationStatus={generationStatus || undefined}
               conversationId={mysteryId}
-              isGenerating={generating} // Add the missing isGenerating prop
+              isGenerating={generating}
             />
             
             {generationStatus?.status === 'failed' && (
