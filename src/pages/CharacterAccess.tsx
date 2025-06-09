@@ -49,11 +49,18 @@ const CharacterAccess: React.FC = () => {
   useEffect(() => {
     if (token) {
       loadCharacterAssignment();
+    } else {
+      setError("No access token provided");
+      setLoading(false);
     }
   }, [token]);
 
   const loadCharacterAssignment = async () => {
-    if (!token) return;
+    if (!token) {
+      setError("Access token is required");
+      setLoading(false);
+      return;
+    }
 
     try {
       setLoading(true);
@@ -99,17 +106,23 @@ const CharacterAccess: React.FC = () => {
 
       if (error) {
         if (error.code === 'PGRST116') {
-          setError('Character assignment not found or access denied.');
+          setError('Character assignment not found or access denied. This link may be invalid or expired.');
         } else {
-          throw error;
+          console.error('Database error:', error);
+          setError(`Error loading character: ${error.message}`);
         }
         return;
       }
 
+      if (!data) {
+        setError('Character assignment not found');
+        return;
+      }
+
       setAssignment(data);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error loading character assignment:', error);
-      setError('Failed to load character assignment.');
+      setError(`Failed to load character: ${error.message || 'Unknown error'}`);
       toast.error('Failed to load character assignment');
     } finally {
       setLoading(false);
