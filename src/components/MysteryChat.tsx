@@ -410,7 +410,7 @@ export default function MysteryChat({
       "flex flex-col bg-muted",
       usePageScroll ? "h-full" : "h-full space-y-4 sm:space-y-6"
     )}>
-      {/* Chat Messages Area - Page Level Scrolling */}
+      {/* Chat Messages Area */}
       <div className={cn(
         "space-y-4 sm:space-y-6",
         usePageScroll ? "pb-4" : "overflow-y-auto h-80 p-3 sm:h-96 sm:p-4"
@@ -502,11 +502,12 @@ export default function MysteryChat({
         <div ref={bottomRef} />
       </div>
 
-      {/* Chat Input Area - Fixed at bottom for page-level scrolling */}
+      {/* Chat Input and Actions Area */}
       <div className={cn(
         "p-3 sm:p-4 bg-[#FEFCF8] shadow-md space-y-4",
         usePageScroll ? "fixed bottom-0 left-0 right-0 z-20 border-t-0" : "border-t"
       )}>
+        {/* Text Input */}
         <div className={cn(
           "flex items-end space-x-2 sm:space-x-3 mx-auto rounded-xl bg-white shadow-sm p-1",
           usePageScroll ? "max-w-4xl" : ""
