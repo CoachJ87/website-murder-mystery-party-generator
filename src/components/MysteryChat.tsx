@@ -549,22 +549,6 @@ export default function MysteryChat({
             )}
           </Button>
         </div>
-        
-        {/* Generate Full Mystery Button */}
-        {onGenerateFinal && (
-          <Button
-            onClick={() => onGenerateFinal(messages)}
-            disabled={!hasAIResponse}
-            size={isMobile ? "default" : "lg"}
-            className={cn(
-              "w-full bg-[#8B1538] hover:bg-[#6B0F28] text-white font-medium shadow-sm rounded-xl",
-              isMobile ? "h-12 text-base" : "px-6"
-            )}
-          >
-            <Zap className="h-4 w-4 mr-2" />
-            Generate Full Mystery
-          </Button>
-        )}
       </div>
     </div>
   );
