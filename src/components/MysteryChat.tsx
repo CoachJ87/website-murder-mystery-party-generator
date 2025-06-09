@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Send, Loader2 } from "lucide-react";
+import { Send, Loader2, Zap } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
@@ -402,15 +402,42 @@ export default function MysteryChat({
     }
   };
 
+  // Check if AI has provided at least one response
+  const hasAIResponse = messages.some(msg => msg.is_ai);
+
   return (
     <div className={cn(
-      "flex flex-col",
+      "flex flex-col bg-[#F7F3E9]",
       usePageScroll ? "h-full" : "h-full space-y-4 sm:space-y-6"
     )}>
+      {/* Generate Full Mystery Button - Moved to top */}
+      <div className={cn(
+        "px-4 py-3 bg-[#FEFCF8] shadow-md border-b-0 z-20",
+        usePageScroll ? "mb-4" : "mb-2"
+      )}>
+        <div className={cn(
+          "mx-auto flex justify-center",
+          isMobile ? "max-w-full" : "max-w-4xl"
+        )}>
+          <Button
+            onClick={() => onGenerateFinal && onGenerateFinal(messages)}
+            disabled={!hasAIResponse}
+            size={isMobile ? "default" : "lg"}
+            className={cn(
+              "bg-[#8B1538] hover:bg-[#6B0F28] text-white font-medium shadow-sm rounded-xl",
+              isMobile ? "w-full h-12 text-base" : "px-6"
+            )}
+          >
+            <Zap className="h-4 w-4 mr-2" />
+            Generate Full Mystery
+          </Button>
+        </div>
+      </div>
+
       {/* Chat Messages Area - Page Level Scrolling */}
       <div className={cn(
-        "space-y-4 sm:space-y-6",
-        usePageScroll ? "pb-4" : "overflow-y-auto h-80 p-3 sm:h-96 sm:p-4"
+        "space-y-4 sm:space-y-6 bg-[#F7F3E9]",
+        usePageScroll ? "pb-32" : "overflow-y-auto h-80 p-3 sm:h-96 sm:p-4"
       )}>
         {/* Loading History */}
         {isLoadingHistory && (
