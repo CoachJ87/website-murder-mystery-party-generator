@@ -150,9 +150,6 @@ const CharacterAccess: React.FC = () => {
     if (character.round2_questions) {
       content += `### Questions to Ask\n\n${character.round2_questions}\n\n`;
     }
-    
-    if (character.round2_innocent || character.round2_guilty || character.round2_accomplice) {
-      content += `### Your Responses When Questioned\n\n`;
       
       if (character.round2_innocent) {
         content += `**If You're Innocent:**\n${character.round2_innocent}\n\n`;
@@ -171,10 +168,6 @@ const CharacterAccess: React.FC = () => {
     if (character.round3_statement) {
       content += `## Round 3: Method\n\n${character.round3_statement}\n\n`;
     }
-    
-    // Add final statements
-    if (character.final_innocent || character.final_guilty || character.final_accomplice) {
-      content += `## Final Statements\n\n`;
       
       if (character.final_innocent) {
         content += `**If You're Innocent:**\n${character.final_innocent}\n\n`;
