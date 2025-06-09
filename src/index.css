@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -223,6 +222,35 @@
   
   .sophisticated-gradient {
     background: linear-gradient(135deg, hsl(var(--color-surface)) 0%, hsl(var(--color-muted)) 100%);
+  }
+  
+  /* Claude-style chat elements */
+  .claude-message-user {
+    @apply bg-[#8B1538] text-white rounded-2xl shadow-sm border-none;
+  }
+  
+  .claude-message-ai {
+    @apply bg-[#FEFCF8] text-[#2A2A2A] rounded-2xl shadow-sm border-none;
+  }
+  
+  .claude-input-container {
+    @apply bg-[#FEFCF8] shadow-md border-t-0 rounded-t-xl;
+  }
+  
+  .claude-input {
+    @apply bg-white rounded-xl shadow-sm border-0 focus-visible:ring-0;
+  }
+  
+  .claude-send-button {
+    @apply bg-[#8B1538] hover:bg-[#6B0F28] text-white rounded-lg;
+  }
+  
+  .claude-typing-indicator {
+    @apply bg-[#FEFCF8] rounded-2xl shadow-sm;
+  }
+  
+  .claude-typing-dot {
+    @apply bg-[#8B1538]/60 rounded-full animate-bounce;
   }
 }
 

@@ -26,7 +26,7 @@ interface MysteryChatProps {
   preventDuplicateMessages?: boolean;
   skipForm?: boolean;
   needsInitialAIResponse?: boolean;
-  usePageScroll?: boolean; // New prop to enable page-level scrolling
+  usePageScroll?: boolean;
 }
 
 export default function MysteryChat({
@@ -44,7 +44,7 @@ export default function MysteryChat({
   preventDuplicateMessages = false,
   skipForm = false,
   needsInitialAIResponse = false,
-  usePageScroll = false // Default to false for backward compatibility
+  usePageScroll = false
 }: MysteryChatProps) {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
@@ -409,7 +409,7 @@ export default function MysteryChat({
     )}>
       {/* Chat Messages Area - Page Level Scrolling */}
       <div className={cn(
-        "space-y-3 sm:space-y-4",
+        "space-y-4 sm:space-y-6",
         usePageScroll ? "pb-4" : "overflow-y-auto h-80 p-3 sm:h-96 sm:p-4"
       )}>
         {/* Loading History */}
@@ -430,10 +430,10 @@ export default function MysteryChat({
           >
             <div
               className={cn(
-                "rounded-lg px-3 py-2 sm:px-4 sm:py-3 max-w-[85%] sm:max-w-[80%]",
+                "rounded-2xl px-4 py-3 sm:px-5 sm:py-4 max-w-[85%] sm:max-w-[80%] shadow-sm",
                 message.is_ai
-                  ? "bg-muted border overflow-auto"
-                  : "bg-primary text-primary-foreground"
+                  ? "bg-[#FEFCF8] text-[#2A2A2A] border-none"
+                  : "bg-[#8B1538] text-white border-none"
               )}
             >
               {message.is_ai ? (
@@ -445,18 +445,18 @@ export default function MysteryChat({
                     rehypePlugins={[rehypeRaw]}
                     components={{
                       h1: ({node, ...props}) => <h1 className={cn(
-                        "font-bold mt-3 mb-2",
+                        "font-bold mt-3 mb-2 text-[#8B1538]",
                         isMobile ? "text-lg" : "text-2xl"
                       )} {...props} />,
                       h2: ({node, ...props}) => <h2 className={cn(
-                        "font-semibold mt-2 mb-1",
+                        "font-semibold mt-2 mb-1 text-[#8B1538]",
                         isMobile ? "text-base" : "text-xl"
                       )} {...props} />,
                       h3: ({node, ...props}) => <h3 className={cn(
-                        "font-medium mt-2 mb-1",
+                        "font-medium mt-2 mb-1 text-[#8B1538]",
                         isMobile ? "text-sm" : "text-lg"
                       )} {...props} />,
-                      p: ({node, ...props}) => <p className="my-1 leading-relaxed" {...props} />,
+                      p: ({node, ...props}) => <p className="my-1 leading-relaxed text-[#2A2A2A]" {...props} />,
                       ul: ({node, ...props}) => <ul className={cn(
                         "list-disc my-2",
                         isMobile ? "pl-4" : "pl-6"
@@ -465,10 +465,10 @@ export default function MysteryChat({
                         "list-decimal my-2",
                         isMobile ? "pl-4" : "pl-6"
                       )} {...props} />,
-                      li: ({node, ...props}) => <li className="my-1" {...props} />,
-                      strong: ({node, ...props}) => <strong className="font-bold" {...props} />,
+                      li: ({node, ...props}) => <li className="my-1 text-[#2A2A2A]" {...props} />,
+                      strong: ({node, ...props}) => <strong className="font-bold text-[#8B1538]" {...props} />,
                       em: ({node, ...props}) => <em className="italic" {...props} />,
-                      blockquote: ({node, ...props}) => <blockquote className="pl-3 border-l-3 border-gray-300 italic my-2" {...props} />
+                      blockquote: ({node, ...props}) => <blockquote className="pl-3 border-l-3 border-[#8B1538] bg-[#F7F3E9] italic my-2 rounded-r-md p-2" {...props} />
                     }}
                   >
                     {message.content}
@@ -487,11 +487,11 @@ export default function MysteryChat({
         {/* AI Typing Indicator - Mobile Optimized */}
         {isAiTyping && (
           <div className="flex justify-start">
-            <div className="bg-muted border rounded-lg px-3 py-2 sm:px-4 sm:py-3 max-w-[85%] sm:max-w-[80%]">
+            <div className="bg-[#FEFCF8] rounded-2xl px-4 py-3 sm:px-5 sm:py-4 max-w-[85%] sm:max-w-[80%] shadow-sm">
               <div className="flex space-x-1">
-                <div className="h-2 w-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                <div className="h-2 w-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                <div className="h-2 w-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
+                <div className="h-2 w-2 bg-[#8B1538]/60 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                <div className="h-2 w-2 bg-[#8B1538]/60 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                <div className="h-2 w-2 bg-[#8B1538]/60 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
               </div>
             </div>
           </div>
@@ -501,11 +501,11 @@ export default function MysteryChat({
 
       {/* Chat Input Area - Fixed at bottom for page-level scrolling */}
       <div className={cn(
-        "border-t p-3 sm:p-4 bg-background",
-        usePageScroll ? "fixed bottom-0 left-0 right-0 z-20" : ""
+        "p-3 sm:p-4 bg-[#FEFCF8] shadow-md",
+        usePageScroll ? "fixed bottom-0 left-0 right-0 z-20 border-t-0" : "border-t"
       )}>
         <div className={cn(
-          "flex items-end space-x-2 sm:space-x-3 mx-auto",
+          "flex items-end space-x-2 sm:space-x-3 mx-auto rounded-xl bg-white shadow-sm p-1",
           usePageScroll ? "max-w-4xl" : ""
         )}>
           <div className="flex-grow">
@@ -522,7 +522,7 @@ export default function MysteryChat({
               }}
               disabled={isAiTyping}
               className={cn(
-                "resize-none border-0 shadow-none focus-visible:ring-1 focus-visible:ring-ring min-h-[44px]",
+                "resize-none border-0 shadow-none focus-visible:ring-0 min-h-[44px] bg-transparent",
                 isMobile ? "text-base" : "text-sm"
               )}
               rows={1}
@@ -534,7 +534,7 @@ export default function MysteryChat({
             disabled={isAiTyping || !input.trim()}
             size={isMobile ? "default" : "icon"}
             className={cn(
-              "shrink-0",
+              "shrink-0 bg-[#8B1538] hover:bg-[#6B0F28] text-white rounded-lg",
               isMobile ? "h-11 w-11" : "h-9 w-9"
             )}
           >
@@ -545,13 +545,6 @@ export default function MysteryChat({
             )}
           </Button>
         </div>
-        
-        {/* Mobile Helper Text */}
-        {isMobile && (
-          <p className="text-xs text-muted-foreground mt-2 text-center">
-            Tap Enter to send • Shift+Enter for new line
-          </p>
-        )}
       </div>
     </div>
   );

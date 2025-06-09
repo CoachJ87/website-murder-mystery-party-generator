@@ -114,7 +114,7 @@ const MysteryChatPage = () => {
     }
 
     return (
-        <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen flex flex-col bg-[#F7F3E9]">
             <Header />
             <main className={cn(
                 "flex-1 pb-32", // Add padding at the bottom for fixed elements
@@ -144,7 +144,7 @@ const MysteryChatPage = () => {
 
             {/* Fixed Bottom Action Button */}
             <div className={cn(
-                "fixed bottom-20 left-0 right-0 z-10 px-4 py-2 bg-background/95 backdrop-blur-sm border-t",
+                "fixed bottom-20 left-0 right-0 z-10 px-4 py-2 bg-[#FEFCF8] shadow-md border-t-0",
                 isMobile ? "px-3" : "px-4"
             )}>
                 <div className={cn(
@@ -156,7 +156,7 @@ const MysteryChatPage = () => {
                         disabled={!hasAIResponse}
                         size={isMobile ? "default" : "lg"}
                         className={cn(
-                            "bg-blue-600 hover:bg-blue-700 text-white font-medium",
+                            "bg-[#8B1538] hover:bg-[#6B0F28] text-white font-medium shadow-sm rounded-xl",
                             isMobile ? "w-full h-12 text-base" : "px-6"
                         )}
                     >
