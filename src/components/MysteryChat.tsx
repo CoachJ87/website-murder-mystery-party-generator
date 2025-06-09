@@ -433,7 +433,7 @@ export default function MysteryChat({
           >
             <div
               className={cn(
-                "rounded-2xl px-4 py-3 sm:px-5 sm:py-4 max-w-[85%] sm:max-w-[80%] shadow-sm",
+                "rounded-2xl px-4 py-3 sm:px-5 sm:py-4 max-w-[85%] sm:max-w-[80%] shadow-lg",
                 message.is_ai
                   ? "bg-[#FEFCF8] text-[#2A2A2A] border-none"
                   : "bg-[#8B1538] text-white border-none"
@@ -504,8 +504,8 @@ export default function MysteryChat({
 
       {/* Fixed Bottom Input and Generate Button */}
       <div className={cn(
-        "fixed bottom-0 left-0 right-0 z-20 bg-[#F7F3E9] border-t border-gray-200",
-        isMobile ? "px-3 py-2" : "px-4 py-3"
+      "fixed bottom-0 left-0 right-0 z-20 bg-[#F7F3E9] border-t border-[#F7F3E9]",
+      isMobile ? "px-3 py-2" : "px-4 py-3"
       )}>
         <div className={cn(
           "mx-auto space-y-3",
