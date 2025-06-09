@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Send, Loader2 } from "lucide-react";
+import { Send, Loader2, Zap } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
@@ -402,61 +402,15 @@ export default function MysteryChat({
     }
   };
 
+  // Check if AI has provided at least one response
+  const hasAIResponse = messages.some(msg => msg.is_ai);
+
   return (
     <div className={cn(
-      "flex flex-col",
-      usePageScroll ? "h-full" : "h-full space-y-4 sm:space-y-6",
-      "bg-[#F7F3E9]" // Changed from bg-muted to explicit warm cream color
+      "flex flex-col bg-muted",
+      usePageScroll ? "h-full" : "h-full space-y-4 sm:space-y-6"
     )}>
-      {/* Text Input Area - Moved to the top */}
-      <div className={cn(
-        "p-3 sm:p-4 bg-[#FEFCF8] shadow-md",
-        usePageScroll ? "" : "border-t"
-      )}>
-        <div className={cn(
-          "flex items-end space-x-2 sm:space-x-3 mx-auto rounded-xl bg-white shadow-sm p-1",
-          usePageScroll ? "max-w-4xl" : ""
-        )}>
-          <div className="flex-grow">
-            <Textarea
-              ref={inputRef}
-              placeholder="Share your ideas for the mystery..."
-              value={input}
-              onChange={handleTextareaChange}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSendMessage(input);
-                }
-              }}
-              disabled={isAiTyping}
-              className={cn(
-                "resize-none border-0 shadow-none focus-visible:ring-0 min-h-[44px] bg-transparent",
-                isMobile ? "text-base" : "text-sm"
-              )}
-              rows={1}
-            />
-          </div>
-          <Button 
-            type="submit" 
-            onClick={() => handleSendMessage(input)} 
-            disabled={isAiTyping || !input.trim()}
-            size={isMobile ? "default" : "icon"}
-            className={cn(
-              "shrink-0 bg-[#8B1538] hover:bg-[#6B0F28] text-white rounded-lg",
-              isMobile ? "h-11 w-11" : "h-9 w-9"
-            )}
-          >
-            {isAiTyping ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Send className="h-4 w-4" />
-            )}
-          </Button>
-        </div>
-      </div>
-
-      {/* Chat Messages Area - Page Level Scrolling */}
+      {/* Chat Messages Area */}
       <div className={cn(
         "space-y-4 sm:space-y-6",
         usePageScroll ? "pb-4" : "overflow-y-auto h-80 p-3 sm:h-96 sm:p-4"
@@ -546,6 +500,55 @@ export default function MysteryChat({
           </div>
         )}
         <div ref={bottomRef} />
+      </div>
+
+      {/* Chat Input and Actions Area */}
+      <div className={cn(
+        "p-3 sm:p-4 bg-[#FEFCF8] shadow-md space-y-4",
+        usePageScroll ? "fixed bottom-0 left-0 right-0 z-20 border-t-0" : "border-t"
+      )}>
+        {/* Text Input */}
+        <div className={cn(
+          "flex items-end space-x-2 sm:space-x-3 mx-auto rounded-xl bg-white shadow-sm p-1",
+          usePageScroll ? "max-w-4xl" : ""
+        )}>
+          <div className="flex-grow">
+            <Textarea
+              ref={inputRef}
+              placeholder="Share your ideas for the mystery..."
+              value={input}
+              onChange={handleTextareaChange}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendMessage(input);
+                }
+              }}
+              disabled={isAiTyping}
+              className={cn(
+                "resize-none border-0 shadow-none focus-visible:ring-0 min-h-[44px] bg-transparent",
+                isMobile ? "text-base" : "text-sm"
+              )}
+              rows={1}
+            />
+          </div>
+          <Button 
+            type="submit" 
+            onClick={() => handleSendMessage(input)} 
+            disabled={isAiTyping || !input.trim()}
+            size={isMobile ? "default" : "icon"}
+            className={cn(
+              "shrink-0 bg-[#8B1538] hover:bg-[#6B0F28] text-white rounded-lg",
+              isMobile ? "h-11 w-11" : "h-9 w-9"
+            )}
+          >
+            {isAiTyping ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
       </div>
     </div>
   );
