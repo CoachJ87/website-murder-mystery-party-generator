@@ -24,6 +24,7 @@ import Privacy from "./pages/Privacy";
 import Support from "./pages/Support";
 import NotFound from "./pages/NotFound";
 import AuthCallback from "./pages/AuthCallback";
+import CharacterAccess from "./pages/CharacterAccess";
 import React from "react";
 
 const queryClient = new QueryClient();
@@ -77,6 +78,9 @@ const AppRoutes = () => {
         <Route path="/contact" element={<Contact />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/support" element={<Support />} />
+        
+        {/* Character access route (public) */}
+        <Route path="/character/:token" element={<CharacterAccess />} />
         
         {/* Payment success and cancel routes */}
         <Route path="/payment-success" element={<Navigate to="/" replace />} />

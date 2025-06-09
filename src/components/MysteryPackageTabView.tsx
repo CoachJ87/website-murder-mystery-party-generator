@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
-import { Loader2, Wand2, CheckCircle2, Eye } from "lucide-react";
+import { Loader2, Wand2, CheckCircle2, Eye, Mail } from "lucide-react";
 import { MysteryCharacter } from "@/interfaces/mystery";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
+import MysteryGuestManager from "./MysteryGuestManager";
 import "../styles/mystery-package.css";
 
 interface MysteryPackageData {
@@ -47,6 +48,7 @@ const MysteryPackageTabView = React.memo(({
 }: MysteryPackageTabViewProps) => {
   const [activeTab, setActiveTab] = useState("host-guide");
   const [statusMessage, setStatusMessage] = useState("Starting generation...");
+  const [showGuestManager, setShowGuestManager] = useState(false);
   const isMobile = useIsMobile();
   
   // Controlled logging
@@ -438,6 +440,12 @@ const MysteryPackageTabView = React.memo(({
     return generationStatus?.sections?.[sectionName] || false;
   }, [generationStatus?.sections]);
 
+  // Check if mystery is complete enough to share
+  const canShareMystery = useMemo(() => {
+    return (packageData && (hostGuide || detectiveScript || evidenceCards)) || 
+           (characters && characters.length > 0);
+  }, [packageData, hostGuide, detectiveScript, evidenceCards, characters]);
+
   // Simplified loading component for individual tabs with mobile optimization
   const LoadingTabContent = useCallback(({ message }: { message: string }) => (
     <div className={cn(
@@ -486,6 +494,25 @@ const MysteryPackageTabView = React.memo(({
           {mysteryTitle}
         </h1>
       </div>
+
+      {/* Share Mystery with Guests Button */}
+      {canShareMystery && conversationId && (
+        <div className={cn(
+          "mb-4 flex justify-center",
+          isMobile && "px-2"
+        )}>
+          <Button
+            onClick={() => setShowGuestManager(true)}
+            className={cn(
+              "gap-2",
+              isMobile && "w-full"
+            )}
+          >
+            <Mail className="h-4 w-4" />
+            Share Mystery with Guests
+          </Button>
+        </div>
+      )}
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className={cn(
@@ -991,6 +1018,14 @@ const MysteryPackageTabView = React.memo(({
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Mystery Guest Manager Dialog */}
+      <MysteryGuestManager
+        open={showGuestManager}
+        onOpenChange={setShowGuestManager}
+        characters={charactersList}
+        mysteryId={conversationId || ""}
+      />
     </div>
   );
 });

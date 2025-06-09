@@ -9,6 +9,45 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      character_assignments: {
+        Row: {
+          access_token: string
+          character_id: string
+          created_at: string
+          guest_email: string
+          guest_name: string
+          id: string
+          is_sent: boolean
+          mystery_id: string
+          sent_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          access_token?: string
+          character_id: string
+          created_at?: string
+          guest_email: string
+          guest_name: string
+          id?: string
+          is_sent?: boolean
+          mystery_id: string
+          sent_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          access_token?: string
+          character_id?: string
+          created_at?: string
+          guest_email?: string
+          guest_name?: string
+          id?: string
+          is_sent?: boolean
+          mystery_id?: string
+          sent_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       conversations: {
         Row: {
           additional_details: string | null
