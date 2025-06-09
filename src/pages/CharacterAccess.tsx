@@ -180,6 +180,9 @@ const CharacterAccess: React.FC = () => {
       if (character.final_accomplice) {
         content += `**If You're an Accomplice:**\n${character.final_accomplice}\n\n`;
       }
+
+      if (character.accusations) {
+        content += `${character.accusations}\n\n`;
     }
     
     return content;
