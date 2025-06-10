@@ -752,13 +752,6 @@ const MysteryView = () => {
                   Try Again
                 </Button>
               )}
-              <Button 
-                variant="outline" 
-                onClick={() => navigate("/dashboard")}
-                className={cn(isMobile && "w-full text-sm h-10")}
-              >
-                Back to Dashboard
-              </Button>
             </div>
           </CardContent>
         </Card>
