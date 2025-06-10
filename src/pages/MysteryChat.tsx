@@ -132,6 +132,7 @@ const MysteryChatPage = () => {
                         initialAdditionalDetails={conversationData?.mystery_data?.additionalDetails}
                         savedMysteryId={id}
                         onSave={handleSaveMessage}
+                        onGenerateFinal={handleGenerateFullMystery}
                         initialMessages={messages}
                         isLoadingHistory={false}
                         systemInstruction={conversationData?.system_instruction}
