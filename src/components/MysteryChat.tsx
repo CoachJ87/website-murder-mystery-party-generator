@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -407,7 +408,7 @@ export default function MysteryChat({
 
   return (
     <div className={cn(
-      "flex flex-col bg-[#F7F3E9]",
+      "flex flex-col bg-muted",
       usePageScroll ? "h-full" : "h-full space-y-4 sm:space-y-6"
     )}>
       {/* Chat Messages Area */}
@@ -418,8 +419,14 @@ export default function MysteryChat({
         {/* Loading History */}
         {isLoadingHistory && (
           <div className="text-center text-muted-foreground py-4">
-            <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin mx-auto mb-2" />
-            <p className="text-sm sm:text-base">Loading previous messages...</p>
+            <Loader2 className={cn(
+              "animate-spin text-primary",
+              isMobile ? "h-5 w-5" : "h-6 w-6"
+            )} />
+            <p className={cn(
+              "text-sm",
+              isMobile ? "text-sm" : "text-base"
+            )}>Loading previous messages...</p>
           </div>
         )}
         
@@ -568,5 +575,6 @@ export default function MysteryChat({
           )}
         </div>
       </div>
+    </div>
   );
 }
