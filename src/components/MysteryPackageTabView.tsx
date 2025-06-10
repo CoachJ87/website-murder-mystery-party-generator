@@ -326,6 +326,15 @@ const MysteryPackageTabView = React.memo(({
     const match = packageContent.match(matrixPattern);
     return match ? match[1].trim() : "";
   }, [packageContent]);
+    
+  const lines = content.split('\n');
+    const tableStartIndex = lines.findIndex(line => line.trim().startsWith('|'));
+    
+    if (tableStartIndex === -1) return content; // No table found, return original
+    
+    // Return only the table portion
+    return lines.slice(tableStartIndex).join('\n');
+  }, [packageContent]);
 
   const extractCharacters = useCallback(() => {
     if (!packageContent) return [];
@@ -393,9 +402,19 @@ const MysteryPackageTabView = React.memo(({
   }, [packageData?.detectiveScript, extractInspectorScript]);
 
   const relationshipMatrix = useMemo(() => {
-    const rawMatrix = packageData?.relationshipMatrix || extractCharacterMatrix();
-    return cleanMarkdownTable(rawMatrix);
-  }, [packageData?.relationshipMatrix, extractCharacterMatrix, cleanMarkdownTable]);
+    let rawMatrix = packageData?.relationshipMatrix || extractCharacterMatrix();
+    
+    // If using packageData, extract just the table portion
+    if (packageData?.relationshipMatrix) {
+      const lines = rawMatrix.split('\n');
+      const tableStartIndex = lines.findIndex(line => line.trim().startsWith('|'));
+      if (tableStartIndex !== -1) {
+        rawMatrix = lines.slice(tableStartIndex).join('\n');
+      }
+    }
+  
+  return cleanMarkdownTable(rawMatrix);
+}, [packageData?.relationshipMatrix, extractCharacterMatrix, cleanMarkdownTable]);
 
   const charactersList = useMemo(() => {
     // Priority 1: Use characters prop from database
