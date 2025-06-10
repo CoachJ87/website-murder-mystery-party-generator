@@ -511,23 +511,8 @@ export default function MysteryChat({
           "mx-auto space-y-3",
           isMobile ? "max-w-full" : "max-w-4xl"
         )}>
-          {/* Generate Full Mystery Button - NOW ON TOP */}
-          {onGenerateFinal && (
-            <Button
-              onClick={() => onGenerateFinal(messages)}
-              disabled={!hasAIResponse}
-              size={isMobile ? "default" : "lg"}
-              className={cn(
-                "w-full bg-[#8B1538] hover:bg-[#6B0F28] text-white font-medium shadow-sm rounded-xl",
-                isMobile ? "h-12 text-base" : "px-6"
-              )}
-            >
-              <Zap className="h-4 w-4 mr-2" />
-              Generate Full Mystery
-            </Button>
-          )}
-          
-          {/* Text Input - NOW ON BOTTOM */}
+                   
+          {/* Text Input - NOW ON TOP */}
           <div className="flex items-end space-x-2 sm:space-x-3 rounded-xl bg-white shadow-sm p-1">
             <div className="flex-grow">
               <Textarea
@@ -549,6 +534,21 @@ export default function MysteryChat({
                 rows={1}
               />
             </div>
+            {/* Generate Full Mystery Button - NOW ON BOTTOM */}
+            {onGenerateFinal && (
+            <Button
+              onClick={() => onGenerateFinal(messages)}
+              disabled={!hasAIResponse}
+              size={isMobile ? "default" : "lg"}
+              className={cn(
+                "w-full bg-[#8B1538] hover:bg-[#6B0F28] text-white font-medium shadow-sm rounded-xl",
+                isMobile ? "h-12 text-base" : "px-6"
+              )}
+            >
+              <Zap className="h-4 w-4 mr-2" />
+              Generate Full Mystery
+            </Button>
+          )}  
             <Button 
               type="submit" 
               onClick={() => handleSendMessage(input)} 
