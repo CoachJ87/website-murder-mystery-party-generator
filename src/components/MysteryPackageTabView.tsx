@@ -472,7 +472,7 @@ const MysteryPackageTabView = React.memo(({
   ), [statusMessage, isMobile]);
 
   return (
-    <div className="w-full relative">
+    <div className="w-full">
       <div className={cn(
         "mb-6 flex items-center justify-between",
         isMobile && "mb-4 px-2 flex-col space-y-3"
@@ -489,7 +489,7 @@ const MysteryPackageTabView = React.memo(({
           <Button
             onClick={() => setShowGuestManager(true)}
             className={cn(
-              "gap-2",
+              "gap-2 bg-primary hover:bg-primary/90",
               isMobile && "w-full"
             )}
           >
@@ -501,507 +501,444 @@ const MysteryPackageTabView = React.memo(({
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className={cn(
-          "w-full mb-4",
+          "w-full mb-4 bg-primary",
           isMobile ? "grid grid-cols-2 gap-1 h-auto p-1" : "grid grid-cols-2 md:grid-cols-5"
         )}>
           <TabsTrigger 
             value="host-guide" 
             className={cn(
-              "whitespace-nowrap",
-              isMobile && "text-xs px-2 py-2 h-auto flex-col space-y-1"
+              "whitespace-nowrap text-white data-[state=active]:bg-primary/80 data-[state=active]:text-white hover:bg-primary/90",
+              isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
-            <div className={cn(
-              "flex items-center space-x-1",
-              isMobile && "flex-col space-x-0 space-y-1"
-            )}>
-              <span className={cn(isMobile && "text-center leading-tight")}>
-                {isMobile ? "Host" : "Host Guide"}
-              </span>
-              {(hostGuide || isSectionComplete('hostGuide')) && (
-                <CheckCircle2 className={cn(
-                  "text-green-500",
-                  isMobile ? "h-2 w-2" : "h-3 w-3"
-                )} />
-              )}
-            </div>
+            {isMobile ? "Host" : "Host Guide"}
           </TabsTrigger>
           <TabsTrigger 
             value="characters" 
             className={cn(
-              "whitespace-nowrap",
-              isMobile && "text-xs px-2 py-2 h-auto flex-col space-y-1"
+              "whitespace-nowrap text-white data-[state=active]:bg-primary/80 data-[state=active]:text-white hover:bg-primary/90",
+              isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
-            <div className={cn(
-              "flex items-center space-x-1",
-              isMobile && "flex-col space-x-0 space-y-1"
-            )}>
-              <span className={cn(isMobile && "text-center leading-tight")}>
-                {isMobile ? `Characters (${charactersList?.length || 0})` : `Characters (${charactersList?.length || 0})`}
-              </span>
-              {(charactersList.length > 0 || isSectionComplete('characters')) && (
-                <CheckCircle2 className={cn(
-                  "text-green-500",
-                  isMobile ? "h-2 w-2" : "h-3 w-3"
-                )} />
-              )}
-            </div>
+            {isMobile ? `Characters (${charactersList?.length || 0})` : `Characters (${charactersList?.length || 0})`}
           </TabsTrigger>
           <TabsTrigger 
             value="clues" 
             className={cn(
-              "whitespace-nowrap",
-              isMobile && "text-xs px-2 py-2 h-auto flex-col space-y-1"
+              "whitespace-nowrap text-white data-[state=active]:bg-primary/80 data-[state=active]:text-white hover:bg-primary/90",
+              isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
-            <div className={cn(
-              "flex items-center space-x-1",
-              isMobile && "flex-col space-x-0 space-y-1"
-            )}>
-              <span className={cn(isMobile && "text-center leading-tight")}>
-                Evidence
-              </span>
-              {(evidenceCards || isSectionComplete('clues')) && (
-                <CheckCircle2 className={cn(
-                  "text-green-500",
-                  isMobile ? "h-2 w-2" : "h-3 w-3"
-                )} />
-              )}
-            </div>
+            Evidence
           </TabsTrigger>
           <TabsTrigger 
             value="inspector" 
             className={cn(
-              "whitespace-nowrap",
-              isMobile && "text-xs px-2 py-2 h-auto flex-col space-y-1 col-span-1"
+              "whitespace-nowrap text-white data-[state=active]:bg-primary/80 data-[state=active]:text-white hover:bg-primary/90",
+              isMobile && "text-xs px-2 py-2 h-auto col-span-1"
             )}
           >
-            <div className={cn(
-              "flex items-center space-x-1",
-              isMobile && "flex-col space-x-0 space-y-1"
-            )}>
-              <span className={cn(isMobile && "text-center leading-tight")}>
-                {isMobile ? "Detective" : "Detective Guide"}
-              </span>
-              {detectiveScript && (
-                <CheckCircle2 className={cn(
-                  "text-green-500",
-                  isMobile ? "h-2 w-2" : "h-3 w-3"
-                )} />
-              )}
-            </div>
+            {isMobile ? "Detective" : "Detective Guide"}
           </TabsTrigger>
           <TabsTrigger 
             value="matrix" 
             className={cn(
-              "whitespace-nowrap",
-              isMobile && "text-xs px-2 py-2 h-auto flex-col space-y-1 col-span-1"
+              "whitespace-nowrap text-white data-[state=active]:bg-primary/80 data-[state=active]:text-white hover:bg-primary/90",
+              isMobile && "text-xs px-2 py-2 h-auto col-span-1"
             )}
           >
-            <div className={cn(
-              "flex items-center space-x-1",
-              isMobile && "flex-col space-x-0 space-y-1"
-            )}>
-              <span className={cn(isMobile && "text-center leading-tight")}>
-                {isMobile ? "Relations" : "Relationships"}
-              </span>
-              {relationshipMatrix && (
-                <CheckCircle2 className={cn(
-                  "text-green-500",
-                  isMobile ? "h-2 w-2" : "h-3 w-3"
-                )} />
-              )}
-            </div>
+            {isMobile ? "Relations" : "Relationships"}
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="host-guide" className={cn(isMobile && "px-2")}>
-          <div className={cn(
-            "mystery-content",
-            isMobile && "text-sm"
-          )}>
-            {hostGuide ? (
-              <ReactMarkdown 
-                components={{
-                  table: ({ children }) => (
-                    <div className="overflow-x-auto">
-                      <table className={cn(isMobile && "text-xs")}>{children}</table>
-                    </div>
-                  ),
-                  h1: ({ children }) => (
-                    <h1 className={cn(
-                      "text-2xl font-bold mb-4",
-                      isMobile && "text-lg mb-3"
-                    )}>
-                      {children}
-                    </h1>
-                  ),
-                  h2: ({ children }) => (
-                    <h2 className={cn(
-                      "text-xl font-semibold mb-3",
-                      isMobile && "text-base mb-2"
-                    )}>
-                      {children}
-                    </h2>
-                  ),
-                  h3: ({ children }) => (
-                    <h3 className={cn(
-                      "text-lg font-medium mb-2",
-                      isMobile && "text-sm mb-2"
-                    )}>
-                      {children}
-                    </h3>
-                  ),
-                  p: ({ children }) => (
-                    <p className={cn(
-                      "mb-4",
-                      isMobile && "mb-3 text-sm leading-relaxed"
-                    )}>
-                      {children}
-                    </p>
-                  ),
-                  ul: ({ children }) => (
-                    <ul className={cn(
-                      "list-disc pl-6 mb-4",
-                      isMobile && "pl-4 mb-3 text-sm"
-                    )}>
-                      {children}
-                    </ul>
-                  ),
-                  ol: ({ children }) => (
-                    <ol className={cn(
-                      "list-decimal pl-6 mb-4",
-                      isMobile && "pl-4 mb-3 text-sm"
-                    )}>
-                      {children}
-                    </ol>
-                  ),
-                }}
-              >
-                {hostGuide}
-              </ReactMarkdown>
-            ) : isGenerating ? (
-              <LoadingTabContent message="Creating your complete host guide with all the instructions and materials needed to run your mystery game." />
-            ) : (
-              <div className={cn(
-                "text-center py-12 space-y-4",
-                isMobile && "py-8 space-y-3 px-4"
-              )}>
-                <Wand2 className={cn(
-                  "mx-auto text-muted-foreground",
-                  isMobile ? "h-10 w-10" : "h-12 w-12"
-                )} />
-                <h3 className={cn(
-                  "font-semibold",
-                  isMobile ? "text-lg" : "text-xl"
+        <div className="max-h-[calc(100vh-300px)] overflow-y-auto">
+          <TabsContent value="host-guide" className={cn(isMobile && "px-2")}>
+            <div className={cn(
+              "mystery-content",
+              isMobile && "text-sm"
+            )}>
+              {hostGuide ? (
+                <ReactMarkdown 
+                  components={{
+                    table: ({ children }) => (
+                      <div className="overflow-x-auto">
+                        <table className={cn(isMobile && "text-xs")}>{children}</table>
+                      </div>
+                    ),
+                    h1: ({ children }) => (
+                      <h1 className={cn(
+                        "text-2xl font-bold mb-4",
+                        isMobile && "text-lg mb-3"
+                      )}>
+                        {children}
+                      </h1>
+                    ),
+                    h2: ({ children }) => (
+                      <h2 className={cn(
+                        "text-xl font-semibold mb-3",
+                        isMobile && "text-base mb-2"
+                      )}>
+                        {children}
+                      </h2>
+                    ),
+                    h3: ({ children }) => (
+                      <h3 className={cn(
+                        "text-lg font-medium mb-2",
+                        isMobile && "text-sm mb-2"
+                      )}>
+                        {children}
+                      </h3>
+                    ),
+                    p: ({ children }) => (
+                      <p className={cn(
+                        "mb-4",
+                        isMobile && "mb-3 text-sm leading-relaxed"
+                      )}>
+                        {children}
+                      </p>
+                    ),
+                    ul: ({ children }) => (
+                      <ul className={cn(
+                        "list-disc pl-6 mb-4",
+                        isMobile && "pl-4 mb-3 text-sm"
+                      )}>
+                        {children}
+                      </ul>
+                    ),
+                    ol: ({ children }) => (
+                      <ol className={cn(
+                        "list-decimal pl-6 mb-4",
+                        isMobile && "pl-4 mb-3 text-sm"
+                      )}>
+                        {children}
+                      </ol>
+                    ),
+                  }}
+                >
+                  {hostGuide}
+                </ReactMarkdown>
+              ) : isGenerating ? (
+                <LoadingTabContent message="Creating your complete host guide with all the instructions and materials needed to run your mystery game." />
+              ) : (
+                <div className={cn(
+                  "text-center py-12 space-y-4",
+                  isMobile && "py-8 space-y-3 px-4"
                 )}>
-                  Ready to Generate Your Mystery
-                </h3>
-                <p className={cn(
-                  "text-muted-foreground",
-                  isMobile && "text-sm"
-                )}>
-                  Click the button below to start generating your complete mystery package with all materials included.
-                </p>
-                {onGenerateClick && (
-                  <Button 
-                    onClick={onGenerateClick} 
-                    className={cn(
-                      "mt-4",
-                      isMobile && "w-full text-sm h-11"
-                    )}
-                  >
-                    Generate Package
-                  </Button>
-                )}
-              </div>
-            )}
-          </div>
-        </TabsContent>
+                  <Wand2 className={cn(
+                    "mx-auto text-muted-foreground",
+                    isMobile ? "h-10 w-10" : "h-12 w-12"
+                  )} />
+                  <h3 className={cn(
+                    "font-semibold",
+                    isMobile ? "text-lg" : "text-xl"
+                  )}>
+                    Ready to Generate Your Mystery
+                  </h3>
+                  <p className={cn(
+                    "text-muted-foreground",
+                    isMobile && "text-sm"
+                  )}>
+                    Click the button below to start generating your complete mystery package with all materials included.
+                  </p>
+                  {onGenerateClick && (
+                    <Button 
+                      onClick={onGenerateClick} 
+                      className={cn(
+                        "mt-4",
+                        isMobile && "w-full text-sm h-11"
+                      )}
+                    >
+                      Generate Package
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
+          </TabsContent>
 
-        <TabsContent value="characters" className={cn(isMobile && "px-2")}>
-          <div className={cn(
-            "mystery-content",
-            isMobile && "text-sm"
-          )}>
-            {Array.isArray(charactersList) && charactersList.length > 0 ? (
-              <div className={cn(
-                "space-y-4",
-                isMobile && "space-y-3"
-              )}>
-                {charactersList.map((character, index) => {
-                  const characterGuideContent = buildCharacterGuideContent(character);
-                  
-                  return (
-                    <Accordion key={character.id || index} type="single" collapsible className="character-accordion">
-                      <AccordionItem value={`character-${index}`}>
-                        <AccordionTrigger className={cn(
-                          "text-left",
-                          isMobile && "py-3"
-                        )}>
-                          <h3 className={cn(
-                            "font-semibold text-foreground",
-                            isMobile ? "text-base" : "text-lg"
+          <TabsContent value="characters" className={cn(isMobile && "px-2")}>
+            <div className={cn(
+              "mystery-content",
+              isMobile && "text-sm"
+            )}>
+              {Array.isArray(charactersList) && charactersList.length > 0 ? (
+                <div className={cn(
+                  "space-y-4",
+                  isMobile && "space-y-3"
+                )}>
+                  {charactersList.map((character, index) => {
+                    const characterGuideContent = buildCharacterGuideContent(character);
+                    
+                    return (
+                      <Accordion key={character.id || index} type="single" collapsible className="character-accordion">
+                        <AccordionItem value={`character-${index}`}>
+                          <AccordionTrigger className={cn(
+                            "text-left",
+                            isMobile && "py-3"
                           )}>
-                            {character.character_name}
-                          </h3>
-                        </AccordionTrigger>
-                        <AccordionContent className={cn(
-                          "text-foreground",
-                          isMobile && "text-sm"
-                        )}>
-                          <ReactMarkdown 
-                            components={{
-                              table: ({ children }) => (
-                                <div className="overflow-x-auto">
-                                  <table className={cn(isMobile && "text-xs")}>{children}</table>
-                                </div>
-                              ),
-                              h1: ({ children }) => (
-                                <h1 className={cn(
-                                  "text-xl font-bold mb-3",
-                                  isMobile && "text-base mb-2"
-                                )}>
-                                  {children}
-                                </h1>
-                              ),
-                              h2: ({ children }) => (
-                                <h2 className={cn(
-                                  "text-lg font-semibold mb-3",
-                                  isMobile && "text-sm mb-2"
-                                )}>
-                                  {children}
-                                </h2>
-                              ),
-                              h3: ({ children }) => (
-                                <h3 className={cn(
-                                  "text-base font-medium mb-2",
-                                  isMobile && "text-sm mb-2"
-                                )}>
-                                  {children}
-                                </h3>
-                              ),
-                              p: ({ children }) => (
-                                <p className={cn(
-                                  "mb-3",
-                                  isMobile && "mb-2 text-sm leading-relaxed"
-                                )}>
-                                  {children}
-                                </p>
-                              ),
-                              ul: ({ children }) => (
-                                <ul className={cn(
-                                  "list-disc pl-5 mb-3",
-                                  isMobile && "pl-4 mb-2 text-sm"
-                                )}>
-                                  {children}
-                                </ul>
-                              ),
-                            }}
-                          >
-                            {characterGuideContent}
-                          </ReactMarkdown>
-                        </AccordionContent>
-                      </AccordionItem>
-                    </Accordion>
-                  );
-                })}
-              </div>
-            ) : isGenerating ? (
-              <LoadingTabContent message="Developing unique character profiles with backgrounds, motivations, and secrets for your mystery game." />
-            ) : (
-              <div className={cn(
-                "text-center py-6",
-                isMobile && "py-4 px-4"
-              )}>
-                <p className={cn(
-                  "text-muted-foreground",
-                  isMobile && "text-sm"
+                            <h3 className={cn(
+                              "font-semibold text-foreground",
+                              isMobile ? "text-base" : "text-lg"
+                            )}>
+                              {character.character_name}
+                            </h3>
+                          </AccordionTrigger>
+                          <AccordionContent className={cn(
+                            "text-foreground",
+                            isMobile && "text-sm"
+                          )}>
+                            <ReactMarkdown 
+                              components={{
+                                table: ({ children }) => (
+                                  <div className="overflow-x-auto">
+                                    <table className={cn(isMobile && "text-xs")}>{children}</table>
+                                  </div>
+                                ),
+                                h1: ({ children }) => (
+                                  <h1 className={cn(
+                                    "text-xl font-bold mb-3",
+                                    isMobile && "text-base mb-2"
+                                  )}>
+                                    {children}
+                                  </h1>
+                                ),
+                                h2: ({ children }) => (
+                                  <h2 className={cn(
+                                    "text-lg font-semibold mb-3",
+                                    isMobile && "text-sm mb-2"
+                                  )}>
+                                    {children}
+                                  </h2>
+                                ),
+                                h3: ({ children }) => (
+                                  <h3 className={cn(
+                                    "text-base font-medium mb-2",
+                                    isMobile && "text-sm mb-2"
+                                  )}>
+                                    {children}
+                                  </h3>
+                                ),
+                                p: ({ children }) => (
+                                  <p className={cn(
+                                    "mb-3",
+                                    isMobile && "mb-2 text-sm leading-relaxed"
+                                  )}>
+                                    {children}
+                                  </p>
+                                ),
+                                ul: ({ children }) => (
+                                  <ul className={cn(
+                                    "list-disc pl-5 mb-3",
+                                    isMobile && "pl-4 mb-2 text-sm"
+                                  )}>
+                                    {children}
+                                  </ul>
+                                ),
+                              }}
+                            >
+                              {characterGuideContent}
+                            </ReactMarkdown>
+                          </AccordionContent>
+                        </AccordionItem>
+                      </Accordion>
+                    );
+                  })}
+                </div>
+              ) : isGenerating ? (
+                <LoadingTabContent message="Developing unique character profiles with backgrounds, motivations, and secrets for your mystery game." />
+              ) : (
+                <div className={cn(
+                  "text-center py-6",
+                  isMobile && "py-4 px-4"
                 )}>
-                  Character guides will be available after generation starts.
-                </p>
-              </div>
-            )}
-          </div>
-        </TabsContent>
+                  <p className={cn(
+                    "text-muted-foreground",
+                    isMobile && "text-sm"
+                  )}>
+                    Character guides will be available after generation starts.
+                  </p>
+                </div>
+              )}
+            </div>
+          </TabsContent>
 
-        <TabsContent value="clues" className={cn(isMobile && "px-2")}>
-          <div className={cn(
-            "mystery-content",
-            isMobile && "text-sm"
-          )}>
-            {evidenceCards ? (
-              <ReactMarkdown 
-                components={{
-                  table: ({ children }) => (
-                    <div className="overflow-x-auto">
-                      <table className={cn(isMobile && "text-xs")}>{children}</table>
-                    </div>
-                  ),
-                  h1: ({ children }) => (
-                    <h1 className={cn(
-                      "text-2xl font-bold mb-4",
-                      isMobile && "text-lg mb-3"
-                    )}>
-                      {children}
-                    </h1>
-                  ),
-                  h2: ({ children }) => (
-                    <h2 className={cn(
-                      "text-xl font-semibold mb-3",
-                      isMobile && "text-base mb-2"
-                    )}>
-                      {children}
-                    </h2>
-                  ),
-                  p: ({ children }) => (
-                    <p className={cn(
-                      "mb-4",
-                      isMobile && "mb-3 text-sm leading-relaxed"
-                    )}>
-                      {children}
-                    </p>
-                  ),
-                }}
-              >
-                {evidenceCards}
-              </ReactMarkdown>
-            ) : isGenerating ? (
-              <LoadingTabContent message="Crafting evidence cards, clues, and investigative materials that will help solve your mystery." />
-            ) : (
-              <div className={cn(
-                "text-center py-6",
-                isMobile && "py-4 px-4"
-              )}>
-                <p className={cn(
-                  "text-muted-foreground",
-                  isMobile && "text-sm"
+          <TabsContent value="clues" className={cn(isMobile && "px-2")}>
+            <div className={cn(
+              "mystery-content",
+              isMobile && "text-sm"
+            )}>
+              {evidenceCards ? (
+                <ReactMarkdown 
+                  components={{
+                    table: ({ children }) => (
+                      <div className="overflow-x-auto">
+                        <table className={cn(isMobile && "text-xs")}>{children}</table>
+                      </div>
+                    ),
+                    h1: ({ children }) => (
+                      <h1 className={cn(
+                        "text-2xl font-bold mb-4",
+                        isMobile && "text-lg mb-3"
+                      )}>
+                        {children}
+                      </h1>
+                    ),
+                    h2: ({ children }) => (
+                      <h2 className={cn(
+                        "text-xl font-semibold mb-3",
+                        isMobile && "text-base mb-2"
+                      )}>
+                        {children}
+                      </h2>
+                    ),
+                    p: ({ children }) => (
+                      <p className={cn(
+                        "mb-4",
+                        isMobile && "mb-3 text-sm leading-relaxed"
+                      )}>
+                        {children}
+                      </p>
+                    ),
+                  }}
+                >
+                  {evidenceCards}
+                </ReactMarkdown>
+              ) : isGenerating ? (
+                <LoadingTabContent message="Crafting evidence cards, clues, and investigative materials that will help solve your mystery." />
+              ) : (
+                <div className={cn(
+                  "text-center py-6",
+                  isMobile && "py-4 px-4"
                 )}>
-                  Evidence cards will be available after generation starts.
-                </p>
-              </div>
-            )}
-          </div>
-        </TabsContent>
+                  <p className={cn(
+                    "text-muted-foreground",
+                    isMobile && "text-sm"
+                  )}>
+                    Evidence cards will be available after generation starts.
+                  </p>
+                </div>
+              )}
+            </div>
+          </TabsContent>
 
-        <TabsContent value="inspector" className={cn(isMobile && "px-2")}>
-          <div className={cn(
-            "mystery-content",
-            isMobile && "text-sm"
-          )}>
-            {detectiveScript ? (
-              <ReactMarkdown 
-                components={{
-                  table: ({ children }) => (
-                    <div className="overflow-x-auto">
-                      <table className={cn(isMobile && "text-xs")}>{children}</table>
-                    </div>
-                  ),
-                  h1: ({ children }) => (
-                    <h1 className={cn(
-                      "text-2xl font-bold mb-4",
-                      isMobile && "text-lg mb-3"
-                    )}>
-                      {children}
-                    </h1>
-                  ),
-                  h2: ({ children }) => (
-                    <h2 className={cn(
-                      "text-xl font-semibold mb-3",
-                      isMobile && "text-base mb-2"
-                    )}>
-                      {children}
-                    </h2>
-                  ),
-                  p: ({ children }) => (
-                    <p className={cn(
-                      "mb-4",
-                      isMobile && "mb-3 text-sm leading-relaxed"
-                    )}>
-                      {children}
-                    </p>
-                  ),
-                }}
-              >
-                {detectiveScript}
-              </ReactMarkdown>
-            ) : isGenerating ? (
-              <LoadingTabContent message="Writing the detective's script and investigation timeline to guide the mystery solving process." />
-            ) : (
-              <div className={cn(
-                "text-center py-6",
-                isMobile && "py-4 px-4"
-              )}>
-                <p className={cn(
-                  "text-muted-foreground",
-                  isMobile && "text-sm"
+          <TabsContent value="inspector" className={cn(isMobile && "px-2")}>
+            <div className={cn(
+              "mystery-content",
+              isMobile && "text-sm"
+            )}>
+              {detectiveScript ? (
+                <ReactMarkdown 
+                  components={{
+                    table: ({ children }) => (
+                      <div className="overflow-x-auto">
+                        <table className={cn(isMobile && "text-xs")}>{children}</table>
+                      </div>
+                    ),
+                    h1: ({ children }) => (
+                      <h1 className={cn(
+                        "text-2xl font-bold mb-4",
+                        isMobile && "text-lg mb-3"
+                      )}>
+                        {children}
+                      </h1>
+                    ),
+                    h2: ({ children }) => (
+                      <h2 className={cn(
+                        "text-xl font-semibold mb-3",
+                        isMobile && "text-base mb-2"
+                      )}>
+                        {children}
+                      </h2>
+                    ),
+                    p: ({ children }) => (
+                      <p className={cn(
+                        "mb-4",
+                        isMobile && "mb-3 text-sm leading-relaxed"
+                      )}>
+                        {children}
+                      </p>
+                    ),
+                  }}
+                >
+                  {detectiveScript}
+                </ReactMarkdown>
+              ) : isGenerating ? (
+                <LoadingTabContent message="Writing the detective's script and investigation timeline to guide the mystery solving process." />
+              ) : (
+                <div className={cn(
+                  "text-center py-6",
+                  isMobile && "py-4 px-4"
                 )}>
-                  Detective guide will be available after generation starts.
-                </p>
-              </div>
-            )}
-          </div>
-        </TabsContent>
+                  <p className={cn(
+                    "text-muted-foreground",
+                    isMobile && "text-sm"
+                  )}>
+                    Detective guide will be available after generation starts.
+                  </p>
+                </div>
+              )}
+            </div>
+          </TabsContent>
 
-        <TabsContent value="matrix" className={cn(isMobile && "px-2")}>
-          <div className={cn(
-            "mystery-content",
-            isMobile && "text-sm"
-          )}>
-            {relationshipMatrix ? (
-              <ReactMarkdown 
-                components={{
-                  table: ({ children }) => (
-                    <div className="overflow-x-auto">
-                      <table className={cn(isMobile && "text-xs")}>{children}</table>
-                    </div>
-                  ),
-                  h1: ({ children }) => (
-                    <h1 className={cn(
-                      "text-2xl font-bold mb-4",
-                      isMobile && "text-lg mb-3"
-                    )}>
-                      {children}
-                    </h1>
-                  ),
-                  h2: ({ children }) => (
-                    <h2 className={cn(
-                      "text-xl font-semibold mb-3",
-                      isMobile && "text-base mb-2"
-                    )}>
-                      {children}
-                    </h2>
-                  ),
-                  p: ({ children }) => (
-                    <p className={cn(
-                      "mb-4",
-                      isMobile && "mb-3 text-sm leading-relaxed"
-                    )}>
-                      {children}
-                    </p>
-                  ),
-                }}
-              >
-                {relationshipMatrix}
-              </ReactMarkdown>
-            ) : isGenerating ? (
-              <LoadingTabContent message="Building the character relationship matrix showing connections, conflicts, and hidden relationships." />
-            ) : (
-              <div className={cn(
-                "text-center py-6",
-                isMobile && "py-4 px-4"
-              )}>
-                <p className={cn(
-                  "text-muted-foreground",
-                  isMobile && "text-sm"
+          <TabsContent value="matrix" className={cn(isMobile && "px-2")}>
+            <div className={cn(
+              "mystery-content",
+              isMobile && "text-sm"
+            )}>
+              {relationshipMatrix ? (
+                <ReactMarkdown 
+                  components={{
+                    table: ({ children }) => (
+                      <div className="overflow-x-auto">
+                        <table className={cn(isMobile && "text-xs")}>{children}</table>
+                      </div>
+                    ),
+                    h1: ({ children }) => (
+                      <h1 className={cn(
+                        "text-2xl font-bold mb-4",
+                        isMobile && "text-lg mb-3"
+                      )}>
+                        {children}
+                      </h1>
+                    ),
+                    h2: ({ children }) => (
+                      <h2 className={cn(
+                        "text-xl font-semibold mb-3",
+                        isMobile && "text-base mb-2"
+                      )}>
+                        {children}
+                      </h2>
+                    ),
+                    p: ({ children }) => (
+                      <p className={cn(
+                        "mb-4",
+                        isMobile && "mb-3 text-sm leading-relaxed"
+                      )}>
+                        {children}
+                      </p>
+                    ),
+                  }}
+                >
+                  {relationshipMatrix}
+                </ReactMarkdown>
+              ) : isGenerating ? (
+                <LoadingTabContent message="Building the character relationship matrix showing connections, conflicts, and hidden relationships." />
+              ) : (
+                <div className={cn(
+                  "text-center py-6",
+                  isMobile && "py-4 px-4"
                 )}>
-                  Relationship matrix will be available after generation starts.
-                </p>
-              </div>
-            )}
-          </div>
-        </TabsContent>
+                  <p className={cn(
+                    "text-muted-foreground",
+                    isMobile && "text-sm"
+                  )}>
+                    Relationship matrix will be available after generation starts.
+                  </p>
+                </div>
+              )}
+            </div>
+          </TabsContent>
+        </div>
       </Tabs>
 
       {/* Mystery Guest Manager Dialog */}
@@ -1018,3 +955,5 @@ const MysteryPackageTabView = React.memo(({
 MysteryPackageTabView.displayName = 'MysteryPackageTabView';
 
 export default MysteryPackageTabView;
+
+}
