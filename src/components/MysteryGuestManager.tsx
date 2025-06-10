@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -198,26 +197,26 @@ const MysteryGuestManager: React.FC<MysteryGuestManagerProps> = ({
     }
   };
 
+  // Helper function to clean character description
+  const cleanCharacterDescription = (description: string): string => {
+    if (!description) return '';
+    
+    // Remove "## CHARACTER DESCRIPTION" prefix if present
+    const cleanedDescription = description.replace(/^##\s*CHARACTER\s*DESCRIPTION\s*/i, '').trim();
+    
+    return cleanedDescription;
+  };
+
   const assignedCount = assignments.filter(a => a.guest_name.trim() && a.guest_email.trim()).length;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[90vw] w-full max-w-[800px] max-h-[90vh] overflow-hidden flex flex-col">
-        <DialogHeader className="flex flex-row items-center justify-between">
-          <div>
-            <DialogTitle className="text-xl font-semibold">Share Characters with Guests</DialogTitle>
-            <p className="text-sm text-muted-foreground mt-1">
-              Assign each character to a guest and send via email
-            </p>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onOpenChange(false)}
-            className="h-6 w-6"
-          >
-            <X className="h-4 w-4" />
-          </Button>
+        <DialogHeader>
+          <DialogTitle className="text-xl font-semibold">Share Characters with Guests</DialogTitle>
+          <p className="text-sm text-muted-foreground mt-1">
+            Assign each character to a guest and send via email
+          </p>
         </DialogHeader>
 
         <div className="flex-1 overflow-auto">
@@ -238,13 +237,19 @@ const MysteryGuestManager: React.FC<MysteryGuestManagerProps> = ({
                 const isLocked = assignment.is_sent;
                 const canSendThis = canSend(assignment);
 
+                // Clean the character description
+                const cleanedDescription = cleanCharacterDescription(character.description || '');
+                const truncatedDescription = cleanedDescription.length > 60 
+                  ? `${cleanedDescription.substring(0, 60)}...`
+                  : cleanedDescription;
+
                 return (
                   <TableRow key={character.id}>
                     <TableCell>
                       <div>
                         <div className="font-medium">{character.character_name}</div>
                         <div className="text-xs text-muted-foreground line-clamp-2">
-                          {character.description?.substring(0, 60)}...
+                          {truncatedDescription}
                         </div>
                       </div>
                     </TableCell>

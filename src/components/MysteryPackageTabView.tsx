@@ -484,23 +484,18 @@ const MysteryPackageTabView = React.memo(({
   return (
     <div className="w-full relative">
       <div className={cn(
-        "mb-6",
-        isMobile && "mb-4 px-2"
+        "mb-6 flex items-center justify-between",
+        isMobile && "mb-4 px-2 flex-col space-y-3"
       )}>
         <h1 className={cn(
-          "font-bold text-center",
-          isMobile ? "text-xl" : "text-3xl"
+          "font-bold",
+          isMobile ? "text-xl text-center" : "text-3xl"
         )}>
           {mysteryTitle}
         </h1>
-      </div>
 
-      {/* Share Mystery with Guests Button */}
-      {canShareMystery && conversationId && (
-        <div className={cn(
-          "mb-4 flex justify-center",
-          isMobile && "px-2"
-        )}>
+        {/* Share Mystery with Guests Button */}
+        {canShareMystery && conversationId && (
           <Button
             onClick={() => setShowGuestManager(true)}
             className={cn(
@@ -509,10 +504,10 @@ const MysteryPackageTabView = React.memo(({
             )}
           >
             <Mail className="h-4 w-4" />
-            Share Mystery with Guests
+            Share With Guests
           </Button>
-        </div>
-      )}
+        )}
+      </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className={cn(
@@ -1033,3 +1028,5 @@ const MysteryPackageTabView = React.memo(({
 MysteryPackageTabView.displayName = 'MysteryPackageTabView';
 
 export default MysteryPackageTabView;
+
+}
