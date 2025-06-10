@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -5,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
-import { Loader2, Wand2, CheckCircle2, Eye, Mail } from "lucide-react";
+import { Loader2, Wand2, Eye, Mail } from "lucide-react";
 import { MysteryCharacter } from "@/interfaces/mystery";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
@@ -489,7 +490,7 @@ const MysteryPackageTabView = React.memo(({
           <Button
             onClick={() => setShowGuestManager(true)}
             className={cn(
-              "gap-2 bg-primary hover:bg-primary/90",
+              "gap-2 bg-[#8B0000] hover:bg-[#7A0000] text-white",
               isMobile && "w-full"
             )}
           >
@@ -501,13 +502,13 @@ const MysteryPackageTabView = React.memo(({
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className={cn(
-          "w-full mb-4 bg-primary",
-          isMobile ? "grid grid-cols-2 gap-1 h-auto p-1" : "grid grid-cols-2 md:grid-cols-5"
+          "w-full mb-4 bg-[#8B0000] p-1",
+          isMobile ? "grid grid-cols-2 gap-1 h-auto" : "grid grid-cols-2 md:grid-cols-5"
         )}>
           <TabsTrigger 
             value="host-guide" 
             className={cn(
-              "whitespace-nowrap text-white data-[state=active]:bg-primary/80 data-[state=active]:text-white hover:bg-primary/90",
+              "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000]",
               isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
@@ -516,7 +517,7 @@ const MysteryPackageTabView = React.memo(({
           <TabsTrigger 
             value="characters" 
             className={cn(
-              "whitespace-nowrap text-white data-[state=active]:bg-primary/80 data-[state=active]:text-white hover:bg-primary/90",
+              "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000]",
               isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
@@ -525,7 +526,7 @@ const MysteryPackageTabView = React.memo(({
           <TabsTrigger 
             value="clues" 
             className={cn(
-              "whitespace-nowrap text-white data-[state=active]:bg-primary/80 data-[state=active]:text-white hover:bg-primary/90",
+              "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000]",
               isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
@@ -534,7 +535,7 @@ const MysteryPackageTabView = React.memo(({
           <TabsTrigger 
             value="inspector" 
             className={cn(
-              "whitespace-nowrap text-white data-[state=active]:bg-primary/80 data-[state=active]:text-white hover:bg-primary/90",
+              "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000]",
               isMobile && "text-xs px-2 py-2 h-auto col-span-1"
             )}
           >
@@ -543,7 +544,7 @@ const MysteryPackageTabView = React.memo(({
           <TabsTrigger 
             value="matrix" 
             className={cn(
-              "whitespace-nowrap text-white data-[state=active]:bg-primary/80 data-[state=active]:text-white hover:bg-primary/90",
+              "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000]",
               isMobile && "text-xs px-2 py-2 h-auto col-span-1"
             )}
           >
@@ -551,7 +552,7 @@ const MysteryPackageTabView = React.memo(({
           </TabsTrigger>
         </TabsList>
 
-        <div className="max-h-[calc(100vh-300px)] overflow-y-auto">
+        <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 250px)' }}>
           <TabsContent value="host-guide" className={cn(isMobile && "px-2")}>
             <div className={cn(
               "mystery-content",
@@ -955,5 +956,3 @@ const MysteryPackageTabView = React.memo(({
 MysteryPackageTabView.displayName = 'MysteryPackageTabView';
 
 export default MysteryPackageTabView;
-
-}
