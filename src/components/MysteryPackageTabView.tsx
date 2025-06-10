@@ -551,8 +551,6 @@ const MysteryPackageTabView = React.memo(({
             {isMobile ? "Relations" : "Relationships"}
           </TabsTrigger>
         </TabsList>
-
-        <div className="h-[calc(100vh-200px)] overflow-y-auto">
           <TabsContent value="host-guide" className={cn(isMobile && "px-2")}>
             <div className={cn(
               "mystery-content",
@@ -760,7 +758,6 @@ const MysteryPackageTabView = React.memo(({
                   </p>
                 </div>
               )}
-            </div>
           </TabsContent>
 
           <TabsContent value="clues" className={cn(isMobile && "px-2")}>
