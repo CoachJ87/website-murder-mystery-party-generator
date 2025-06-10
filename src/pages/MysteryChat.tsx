@@ -141,30 +141,6 @@ const MysteryChatPage = () => {
                     />
                 </div>
             </main>
-
-            {/* Fixed Bottom Action Button */}
-            <div className={cn(
-                "fixed bottom-20 left-0 right-0 z-10 px-4 py-2 bg-[#F7F3E9] shadow-none border-t-0",
-                isMobile ? "px-3" : "px-4"
-            )}>
-                <div className={cn(
-                    "mx-auto flex justify-center",
-                    isMobile ? "max-w-full" : "max-w-4xl"
-                )}>
-                    <Button
-                        onClick={handleGenerateFullMystery}
-                        disabled={!hasAIResponse}
-                        size={isMobile ? "default" : "lg"}
-                        className={cn(
-                            "bg-[#8B1538] hover:bg-[#6B0F28] text-white font-medium shadow-sm rounded-xl",
-                            isMobile ? "w-full h-12 text-base" : "px-6"
-                        )}
-                    >
-                        <Zap className="h-4 w-4 mr-2" />
-                        Generate Full Mystery
-                    </Button>
-                </div>
-            </div>
         </div>
     );
 };
