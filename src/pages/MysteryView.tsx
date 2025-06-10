@@ -980,6 +980,18 @@ const MysteryView = () => {
               </Card>
             )
           )}
+          
+          <div className={cn(
+            "flex justify-center mt-8",
+            isMobile && "mt-6"
+          )}>
+            <Button 
+              variant="outline" 
+              onClick={() => navigate("/dashboard")}
+              className={cn(isMobile && "text-sm h-10 px-6")}
+            >
+              Back to Dashboard
+            </Button>
           </div>
         </div>
       </main>
