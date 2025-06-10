@@ -92,7 +92,7 @@ const MysteryChatPage = () => {
         }
     };
 
-    const handleGenerateFullMystery = () => {
+    const handleGenerateFullMystery = async (messages: Message[]): Promise<void> => {
         navigate(`/mystery/purchase/${id}`);
     };
 
