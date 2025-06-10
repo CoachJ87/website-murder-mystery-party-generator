@@ -490,7 +490,7 @@ export default function MysteryChat({
         {/* AI Typing Indicator - Mobile Optimized */}
         {isAiTyping && (
           <div className="flex justify-start">
-            <div className="bg-[#FEFCF8] rounded-2xl px-4 py-3 sm:px-5 sm:py-4 max-w-[85%] sm:max-w-[80%] shadow-sm">
+            <div className="bg-[#FEFCF8] rounded-2xl px-4 py-3 sm:px-5 sm:py-4 max-w-[85%] sm:max-w-[80%] shadow-lg">
               <div className="flex space-x-1">
                 <div className="h-2 w-2 bg-[#8B1538]/60 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
                 <div className="h-2 w-2 bg-[#8B1538]/60 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
@@ -502,16 +502,32 @@ export default function MysteryChat({
         <div ref={bottomRef} />
       </div>
 
-      {/* Fixed Bottom Input and Generate Button */}
+      {/* Fixed Bottom Generate Button and Text Input */}
       <div className={cn(
-      "fixed bottom-0 left-0 right-0 z-20 bg-[#F7F3E9] border-t border-[#F7F3E9]",
-      isMobile ? "px-3 py-2" : "px-4 py-3"
+        "fixed bottom-0 left-0 right-0 z-20 bg-[#F7F3E9] border-t border-[#F7F3E9]",
+        isMobile ? "px-3 py-2" : "px-4 py-3"
       )}>
         <div className={cn(
           "mx-auto space-y-3",
           isMobile ? "max-w-full" : "max-w-4xl"
         )}>
-          {/* Text Input */}
+          {/* Generate Full Mystery Button - NOW ON TOP */}
+          {onGenerateFinal && (
+            <Button
+              onClick={() => onGenerateFinal(messages)}
+              disabled={!hasAIResponse}
+              size={isMobile ? "default" : "lg"}
+              className={cn(
+                "w-full bg-[#8B1538] hover:bg-[#6B0F28] text-white font-medium shadow-sm rounded-xl",
+                isMobile ? "h-12 text-base" : "px-6"
+              )}
+            >
+              <Zap className="h-4 w-4 mr-2" />
+              Generate Full Mystery
+            </Button>
+          )}
+          
+          {/* Text Input - NOW ON BOTTOM */}
           <div className="flex items-end space-x-2 sm:space-x-3 rounded-xl bg-white shadow-sm p-1">
             <div className="flex-grow">
               <Textarea
@@ -550,22 +566,6 @@ export default function MysteryChat({
               )}
             </Button>
           </div>
-          
-          {/* Generate Full Mystery Button */}
-          {onGenerateFinal && (
-            <Button
-              onClick={() => onGenerateFinal(messages)}
-              disabled={!hasAIResponse}
-              size={isMobile ? "default" : "lg"}
-              className={cn(
-                "w-full bg-[#8B1538] hover:bg-[#6B0F28] text-white font-medium shadow-sm rounded-xl",
-                isMobile ? "h-12 text-base" : "px-6"
-              )}
-            >
-              <Zap className="h-4 w-4 mr-2" />
-              Generate Full Mystery
-            </Button>
-          )}
         </div>
       </div>
     </div>
