@@ -21,7 +21,7 @@ const Header = () => {
           <Link to="/" className="flex items-center space-x-2 mr-4 md:mr-8 no-underline">
             <span className="text-lg md:text-2xl font-bold gradient-text font-playfair">
               <span className="hidden sm:inline">Mystery Maker</span>
-              <span className="sm:hidden">MMG</span>
+              <span className="sm:hidden">Mystery Maker</span>
             </span>
           </Link>
 
