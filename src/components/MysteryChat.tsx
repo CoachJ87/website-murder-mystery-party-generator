@@ -513,7 +513,7 @@ export default function MysteryChat({
         )}>
                    
           {/* Text Input - NOW ON TOP */}
-          <div className="flex items-end space-x-2 sm:space-x-3 rounded-xl bg-white shadow-sm p-1">
+          <div className="flex items-end space-x-2 sm:space-x-3 rounded-xl bg-white shadow-lg p-1">
             <div className="flex-grow">
               <Textarea
                 ref={inputRef}
