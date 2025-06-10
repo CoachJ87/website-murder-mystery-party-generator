@@ -284,25 +284,25 @@ const MysteryPackageTabView = React.memo(({
     }
     
     if (packageData.preparation) {
-      content += `${packageData.preparation}\n\n`;  // Already has headers
+      content += `${packageData.preparation}\n\n`;
     }
     
     if (packageData.timeline) {
-      content += `${packageData.timeline}\n\n`;  // Already has headers
+      content += `${packageData.timeline}\n\n`;
     }
     
     if (packageData.hostGuide) {
-      content += `${packageData.hostGuide}\n\n`;  // Already has headers
+      content += `${packageData.hostGuide}\n\n`;
     }
     
     if (packageData.hostingTips) {
-      content += `${packageData.hostingTips}\n\n`;  // Already has headers
+      content += `${packageData.hostingTips}\n\n`;
     }
     
     return content;
   }, [packageData, mysteryTitle]);
 
-  // Memoized content extraction functions to prevent unnecessary recalculations
+  // Memoized content extraction functions
   const extractHostGuide = useCallback(() => {
     if (!packageContent) return "";
     
@@ -325,15 +325,6 @@ const MysteryPackageTabView = React.memo(({
     const matrixPattern = /# CHARACTER RELATIONSHIP MATRIX\n([\s\S]*?)(?=# |$)/i;
     const match = packageContent.match(matrixPattern);
     return match ? match[1].trim() : "";
-  }, [packageContent]);
-    
-  const lines = content.split('\n');
-    const tableStartIndex = lines.findIndex(line => line.trim().startsWith('|'));
-    
-    if (tableStartIndex === -1) return content; // No table found, return original
-    
-    // Return only the table portion
-    return lines.slice(tableStartIndex).join('\n');
   }, [packageContent]);
 
   const extractCharacters = useCallback(() => {
@@ -381,19 +372,16 @@ const MysteryPackageTabView = React.memo(({
     return clues;
   }, [packageContent]);
 
-  // Memoized content getters - only recalculate when dependencies change
+  // Memoized content getters
   const hostGuide = useMemo(() => {
-    // Priority 1: Use complete host guide from database fields
     if (packageData) {
       return buildCompleteHostGuide();
     }
     
-    // Priority 2: Use legacy hostGuide field
     if (packageData?.hostGuide) {
       return packageData.hostGuide;
     }
     
-    // Priority 3: Fallback to text parsing
     return extractHostGuide();
   }, [packageData, buildCompleteHostGuide, extractHostGuide]);
 
@@ -413,16 +401,14 @@ const MysteryPackageTabView = React.memo(({
       }
     }
   
-  return cleanMarkdownTable(rawMatrix);
-}, [packageData?.relationshipMatrix, extractCharacterMatrix, cleanMarkdownTable]);
+    return cleanMarkdownTable(rawMatrix);
+  }, [packageData?.relationshipMatrix, extractCharacterMatrix, cleanMarkdownTable]);
 
   const charactersList = useMemo(() => {
-    // Priority 1: Use characters prop from database
     if (characters && characters.length > 0) {
       return characters;
     }
     
-    // Priority 2: Fallback to text parsing only if no database characters
     return extractCharacters();
   }, [characters, extractCharacters]);
 
@@ -431,7 +417,6 @@ const MysteryPackageTabView = React.memo(({
       return packageData.evidenceCards;
     }
     
-    // Fallback to extracting clues and formatting them
     const clues = extractClues();
     if (clues.length > 0) {
       return clues.map(clue => `## ${clue.title}\n\n${clue.content}`).join('\n\n---\n\n');
@@ -439,20 +424,6 @@ const MysteryPackageTabView = React.memo(({
     
     return "";
   }, [packageData?.evidenceCards, extractClues]);
-
-  // Log only when content availability actually changes
-  const contentAvailability = useMemo(() => {
-    const availability = {
-      hostGuide: !!hostGuide,
-      detectiveScript: !!detectiveScript,
-      relationshipMatrix: !!relationshipMatrix,
-      characters: charactersList.length > 0,
-      evidenceCards: !!evidenceCards
-    };
-    
-    debugLog("Content availability changed", availability);
-    return availability;
-  }, [hostGuide, detectiveScript, relationshipMatrix, charactersList.length, evidenceCards, debugLog]);
 
   // Helper function to check if a section is generated based on generationStatus
   const isSectionComplete = useCallback((sectionName: string) => {
