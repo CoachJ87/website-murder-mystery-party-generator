@@ -552,7 +552,6 @@ const MysteryPackageTabView = React.memo(({
           </TabsTrigger>
         </TabsList>
 
-        <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 250px)' }}>
           <TabsContent value="host-guide" className={cn(isMobile && "px-2")}>
             <div className={cn(
               "mystery-content",
