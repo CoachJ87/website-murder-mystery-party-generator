@@ -73,395 +73,144 @@ const MysteryPackageTabView = React.memo(({
     }
   }, [generationStatus]);
 
-  // Markdown cleaning function to handle malformed table data
+  // Enhanced markdown table cleaning function
   const cleanMarkdownTable = useCallback((content: string) => {
     if (!content) return '';
     
-    return content
-      // Replace escaped newlines with actual newlines
-      .replace(/\\n/g, '\n')
-      // Remove any escaped quotes
-      .replace(/\\"/g, '"')
-      // Ensure proper table spacing
-      .replace(/\n\s*\n/g, '\n\n')
-      // Clean up any extra whitespace in table cells
-      .replace(/\|\s+([^|]+)\s+\|/g, '| $1 |');
-  }, []);
-
-  // Helper function to safely get relationships as an array
-  const getRelationshipsArray = useCallback((relationships: any): Array<{character: string, description: string}> => {
-    if (!relationships) return [];
+    console.log("Cleaning table content:", content.substring(0, 200) + "...");
     
-    if (Array.isArray(relationships)) {
-      return relationships.map(rel => {
-        if (typeof rel === 'object' && rel !== null) {
-          return {
-            character: rel.character || rel.name || '',
-            description: rel.description || rel.relation || ''
-          };
-        }
-        return { character: '', description: String(rel) };
-      }).filter(rel => rel.character || rel.description);
-    }
+    // Split into lines and process
+    const lines = content.split('\n');
+    const cleanLines: string[] = [];
+    let foundTable = false;
     
-    return [];
-  }, []);
-
-  // Helper function to safely get secrets as an array
-  const getSecretsArray = useCallback((secrets: any): string[] => {
-    if (!secrets) return [];
-    
-    if (Array.isArray(secrets)) {
-      return secrets.map(secret => String(secret));
-    }
-    
-    if (typeof secrets === 'string') {
-      return [secrets];
-    }
-    
-    return [];
-  }, []);
-
-  // Helper function to safely get questioning options as an array
-  const getQuestioningOptionsArray = useCallback((options: any): Array<{target: string, question: string}> => {
-    if (!options) return [];
-    
-    if (Array.isArray(options)) {
-      return options.map(opt => {
-        if (typeof opt === 'object' && opt !== null) {
-          return {
-            target: opt.target || '',
-            question: opt.question || ''
-          };
-        }
-        return { target: '', question: String(opt) };
-      }).filter(opt => opt.target || opt.question);
-    }
-    
-    return [];
-  }, []);
-
-  // Function to build complete character guide content
-  const buildCharacterGuideContent = useCallback((character: MysteryCharacter): string => {
-    const relationships = getRelationshipsArray(character.relationships);
-    const secrets = getSecretsArray(character.secrets);
-    
-    let content = `# ${character.character_name} - Character Guide\n\n`;
-    
-    // Character Description
-    if (character.description) {
-      content += `${character.description}\n\n`;
-    }
-    
-    // Your Background
-    if (character.background) {
-      content += `${character.background}\n\n`;
-    }
-    
-    // Your Relationships
-    if (relationships.length > 0) {
-      content += `## YOUR RELATIONSHIPS\n\n`;
-      relationships.forEach(rel => {
-        if (rel.character && rel.description) {
-          content += `- **${rel.character}**: ${rel.description}\n`;
-        }
-      });
-      content += '\n';
-    }
-    
-    // Your Secret
-    const secret = character.secret || (secrets.length > 0 ? secrets[0] : '');
-    if (secret) {
-      content += `${secret}\n\n`;
-    }
-    
-    // Round 1: Introductions & Rumors
-    if (character.introduction) {
-      content += `${character.introduction}\n\n`;
-    }
-    
-    if (character.round1_statement) {
-      content += `${character.round1_statement}\n\n`;
-    }
-    
-    if (character.rumors) {
-      content += `${character.rumors}\n\n`;
-    }
-    
-    // Round 2: Motives
-    if (character.round2_statement) {
-      content += `${character.round2_statement}\n\n`;
-    }
-    
-    if (character.round2_questions) {
-      content += `${character.round2_questions}\n\n`;
-    }
-    
-    if (character.round2_innocent || character.round2_guilty || character.round2_accomplice) {
-      content += `### YOUR RESPONSES WHEN QUESTIONED\n\n`;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
       
-      if (character.round2_innocent) {
-        content += `${character.round2_innocent}\n\n`;
-      }
+      // Skip empty lines before table starts
+      if (!foundTable && !line) continue;
       
-      if (character.round2_guilty) {
-        content += `${character.round2_guilty}\n\n`;
-      }
-      
-      if (character.round2_accomplice) {
-        content += `${character.round2_accomplice}\n\n`;
+      // Detect table start (line with pipes)
+      if (line.includes('|')) {
+        foundTable = true;
+        
+        // Clean the table line
+        let cleanLine = line
+          // Remove extra whitespace around pipes
+          .replace(/\s*\|\s*/g, ' | ')
+          // Ensure proper spacing
+          .replace(/^\s*\|/, '|')
+          .replace(/\|\s*$/, '|')
+          // Handle escaped characters
+          .replace(/\\n/g, ' ')
+          .replace(/\\"/g, '"');
+        
+        // Ensure the line starts and ends with pipes if it contains pipes
+        if (!cleanLine.startsWith('|') && cleanLine.includes('|')) {
+          cleanLine = '| ' + cleanLine;
+        }
+        if (!cleanLine.endsWith('|') && cleanLine.includes('|')) {
+          cleanLine = cleanLine + ' |';
+        }
+        
+        cleanLines.push(cleanLine);
+        
+        // Check if next line should be a separator (for header)
+        if (cleanLines.length === 1 && i + 1 < lines.length) {
+          const nextLine = lines[i + 1].trim();
+          if (!nextLine.includes('-') && !nextLine.includes('|')) {
+            // Add separator line for table header
+            const cellCount = (cleanLine.match(/\|/g) || []).length - 1;
+            const separator = '|' + ' --- |'.repeat(cellCount);
+            cleanLines.push(separator);
+          }
+        }
+      } else if (foundTable && line.includes('-')) {
+        // This is likely a separator line
+        let cleanLine = line.replace(/\s+/g, '').replace(/-+/g, '---');
+        if (!cleanLine.startsWith('|')) cleanLine = '|' + cleanLine;
+        if (!cleanLine.endsWith('|')) cleanLine = cleanLine + '|';
+        cleanLines.push(cleanLine);
+      } else if (foundTable && !line) {
+        // Empty line after table - stop processing
+        break;
+      } else if (foundTable) {
+        // Continue with table content
+        cleanLines.push(line);
       }
     }
     
-    // Round 3: Method
-    if (character.round3_statement) {
-      content += `${character.round3_statement}\n\n`;
-    }
-    
-    if (character.round3_questions) {
-      content += `${character.round3_questions}\n\n`;
-    }
-    
-    if (character.round3_innocent) {
-      content += `${character.round3_innocent}\n\n`;
-    }
-    
-    if (character.round3_guilty) {
-      content += `${character.round3_guilty}\n\n`;
-    }
-    
-    if (character.round3_accomplice) {
-      content += `${character.round3_accomplice}\n\n`;
-    }
-    
-    // Round 4: Opportunity
-    if (character.round4_questions) {
-      content += `${character.round4_questions}\n\n`;
-    }
-    
-    if (character.round4_innocent) {
-      content += `${character.round4_innocent}\n\n`;
-    }
-    
-    if (character.round4_guilty) {
-      content += `${character.round4_guilty}\n\n`;
-    }
-    
-    if (character.round4_accomplice) {
-      content += `${character.round4_accomplice}\n\n`;
-    }
-    
-    // Final Statement
-    if (character.final_innocent) {
-      content += `${character.final_innocent}\n\n`;
-    }
-    
-    if (character.final_guilty) {
-      content += `${character.final_guilty}\n\n`;
-    }
-    
-    if (character.final_accomplice) {
-      content += `${character.final_accomplice}\n\n`;
-    }
-    
-    return content;
-  }, [getRelationshipsArray, getSecretsArray]);
+    const result = cleanLines.join('\n');
+    console.log("Cleaned table result:", result);
+    return result;
+  }, []);
 
-  // Function to build complete host guide content
-  const buildCompleteHostGuide = useCallback((): string => {
-    if (!packageData) return "";
-    
-    const title = packageData.title || mysteryTitle || "Mystery";
-    let content = `# ${title} - HOST GUIDE\n\n`;
-    
-    // Use the content EXACTLY as generated by Make.com - no rebuilding headers
-    if (packageData.gameOverview) {
-      content += `${packageData.gameOverview}\n\n`;
-    }
-    
-    if (packageData.materials) {
-      content += `${packageData.materials}\n\n`;
-    }
-    
-    if (packageData.preparation) {
-      content += `${packageData.preparation}\n\n`;
-    }
-    
-    if (packageData.timeline) {
-      content += `${packageData.timeline}\n\n`;
-    }
-    
-    if (packageData.hostGuide) {
-      content += `${packageData.hostGuide}\n\n`;
-    }
-    
-    if (packageData.hostingTips) {
-      content += `${packageData.hostingTips}\n\n`;
-    }
-    
-    return content;
-  }, [packageData, mysteryTitle]);
-
-  // Memoized content extraction functions
-  const extractHostGuide = useCallback(() => {
-    if (!packageContent) return "";
-    
-    const hostGuidePattern = /# .+ - Host Guide\n([\s\S]*?)(?=# |$)/i;
-    const match = packageContent.match(hostGuidePattern);
-    return match ? match[1].trim() : "";
-  }, [packageContent]);
-
-  const extractInspectorScript = useCallback(() => {
-    if (!packageContent) return "";
-    
-    const inspectorPattern = /# (?:INSPECTOR|DETECTIVE) SCRIPT\n([\s\S]*?)(?=# |$)/i;
-    const match = packageContent.match(inspectorPattern);
-    return match ? match[1].trim() : "";
-  }, [packageContent]);
-
+  // Enhanced character matrix extraction
   const extractCharacterMatrix = useCallback(() => {
     if (!packageContent) return "";
     
     const matrixPattern = /# CHARACTER RELATIONSHIP MATRIX\n([\s\S]*?)(?=# |$)/i;
     const match = packageContent.match(matrixPattern);
-    return match ? match[1].trim() : "";
+    
+    if (!match) return "";
+    
+    const rawContent = match[1].trim();
+    console.log("Raw matrix content:", rawContent.substring(0, 300) + "...");
+    
+    // Find the actual table content by looking for the first line with pipes
+    const lines = rawContent.split('\n');
+    const tableStartIndex = lines.findIndex(line => line.trim().includes('|'));
+    
+    if (tableStartIndex === -1) {
+      console.log("No table found in matrix content");
+      return rawContent; // Return as-is if no table found
+    }
+    
+    // Extract just the table portion
+    const tableLines = lines.slice(tableStartIndex);
+    
+    // Find where table ends (first empty line or non-table content)
+    const tableEndIndex = tableLines.findIndex((line, index) => {
+      if (index === 0) return false; // Don't end on first line
+      const trimmed = line.trim();
+      return !trimmed || (!trimmed.includes('|') && !trimmed.includes('-'));
+    });
+    
+    const finalTableLines = tableEndIndex > 0 ? tableLines.slice(0, tableEndIndex) : tableLines;
+    const extractedTable = finalTableLines.join('\n');
+    
+    console.log("Extracted table:", extractedTable);
+    return extractedTable;
   }, [packageContent]);
-
-  const extractCharacters = useCallback(() => {
-    if (!packageContent) return [];
-    
-    const charactersList: MysteryCharacter[] = [];
-    const characterPattern = /# ([^-\n]+) - CHARACTER GUIDE\n([\s\S]*?)(?=# \w+ - CHARACTER GUIDE|# |$)/g;
-    
-    let match;
-    while ((match = characterPattern.exec(packageContent)) !== null) {
-      const characterName = match[1].trim();
-      const characterContent = match[2].trim();
-      
-      charactersList.push({
-        id: crypto.randomUUID(),
-        package_id: conversationId || "",
-        character_name: characterName,
-        description: characterContent.substring(0, characterContent.indexOf('\n\n')) || '',
-        background: '',
-        relationships: [],
-        secrets: []
-      });
-    }
-    
-    return charactersList;
-  }, [packageContent, conversationId]);
-
-  const extractClues = useCallback(() => {
-    if (!packageContent) return [];
-    
-    const clues: any[] = [];
-    const cluePattern = /# EVIDENCE: (.*?)\n([\s\S]*?)(?=# EVIDENCE:|# |$)/gi;
-    
-    let match;
-    while ((match = cluePattern.exec(packageContent)) !== null) {
-      const title = match[1].trim();
-      const clueContent = match[2].trim();
-      
-      clues.push({
-        title,
-        content: clueContent
-      });
-    }
-    
-    return clues;
-  }, [packageContent]);
-
-  // Memoized content getters
-  const hostGuide = useMemo(() => {
-    if (packageData) {
-      return buildCompleteHostGuide();
-    }
-    
-    if (packageData?.hostGuide) {
-      return packageData.hostGuide;
-    }
-    
-    return extractHostGuide();
-  }, [packageData, buildCompleteHostGuide, extractHostGuide]);
-
-  const detectiveScript = useMemo(() => {
-    return packageData?.detectiveScript || extractInspectorScript();
-  }, [packageData?.detectiveScript, extractInspectorScript]);
 
   const relationshipMatrix = useMemo(() => {
     let rawMatrix = packageData?.relationshipMatrix || extractCharacterMatrix();
+    
+    if (!rawMatrix) return "";
     
     // If using packageData, extract just the table portion
     if (packageData?.relationshipMatrix) {
       const lines = rawMatrix.split('\n');
       const tableStartIndex = lines.findIndex(line => line.trim().startsWith('|'));
       if (tableStartIndex !== -1) {
-        rawMatrix = lines.slice(tableStartIndex).join('\n');
+        // Find table end
+        const tableEndIndex = lines.findIndex((line, index) => {
+          if (index <= tableStartIndex) return false;
+          const trimmed = line.trim();
+          return !trimmed || (!trimmed.includes('|') && !trimmed.includes('-'));
+        });
+        
+        const tablePortion = tableEndIndex > 0 ? 
+          lines.slice(tableStartIndex, tableEndIndex) : 
+          lines.slice(tableStartIndex);
+        rawMatrix = tablePortion.join('\n');
       }
     }
   
-    return cleanMarkdownTable(rawMatrix);
+    const cleanedMatrix = cleanMarkdownTable(rawMatrix);
+    console.log("Final relationship matrix:", cleanedMatrix);
+    return cleanedMatrix;
   }, [packageData?.relationshipMatrix, extractCharacterMatrix, cleanMarkdownTable]);
-
-  const charactersList = useMemo(() => {
-    if (characters && characters.length > 0) {
-      return characters;
-    }
-    
-    return extractCharacters();
-  }, [characters, extractCharacters]);
-
-  const evidenceCards = useMemo(() => {
-    if (packageData?.evidenceCards) {
-      return packageData.evidenceCards;
-    }
-    
-    const clues = extractClues();
-    if (clues.length > 0) {
-      return clues.map(clue => `## ${clue.title}\n\n${clue.content}`).join('\n\n---\n\n');
-    }
-    
-    return "";
-  }, [packageData?.evidenceCards, extractClues]);
-
-  // Helper function to check if a section is generated based on generationStatus
-  const isSectionComplete = useCallback((sectionName: string) => {
-    return generationStatus?.sections?.[sectionName] || false;
-  }, [generationStatus?.sections]);
-
-  // Check if mystery is complete enough to share
-  const canShareMystery = useMemo(() => {
-    return (packageData && (hostGuide || detectiveScript || evidenceCards)) || 
-           (characters && characters.length > 0);
-  }, [packageData, hostGuide, detectiveScript, evidenceCards, characters]);
-
-  // Simplified loading component for individual tabs with mobile optimization
-  const LoadingTabContent = useCallback(({ message }: { message: string }) => (
-    <div className={cn(
-      "loading-section",
-      isMobile && "py-8"
-    )}>
-      <div className="flex flex-col items-center justify-center space-y-4">
-        <Loader2 className={cn(
-          "animate-spin text-primary",
-          isMobile ? "h-6 w-6" : "h-8 w-8"
-        )} />
-        <h3 className={cn(
-          "font-semibold",
-          isMobile ? "text-base" : "text-lg"
-        )}>
-          Generating...
-        </h3>
-        <p className={cn(
-          "text-muted-foreground text-center max-w-md",
-          isMobile && "text-sm px-4"
-        )}>
-          {message}
-        </p>
-      </div>
-    </div>
-  ), [statusMessage, isMobile]);
 
   return (
     <div className="w-full">
@@ -500,7 +249,7 @@ const MysteryPackageTabView = React.memo(({
             value="host-guide" 
             className={cn(
               "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000]",
-    isMobile && "text-xs px-2 py-2 h-auto"
+              isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
             {isMobile ? "Host" : "Host Guide"}
@@ -509,7 +258,7 @@ const MysteryPackageTabView = React.memo(({
             value="characters" 
             className={cn(
               "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000]",
-    isMobile && "text-xs px-2 py-2 h-auto"
+              isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
             {isMobile ? `Characters (${charactersList?.length || 0})` : `Characters (${charactersList?.length || 0})`}
@@ -518,7 +267,7 @@ const MysteryPackageTabView = React.memo(({
             value="clues" 
             className={cn(
               "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000]",
-    isMobile && "text-xs px-2 py-2 h-auto"
+              isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
             Evidence
@@ -527,7 +276,7 @@ const MysteryPackageTabView = React.memo(({
             value="inspector" 
             className={cn(
               "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000]",
-    isMobile && "text-xs px-2 py-2 h-auto"
+              isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
             {isMobile ? "Detective" : "Detective Guide"}
@@ -536,7 +285,7 @@ const MysteryPackageTabView = React.memo(({
             value="matrix" 
             className={cn(
               "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000]",
-    isMobile && "text-xs px-2 py-2 h-auto"
+              isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
             {isMobile ? "Relations" : "Relationships"}
@@ -899,41 +648,85 @@ const MysteryPackageTabView = React.memo(({
             isMobile && "text-sm"
           )}>
             {relationshipMatrix ? (
-              <ReactMarkdown 
-                components={{
-                  table: ({ children }) => (
-                    <div className="overflow-x-auto">
-                      <table className={cn(isMobile && "text-xs")}>{children}</table>
-                    </div>
-                  ),
-                  h1: ({ children }) => (
-                    <h1 className={cn(
-                      "text-2xl font-bold mb-4",
-                      isMobile && "text-lg mb-3"
-                    )}>
-                      {children}
-                    </h1>
-                  ),
-                  h2: ({ children }) => (
-                    <h2 className={cn(
-                      "text-xl font-semibold mb-3",
-                      isMobile && "text-base mb-2"
-                    )}>
-                      {children}
-                    </h2>
-                  ),
-                  p: ({ children }) => (
-                    <p className={cn(
-                      "mb-4",
-                      isMobile && "mb-3 text-sm leading-relaxed"
-                    )}>
-                      {children}
-                    </p>
-                  ),
-                }}
-              >
-                {relationshipMatrix}
-              </ReactMarkdown>
+              <div>
+                <h2 className={cn(
+                  "text-xl font-semibold mb-4",
+                  isMobile && "text-lg mb-3"
+                )}>
+                  Character Relationship Matrix
+                </h2>
+                <ReactMarkdown 
+                  components={{
+                    table: ({ children }) => (
+                      <div className="overflow-x-auto mb-4">
+                        <table className={cn(
+                          "w-full border-collapse border border-border",
+                          isMobile && "text-xs"
+                        )}>
+                          {children}
+                        </table>
+                      </div>
+                    ),
+                    thead: ({ children }) => (
+                      <thead className="bg-muted/50">
+                        {children}
+                      </thead>
+                    ),
+                    tbody: ({ children }) => (
+                      <tbody>
+                        {children}
+                      </tbody>
+                    ),
+                    tr: ({ children }) => (
+                      <tr className="border-b border-border">
+                        {children}
+                      </tr>
+                    ),
+                    th: ({ children }) => (
+                      <th className={cn(
+                        "border border-border px-3 py-2 text-left font-medium",
+                        isMobile && "px-2 py-1 text-xs"
+                      )}>
+                        {children}
+                      </th>
+                    ),
+                    td: ({ children }) => (
+                      <td className={cn(
+                        "border border-border px-3 py-2",
+                        isMobile && "px-2 py-1 text-xs"
+                      )}>
+                        {children}
+                      </td>
+                    ),
+                    h1: ({ children }) => (
+                      <h1 className={cn(
+                        "text-2xl font-bold mb-4",
+                        isMobile && "text-lg mb-3"
+                      )}>
+                        {children}
+                      </h1>
+                    ),
+                    h2: ({ children }) => (
+                      <h2 className={cn(
+                        "text-xl font-semibold mb-3",
+                        isMobile && "text-base mb-2"
+                      )}>
+                        {children}
+                      </h2>
+                    ),
+                    p: ({ children }) => (
+                      <p className={cn(
+                        "mb-4",
+                        isMobile && "mb-3 text-sm leading-relaxed"
+                      )}>
+                        {children}
+                      </p>
+                    ),
+                  }}
+                >
+                  {relationshipMatrix}
+                </ReactMarkdown>
+              </div>
             ) : isGenerating ? (
               <LoadingTabContent message="Building the character relationship matrix showing connections, conflicts, and hidden relationships." />
             ) : (
