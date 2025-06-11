@@ -223,26 +223,25 @@
   }
 }
 
-/* Fix tab padding - reduce vertical padding */
-button[role="tab"] {
-  padding: 6px 16px !important;  /* Less vertical padding */
-  min-height: 44px !important;   /* Slightly shorter height */
+/* More specific selector to override Tailwind classes */
+button[role="tab"][data-radix-collection-item] {
+  padding: 0 16px !important;  /* Remove all vertical padding */
+  min-height: 40px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  line-height: 1.2 !important;
 }
 
-/* Remove any internal padding/margin from text */
-button[role="tab"] span {
-  padding: 0 !important;
-  margin: 0 !important;
-  line-height: 1 !important;
+/* Target the text content directly */
+button[role="tab"][data-radix-collection-item]:before {
+  content: none !important;
 }
 
-/* Mobile adjustments */
-@media (max-width: 768px) {
-  button[role="tab"] {
-    padding: 4px 12px !important;  /* Even less padding on mobile */
-    min-height: 36px !important;
-  }
+/* Alternative - target by the specific classes */
+.inline-flex.items-center.justify-center[role="tab"] {
+  padding: 0 16px !important;
+  min-height: 40px !important;
+  line-height: 1.2 !important;
+}
 }
