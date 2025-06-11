@@ -953,5 +953,3 @@ const MysteryPackageTabView = React.memo(({
 MysteryPackageTabView.displayName = 'MysteryPackageTabView';
 
 export default MysteryPackageTabView;
-
-</edits_to_apply>
