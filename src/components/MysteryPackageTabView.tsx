@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -73,76 +74,98 @@ const MysteryPackageTabView = React.memo(({
     }
   }, [generationStatus]);
 
-  // Enhanced markdown table cleaning function
-  const cleanMarkdownTable = useCallback((content: string) => {
+  // Validate markdown table function
+  const isValidMarkdownTable = useCallback((content: string): boolean => {
+    if (!content) return false;
+    
+    const lines = content.trim().split('\n');
+    if (lines.length < 2) return false;
+    
+    // Check if we have at least a header row and separator
+    const hasHeaderRow = lines[0].includes('|');
+    const hasSeparatorRow = lines.length > 1 && lines[1].includes('-') && lines[1].includes('|');
+    
+    return hasHeaderRow && hasSeparatorRow;
+  }, []);
+
+  // Improved markdown table cleaning function
+  const cleanMarkdownTable = useCallback((content: string): string => {
     if (!content) return '';
     
-    console.log("Cleaning table content:", content.substring(0, 200) + "...");
-    
-    // Split into lines and process
     const lines = content.split('\n');
     const cleanLines: string[] = [];
-    let foundTable = false;
+    let tableStarted = false;
     
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
       
       // Skip empty lines before table starts
-      if (!foundTable && !line) continue;
+      if (!tableStarted && !line) continue;
       
       // Detect table start (line with pipes)
       if (line.includes('|')) {
-        foundTable = true;
+        tableStarted = true;
         
         // Clean the table line
         let cleanLine = line
           // Remove extra whitespace around pipes
-          .replace(/\s*\|\s*/g, ' | ')
-          // Ensure proper spacing
-          .replace(/^\s*\|/, '|')
-          .replace(/\|\s*$/, '|')
+          .replace(/\s*\|\s*/g, '|')
+          // Ensure proper spacing after pipes
+          .replace(/\|/g, '| ')
           // Handle escaped characters
           .replace(/\\n/g, ' ')
-          .replace(/\\"/g, '"');
+          .replace(/\\"/g, '"')
+          // Remove extra spaces
+          .replace(/\s+/g, ' ')
+          .trim();
         
-        // Ensure the line starts and ends with pipes if it contains pipes
-        if (!cleanLine.startsWith('|') && cleanLine.includes('|')) {
-          cleanLine = '| ' + cleanLine;
+        // Ensure the line starts and ends with pipes
+        if (!cleanLine.startsWith('|')) {
+          cleanLine = '|' + cleanLine;
         }
-        if (!cleanLine.endsWith('|') && cleanLine.includes('|')) {
-          cleanLine = cleanLine + ' |';
+        if (!cleanLine.endsWith('|')) {
+          cleanLine = cleanLine + '|';
         }
         
         cleanLines.push(cleanLine);
         
-        // Check if next line should be a separator (for header)
+        // Add separator row after header if missing
         if (cleanLines.length === 1 && i + 1 < lines.length) {
           const nextLine = lines[i + 1].trim();
-          if (!nextLine.includes('-') && !nextLine.includes('|')) {
-            // Add separator line for table header
+          if (!nextLine.includes('-') || !nextLine.includes('|')) {
+            // Count cells in header to create proper separator
             const cellCount = (cleanLine.match(/\|/g) || []).length - 1;
-            const separator = '|' + ' --- |'.repeat(cellCount);
-            cleanLines.push(separator);
+            if (cellCount > 0) {
+              const separator = '|' + ' --- |'.repeat(cellCount);
+              cleanLines.push(separator);
+            }
           }
         }
-      } else if (foundTable && line.includes('-')) {
-        // This is likely a separator line
-        let cleanLine = line.replace(/\s+/g, '').replace(/-+/g, '---');
+      } else if (tableStarted && line.includes('-') && line.includes('|')) {
+        // This is a separator line
+        let cleanLine = line
+          .replace(/\s+/g, '')
+          .replace(/-+/g, '---');
+        
         if (!cleanLine.startsWith('|')) cleanLine = '|' + cleanLine;
         if (!cleanLine.endsWith('|')) cleanLine = cleanLine + '|';
+        
         cleanLines.push(cleanLine);
-      } else if (foundTable && !line) {
+      } else if (tableStarted && !line) {
         // Empty line after table - stop processing
         break;
-      } else if (foundTable) {
-        // Continue with table content
-        cleanLines.push(line);
+      } else if (tableStarted) {
+        // Potential continuation of table content
+        if (line.includes('|')) {
+          cleanLines.push(line);
+        } else {
+          // Non-table content after table started - stop
+          break;
+        }
       }
     }
     
-    const result = cleanLines.join('\n');
-    console.log("Cleaned table result:", result);
-    return result;
+    return cleanLines.join('\n');
   }, []);
 
   // Helper function to safely get relationships as an array
@@ -268,7 +291,7 @@ const MysteryPackageTabView = React.memo(({
     return match ? match[1].trim() : "";
   }, [packageContent]);
 
-  // Enhanced character matrix extraction
+  // Improved character matrix extraction
   const extractCharacterMatrix = useCallback(() => {
     if (!packageContent) return "";
     
@@ -278,32 +301,28 @@ const MysteryPackageTabView = React.memo(({
     if (!match) return "";
     
     const rawContent = match[1].trim();
-    console.log("Raw matrix content:", rawContent.substring(0, 300) + "...");
     
     // Find the actual table content by looking for the first line with pipes
     const lines = rawContent.split('\n');
     const tableStartIndex = lines.findIndex(line => line.trim().includes('|'));
     
     if (tableStartIndex === -1) {
-      console.log("No table found in matrix content");
-      return rawContent; // Return as-is if no table found
+      return ""; // No table found
     }
     
-    // Extract just the table portion
+    // Extract from table start to end of content or next section
     const tableLines = lines.slice(tableStartIndex);
     
-    // Find where table ends (first empty line or non-table content)
+    // Find where table ends (empty line or non-table content)
     const tableEndIndex = tableLines.findIndex((line, index) => {
       if (index === 0) return false; // Don't end on first line
       const trimmed = line.trim();
-      return !trimmed || (!trimmed.includes('|') && !trimmed.includes('-'));
+      // End if we hit an empty line followed by non-table content, or a new section
+      return !trimmed || (trimmed.startsWith('#') && !trimmed.includes('|'));
     });
     
     const finalTableLines = tableEndIndex > 0 ? tableLines.slice(0, tableEndIndex) : tableLines;
-    const extractedTable = finalTableLines.join('\n');
-    
-    console.log("Extracted table:", extractedTable);
-    return extractedTable;
+    return finalTableLines.join('\n').trim();
   }, [packageContent]);
 
   const extractCharacters = useCallback(() => {
@@ -368,56 +387,45 @@ const MysteryPackageTabView = React.memo(({
     return packageData?.detectiveScript || extractInspectorScript();
   }, [packageData?.detectiveScript, extractInspectorScript]);
 
-const relationshipMatrix = useMemo(() => {
-  let rawMatrix = packageData?.relationshipMatrix || extractCharacterMatrix();
-  
-  console.log("=== RELATIONSHIP MATRIX DEBUG ===");
-  console.log("Raw matrix data:", rawMatrix);
-  console.log("Raw matrix length:", rawMatrix?.length);
-  console.log("First 500 chars:", rawMatrix?.substring(0, 500));
-  console.log("Package data exists:", !!packageData?.relationshipMatrix);
-  console.log("Extract result:", extractCharacterMatrix()?.substring(0, 200));
-  
-  if (!rawMatrix) {
-    console.log("No raw matrix data found");
-    return "";
-  }
-  
-  // If using packageData, extract just the table portion
-  if (packageData?.relationshipMatrix) {
-    console.log("Processing packageData matrix");
-    const lines = rawMatrix.split('\n');
-    console.log("Total lines:", lines.length);
-    console.log("Lines preview:", lines.slice(0, 5));
+  // Enhanced relationship matrix processing
+  const relationshipMatrix = useMemo(() => {
+    let rawMatrix = packageData?.relationshipMatrix || extractCharacterMatrix();
     
-    const tableStartIndex = lines.findIndex(line => line.trim().startsWith('|'));
-    console.log("Table start index:", tableStartIndex);
-    
-    if (tableStartIndex !== -1) {
-      // Find table end
-      const tableEndIndex = lines.findIndex((line, index) => {
-        if (index <= tableStartIndex) return false;
-        const trimmed = line.trim();
-        return !trimmed || (!trimmed.includes('|') && !trimmed.includes('-'));
-      });
-      
-      console.log("Table end index:", tableEndIndex);
-      
-      const tablePortion = tableEndIndex > 0 ? 
-        lines.slice(tableStartIndex, tableEndIndex) : 
-        lines.slice(tableStartIndex);
-      
-      console.log("Extracted table lines:", tablePortion);
-      rawMatrix = tablePortion.join('\n');
+    if (!rawMatrix) {
+      return "";
     }
-  }
+    
+    // If using packageData, we might need to extract just the table portion
+    if (packageData?.relationshipMatrix) {
+      const lines = rawMatrix.split('\n');
+      const tableStartIndex = lines.findIndex(line => line.trim().includes('|'));
+      
+      if (tableStartIndex !== -1) {
+        // Find table end
+        const tableEndIndex = lines.findIndex((line, index) => {
+          if (index <= tableStartIndex) return false;
+          const trimmed = line.trim();
+          return !trimmed || (!trimmed.includes('|') && !trimmed.includes('-'));
+        });
+        
+        const tablePortion = tableEndIndex > 0 ? 
+          lines.slice(tableStartIndex, tableEndIndex) : 
+          lines.slice(tableStartIndex);
+        
+        rawMatrix = tablePortion.join('\n');
+      }
+    }
 
-  const cleanedMatrix = cleanMarkdownTable(rawMatrix);
-  console.log("Final cleaned matrix:", cleanedMatrix);
-  console.log("=== END DEBUG ===");
-  
-  return cleanedMatrix;
-}, [packageData?.relationshipMatrix, extractCharacterMatrix, cleanMarkdownTable]);
+    const cleanedMatrix = cleanMarkdownTable(rawMatrix);
+    
+    // Validate the cleaned matrix
+    if (!isValidMarkdownTable(cleanedMatrix)) {
+      console.warn("Invalid markdown table detected in relationship matrix");
+      return "";
+    }
+    
+    return cleanedMatrix;
+  }, [packageData?.relationshipMatrix, extractCharacterMatrix, cleanMarkdownTable, isValidMarkdownTable]);
 
   const charactersList = useMemo(() => {
     if (characters && characters.length > 0) {
@@ -472,6 +480,51 @@ const relationshipMatrix = useMemo(() => {
       </div>
     </div>
   ), [statusMessage, isMobile]);
+
+  // Enhanced table components for ReactMarkdown
+  const tableComponents = useMemo(() => ({
+    table: ({ children }: any) => (
+      <div className="overflow-x-auto mb-4">
+        <table className={cn(
+          "w-full border-collapse border border-border bg-background",
+          isMobile && "text-xs"
+        )}>
+          {children}
+        </table>
+      </div>
+    ),
+    thead: ({ children }: any) => (
+      <thead className="bg-muted/50">
+        {children}
+      </thead>
+    ),
+    tbody: ({ children }: any) => (
+      <tbody>
+        {children}
+      </tbody>
+    ),
+    tr: ({ children }: any) => (
+      <tr className="border-b border-border hover:bg-muted/25">
+        {children}
+      </tr>
+    ),
+    th: ({ children }: any) => (
+      <th className={cn(
+        "border border-border px-3 py-2 text-left font-medium text-foreground bg-muted/30",
+        isMobile && "px-2 py-1 text-xs"
+      )}>
+        {children}
+      </th>
+    ),
+    td: ({ children }: any) => (
+      <td className={cn(
+        "border border-border px-3 py-2 text-foreground",
+        isMobile && "px-2 py-1 text-xs"
+      )}>
+        {children}
+      </td>
+    ),
+  }), [isMobile]);
 
   return (
     <div className="w-full">
@@ -916,53 +969,20 @@ const relationshipMatrix = useMemo(() => {
                 )}>
                   Character Relationship Matrix
                 </h2>
-                <ReactMarkdown 
-                  components={{
-                    table: ({ children }) => (
-                      <div className="overflow-x-auto mb-4">
-                        <table className={cn(
-                          "w-full border-collapse border border-border",
-                          isMobile && "text-xs"
-                        )}>
-                          {children}
-                        </table>
-                      </div>
-                    ),
-                    thead: ({ children }) => (
-                      <thead className="bg-muted/50">
-                        {children}
-                      </thead>
-                    ),
-                    tbody: ({ children }) => (
-                      <tbody>
-                        {children}
-                      </tbody>
-                    ),
-                    tr: ({ children }) => (
-                      <tr className="border-b border-border">
-                        {children}
-                      </tr>
-                    ),
-                    th: ({ children }) => (
-                      <th className={cn(
-                        "border border-border px-3 py-2 text-left font-medium",
-                        isMobile && "px-2 py-1 text-xs"
-                      )}>
-                        {children}
-                      </th>
-                    ),
-                    td: ({ children }) => (
-                      <td className={cn(
-                        "border border-border px-3 py-2",
-                        isMobile && "px-2 py-1 text-xs"
-                      )}>
-                        {children}
-                      </td>
-                    ),
-                  }}
-                >
-                  {relationshipMatrix}
-                </ReactMarkdown>
+                {isValidMarkdownTable(relationshipMatrix) ? (
+                  <ReactMarkdown 
+                    components={tableComponents}
+                  >
+                    {relationshipMatrix}
+                  </ReactMarkdown>
+                ) : (
+                  <div className="p-4 border border-border rounded-lg bg-muted/20">
+                    <p className="text-muted-foreground text-center">
+                      The relationship matrix data is not in a valid table format. 
+                      Please regenerate the mystery package for proper table formatting.
+                    </p>
+                  </div>
+                )}
               </div>
             ) : isGenerating ? (
               <LoadingTabContent message="Building the character relationship matrix showing connections, conflicts, and hidden relationships." />
