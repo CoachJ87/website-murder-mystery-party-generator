@@ -501,7 +501,7 @@ const MysteryPackageTabView = React.memo(({
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="">
         <TabsList className={cn(
-          "w-full mb-4 bg-[#8B0000] p-1",
+          "w-full mb-4 bg-[#8B0000] p-1 overflow-hidden",
           isMobile ? "grid grid-cols-2 gap-1 h-auto" : "grid grid-cols-2 md:grid-cols-5"
         )}>
           <TabsTrigger 
