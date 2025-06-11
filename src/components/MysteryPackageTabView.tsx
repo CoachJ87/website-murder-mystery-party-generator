@@ -507,45 +507,80 @@ const MysteryPackageTabView = React.memo(({
           <TabsTrigger 
             value="host-guide" 
             className={cn(
-              "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000] h-12 flex items-center justify-center py-3",
-              isMobile && "text-xs px-2 h-10"
+              "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000]",
+    isMobile && "text-xs px-2 py-2 h-auto"
             )}
+              style={{ 
+              display: 'flex !important', 
+              alignItems: 'center !important', 
+              justifyContent: 'center !important',
+              height: '48px',
+              padding: '0 16px'
+            }}
           >
             {isMobile ? "Host" : "Host Guide"}
           </TabsTrigger>
           <TabsTrigger 
             value="characters" 
             className={cn(
-              "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000] h-12 flex items-center justify-center py-3",
-              isMobile && "text-xs px-2 h-10"
+              "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000]",
+    isMobile && "text-xs px-2 py-2 h-auto"
             )}
+              style={{ 
+              display: 'flex !important', 
+              alignItems: 'center !important', 
+              justifyContent: 'center !important',
+              height: '48px',
+              padding: '0 16px'
+            }}
           >
             {isMobile ? `Characters (${charactersList?.length || 0})` : `Characters (${charactersList?.length || 0})`}
           </TabsTrigger>
           <TabsTrigger 
             value="clues" 
             className={cn(
-              "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000] h-12 flex items-center justify-center py-3",
-              isMobile && "text-xs px-2 h-10"
+              "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000]",
+    isMobile && "text-xs px-2 py-2 h-auto"
             )}
+              style={{ 
+              display: 'flex !important', 
+              alignItems: 'center !important', 
+              justifyContent: 'center !important',
+              height: '48px',
+              padding: '0 16px'
+            }}
           >
             Evidence
           </TabsTrigger>
           <TabsTrigger 
             value="inspector" 
             className={cn(
-              "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000] h-12 flex items-center justify-center py-3",
-              isMobile && "text-xs px-2 h-10"
+              "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000]",
+    isMobile && "text-xs px-2 py-2 h-auto"
             )}
+              style={{ 
+              display: 'flex !important', 
+              alignItems: 'center !important', 
+              justifyContent: 'center !important',
+              height: '48px',
+              padding: '0 16px'
+            }}
           >
             {isMobile ? "Detective" : "Detective Guide"}
           </TabsTrigger>
           <TabsTrigger 
             value="matrix" 
             className={cn(
-              "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000] h-12 flex items-center justify-center py-3",
-              isMobile && "text-xs px-2 h-10"
+              "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000]",
+    isMobile && "text-xs px-2 py-2 h-auto"
             )}
+              style={{ 
+              display: 'flex !important', 
+              alignItems: 'center !important', 
+              justifyContent: 'center !important',
+              height: '48px',
+              padding: '0 16px'
+            }}
           >
             {isMobile ? "Relations" : "Relationships"}
           </TabsTrigger>
