@@ -224,17 +224,29 @@
 }
 
 /* Custom tab styling to fix vertical alignment */
-[role="tab"] {
+.w-full.mb-4.bg-\[#8B0000\] [role="tab"] {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   min-height: 48px !important;
   padding: 12px 16px !important;
+  line-height: 1 !important;
+}
+
+/* Alternative more specific selector */
+[data-radix-collection-item] {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 48px !important;
+  padding: 12px 16px !important;
+  line-height: 1 !important;
 }
 
 /* Mobile tab styling */
 @media (max-width: 768px) {
-  [role="tab"] {
+  .w-full.mb-4.bg-\[#8B0000\] [role="tab"],
+  [data-radix-collection-item] {
     min-height: 40px !important;
     padding: 8px 12px !important;
   }
