@@ -223,25 +223,25 @@
   }
 }
 
-/* More specific selector to override Tailwind classes */
-button[role="tab"][data-radix-collection-item] {
-  padding: 0 16px !important;  /* Remove all vertical padding */
-  min-height: 40px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  line-height: 1.2 !important;
-}
+  /* More specific selector to override Tailwind classes */
+  button[role="tab"][data-radix-collection-item] {
+    padding: 0 16px !important;  /* Remove all vertical padding */
+    min-height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1.2 !important;
+  }
 
-/* Target the text content directly */
-button[role="tab"][data-radix-collection-item]:before {
-  content: none !important;
-}
+  /* Target the text content directly */
+  button[role="tab"][data-radix-collection-item]:before {
+    content: none !important;
+  }
 
-/* Alternative - target by the specific classes */
-.inline-flex.items-center.justify-center[role="tab"] {
-  padding: 0 16px !important;
-  min-height: 40px !important;
-  line-height: 1.2 !important;
-}
-}
+  /* Alternative - target by the specific classes */
+  .inline-flex.items-center.justify-center[role="tab"] {
+    padding: 0 16px !important;
+    min-height: 40px !important;
+    line-height: 1.2 !important;
+  }
+
