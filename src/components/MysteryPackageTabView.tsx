@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -500,7 +499,7 @@ const MysteryPackageTabView = React.memo(({
         )}
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="overflow-hidden">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="">
         <TabsList className={cn(
           "w-full mb-4 bg-[#8B0000] p-1",
           isMobile ? "grid grid-cols-2 gap-1 h-auto" : "grid grid-cols-2 md:grid-cols-5"
@@ -552,7 +551,7 @@ const MysteryPackageTabView = React.memo(({
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="host-guide" className={cn(isMobile && "px-2")}>
+        <TabsContent value="host-guide" className={cn("overflow-hidden", isMobile && "px-2")}>
           <div className={cn(
             "mystery-content",
             isMobile && "text-sm"
@@ -656,7 +655,7 @@ const MysteryPackageTabView = React.memo(({
           </div>
         </TabsContent>
 
-        <TabsContent value="characters" className={cn(isMobile && "px-2")}>
+        <TabsContent value="characters" className={cn("overflow-hidden", isMobile && "px-2")}>
           <div className={cn(
             "mystery-content",
             isMobile && "text-sm"
@@ -762,7 +761,7 @@ const MysteryPackageTabView = React.memo(({
           </div>
         </TabsContent>
 
-        <TabsContent value="clues" className={cn(isMobile && "px-2")}>
+        <TabsContent value="clues" className={cn("overflow-hidden", isMobile && "px-2")}>
           <div className={cn(
             "mystery-content",
             isMobile && "text-sm"
@@ -821,7 +820,7 @@ const MysteryPackageTabView = React.memo(({
           </div>
         </TabsContent>
 
-        <TabsContent value="inspector" className={cn(isMobile && "px-2")}>
+        <TabsContent value="inspector" className={cn("overflow-hidden", isMobile && "px-2")}>
           <div className={cn(
             "mystery-content",
             isMobile && "text-sm"
@@ -880,7 +879,7 @@ const MysteryPackageTabView = React.memo(({
           </div>
         </TabsContent>
 
-        <TabsContent value="matrix" className={cn(isMobile && "px-2")}>
+        <TabsContent value="matrix" className={cn("overflow-hidden", isMobile && "px-2")}>
           <div className={cn(
             "mystery-content",
             isMobile && "text-sm"
@@ -954,3 +953,5 @@ const MysteryPackageTabView = React.memo(({
 MysteryPackageTabView.displayName = 'MysteryPackageTabView';
 
 export default MysteryPackageTabView;
+
+</edits_to_apply>
