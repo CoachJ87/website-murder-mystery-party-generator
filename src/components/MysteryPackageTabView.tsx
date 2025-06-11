@@ -418,11 +418,6 @@ const relationshipMatrix = useMemo(() => {
   
   return cleanedMatrix;
 }, [packageData?.relationshipMatrix, extractCharacterMatrix, cleanMarkdownTable]);
-  
-    const cleanedMatrix = cleanMarkdownTable(rawMatrix);
-    console.log("Final relationship matrix:", cleanedMatrix);
-    return cleanedMatrix;
-  }, [packageData?.relationshipMatrix, extractCharacterMatrix, cleanMarkdownTable]);
 
   const charactersList = useMemo(() => {
     if (characters && characters.length > 0) {
