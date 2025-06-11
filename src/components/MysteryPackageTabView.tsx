@@ -855,6 +855,22 @@ const MysteryPackageTabView = React.memo(({
                       {children}
                     </p>
                   ),
+                  ul: ({ children }) => (
+                    <ul className={cn(
+                      "list-disc pl-6 mb-4",
+                      isMobile && "pl-4 mb-3 text-sm"
+                    )}>
+                      {children}
+                    </ul>
+                  ),
+                  ol: ({ children }) => (
+                    <ol className={cn(
+                      "list-decimal pl-6 mb-4",
+                      isMobile && "pl-4 mb-3 text-sm"
+                    )}>
+                      {children}
+                    </ol>
+                  ),
                 }}
               >
                 {detectiveScript}
