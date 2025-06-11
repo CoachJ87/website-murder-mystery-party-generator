@@ -474,14 +474,6 @@ const relationshipMatrix = useMemo(() => {
         )}>
           {message}
         </p>
-        {statusMessage && (
-          <p className={cn(
-            "text-sm text-center text-muted-foreground",
-            isMobile && "text-xs px-4"
-          )}>
-            Status: {statusMessage}
-          </p>
-        )}
       </div>
     </div>
   ), [statusMessage, isMobile]);
@@ -971,30 +963,6 @@ const relationshipMatrix = useMemo(() => {
                       )}>
                         {children}
                       </td>
-                    ),
-                    h1: ({ children }) => (
-                      <h1 className={cn(
-                        "text-2xl font-bold mb-4",
-                        isMobile && "text-lg mb-3"
-                      )}>
-                        {children}
-                      </h1>
-                    ),
-                    h2: ({ children }) => (
-                      <h2 className={cn(
-                        "text-xl font-semibold mb-3",
-                        isMobile && "text-base mb-2"
-                      )}>
-                        {children}
-                      </h2>
-                    ),
-                    p: ({ children }) => (
-                      <p className={cn(
-                        "mb-4",
-                        isMobile && "mb-3 text-sm leading-relaxed"
-                      )}>
-                        {children}
-                      </p>
                     ),
                   }}
                 >
