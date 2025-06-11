@@ -368,29 +368,56 @@ const MysteryPackageTabView = React.memo(({
     return packageData?.detectiveScript || extractInspectorScript();
   }, [packageData?.detectiveScript, extractInspectorScript]);
 
-  const relationshipMatrix = useMemo(() => {
-    let rawMatrix = packageData?.relationshipMatrix || extractCharacterMatrix();
+const relationshipMatrix = useMemo(() => {
+  let rawMatrix = packageData?.relationshipMatrix || extractCharacterMatrix();
+  
+  console.log("=== RELATIONSHIP MATRIX DEBUG ===");
+  console.log("Raw matrix data:", rawMatrix);
+  console.log("Raw matrix length:", rawMatrix?.length);
+  console.log("First 500 chars:", rawMatrix?.substring(0, 500));
+  console.log("Package data exists:", !!packageData?.relationshipMatrix);
+  console.log("Extract result:", extractCharacterMatrix()?.substring(0, 200));
+  
+  if (!rawMatrix) {
+    console.log("No raw matrix data found");
+    return "";
+  }
+  
+  // If using packageData, extract just the table portion
+  if (packageData?.relationshipMatrix) {
+    console.log("Processing packageData matrix");
+    const lines = rawMatrix.split('\n');
+    console.log("Total lines:", lines.length);
+    console.log("Lines preview:", lines.slice(0, 5));
     
-    if (!rawMatrix) return "";
+    const tableStartIndex = lines.findIndex(line => line.trim().startsWith('|'));
+    console.log("Table start index:", tableStartIndex);
     
-    // If using packageData, extract just the table portion
-    if (packageData?.relationshipMatrix) {
-      const lines = rawMatrix.split('\n');
-      const tableStartIndex = lines.findIndex(line => line.trim().startsWith('|'));
-      if (tableStartIndex !== -1) {
-        // Find table end
-        const tableEndIndex = lines.findIndex((line, index) => {
-          if (index <= tableStartIndex) return false;
-          const trimmed = line.trim();
-          return !trimmed || (!trimmed.includes('|') && !trimmed.includes('-'));
-        });
-        
-        const tablePortion = tableEndIndex > 0 ? 
-          lines.slice(tableStartIndex, tableEndIndex) : 
-          lines.slice(tableStartIndex);
-        rawMatrix = tablePortion.join('\n');
-      }
+    if (tableStartIndex !== -1) {
+      // Find table end
+      const tableEndIndex = lines.findIndex((line, index) => {
+        if (index <= tableStartIndex) return false;
+        const trimmed = line.trim();
+        return !trimmed || (!trimmed.includes('|') && !trimmed.includes('-'));
+      });
+      
+      console.log("Table end index:", tableEndIndex);
+      
+      const tablePortion = tableEndIndex > 0 ? 
+        lines.slice(tableStartIndex, tableEndIndex) : 
+        lines.slice(tableStartIndex);
+      
+      console.log("Extracted table lines:", tablePortion);
+      rawMatrix = tablePortion.join('\n');
     }
+  }
+
+  const cleanedMatrix = cleanMarkdownTable(rawMatrix);
+  console.log("Final cleaned matrix:", cleanedMatrix);
+  console.log("=== END DEBUG ===");
+  
+  return cleanedMatrix;
+}, [packageData?.relationshipMatrix, extractCharacterMatrix, cleanMarkdownTable]);
   
     const cleanedMatrix = cleanMarkdownTable(rawMatrix);
     console.log("Final relationship matrix:", cleanedMatrix);
