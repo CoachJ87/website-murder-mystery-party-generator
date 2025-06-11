@@ -459,14 +459,6 @@ const MysteryPackageTabView = React.memo(({
         )}>
           {message}
         </p>
-        {statusMessage && (
-          <p className={cn(
-            "text-sm text-center text-muted-foreground",
-            isMobile && "text-xs px-4"
-          )}>
-            Status: {statusMessage}
-          </p>
-        )}
       </div>
     </div>
   ), [statusMessage, isMobile]);
@@ -617,7 +609,13 @@ const MysteryPackageTabView = React.memo(({
                 {hostGuide}
               </ReactMarkdown>
             ) : isGenerating ? (
-              <LoadingTabContent message="Creating your complete host guide with all the instructions and materials needed to run your mystery game." />
+              <LoadingTabContent message={
+                <>
+                  Currently generating your complete mystery. This process will take around 3-5 minutes.
+                  <br />
+                  This page will automatically refresh once the mystery is complete.
+                </>
+              } />            
             ) : (
               <div className={cn(
                 "text-center py-12 space-y-4",
