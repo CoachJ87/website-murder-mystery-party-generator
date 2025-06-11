@@ -507,8 +507,8 @@ const MysteryPackageTabView = React.memo(({
           <TabsTrigger 
             value="host-guide" 
             className={cn(
-              "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000] flex items-center justify-center",
-              isMobile && "text-xs px-2 py-2 h-auto"
+              "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000] h-12 flex items-center justify-center py-3",
+              isMobile && "text-xs px-2 h-10"
             )}
           >
             {isMobile ? "Host" : "Host Guide"}
@@ -516,8 +516,8 @@ const MysteryPackageTabView = React.memo(({
           <TabsTrigger 
             value="characters" 
             className={cn(
-              "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000] flex items-center justify-center",
-              isMobile && "text-xs px-2 py-2 h-auto"
+              "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000] h-12 flex items-center justify-center py-3",
+              isMobile && "text-xs px-2 h-10"
             )}
           >
             {isMobile ? `Characters (${charactersList?.length || 0})` : `Characters (${charactersList?.length || 0})`}
@@ -525,8 +525,8 @@ const MysteryPackageTabView = React.memo(({
           <TabsTrigger 
             value="clues" 
             className={cn(
-              "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000] flex items-center justify-center",
-              isMobile && "text-xs px-2 py-2 h-auto"
+              "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000] h-12 flex items-center justify-center py-3",
+              isMobile && "text-xs px-2 h-10"
             )}
           >
             Evidence
@@ -534,8 +534,8 @@ const MysteryPackageTabView = React.memo(({
           <TabsTrigger 
             value="inspector" 
             className={cn(
-              "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000] flex items-center justify-center",
-              isMobile && "text-xs px-2 py-2 h-auto col-span-1"
+              "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000] h-12 flex items-center justify-center py-3",
+              isMobile && "text-xs px-2 h-10"
             )}
           >
             {isMobile ? "Detective" : "Detective Guide"}
@@ -543,8 +543,8 @@ const MysteryPackageTabView = React.memo(({
           <TabsTrigger 
             value="matrix" 
             className={cn(
-              "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000] flex items-center justify-center",
-              isMobile && "text-xs px-2 py-2 h-auto col-span-1"
+              "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000] h-12 flex items-center justify-center py-3",
+              isMobile && "text-xs px-2 h-10"
             )}
           >
             {isMobile ? "Relations" : "Relationships"}
