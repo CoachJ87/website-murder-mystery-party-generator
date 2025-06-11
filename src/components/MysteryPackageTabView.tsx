@@ -510,13 +510,6 @@ const MysteryPackageTabView = React.memo(({
               "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000]",
     isMobile && "text-xs px-2 py-2 h-auto"
             )}
-              style={{ 
-              display: 'flex !important', 
-              alignItems: 'center !important', 
-              justifyContent: 'center !important',
-              height: '48px',
-              padding: '0 16px'
-            }}
           >
             {isMobile ? "Host" : "Host Guide"}
           </TabsTrigger>
@@ -526,13 +519,6 @@ const MysteryPackageTabView = React.memo(({
               "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000]",
     isMobile && "text-xs px-2 py-2 h-auto"
             )}
-              style={{ 
-              display: 'flex !important', 
-              alignItems: 'center !important', 
-              justifyContent: 'center !important',
-              height: '48px',
-              padding: '0 16px'
-            }}
           >
             {isMobile ? `Characters (${charactersList?.length || 0})` : `Characters (${charactersList?.length || 0})`}
           </TabsTrigger>
@@ -542,13 +528,6 @@ const MysteryPackageTabView = React.memo(({
               "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000]",
     isMobile && "text-xs px-2 py-2 h-auto"
             )}
-              style={{ 
-              display: 'flex !important', 
-              alignItems: 'center !important', 
-              justifyContent: 'center !important',
-              height: '48px',
-              padding: '0 16px'
-            }}
           >
             Evidence
           </TabsTrigger>
@@ -558,13 +537,6 @@ const MysteryPackageTabView = React.memo(({
               "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000]",
     isMobile && "text-xs px-2 py-2 h-auto"
             )}
-              style={{ 
-              display: 'flex !important', 
-              alignItems: 'center !important', 
-              justifyContent: 'center !important',
-              height: '48px',
-              padding: '0 16px'
-            }}
           >
             {isMobile ? "Detective" : "Detective Guide"}
           </TabsTrigger>
@@ -574,13 +546,6 @@ const MysteryPackageTabView = React.memo(({
               "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000]",
     isMobile && "text-xs px-2 py-2 h-auto"
             )}
-              style={{ 
-              display: 'flex !important', 
-              alignItems: 'center !important', 
-              justifyContent: 'center !important',
-              height: '48px',
-              padding: '0 16px'
-            }}
           >
             {isMobile ? "Relations" : "Relationships"}
           </TabsTrigger>
