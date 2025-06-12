@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -74,98 +73,53 @@ const MysteryPackageTabView = React.memo(({
     }
   }, [generationStatus]);
 
-  // Validate markdown table function
-  const isValidMarkdownTable = useCallback((content: string): boolean => {
-    if (!content) return false;
-    
-    const lines = content.trim().split('\n');
-    if (lines.length < 2) return false;
-    
-    // Check if we have at least a header row and separator
-    const hasHeaderRow = lines[0].includes('|');
-    const hasSeparatorRow = lines.length > 1 && lines[1].includes('-') && lines[1].includes('|');
-    
-    return hasHeaderRow && hasSeparatorRow;
+  // Simplified processing for relationship matrix
+  const processRelationshipMatrix = useCallback((rawMatrix: string): string => {
+    if (!rawMatrix) {
+      console.log("[Matrix Debug] No raw matrix data");
+      return "";
+    }
+
+    console.log("[Matrix Debug] Raw matrix data:", rawMatrix.substring(0, 200) + "...");
+
+    // Step 1: Convert escaped newlines to actual newlines
+    let processedMatrix = rawMatrix.replace(/\\n/g, '\n');
+    console.log("[Matrix Debug] After newline conversion:", processedMatrix.substring(0, 200) + "...");
+
+    // Step 2: Clean up any extra whitespace but preserve table structure
+    const lines = processedMatrix.split('\n');
+    const cleanedLines = lines
+      .map(line => line.trim())
+      .filter(line => line.length > 0); // Remove empty lines
+
+    const result = cleanedLines.join('\n');
+    console.log("[Matrix Debug] Final processed result:", result.substring(0, 200) + "...");
+    console.log("[Matrix Debug] Line count:", cleanedLines.length);
+    console.log("[Matrix Debug] First few lines:", cleanedLines.slice(0, 5));
+
+    return result;
   }, []);
 
-  // Improved markdown table cleaning function
-  const cleanMarkdownTable = useCallback((content: string): string => {
-    if (!content) return '';
-    
-    const lines = content.split('\n');
-    const cleanLines: string[] = [];
-    let tableStarted = false;
-    
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim();
-      
-      // Skip empty lines before table starts
-      if (!tableStarted && !line) continue;
-      
-      // Detect table start (line with pipes)
-      if (line.includes('|')) {
-        tableStarted = true;
-        
-        // Clean the table line
-        let cleanLine = line
-          // Remove extra whitespace around pipes
-          .replace(/\s*\|\s*/g, '|')
-          // Ensure proper spacing after pipes
-          .replace(/\|/g, '| ')
-          // Handle escaped characters
-          .replace(/\\n/g, ' ')
-          .replace(/\\"/g, '"')
-          // Remove extra spaces
-          .replace(/\s+/g, ' ')
-          .trim();
-        
-        // Ensure the line starts and ends with pipes
-        if (!cleanLine.startsWith('|')) {
-          cleanLine = '|' + cleanLine;
-        }
-        if (!cleanLine.endsWith('|')) {
-          cleanLine = cleanLine + '|';
-        }
-        
-        cleanLines.push(cleanLine);
-        
-        // Add separator row after header if missing
-        if (cleanLines.length === 1 && i + 1 < lines.length) {
-          const nextLine = lines[i + 1].trim();
-          if (!nextLine.includes('-') || !nextLine.includes('|')) {
-            // Count cells in header to create proper separator
-            const cellCount = (cleanLine.match(/\|/g) || []).length - 1;
-            if (cellCount > 0) {
-              const separator = '|' + ' --- |'.repeat(cellCount);
-              cleanLines.push(separator);
-            }
-          }
-        }
-      } else if (tableStarted && line.includes('-') && line.includes('|')) {
-        // This is a separator line
-        let cleanLine = line
-          .replace(/\s+/g, '')
-          .replace(/-+/g, '---');
-        
-        if (!cleanLine.startsWith('|')) cleanLine = '|' + cleanLine;
-        if (!cleanLine.endsWith('|')) cleanLine = cleanLine + '|';
-        
-        cleanLines.push(cleanLine);
-      } else if (tableStarted && !line) {
-        // Empty line after table - stop processing
-        break;
-      } else if (tableStarted) {
-        // Potential continuation of table content
-        if (line.includes('|')) {
-          cleanLines.push(line);
-        } else {
-          // Non-table content after table started - stop
-          break;
-        }
-      }
+  // Simplified validation that just checks for basic table structure
+  const isValidTable = useCallback((content: string): boolean => {
+    if (!content) {
+      console.log("[Matrix Debug] Validation failed: no content");
+      return false;
     }
     
-    return cleanLines.join('\n');
+    const lines = content.trim().split('\n');
+    const hasTableLines = lines.filter(line => line.includes('|')).length;
+    const hasSeparator = lines.some(line => line.includes('---') || line.includes('-'));
+    
+    console.log("[Matrix Debug] Validation check:", {
+      totalLines: lines.length,
+      tableLines: hasTableLines,
+      hasSeparator,
+      firstLine: lines[0]?.substring(0, 50) + "...",
+      secondLine: lines[1]?.substring(0, 50) + "..."
+    });
+
+    return hasTableLines >= 2 && hasSeparator;
   }, []);
 
   // Helper function to safely get relationships as an array
@@ -387,45 +341,30 @@ const MysteryPackageTabView = React.memo(({
     return packageData?.detectiveScript || extractInspectorScript();
   }, [packageData?.detectiveScript, extractInspectorScript]);
 
-  // Enhanced relationship matrix processing
+  // Enhanced relationship matrix processing with improved debugging
   const relationshipMatrix = useMemo(() => {
+    console.log("[Matrix Debug] Starting relationship matrix processing");
+    
     let rawMatrix = packageData?.relationshipMatrix || extractCharacterMatrix();
     
     if (!rawMatrix) {
+      console.log("[Matrix Debug] No raw matrix found");
       return "";
-    }
-    
-    // If using packageData, we might need to extract just the table portion
-    if (packageData?.relationshipMatrix) {
-      const lines = rawMatrix.split('\n');
-      const tableStartIndex = lines.findIndex(line => line.trim().includes('|'));
-      
-      if (tableStartIndex !== -1) {
-        // Find table end
-        const tableEndIndex = lines.findIndex((line, index) => {
-          if (index <= tableStartIndex) return false;
-          const trimmed = line.trim();
-          return !trimmed || (!trimmed.includes('|') && !trimmed.includes('-'));
-        });
-        
-        const tablePortion = tableEndIndex > 0 ? 
-          lines.slice(tableStartIndex, tableEndIndex) : 
-          lines.slice(tableStartIndex);
-        
-        rawMatrix = tablePortion.join('\n');
-      }
     }
 
-    const cleanedMatrix = cleanMarkdownTable(rawMatrix);
+    console.log("[Matrix Debug] Raw matrix source:", packageData?.relationshipMatrix ? "packageData" : "extracted");
     
-    // Validate the cleaned matrix
-    if (!isValidMarkdownTable(cleanedMatrix)) {
-      console.warn("Invalid markdown table detected in relationship matrix");
-      return "";
+    // Process the matrix using our simplified function
+    const processedMatrix = processRelationshipMatrix(rawMatrix);
+    
+    // Validate the processed matrix
+    if (!isValidTable(processedMatrix)) {
+      console.warn("[Matrix Debug] Validation failed, but will still try to render");
+      // Don't return empty - let ReactMarkdown try to render it anyway
     }
     
-    return cleanedMatrix;
-  }, [packageData?.relationshipMatrix, extractCharacterMatrix, cleanMarkdownTable, isValidMarkdownTable]);
+    return processedMatrix;
+  }, [packageData?.relationshipMatrix, extractCharacterMatrix, processRelationshipMatrix, isValidTable]);
 
   const charactersList = useMemo(() => {
     if (characters && characters.length > 0) {
@@ -481,18 +420,21 @@ const MysteryPackageTabView = React.memo(({
     </div>
   ), [statusMessage, isMobile]);
 
-  // Enhanced table components for ReactMarkdown
+  // Enhanced table components for ReactMarkdown with better debugging
   const tableComponents = useMemo(() => ({
-    table: ({ children }: any) => (
-      <div className="overflow-x-auto mb-4">
-        <table className={cn(
-          "w-full border-collapse border border-border bg-background",
-          isMobile && "text-xs"
-        )}>
-          {children}
-        </table>
-      </div>
-    ),
+    table: ({ children }: any) => {
+      console.log("[Table Component] Rendering table with children:", children);
+      return (
+        <div className="overflow-x-auto mb-4">
+          <table className={cn(
+            "w-full border-collapse border border-border bg-background",
+            isMobile && "text-xs"
+          )}>
+            {children}
+          </table>
+        </div>
+      );
+    },
     thead: ({ children }: any) => (
       <thead className="bg-muted/50">
         {children}
@@ -969,20 +911,15 @@ const MysteryPackageTabView = React.memo(({
                 )}>
                   Character Relationship Matrix
                 </h2>
-                {isValidMarkdownTable(relationshipMatrix) ? (
-                  <ReactMarkdown 
-                    components={tableComponents}
-                  >
-                    {relationshipMatrix}
-                  </ReactMarkdown>
-                ) : (
-                  <div className="p-4 border border-border rounded-lg bg-muted/20">
-                    <p className="text-muted-foreground text-center">
-                      The relationship matrix data is not in a valid table format. 
-                      Please regenerate the mystery package for proper table formatting.
-                    </p>
-                  </div>
-                )}
+                <div className="mb-4 p-2 bg-gray-100 rounded text-xs">
+                  <strong>Debug Info:</strong> Matrix length: {relationshipMatrix.length}, 
+                  Lines: {relationshipMatrix.split('\n').length}
+                </div>
+                <ReactMarkdown 
+                  components={tableComponents}
+                >
+                  {relationshipMatrix}
+                </ReactMarkdown>
               </div>
             ) : isGenerating ? (
               <LoadingTabContent message="Building the character relationship matrix showing connections, conflicts, and hidden relationships." />
