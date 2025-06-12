@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -50,21 +51,6 @@ const MysteryPackageTabView = React.memo(({
   const [statusMessage, setStatusMessage] = useState("Starting generation...");
   const [showGuestManager, setShowGuestManager] = useState(false);
   const isMobile = useIsMobile();
-  
-  // Controlled logging
-  const DEBUG_MODE = process.env.NODE_ENV === 'development';
-  const lastLogTime = useRef<number>(0);
-  
-  const debugLog = useCallback((message: string, data?: any) => {
-    if (!DEBUG_MODE) return;
-    
-    const now = Date.now();
-    // Only log every 10 seconds max to reduce spam
-    if (now - lastLogTime.current > 10000) {
-      console.log(`[MysteryPackage] ${message}`, data);
-      lastLogTime.current = now;
-    }
-  }, []);
 
   // Update status message based on generationStatus
   useEffect(() => {
@@ -73,53 +59,29 @@ const MysteryPackageTabView = React.memo(({
     }
   }, [generationStatus]);
 
-  // Simplified processing for relationship matrix
+  // Clean table processing function
   const processRelationshipMatrix = useCallback((rawMatrix: string): string => {
     if (!rawMatrix) {
-      console.log("[Matrix Debug] No raw matrix data");
       return "";
     }
 
-    console.log("[Matrix Debug] Raw matrix data:", rawMatrix.substring(0, 200) + "...");
-
-    // Step 1: Convert escaped newlines to actual newlines
+    // Convert escaped newlines to actual newlines
     let processedMatrix = rawMatrix.replace(/\\n/g, '\n');
-    console.log("[Matrix Debug] After newline conversion:", processedMatrix.substring(0, 200) + "...");
-
-    // Step 2: Clean up any extra whitespace but preserve table structure
+    
+    // Extract only the table portion (lines with |)
     const lines = processedMatrix.split('\n');
-    const cleanedLines = lines
-      .map(line => line.trim())
-      .filter(line => line.length > 0); // Remove empty lines
-
-    const result = cleanedLines.join('\n');
-    console.log("[Matrix Debug] Final processed result:", result.substring(0, 200) + "...");
-    console.log("[Matrix Debug] Line count:", cleanedLines.length);
-    console.log("[Matrix Debug] First few lines:", cleanedLines.slice(0, 5));
-
-    return result;
-  }, []);
-
-  // Simplified validation that just checks for basic table structure
-  const isValidTable = useCallback((content: string): boolean => {
-    if (!content) {
-      console.log("[Matrix Debug] Validation failed: no content");
-      return false;
-    }
-    
-    const lines = content.trim().split('\n');
-    const hasTableLines = lines.filter(line => line.includes('|')).length;
-    const hasSeparator = lines.some(line => line.includes('---') || line.includes('-'));
-    
-    console.log("[Matrix Debug] Validation check:", {
-      totalLines: lines.length,
-      tableLines: hasTableLines,
-      hasSeparator,
-      firstLine: lines[0]?.substring(0, 50) + "...",
-      secondLine: lines[1]?.substring(0, 50) + "..."
+    const tableLines = lines.filter(line => {
+      const trimmed = line.trim();
+      return trimmed.includes('|') && trimmed.length > 0;
     });
 
-    return hasTableLines >= 2 && hasSeparator;
+    if (tableLines.length === 0) {
+      return "";
+    }
+
+    // Ensure proper table formatting with blank lines around
+    const cleanTable = tableLines.join('\n');
+    return `\n${cleanTable}\n`;
   }, []);
 
   // Helper function to safely get relationships as an array
@@ -341,30 +303,17 @@ const MysteryPackageTabView = React.memo(({
     return packageData?.detectiveScript || extractInspectorScript();
   }, [packageData?.detectiveScript, extractInspectorScript]);
 
-  // Enhanced relationship matrix processing with improved debugging
+  // Clean relationship matrix processing
   const relationshipMatrix = useMemo(() => {
-    console.log("[Matrix Debug] Starting relationship matrix processing");
-    
     let rawMatrix = packageData?.relationshipMatrix || extractCharacterMatrix();
     
     if (!rawMatrix) {
-      console.log("[Matrix Debug] No raw matrix found");
       return "";
     }
 
-    console.log("[Matrix Debug] Raw matrix source:", packageData?.relationshipMatrix ? "packageData" : "extracted");
-    
-    // Process the matrix using our simplified function
-    const processedMatrix = processRelationshipMatrix(rawMatrix);
-    
-    // Validate the processed matrix
-    if (!isValidTable(processedMatrix)) {
-      console.warn("[Matrix Debug] Validation failed, but will still try to render");
-      // Don't return empty - let ReactMarkdown try to render it anyway
-    }
-    
-    return processedMatrix;
-  }, [packageData?.relationshipMatrix, extractCharacterMatrix, processRelationshipMatrix, isValidTable]);
+    // Process the matrix using our clean function
+    return processRelationshipMatrix(rawMatrix);
+  }, [packageData?.relationshipMatrix, extractCharacterMatrix, processRelationshipMatrix]);
 
   const charactersList = useMemo(() => {
     if (characters && characters.length > 0) {
@@ -420,21 +369,18 @@ const MysteryPackageTabView = React.memo(({
     </div>
   ), [statusMessage, isMobile]);
 
-  // Enhanced table components for ReactMarkdown with better debugging
+  // Enhanced table components for ReactMarkdown
   const tableComponents = useMemo(() => ({
-    table: ({ children }: any) => {
-      console.log("[Table Component] Rendering table with children:", children);
-      return (
-        <div className="overflow-x-auto mb-4">
-          <table className={cn(
-            "w-full border-collapse border border-border bg-background",
-            isMobile && "text-xs"
-          )}>
-            {children}
-          </table>
-        </div>
-      );
-    },
+    table: ({ children }: any) => (
+      <div className="overflow-x-auto mb-4">
+        <table className={cn(
+          "w-full border-collapse border border-border bg-background",
+          isMobile && "text-xs"
+        )}>
+          {children}
+        </table>
+      </div>
+    ),
     thead: ({ children }: any) => (
       <thead className="bg-muted/50">
         {children}
@@ -911,10 +857,6 @@ const MysteryPackageTabView = React.memo(({
                 )}>
                   Character Relationship Matrix
                 </h2>
-                <div className="mb-4 p-2 bg-gray-100 rounded text-xs">
-                  <strong>Debug Info:</strong> Matrix length: {relationshipMatrix.length}, 
-                  Lines: {relationshipMatrix.split('\n').length}
-                </div>
                 <ReactMarkdown 
                   components={tableComponents}
                 >
