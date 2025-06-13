@@ -1,0 +1,156 @@
+
+{
+  "navigation": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out",
+    "account": "Account Settings"
+  },
+  "hero": {
+    "title": "Host a Killer Party Tonight.",
+    "subtitle": "Generate custom murder mysteries with characters, clues, and everything you need.",
+    "subtitleAuth": "Tell us what you'd like to create and we'll make it happen.",
+    "placeholder": "What kind of murder mystery would you like to host?",
+    "placeholderAuth": "What kind of murder mystery would you like to create today?",
+    "themes": {
+      "1920sSpeakeasy": "1920s Speakeasy",
+      "hollywoodMurder": "Hollywood Murder",
+      "castleMystery": "Castle Mystery",
+      "sciFiMystery": "Sci-Fi Mystery",
+      "artGalleryOpening": "Art Gallery Opening",
+      "bakeryCompetition": "Bakery Competition",
+      "mountainSkiResort": "Mountain Ski Resort",
+      "luxuryTrainJourney": "Luxury Train Journey",
+      "historicUniversity": "Historic University",
+      "pokerTournament": "Poker Tournament",
+      "barbieDreamworld": "Barbie Dreamworld",
+      "dystopianWaterworld": "Dystopian Waterworld",
+      "jungleSteampunk": "Jungle Steampunk",
+      "magicalBakery": "Magical Bakery",
+      "gamingTournament": "Gaming Tournament",
+      "synthwave80s": "Synthwave 80s",
+      "beachResort": "Beach Resort",
+      "operaHouse": "Opera House",
+      "wineCountry": "Wine Country",
+      "safariAdventure": "Safari Adventure",
+      "fashionShow": "Fashion Show",
+      "casinoNight": "Casino Night",
+      "fairyTaleKingdom": "Fairy Tale Kingdom",
+      "spaceColony": "Space Colony",
+      "superheroAcademy": "Superhero Academy",
+      "underwaterCity": "Underwater City",
+      "wildWestSaloon": "Wild West Saloon",
+      "vikingFeast": "Viking Feast",
+      "candyKingdom": "Candy Kingdom",
+      "dragonsLair": "Dragon's Lair",
+      "timeTravelersBall": "Time Travelers' Ball",
+      "atlantisRising": "Atlantis Rising",
+      "toyBoxAdventure": "Toy Box Adventure",
+      "vampireMasquerade": "Vampire Masquerade",
+      "dimensionHopping": "Dimension Hopping",
+      "cyberpunkNightclub": "Cyberpunk Nightclub",
+      "ghostShip": "Ghost Ship",
+      "sentientPlantColony": "Sentient Plant Colony"
+    }
+  },
+  "howItWorks": {
+    "step1": {
+      "title": "Describe ideal murder mystery.",
+      "description": "Tell us what theme and features you want in your mystery."
+    },
+    "step2": {
+      "title": "The Mystery Machine creates your first version instantly.",
+      "description": "Our AI generates a complete mystery with characters and clues."
+    },
+    "step3": {
+      "title": "Talk to the editor to design and perfect your idea.",
+      "description": "Refine the mystery with the AI assistant until it's perfect."
+    },
+    "step4": {
+      "title": "Generate PDF guides for you and your friends",
+      "description": "Download everything you need to host an amazing party."
+    }
+  },
+  "features": {
+    "title": "Everything You Need Included",
+    "step1": {
+      "step": "Step 1",
+      "title": "Customizable Storylines",
+      "content": "Create your own unique murder mystery scenario, from classic themes to dreamed up reality."
+    },
+    "step2": {
+      "step": "Step 2",
+      "title": "Character Profiles",
+      "content": "Detailed character backgrounds, motivations, and secrets for all participants."
+    },
+    "step3": {
+      "step": "Step 3",
+      "title": "Host Guide",
+      "content": "Easy-to-follow step-by-step instructions to host a memorable murder mystery event."
+    }
+  },
+  "testimonials": {
+    "title": "What Others Are Saying",
+    "testimonial1": {
+      "text": "My friends still talk about our murder mystery night. The characters were so detailed and the plot twists were perfect!",
+      "author": "Jessica Davis",
+      "role": "Party Host"
+    },
+    "testimonial2": {
+      "text": "So easy to set up! I was worried about hosting for 12 people, but the materials made it simple and everyone had a blast.",
+      "author": "Mark Klein",
+      "role": "Corporate Event Planner"
+    },
+    "testimonial3": {
+      "text": "Third murder mystery party using this service and they keep getting better. The customization options are amazing.",
+      "author": "Amanda Smith",
+      "role": "Birthday Celebrant"
+    }
+  },
+  "support": {
+    "title": "Need More Help?",
+    "description": "Visit our comprehensive support center for FAQs, hosting tips, and more information about using our Murder Mystery Generator.",
+    "button": "Visit Support Center"
+  },
+  "footer": {
+    "tagline": "Craft captivating murder mysteries at the speed of imagination.",
+    "quickLinks": "Quick Links",
+    "company": "Company",
+    "links": {
+      "home": "Home",
+      "support": "Support",
+      "contact": "Contact",
+      "privacy": "Privacy Policy"
+    },
+    "copyright": "Murder Mystery Generator, Inc. All rights reserved."
+  },
+  "common": {
+    "buttons": {
+      "createNew": "Create New Mystery",
+      "getStarted": "Get Started",
+      "learnMore": "Learn More",
+      "tryNow": "Try Now",
+      "continue": "Continue",
+      "cancel": "Cancel",
+      "save": "Save",
+      "delete": "Delete",
+      "edit": "Edit",
+      "close": "Close"
+    },
+    "labels": {
+      "loading": "Loading...",
+      "error": "Error",
+      "success": "Success",
+      "warning": "Warning",
+      "info": "Information"
+    },
+    "messages": {
+      "welcome": "Welcome!",
+      "thankYou": "Thank you!",
+      "comingSoon": "Coming Soon",
+      "notFound": "Not Found"
+    }
+  }
+}
