@@ -856,7 +856,8 @@ const MysteryPackageTabView = React.memo(({
                       .split('\n')
                       .filter(line => line.trim().startsWith('|'))
                       .map((line, index) => {
-                        const cells = line.split('|').slice(1, -1).map(cell => cell.trim());
+                        const cells = line.split('|').slice(1, -1).map(cell => {
+                          // Process **bold** markdown syntax
                           return cell.trim().replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                         });
                         if (index === 0) {
