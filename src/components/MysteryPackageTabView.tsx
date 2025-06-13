@@ -842,11 +842,17 @@ const MysteryPackageTabView = React.memo(({
             isMobile && "text-sm"
           )}>
             {relationshipMatrix ? (
-              <ReactMarkdown 
-            components={tableComponents}
-            >
-              {relationshipMatrix}
-            </ReactMarkdown>
+              <div>
+                <ReactMarkdown 
+                  components={tableComponents}
+                >
+                  {relationshipMatrix}
+                </ReactMarkdown>
+                <div style={{background: '#f0f0f0', padding: '10px', marginTop: '10px', fontSize: '12px'}}>
+                  <strong>DEBUG:</strong> 
+                  <pre>{relationshipMatrix}</pre>
+                </div>
+              </div>
             ) : isGenerating ? (
               <LoadingTabContent message="Building the character relationship matrix showing connections, conflicts, and hidden relationships." />
             ) : (
