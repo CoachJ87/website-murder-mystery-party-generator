@@ -516,19 +516,6 @@ const MysteryPurchase = () => {
                       </>
                     )}
                   </Button>
-                  
-                  {isDevMode && (
-                    <Button 
-                      variant="outline" 
-                      className={cn(
-                        "w-full",
-                        isMobile ? "h-11 text-sm" : "h-10"
-                      )}
-                      onClick={handleSimulatePurchase}
-                    >
-                      Simulate Purchase (Dev Mode)
-                    </Button>
-                  )}
                 </CardFooter>
               </Card>
 
