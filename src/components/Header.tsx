@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 const Header = () => {
   const { isAuthenticated, user, signOut } = useAuth();
@@ -31,8 +32,9 @@ const Header = () => {
           </nav>
         </div>
 
-        {/* Auth Buttons - Desktop */}
+        {/* Auth Buttons and Language Switcher - Desktop */}
         <div className="hidden md:flex items-center space-x-4">
+          <LanguageSwitcher />
           {isAuthenticated ? (
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
@@ -79,6 +81,11 @@ const Header = () => {
       {isMenuOpen && (
         <div className="md:hidden absolute top-full left-0 right-0 bg-background border-b shadow-lg z-50">
           <div className="p-4 space-y-4">
+            {/* Language Switcher in mobile menu */}
+            <div className="flex justify-center">
+              <LanguageSwitcher />
+            </div>
+            
             {isAuthenticated ? (
               <>
                 <div className="flex items-center space-x-3 py-3 border-b border-border">
