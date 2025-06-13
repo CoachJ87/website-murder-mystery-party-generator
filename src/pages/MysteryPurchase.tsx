@@ -347,12 +347,13 @@ const MysteryPurchase = () => {
       setProcessing(true);
       toast.info("Redirecting to secure checkout...");
       
-      // Construct Stripe URL with return URLs
+      // Construct Stripe URL with conversation ID in metadata
       const baseUrl = window.location.origin;
-      const successUrl = `${baseUrl}/mystery/purchase/${id}?purchase=success`;
+      const successUrl = `${baseUrl}/mystery/${id}?purchase=success`;
       const cancelUrl = `${baseUrl}/mystery/purchase/${id}?purchase=cancel`;
       
-      const stripeUrl = `https://buy.stripe.com/test_eVa17344p4056ju8ww?success_url=${encodeURIComponent(successUrl)}&cancel_url=${encodeURIComponent(cancelUrl)}`;      
+      // Add client_reference_id to pass conversation ID to Stripe
+      const stripeUrl = `https://buy.stripe.com/test_eVa17344p4056ju8ww?prefilled_email=${encodeURIComponent(user?.email || '')}&success_url=${encodeURIComponent(successUrl)}&cancel_url=${encodeURIComponent(cancelUrl)}`;      
       // Redirect to Stripe
       window.location.href = stripeUrl;
       
