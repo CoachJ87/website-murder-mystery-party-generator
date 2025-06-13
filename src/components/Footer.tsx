@@ -1,8 +1,11 @@
+
 import { Link } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import { useTranslation } from 'react-i18next';
 
 const Footer = () => {
   const { isAuthenticated } = useAuth();
+  const { t } = useTranslation();
   const currentYear = new Date().getFullYear();
 
   // Return null when user is authenticated
@@ -19,38 +22,37 @@ const Footer = () => {
               <span className="text-xl font-bold gradient-text">Murder Mystery Generator</span>
             </Link>
             <p className="text-muted-foreground">
-              Craft captivating murder mysteries at the speed of imagination.
+              {t('footer.tagline')}
             </p>
           </div>
           
           <div className="space-y-4">
-            <h3 className="font-medium text-lg">Quick Links</h3>
+            <h3 className="font-medium text-lg">{t('footer.quickLinks')}</h3>
             <ul className="space-y-2">
               <li>
                 <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors no-underline">
-                  Home
+                  {t('footer.links.home')}
                 </Link>
               </li>
               <li>
                 <Link to="/support" className="text-muted-foreground hover:text-foreground transition-colors no-underline">
-                  Support
+                  {t('footer.links.support')}
                 </Link>
               </li>
-              {/* Showcase link removed as requested */}
             </ul>
           </div>
           
           <div className="space-y-4">
-            <h3 className="font-medium text-lg">Company</h3>
+            <h3 className="font-medium text-lg">{t('footer.company')}</h3>
             <ul className="space-y-2">
               <li>
                 <Link to="/contact" className="text-muted-foreground hover:text-foreground transition-colors no-underline">
-                  Contact
+                  {t('footer.links.contact')}
                 </Link>
               </li>
               <li>
                 <Link to="/privacy" className="text-muted-foreground hover:text-foreground transition-colors no-underline">
-                  Privacy Policy
+                  {t('footer.links.privacy')}
                 </Link>
               </li>
             </ul>
@@ -59,7 +61,7 @@ const Footer = () => {
         
         <div className="mt-12 pt-8 border-t flex flex-col md:flex-row justify-between items-center">
           <p className="text-muted-foreground text-sm">
-            &copy; {currentYear} Murder Mystery Generator, Inc. All rights reserved.
+            &copy; {currentYear} {t('footer.copyright')}
           </p>
         </div>
       </div>

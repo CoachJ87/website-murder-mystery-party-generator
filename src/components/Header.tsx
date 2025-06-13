@@ -5,11 +5,13 @@ import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import LanguageSwitcher from "./LanguageSwitcher";
+import { useTranslation } from 'react-i18next';
 
 const Header = () => {
   const { isAuthenticated, user, signOut } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -48,19 +50,19 @@ const Header = () => {
                 <span className="font-medium font-inter">{user?.name}</span>
               </div>
               <Button variant="outline" onClick={signOut} className="no-underline font-inter">
-                Sign Out
+                {t('navigation.signOut')}
               </Button>
               <Button asChild className="no-underline font-inter">
-                <Link to="/dashboard">Dashboard</Link>
+                <Link to="/dashboard">{t('navigation.dashboard')}</Link>
               </Button>
             </div>
           ) : (
             <>
               <Button asChild variant="outline" className="no-underline font-inter">
-                <Link to="/sign-in">Sign In</Link>
+                <Link to="/sign-in">{t('navigation.signIn')}</Link>
               </Button>
               <Button asChild className="no-underline font-inter">
-                <Link to="/sign-up">Sign Up</Link>
+                <Link to="/sign-up">{t('navigation.signUp')}</Link>
               </Button>
             </>
           )}
@@ -103,7 +105,7 @@ const Header = () => {
                   className="w-full h-12 no-underline text-base font-inter" 
                   onClick={toggleMenu}
                 >
-                  <Link to="/dashboard">Dashboard</Link>
+                  <Link to="/dashboard">{t('navigation.dashboard')}</Link>
                 </Button>
                 <Button 
                   variant="outline" 
@@ -113,7 +115,7 @@ const Header = () => {
                     toggleMenu();
                   }}
                 >
-                  Sign Out
+                  {t('navigation.signOut')}
                 </Button>
               </>
             ) : (
@@ -124,14 +126,14 @@ const Header = () => {
                   className="w-full h-12 no-underline text-base font-inter" 
                   onClick={toggleMenu}
                 >
-                  <Link to="/sign-in">Sign In</Link>
+                  <Link to="/sign-in">{t('navigation.signIn')}</Link>
                 </Button>
                 <Button 
                   asChild 
                   className="w-full h-12 no-underline text-base font-inter" 
                   onClick={toggleMenu}
                 >
-                  <Link to="/sign-up">Sign Up</Link>
+                  <Link to="/sign-up">{t('navigation.signUp')}</Link>
                 </Button>
               </>
             )}

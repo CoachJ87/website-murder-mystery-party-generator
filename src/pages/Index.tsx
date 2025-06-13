@@ -1,3 +1,4 @@
+
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Footer from "@/components/Footer";
@@ -10,29 +11,31 @@ import { HowItWorks } from "@/components/ui/how-it-works";
 import { useAuth } from "@/context/AuthContext";
 import { HomeDashboard } from "@/components/dashboard/HomeDashboard";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 
 const Index = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   
   // Feature Steps data
   const features = [
     { 
-      step: 'Step 1', 
-      title: 'Customizable Storylines',
-      content: 'Create your own unique murder mystery scenario, from classic themes to dreamed up reality.', 
+      step: t('features.step1.step'), 
+      title: t('features.step1.title'),
+      content: t('features.step1.content'), 
       image: 'https://github.com/CoachJ87/murder-mystery-party-generator/blob/main/public/images/custom_themes.png?raw=true'
     },
     { 
-      step: 'Step 2',
-      title: 'Character Profiles',
-      content: 'Detailed character backgrounds, motivations, and secrets for all participants.',
+      step: t('features.step2.step'),
+      title: t('features.step2.title'),
+      content: t('features.step2.content'),
       image: 'https://github.com/CoachJ87/murder-mystery-party-generator/blob/main/public/images/character_profiles.png?raw=true'
     },
     { 
-      step: 'Step 3',
-      title: 'Host Guide',
-      content: 'Easy-to-follow step-by-step instructions to host a memorable murder mystery event.',
+      step: t('features.step3.step'),
+      title: t('features.step3.title'),
+      content: t('features.step3.content'),
       image: 'https://github.com/CoachJ87/murder-mystery-party-generator/blob/main/public/images/host_guide.png?raw=true'
     },
   ];
@@ -41,23 +44,23 @@ const Index = () => {
   const howItWorksSteps = [
     {
       number: 1,
-      title: "Describe ideal murder mystery.",
-      description: "Tell us what theme and features you want in your mystery."
+      title: t('howItWorks.step1.title'),
+      description: t('howItWorks.step1.description')
     },
     {
       number: 2,
-      title: "The Mystery Machine creates your first version instantly.",
-      description: "Our AI generates a complete mystery with characters and clues."
+      title: t('howItWorks.step2.title'),
+      description: t('howItWorks.step2.description')
     },
     {
       number: 3,
-      title: "Talk to the editor to design and perfect your idea.",
-      description: "Refine the mystery with the AI assistant until it's perfect."
+      title: t('howItWorks.step3.title'),
+      description: t('howItWorks.step3.description')
     },
     {
       number: 4,
-      title: "Generate PDF guides for you and your friends",
-      description: "Download everything you need to host an amazing party."
+      title: t('howItWorks.step4.title'),
+      description: t('howItWorks.step4.description')
     }
   ];
 
@@ -99,7 +102,7 @@ const Index = () => {
               <div className="w-full max-w-7xl mx-auto">
                 <FeatureSteps 
                   features={features}
-                  title="Everything You Need Included"
+                  title={t('features.title')}
                   autoPlayInterval={4000}
                   imageHeight="h-[300px] sm:h-[400px] lg:h-[500px]"
                 />
@@ -110,7 +113,7 @@ const Index = () => {
             <section className="py-12 sm:py-16 lg:py-20 px-2 sm:px-4 md:px-6 lg:px-8">
               <div className="w-full max-w-7xl mx-auto">
                 <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 sm:mb-12 text-black font-playfair">
-                  What Others Are Saying
+                  {t('testimonials.title')}
                 </h2>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
@@ -124,9 +127,7 @@ const Index = () => {
                         ))}
                       </div>
                       <p className="text-foreground mb-4 text-sm sm:text-base font-inter">
-                        {["My friends still talk about our murder mystery night. The characters were so detailed and the plot twists were perfect!",
-                          "So easy to set up! I was worried about hosting for 12 people, but the materials made it simple and everyone had a blast.",
-                          "Third murder mystery party using this service and they keep getting better. The customization options are amazing."][i-1]}
+                        {t(`testimonials.testimonial${i}.text`)}
                       </p>
                       <div className="flex items-center">
                         <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary flex items-center justify-center mr-3">
@@ -136,10 +137,10 @@ const Index = () => {
                         </div>
                         <div>
                           <p className="font-medium text-sm sm:text-base font-inter">
-                            {["Jessica Davis", "Mark Klein", "Amanda Smith"][i-1]}
+                            {t(`testimonials.testimonial${i}.author`)}
                           </p>
                           <p className="text-xs sm:text-sm text-muted-foreground font-inter">
-                            {["Party Host", "Corporate Event Planner", "Birthday Celebrant"][i-1]}
+                            {t(`testimonials.testimonial${i}.role`)}
                           </p>
                         </div>
                       </div>
@@ -159,12 +160,12 @@ const Index = () => {
             {/* Support Link Section */}
             <section className="py-8 sm:py-12 px-2 sm:px-4 md:px-6 lg:px-8">
               <div className="w-full max-w-7xl mx-auto text-center">
-                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 text-black font-playfair">Need More Help?</h2>
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 text-black font-playfair">{t('support.title')}</h2>
                 <p className="text-muted-foreground mb-6 max-w-2xl mx-auto text-sm sm:text-base font-inter">
-                  Visit our comprehensive support center for FAQs, hosting tips, and more information about using our Murder Mystery Generator.
+                  {t('support.description')}
                 </p>
                 <Button asChild size="lg" className="bg-[#E6A73E] text-[#1D2B35] hover:bg-[#C26E3E] hover:text-white no-underline h-12 px-6 text-base font-inter">
-                  <Link to="/support" className="no-underline">Visit Support Center</Link>
+                  <Link to="/support" className="no-underline">{t('support.button')}</Link>
                 </Button>
               </div>
             </section>
