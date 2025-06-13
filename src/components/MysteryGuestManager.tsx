@@ -140,8 +140,20 @@ const MysteryGuestManager: React.FC<MysteryGuestManagerProps> = ({
           : a
       ));
 
-      // In a real implementation, you would send the actual email here
-      // For now, we'll just show a success message
+      // Call the Edge Function to send the email
+      const { data: emailResponse, error: emailError } = await supabase.functions.invoke('send-character-email', {
+        body: {
+          guest_email: assignment.guest_email.trim(),
+          guest_name: assignment.guest_name.trim(),
+          character_name: character.character_name,
+          character_details: character.description?.substring(0, 200) + '...' || 'Mystery character details...',
+          access_token: result.data.access_token
+        }
+      });
+      
+      if (emailError) {
+        throw new Error(`Failed to send email: ${emailError.message}`);
+      }
       toast.success(`Character sent to ${assignment.guest_name}!`);
 
     } catch (error) {
