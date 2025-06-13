@@ -49,5 +49,5 @@ jobs:
         with:
           github_token: ${{ secrets.GH_PAT }}
           publish_dir: ./dist
-          cname: murder-mystery.party  # Replace with your actual domain name
+          cname: mysterymaker.party
           force_orphan: true
