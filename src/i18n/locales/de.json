@@ -1,2 +1,156 @@
 
-{}
+{
+  "navigation": {
+    "home": "Startseite",
+    "dashboard": "Dashboard",
+    "signIn": "Anmelden",
+    "signUp": "Registrieren",
+    "signOut": "Abmelden",
+    "account": "Kontoeinstellungen"
+  },
+  "hero": {
+    "title": "Veranstalten Sie Heute Abend eine Mörderische Party.",
+    "subtitle": "Erstellen Sie individuelle Kriminalrätsel mit Charakteren, Hinweisen und allem was Sie brauchen.",
+    "subtitleAuth": "Sagen Sie uns, was Sie erstellen möchten, und wir machen es möglich.",
+    "placeholder": "Welche Art von Kriminalrätsel möchten Sie veranstalten?",
+    "placeholderAuth": "Welche Art von Kriminalrätsel möchten Sie heute erstellen?",
+    "themes": {
+      "1920sSpeakeasy": "1920er Speakeasy",
+      "hollywoodMurder": "Hollywood Mord",
+      "castleMystery": "Schloss Mysterium",
+      "sciFiMystery": "Sci-Fi Mysterium",
+      "artGalleryOpening": "Galerie Eröffnung",
+      "bakeryCompetition": "Bäckerei Wettbewerb",
+      "mountainSkiResort": "Berg Skigebiet",
+      "luxuryTrainJourney": "Luxus Zugreise",
+      "historicUniversity": "Historische Universität",
+      "pokerTournament": "Poker Turnier",
+      "barbieDreamworld": "Barbie Traumwelt",
+      "dystopianWaterworld": "Dystopische Wasserwelt",
+      "jungleSteampunk": "Dschungel Steampunk",
+      "magicalBakery": "Magische Bäckerei",
+      "gamingTournament": "Gaming Turnier",
+      "synthwave80s": "Synthwave 80er",
+      "beachResort": "Strand Resort",
+      "operaHouse": "Opernhaus",
+      "wineCountry": "Weinland",
+      "safariAdventure": "Safari Abenteuer",
+      "fashionShow": "Modenschau",
+      "casinoNight": "Casino Nacht",
+      "fairyTaleKingdom": "Märchen Königreich",
+      "spaceColony": "Weltraum Kolonie",
+      "superheroAcademy": "Superhelden Akademie",
+      "underwaterCity": "Unterwasser Stadt",
+      "wildWestSaloon": "Wilder Westen Saloon",
+      "vikingFeast": "Wikinger Fest",
+      "candyKingdom": "Süßigkeiten Königreich",
+      "dragonsLair": "Drachen Höhle",
+      "timeTravelersBall": "Zeitreisenden Ball",
+      "atlantisRising": "Atlantis Erwachen",
+      "toyBoxAdventure": "Spielzeugkiste Abenteuer",
+      "vampireMasquerade": "Vampir Maskenball",
+      "dimensionHopping": "Dimensions Sprung",
+      "cyberpunkNightclub": "Cyberpunk Nachtclub",
+      "ghostShip": "Geisterschiff",
+      "sentientPlantColony": "Bewusste Pflanzen Kolonie"
+    }
+  },
+  "howItWorks": {
+    "step1": {
+      "title": "Beschreiben Sie Ihr ideales Kriminalrätsel.",
+      "description": "Sagen Sie uns, welches Thema und welche Funktionen Sie in Ihrem Mysterium wollen."
+    },
+    "step2": {
+      "title": "Die Mysterium-Maschine erstellt sofort Ihre erste Version.",
+      "description": "Unsere KI generiert ein vollständiges Mysterium mit Charakteren und Hinweisen."
+    },
+    "step3": {
+      "title": "Sprechen Sie mit dem Editor, um Ihre Idee zu gestalten und zu perfektionieren.",
+      "description": "Verfeinern Sie das Mysterium mit dem KI-Assistenten, bis es perfekt ist."
+    },
+    "step4": {
+      "title": "Erstellen Sie PDF-Leitfäden für Sie und Ihre Freunde",
+      "description": "Laden Sie alles herunter, was Sie brauchen, um eine fantastische Party zu veranstalten."
+    }
+  },
+  "features": {
+    "title": "Alles was Sie Brauchen Enthalten",
+    "step1": {
+      "step": "Schritt 1",
+      "title": "Anpassbare Geschichten",
+      "content": "Erstellen Sie Ihr eigenes einzigartiges Kriminalrätsel-Szenario, von klassischen Themen bis hin zu erträumten Realitäten."
+    },
+    "step2": {
+      "step": "Schritt 2",
+      "title": "Charakter Profile",
+      "content": "Detaillierte Charakterhintergründe, Motivationen und Geheimnisse für alle Teilnehmer."
+    },
+    "step3": {
+      "step": "Schritt 3",
+      "title": "Gastgeber Leitfaden",
+      "content": "Einfach zu befolgende Schritt-für-Schritt-Anweisungen, um ein unvergessliches Kriminalrätsel-Event zu veranstalten."
+    }
+  },
+  "testimonials": {
+    "title": "Was Andere Sagen",
+    "testimonial1": {
+      "text": "Meine Freunde sprechen immer noch über unseren Kriminalrätsel-Abend. Die Charaktere waren so detailliert und die Wendungen perfekt!",
+      "author": "Jessica Davis",
+      "role": "Party Gastgeberin"
+    },
+    "testimonial2": {
+      "text": "So einfach aufzubauen! Ich war besorgt, für 12 Personen zu organisieren, aber die Materialien machten es einfach und alle hatten Spaß.",
+      "author": "Mark Klein",
+      "role": "Firmenveranstaltungs Planer"
+    },
+    "testimonial3": {
+      "text": "Dritte Kriminalrätsel-Party mit diesem Service und sie werden immer besser. Die Anpassungsoptionen sind erstaunlich.",
+      "author": "Amanda Smith",
+      "role": "Geburtstags Feiernde"
+    }
+  },
+  "support": {
+    "title": "Brauchen Sie Mehr Hilfe?",
+    "description": "Besuchen Sie unser umfassendes Support-Center für FAQs, Gastgeber-Tipps und weitere Informationen zur Nutzung unseres Kriminalrätsel-Generators.",
+    "button": "Support-Center Besuchen"
+  },
+  "footer": {
+    "tagline": "Erstellen Sie fesselnde Kriminalrätsel mit der Geschwindigkeit der Vorstellungskraft.",
+    "quickLinks": "Schnelle Links",
+    "company": "Unternehmen",
+    "links": {
+      "home": "Startseite",
+      "support": "Support",
+      "contact": "Kontakt",
+      "privacy": "Datenschutz-Bestimmungen"
+    },
+    "copyright": "Murder Mystery Generator, Inc. Alle Rechte vorbehalten."
+  },
+  "common": {
+    "buttons": {
+      "createNew": "Neues Mysterium Erstellen",
+      "getStarted": "Loslegen",
+      "learnMore": "Mehr Erfahren",
+      "tryNow": "Jetzt Probieren",
+      "continue": "Weiter",
+      "cancel": "Abbrechen",
+      "save": "Speichern",
+      "delete": "Löschen",
+      "edit": "Bearbeiten",
+      "close": "Schließen"
+    },
+    "labels": {
+      "loading": "Lädt...",
+      "error": "Fehler",
+      "success": "Erfolg",
+      "warning": "Warnung",
+      "info": "Information"
+    },
+    "messages": {
+      "welcome": "Willkommen!",
+      "thankYou": "Danke!",
+      "comingSoon": "Bald Verfügbar",
+      "notFound": "Nicht Gefunden"
+    }
+  }
+}
