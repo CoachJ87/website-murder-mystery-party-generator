@@ -64,24 +64,16 @@ const MysteryPackageTabView = React.memo(({
     if (!rawMatrix) {
       return "";
     }
-
+  
     // Convert escaped newlines to actual newlines
-    let processedMatrix = rawMatrix.replace(/\\n/g, '\n');
+    const withLineBreaks = rawMatrix.replace(/\\n/g, '\n');
     
-    // Extract only the table portion (lines with |)
-    const lines = processedMatrix.split('\n');
-    const tableLines = lines.filter(line => {
-      const trimmed = line.trim();
-      return trimmed.includes('|') && trimmed.length > 0;
-    });
-
-    if (tableLines.length === 0) {
-      return "";
-    }
-
-    // Ensure proper table formatting with blank lines around
-    const cleanTable = tableLines.join('\n');
-    return `\n${cleanTable}\n`;
+    // Extract just the table part (lines starting with |)
+    const lines = withLineBreaks.split('\n');
+    const tableLines = lines.filter(line => line.trim().startsWith('|'));
+    
+    // Join with proper line breaks and add spacing
+    return '\n\n' + tableLines.join('\n') + '\n\n';
   }, []);
 
   // Helper function to safely get relationships as an array
