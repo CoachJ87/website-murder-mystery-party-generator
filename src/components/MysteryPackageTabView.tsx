@@ -849,11 +849,28 @@ const MysteryPackageTabView = React.memo(({
                 )}>
                   Character Relationship Matrix
                 </h2>
-                <ReactMarkdown 
-                  components={tableComponents}
-                >
-                  {`\n${relationshipMatrix}\n`}
-                </ReactMarkdown>
+                <div 
+                  className="overflow-x-auto mb-4"
+                  dangerouslySetInnerHTML={{
+                    __html: relationshipMatrix
+                      .split('\n')
+                      .filter(line => line.trim().startsWith('|'))
+                      .map((line, index) => {
+                        const cells = line.split('|').slice(1, -1).map(cell => cell.trim());
+                        if (index === 0) {
+                          return `<tr>${cells.map(cell => `<th class="border border-gray-300 px-3 py-2 text-left font-medium bg-gray-100">${cell}</th>`).join('')}</tr>`;
+                        } else if (index === 1) {
+                          return ''; // Skip separator row
+                        } else {
+                          return `<tr class="hover:bg-gray-50">${cells.map(cell => `<td class="border border-gray-300 px-3 py-2">${cell}</td>`).join('')}</tr>`;
+                        }
+                      })
+                      .filter(row => row)
+                      .join('')
+                      .replace(/^/, '<table class="w-full border-collapse border border-gray-300 bg-white">')
+                      .replace(/$/, '</table>')
+                  }}
+                />
               </div>
             ) : isGenerating ? (
               <LoadingTabContent message="Building the character relationship matrix showing connections, conflicts, and hidden relationships." />
