@@ -345,54 +345,40 @@ const MysteryPurchase = () => {
     
     try {
       setProcessing(true);
-      toast.info("Processing your purchase...");
+      toast.info("Redirecting to secure checkout...");
       
-      // Directly mark the conversation as purchased
-      const { error } = await supabase
-        .from('conversations')
-        .update({ 
-          is_paid: true,
-          purchase_date: new Date().toISOString(),
-          // Make sure package generation is needed
-          needs_package_generation: true,
-          display_status: "purchased"
-        })
-        .eq('id', id);
-        
-      if (error) {
-        throw new Error(error.message);
-      }
+      // Construct Stripe URL with return URLs
+      const baseUrl = window.location.origin;
+      const successUrl = `${baseUrl}/mystery/purchase/${id}?purchase=success`;
+      const cancelUrl = `${baseUrl}/mystery/purchase/${id}?purchase=cancel`;
       
-      toast.success("Purchase successful! Redirecting to generate your package...");
+      const stripeUrl = `https://buy.stripe.com/dRmdRa2uC2ZS3DW1gd2Nq02?success_url=${encodeURIComponent(successUrl)}&cancel_url=${encodeURIComponent(cancelUrl)}`;
       
-      // Redirect to the tab UI in MysteryView component
-      setTimeout(() => {
-        navigate(`/mystery/${id}`);
-      }, 1500);
+      // Redirect to Stripe
+      window.location.href = stripeUrl;
       
     } catch (error) {
-      console.error("Error processing payment:", error);
-      toast.error("Payment processing failed. Please try again.");
-    } finally {
+      console.error("Error redirecting to Stripe:", error);
+      toast.error("Failed to redirect to checkout. Please try again.");
       setProcessing(false);
     }
   };
-
-  if (!mystery) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1 py-12 px-4">
-          <div className="container mx-auto max-w-7xl">
-            <div className="flex items-center justify-center h-64">
-              <div className="h-8 w-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+  
+    if (!mystery) {
+      return (
+        <div className="min-h-screen flex flex-col">
+          <Header />
+          <main className="flex-1 py-12 px-4">
+            <div className="container mx-auto max-w-7xl">
+              <div className="flex items-center justify-center h-64">
+                <div className="h-8 w-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+              </div>
             </div>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
+          </main>
+          <Footer />
+        </div>
+      );
+    }
 
   return (
     <div className="min-h-screen flex flex-col">
