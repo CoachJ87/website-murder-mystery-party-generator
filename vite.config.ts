@@ -1,4 +1,3 @@
-
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
@@ -50,6 +49,9 @@ export default defineConfig(({ mode }) => ({
     outDir: 'dist',
     // Optimize chunks for better loading performance
     rollupOptions: {
+      input: {
+        main: 'index.html'
+      },
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-router-dom'],
