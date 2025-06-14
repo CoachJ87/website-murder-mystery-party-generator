@@ -28,6 +28,34 @@ jobs:
       - name: Build project
         run: npm run build
 
+      - name: Create SPA 404.html
+        run: |
+          cat > dist/404.html << 'EOF'
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <script>
+                sessionStorage.redirect = location.href;
+              </script>
+              <meta http-equiv="refresh" content="0;URL='/'" />
+            </head>
+            <body></body>
+          </html>
+          EOF
+
+      - name: Update index.html for SPA routing
+        run: |
+          sed -i '/<head>/a \
+          <script>\
+            (function(){\
+              const redirect = sessionStorage.redirect;\
+              delete sessionStorage.redirect;\
+              if (redirect && redirect !== location.href) {\
+                history.replaceState(null, null, redirect);\
+              }\
+            })();\
+          </script>' dist/index.html
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
