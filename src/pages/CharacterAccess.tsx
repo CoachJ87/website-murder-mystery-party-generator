@@ -274,6 +274,21 @@ const CharacterAccess: React.FC = () => {
                       {children}
                     </strong>
                   ),
+                  ul: ({ children }) => (
+                    <ul className="list-disc list-inside mb-4 space-y-2">
+                      {children}
+                    </ul>
+                  ),
+                  ol: ({ children }) => (
+                    <ol className="list-decimal list-inside mb-4 space-y-2">
+                      {children}
+                    </ol>
+                  ),
+                  li: ({ children }) => (
+                    <li className="ml-2">
+                      {children}
+                    </li>
+                  ),
                 }}
               >
                 {characterContent}
