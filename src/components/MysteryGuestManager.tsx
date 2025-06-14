@@ -141,13 +141,21 @@ const MysteryGuestManager: React.FC<MysteryGuestManagerProps> = ({
       ));
 
       // Call the Edge Function to send the email
+      console.log('Sending email data:', {
+        guest_email: assignment.guest_email.trim(),
+        guest_name: assignment.guest_name.trim(),
+        character_name: character.character_name,
+        character_details: character.description?.substring(0, 200) + '...' || 'Mystery character details...',
+        access_token: result.data.access_token || 'temp-token'
+      });
+      
       const { data: emailResponse, error: emailError } = await supabase.functions.invoke('send-character-email', {
         body: {
           guest_email: assignment.guest_email.trim(),
           guest_name: assignment.guest_name.trim(),
           character_name: character.character_name,
           character_details: character.description?.substring(0, 200) + '...' || 'Mystery character details...',
-          access_token: result.data.access_token
+          access_token: result.data.access_token || 'temp-token'
         }
       });
       
