@@ -900,6 +900,7 @@ const MysteryPackageTabView = React.memo(({
         onOpenChange={setShowGuestManager}
         characters={charactersList}
         mysteryId={conversationId || ""}
+        mysteryTitle={mysteryTitle}
       />
     </div>
   );
