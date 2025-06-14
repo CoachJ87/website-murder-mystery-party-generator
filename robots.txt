@@ -1,0 +1,33 @@
+
+# Allow all search engine bots to index the entire site
+User-agent: *
+Allow: /
+
+# Define sitemap location
+Sitemap: https://murder-mystery.party/sitemap.xml
+
+# Specific rules for major search engines
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+# Prevent crawling of authentication-related pages
+Disallow: /sign-in
+Disallow: /sign-up
+Disallow: /reset-password
+Disallow: /check-email
+Disallow: /forgot-password
+
+# Don't crawl user-specific pages
+Disallow: /dashboard
+Disallow: /account
+Disallow: /mystery/create
+Disallow: /mystery/edit/
