@@ -150,7 +150,7 @@ const MysteryGuestManager: React.FC<MysteryGuestManagerProps> = ({
           guest_name: assignment.guest_name.trim(),
           character_name: character.character_name,
           character_details: character.description?.substring(0, 200) + '...' || 'Mystery character details...',
-          access_token: result.data.access_token || 'temp-token'
+          access_token: result.data.access_token || 'temp-token',
           mystery_title: mysteryTitle
         }
       });
