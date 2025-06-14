@@ -45,9 +45,6 @@ const CharacterAccess: React.FC = () => {
   const [assignment, setAssignment] = useState<CharacterAssignment | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  console.log('CharacterAccess component loaded, token:', token);
-  console.log('Current URL:', window.location.href);
   
   useEffect(() => {
     if (token) {
