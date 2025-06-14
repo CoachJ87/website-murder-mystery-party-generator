@@ -22,13 +22,16 @@ interface MysteryGuestManagerProps {
   onOpenChange: (open: boolean) => void;
   characters: MysteryCharacter[];
   mysteryId: string;
+  mysteryTitle?: string;
+
 }
 
 const MysteryGuestManager: React.FC<MysteryGuestManagerProps> = ({
   open,
   onOpenChange,
   characters,
-  mysteryId
+  mysteryId,
+  mysteryTitle = "Your Mystery"
 }) => {
   const [assignments, setAssignments] = useState<CharacterAssignment[]>([]);
   const [loading, setLoading] = useState(false);
@@ -148,6 +151,7 @@ const MysteryGuestManager: React.FC<MysteryGuestManagerProps> = ({
           character_name: character.character_name,
           character_details: character.description?.substring(0, 200) + '...' || 'Mystery character details...',
           access_token: result.data.access_token || 'temp-token'
+          mystery_title: mysteryTitle
         }
       });
     
