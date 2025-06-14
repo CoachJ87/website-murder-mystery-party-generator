@@ -1,53 +1,41 @@
-
 name: Deploy to GitHub Pages
 
 on:
   workflow_dispatch:
+  push:
+    branches: [ main ]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
 
-      - name: Delete all lock files except package-lock.json
-        run: |
-          rm -f pnpm-lock.yaml
-          rm -f yarn.lock
-          rm -f .pnpmfile.cjs
-          rm -f .pnp.*
-
-      - name: Clean npm cache
-        run: npm cache clean --force
-
-      - name: Create fresh package-lock.json
-        run: npm install --package-lock-only
-
-      - name: Install dependencies with npm
+      - name: Install dependencies
         run: npm ci
 
       - name: Build project
         run: npm run build
 
-      - name: Copy index.html to 404.html
-        run: cp dist/index.html dist/404.html
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
 
-      - name: Debug build output
-        run: |
-          echo "Listing contents of the root directory..."
-          ls -la
-          echo "Listing contents of the dist directory..."
-          ls -R dist
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: './dist'
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GH_PAT }}
-          publish_dir: ./dist
-          cname: mysterymaker.party
-          force_orphan: true
+        id: deployment
+        uses: actions/deploy-pages@v2
