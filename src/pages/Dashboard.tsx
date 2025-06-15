@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
@@ -113,7 +114,7 @@ const Dashboard = () => {
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
               <div>
-                <h1 className="text-3xl font-bold">{t("dashboard.title")}</h1>
+                <h1 className="text-3xl font-bold">{t("dashboard.mysteries.title")}</h1>
                 <p className="text-muted-foreground mt-1">
                   {t("dashboard.subtitle")}
                 </p>

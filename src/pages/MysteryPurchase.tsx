@@ -13,6 +13,7 @@ import MysteryPreviewCard from "@/components/purchase/MysteryPreviewCard";
 import { extractTitleFromMessages } from "@/utils/titleExtraction";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface Character {
   name: string;
@@ -41,6 +42,7 @@ const MysteryPurchase = () => {
   const { isAuthenticated, user } = useAuth();
   const isDevMode = import.meta.env.DEV || (window.location.hostname === 'localhost');
   const isMobile = useIsMobile();
+  const { t } = useTranslation();
 
   // Enhanced extraction functions with better pattern matching
   const extractGameOverview = (content: string): string => {
@@ -144,7 +146,7 @@ const MysteryPurchase = () => {
           if (name) {
             characters.push({
               name,
-              description: "Character details will be revealed in the full package."
+              description: t("purchase.preview.characterPlaceholder")
             });
           }
         });
@@ -158,7 +160,7 @@ const MysteryPurchase = () => {
           if (name && name.length > 2 && !name.match(/EVIDENCE CARD|HOST GUIDE/i)) {
             characters.push({
               name,
-              description: "Full character description available in the purchased package."
+              description: t("purchase.preview.characterPlaceholderFull")
             });
           }
         });
@@ -188,7 +190,7 @@ const MysteryPurchase = () => {
       if (title) {
         evidence.push({
           title,
-          description: description || "Evidence details available in the full package."
+          description: description || t("purchase.preview.evidencePlaceholder")
         });
       }
     }
@@ -204,7 +206,7 @@ const MysteryPurchase = () => {
         const purchaseStatus = urlParams.get('purchase');
         
         if (purchaseStatus === 'success') {
-          toast.success("Purchase successful! You now have full access to this mystery package.");
+          toast.success(t("purchase.toasts.success"));
           
           // Need to update the local state to reflect the purchase
           await supabase
@@ -214,7 +216,7 @@ const MysteryPurchase = () => {
         }
         
         if (purchaseStatus === 'cancel') {
-          toast.error("Purchase cancelled. You can try again when you're ready.");
+          toast.error(t("purchase.toasts.cancel"));
         }
         
         const { data: conversation, error: convError } = await supabase
@@ -225,12 +227,12 @@ const MysteryPurchase = () => {
 
         if (convError) {
           console.error("Error fetching mystery:", convError);
-          toast.error("Failed to load mystery details");
+          toast.error(t("purchase.toasts.loadFailed"));
           return;
         }
 
         if (!conversation) {
-          toast.error("Mystery not found");
+          toast.error(t("purchase.toasts.notFound"));
           navigate('/dashboard');
           return;
         }
@@ -240,7 +242,7 @@ const MysteryPurchase = () => {
 
         const mysteryData: Mystery = {
           id: conversation.id,
-          title: extractedTitle || conversation.title || "Custom Murder Mystery",
+          title: extractedTitle || conversation.title || t("purchase.preview.defaultTitle"),
           created_at: conversation.created_at,
           updated_at: conversation.updated_at,
           status: conversation.is_paid ? "purchased" : (conversation.display_status || "draft"),
@@ -301,18 +303,18 @@ const MysteryPurchase = () => {
         }
       } catch (error) {
         console.error("Error in fetchMysteryAndMessages:", error);
-        toast.error("An error occurred while loading mystery details");
+        toast.error(t("purchase.toasts.genericError"));
       }
     };
 
     fetchMysteryAndMessages();
-  }, [id, navigate]);
+  }, [id, navigate, t]);
 
   const handleSimulatePurchase = async () => {
     if (!isDevMode) return;
     
     try {
-      toast.info("Simulating purchase in dev mode...");
+      toast.info(t("purchase.toasts.devPurchaseSim"));
       
       // Update conversation to mark as purchased
       await supabase
@@ -323,7 +325,7 @@ const MysteryPurchase = () => {
         })
         .eq('id', id);
         
-      toast.success("Purchase simulated! Redirecting to generate package...");
+      toast.success(t("purchase.toasts.devPurchaseSuccess"));
       
       // Redirect to the mystery page view (with the tabs)
       setTimeout(() => {
@@ -332,20 +334,20 @@ const MysteryPurchase = () => {
       
     } catch (error) {
       console.error("Error simulating purchase:", error);
-      toast.error("Failed to simulate purchase");
+      toast.error(t("purchase.toasts.devPurchaseFailed"));
     }
   };
 
   const handlePurchase = async () => {
     if (!isAuthenticated) {
-      toast.error("Please sign in to purchase this mystery");
+      toast.error(t("purchase.toasts.signInRequired"));
       navigate("/sign-in");
       return;
     }
     
     try {
       setProcessing(true);
-      toast.info("Redirecting to secure checkout...");
+      toast.info(t("purchase.toasts.checkoutRedirect"));
       
       // Construct Stripe URL with conversation ID in metadata
       const baseUrl = window.location.origin;
@@ -359,7 +361,7 @@ const MysteryPurchase = () => {
       
     } catch (error) {
       console.error("Error redirecting to Stripe:", error);
-      toast.error("Failed to redirect to checkout. Please try again.");
+      toast.error(t("purchase.toasts.checkoutFailed"));
       setProcessing(false);
     }
   };
@@ -398,13 +400,13 @@ const MysteryPurchase = () => {
               "font-bold mb-2",
               isMobile ? "text-xl" : "text-3xl"
             )}>
-              Complete Your Purchase
+              {t("purchase.title")}
             </h1>
             <p className={cn(
               "text-muted-foreground",
               isMobile ? "text-sm px-2" : "text-base"
             )}>
-              Get full access to your murder mystery package
+              {t("purchase.subtitle")}
             </p>
           </div>
           
@@ -424,10 +426,10 @@ const MysteryPurchase = () => {
               <Card className={cn(isMobile && "shadow-sm")}>
                 <CardHeader className={cn(isMobile && "p-4")}>
                   <CardTitle className={cn(isMobile ? "text-lg" : "text-xl")}>
-                    Murder Mystery Package
+                    {t("purchase.package.title")}
                   </CardTitle>
                   <CardDescription className={cn(isMobile && "text-sm")}>
-                    One-time purchase, instant access
+                    {t("purchase.package.description")}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className={cn(isMobile && "p-4 pt-0")}>
@@ -455,7 +457,7 @@ const MysteryPurchase = () => {
                         "text-muted-foreground",
                         isMobile && "text-sm"
                       )}>
-                        Complete murder mystery package with all character materials, clues, and hosting instructions.
+                        {t("purchase.package.priceDescription")}
                       </p>
                     </div>
                   </div>
@@ -468,17 +470,9 @@ const MysteryPurchase = () => {
                       "font-medium",
                       isMobile && "text-sm"
                     )}>
-                      What's included:
+                      {t("purchase.package.whatsIncluded")}
                     </h3>
-                    {[
-                      "Full character profiles for all suspects",
-                      "Host guide with step-by-step instructions",
-                      "Printable character sheets",
-                      "Evidence and clue cards",
-                      "Timeline of events",
-                      "Solution reveal script",
-                      "PDF downloads of all materials"
-                    ].map((item, index) => (
+                    {t<string, string[]>('purchase.package.includes', { returnObjects: true }).map((item, index) => (
                       <div key={index} className="flex items-start gap-2">
                         <CheckCircle className={cn(
                           "text-green-500 shrink-0 mt-0.5",
@@ -507,11 +501,11 @@ const MysteryPurchase = () => {
                     {processing ? (
                       <>
                         <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
-                        Processing...
+                        {t("purchase.buttons.processing")}
                       </>
                     ) : (
                       <>
-                        Complete Purchase
+                        {t("purchase.buttons.complete")}
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </>
                     )}
@@ -528,16 +522,15 @@ const MysteryPurchase = () => {
                   "font-medium mb-2",
                   isMobile && "text-sm"
                 )}>
-                  Important Notes
+                  {t("purchase.notes.title")}
                 </h3>
                 <ul className={cn(
                   "list-disc pl-5 space-y-1 text-muted-foreground",
                   isMobile ? "text-xs pl-4" : "text-sm"
                 )}>
-                  <li>This is a one-time purchase for this specific mystery package</li>
-                  <li>You'll have permanent access to download all materials</li>
-                  <li>Content is for personal use only, not for commercial redistribution</li>
-                  <li>Need help? Contact our support at support@mysterygenerator.com</li>
+                  {t<string, string[]>('purchase.notes.items', { returnObjects: true }).map((item, index) => (
+                    <li key={index}>{item}</li>
+                  ))}
                 </ul>
               </div>
             </div>
@@ -553,7 +546,7 @@ const MysteryPurchase = () => {
               onClick={() => navigate(`/mystery/chat/${id}`)}
               className={cn(isMobile && "w-full h-11")}
             >
-              Back to Mystery Design
+              {t("purchase.buttons.backToDesign")}
             </Button>
           </div>
         </div>

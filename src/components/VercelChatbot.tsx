@@ -9,6 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 type Message = {
   id: string;
@@ -30,6 +31,7 @@ const VercelChatbot = () => {
   const { id } = useParams();
   const initialDataLoaded = useRef(false);
   const isMobile = useIsMobile();
+  const { t } = useTranslation();
 
   // Load or create conversation
   useEffect(() => {
@@ -44,7 +46,7 @@ const VercelChatbot = () => {
           
           if (!uuidRegex.test(id)) {
             console.error("Invalid conversation ID format");
-            toast.error("Invalid conversation ID");
+            toast.error(t("chatbot.toasts.invalidId"));
             return;
           }
           
@@ -56,7 +58,7 @@ const VercelChatbot = () => {
           
           if (fetchError) {
             console.error("Error fetching conversation:", fetchError);
-            toast.error("Could not load your previous conversation");
+            toast.error(t("chatbot.toasts.loadFailed"));
           } else if (existingConversation) {
             setConversationId(existingConversation.id);
             
@@ -82,7 +84,7 @@ const VercelChatbot = () => {
           const welcomeMessage = {
             id: "welcome",
             role: "assistant" as const,
-            content: "Welcome to the Murder Mystery Creator! Describe the type of mystery you'd like to create, or ask me for suggestions.",
+            content: t("chatbot.welcomeMessage"),
             timestamp: new Date(),
           };
           
@@ -106,7 +108,7 @@ const VercelChatbot = () => {
                 .from("conversations")
                 .insert({
                   user_id: user.id,
-                  title: "New Murder Mystery"
+                  title: t("chatbot.newConversationTitle")
                 })
                 .select()
                 .single();
@@ -178,7 +180,7 @@ const VercelChatbot = () => {
       loadOrCreateConversation();
       generateToken();
     }
-  }, [id, isAuthenticated, user, messages.length]);
+  }, [id, isAuthenticated, user, messages.length, t]);
 
   useEffect(() => {
     // Scroll to bottom when messages change
@@ -302,7 +304,7 @@ const VercelChatbot = () => {
         assistantContent = generateFallbackResponse(content, messages.length);
         
         // Inform user of connection issue
-        toast.info("Using offline mode - some features may be limited");
+        toast.info(t("chatbot.toasts.offlineMode"));
       }
       
       // Add assistant response
@@ -319,7 +321,7 @@ const VercelChatbot = () => {
       await saveMessage(assistantMessage);
     } catch (error) {
       console.error("Error processing message:", error);
-      toast.error("Error processing your request");
+      toast.error(t("chatbot.toasts.requestError"));
     } finally {
       setLoading(false);
     }
@@ -333,7 +335,7 @@ const VercelChatbot = () => {
       localStorage.setItem(`mystery_messages_${new Date().getTime()}`, JSON.stringify(messages));
     }
     
-    toast.success("Mystery generated successfully!");
+    toast.success(t("chatbot.toasts.generationSuccess"));
     navigate(`/mystery/preview/${conversationId || new Date().getTime()}`);
   };
   
@@ -341,22 +343,23 @@ const VercelChatbot = () => {
     if (chatbotUrl) {
       window.open(chatbotUrl, '_blank', 'noopener,noreferrer');
     } else {
-      toast.error("Chatbot URL not available yet");
+      toast.error(t("chatbot.toasts.urlUnavailable"));
     }
   };
 
   // Generate fallback responses when API is unavailable
   const generateFallbackResponse = (userMessage: string, messageCount: number) => {
+    const fallbackResponses = t<string, string[]>('chatbot.fallbackResponses', { returnObjects: true });
     if (messageCount <= 1) {
-      return "I'd love to help you create a murder mystery. What theme or setting would you like for your mystery?";
+      return fallbackResponses[0];
     } else if (messageCount <= 3) {
-      return "That's a great choice! Now, let's think about the victim. Who would you like the victim to be?";
+      return fallbackResponses[1];
     } else if (messageCount <= 5) {
-      return "Interesting! Now we need some suspects. Could you describe 2-3 characters who might have motives to commit this crime?";
+      return fallbackResponses[2];
     } else if (messageCount <= 7) {
-      return "Those are compelling suspects. Let's add some clues. What kind of evidence might be found at the scene?";
+      return fallbackResponses[3];
     } else {
-      return "Your mystery is taking shape! To continue developing the details of your story, let's think about what other elements we might include.";
+      return fallbackResponses[4];
     }
   };
 
@@ -375,12 +378,12 @@ const VercelChatbot = () => {
   return (
     <div className="flex flex-col space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className={cn("text-xl font-semibold", isMobile && "text-lg")}>Create Your Murder Mystery</h2>
+        <h2 className={cn("text-xl font-semibold", isMobile && "text-lg")}>{t("chatbot.title")}</h2>
         <div className="flex gap-2">
           {chatbotUrl && (
             <Button variant="outline" onClick={openChatbotInNewWindow} size={isMobile ? "sm" : "default"}>
               <ExternalLink className={cn("mr-2", isMobile ? "h-3 w-3" : "h-4 w-4")} />
-              {isMobile ? "External" : "Open Full Chatbot"}
+              {isMobile ? t("chatbot.buttons.external") : t("chatbot.buttons.openFull")}
             </Button>
           )}
           <Button 
@@ -388,7 +391,7 @@ const VercelChatbot = () => {
             disabled={messages.length < 3}
             size={isMobile ? "sm" : "default"}
           >
-            Finalize
+            {t("chatbot.buttons.finalize")}
           </Button>
         </div>
       </div>
@@ -396,7 +399,7 @@ const VercelChatbot = () => {
       <Card className={cn("p-4", isMobile && "p-2 border-0 shadow-none bg-transparent")}>
         <div className="flex items-center gap-2 mb-4 border-b pb-2">
           <MessageCircle className="h-5 w-5 text-primary" />
-          <h3 className="font-medium text-lg">Murder Mystery Creator</h3>
+          <h3 className="font-medium text-lg">{t("chatbot.creatorTitle")}</h3>
         </div>
         
         <div 
@@ -437,7 +440,7 @@ const VercelChatbot = () => {
           <AIInputWithLoading
             value={input}
             setValue={setInput}
-            placeholder="Type your ideas for the murder mystery..."
+            placeholder={t("chatbot.placeholder")}
             onSubmit={handleUserMessage}
             loadingDuration={2000}
           />
@@ -446,7 +449,7 @@ const VercelChatbot = () => {
 
       <div className="flex flex-col md:flex-row justify-between gap-4">
         <p className={cn("text-muted-foreground text-sm", isMobile && "text-xs")}>
-          When you're satisfied with your mystery, finalize it to continue.
+          {t("chatbot.finalizePrompt")}
         </p>
         <Button 
           onClick={handleGenerateMystery} 
@@ -454,7 +457,7 @@ const VercelChatbot = () => {
           disabled={messages.length < 3}
           size={isMobile ? "sm" : "default"}
         >
-          Finalize Mystery
+          {t("chatbot.buttons.finalizeMystery")}
         </Button>
       </div>
     </div>

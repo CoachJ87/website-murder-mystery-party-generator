@@ -375,6 +375,9 @@
     "form": {
       "description": "Fill out the form below to generate your custom murder mystery"
     },
+    "buttons": {
+      "generateFullMystery": "Generate Full Mystery"
+    },
     "errors": {
       "signInToSave": "Please sign in to save your mystery",
       "saveFailed": "Failed to save mystery",
@@ -492,7 +495,13 @@
     "signInPrompt": "Please <1>sign in</1> to use private mode",
     "errorResponse": "I'm having trouble responding right now. Please try again.",
     "errorResponseWithFallback": "I'm experiencing some technical difficulties. How many players do you want for your murder mystery?",
-    "connectionErrorResponse": "I'm having trouble connecting right now. How many players do you want for your murder mystery?"
+    "connectionErrorResponse": "I'm having trouble connecting right now. How many players do you want for your murder mystery?",
+    "placeholder": "Share your ideas for the mystery...",
+    "loadingMessages": "Loading previous messages...",
+    "errors": {
+      "responseFailed": "Failed to get AI response. Please try again.",
+      "aiUnavailable": "I apologize, but I'm having trouble responding right now. Please try again in a moment."
+    }
   },
   "sendToGuests": {
     "title": "Send Character Guides to Your Guests",
@@ -600,5 +609,86 @@
       "updateAvailable": "A new version is available. Refresh to update.",
       "offlineMode": "You are currently offline"
     }
+  },
+  "purchase": {
+    "toasts": {
+      "success": "Purchase successful! You now have full access to this mystery package.",
+      "cancel": "Purchase cancelled. You can try again when you're ready.",
+      "loadFailed": "Failed to load mystery details.",
+      "notFound": "Mystery not found.",
+      "devPurchaseSim": "Simulating purchase in dev mode...",
+      "devPurchaseSuccess": "Purchase simulated! Redirecting to generate package...",
+      "devPurchaseFailed": "Failed to simulate purchase.",
+      "signInRequired": "Please sign in to purchase this mystery.",
+      "checkoutRedirect": "Redirecting to secure checkout...",
+      "checkoutFailed": "Failed to redirect to checkout. Please try again.",
+      "genericError": "An error occurred while loading mystery details."
+    },
+    "title": "Complete Your Purchase",
+    "subtitle": "Get full access to your murder mystery package",
+    "package": {
+      "title": "Murder Mystery Package",
+      "description": "One-time purchase, instant access",
+      "priceDescription": "Complete murder mystery package with all character materials, clues, and hosting instructions.",
+      "whatsIncluded": "What's included:",
+      "includes": [
+        "Full character profiles for all suspects",
+        "Host guide with step-by-step instructions",
+        "Printable character sheets",
+        "Evidence and clue cards",
+        "Timeline of events",
+        "Solution reveal script",
+        "PDF downloads of all materials"
+      ]
+    },
+    "buttons": {
+      "processing": "Processing...",
+      "complete": "Complete Purchase",
+      "backToDesign": "Back to Mystery Design"
+    },
+    "notes": {
+      "title": "Important Notes",
+      "items": [
+        "This is a one-time purchase for this specific mystery package",
+        "You'll have permanent access to download all materials",
+        "Content is for personal use only, not for commercial redistribution",
+        "Need help? Contact our support at support@mysterygenerator.com"
+      ]
+    },
+    "preview": {
+      "defaultTitle": "Custom Murder Mystery",
+      "characterPlaceholder": "Character details will be revealed in the full package.",
+      "characterPlaceholderFull": "Full character description available in the purchased package.",
+      "evidencePlaceholder": "Evidence details available in the full package."
+    }
+  },
+  "chatbot": {
+    "toasts": {
+      "invalidId": "Invalid conversation ID",
+      "loadFailed": "Could not load your previous conversation",
+      "offlineMode": "Using offline mode - some features may be limited",
+      "requestError": "Error processing your request",
+      "generationSuccess": "Mystery generated successfully!",
+      "urlUnavailable": "Chatbot URL not available yet"
+    },
+    "welcomeMessage": "Welcome to the Murder Mystery Creator! Describe the type of mystery you'd like to create, or ask me for suggestions.",
+    "newConversationTitle": "New Murder Mystery",
+    "fallbackResponses": [
+      "I'd love to help you create a murder mystery. What theme or setting would you like for your mystery?",
+      "That's a great choice! Now, let's think about the victim. Who would you like the victim to be?",
+      "Interesting! Now we need some suspects. Could you describe 2-3 characters who might have motives to commit this crime?",
+      "Those are compelling suspects. Let's add some clues. What kind of evidence might be found at the scene?",
+      "Your mystery is taking shape! To continue developing the details of your story, let's think about what other elements we might include."
+    ],
+    "title": "Create Your Murder Mystery",
+    "buttons": {
+      "external": "External",
+      "openFull": "Open Full Chatbot",
+      "finalize": "Finalize",
+      "finalizeMystery": "Finalize Mystery"
+    },
+    "creatorTitle": "Murder Mystery Creator",
+    "placeholder": "Type your ideas for the murder mystery...",
+    "finalizePrompt": "When you're satisfied with your mystery, finalize it to continue."
   }
 }
