@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -20,6 +19,8 @@ import { HelpCircle, PenSquare } from "lucide-react";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
@@ -33,6 +34,7 @@ type FormValues = z.infer<typeof formSchema>;
 const Support = () => {
   const [activeTab, setActiveTab] = useState("faqs");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isMobile = useIsMobile();
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -157,17 +159,26 @@ const Support = () => {
           </div>
           
           <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
-            <TabsList className="grid w-full grid-cols-2 bg-[#F6E8C6]">
+            <TabsList className={cn(
+              "bg-[#8B0000] p-1 overflow-hidden grid grid-cols-2",
+              isMobile && "h-auto"
+            )}>
               <TabsTrigger 
                 value="faqs" 
-                className="flex items-center gap-2 data-[state=active]:bg-[#8B1538] data-[state=active]:text-white"
+                className={cn(
+                  "flex items-center gap-2 text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000]",
+                  isMobile && "text-xs px-2 py-2 h-auto"
+                )}
               >
                 <HelpCircle className="h-4 w-4" />
                 <span>FAQs</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="contact" 
-                className="flex items-center gap-2 data-[state=active]:bg-[#8B1538] data-[state=active]:text-white"
+                className={cn(
+                  "flex items-center gap-2 text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000]",
+                  isMobile && "text-xs px-2 py-2 h-auto"
+                )}
               >
                 <PenSquare className="h-4 w-4" />
                 <span>Contact Us</span>
