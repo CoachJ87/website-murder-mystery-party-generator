@@ -1,3 +1,4 @@
+
 {
   "navigation": {
     "home": "Home",
@@ -125,6 +126,289 @@
     },
     "copyright": "Murder Mystery Generator, Inc. All rights reserved."
   },
+  "auth": {
+    "signIn": {
+      "title": "Welcome Back",
+      "subtitle": "Sign in to your account to continue creating amazing mysteries",
+      "email": "Email Address",
+      "password": "Password",
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot your password?",
+      "noAccount": "Don't have an account?",
+      "signUpLink": "Sign up here",
+      "submitButton": "Sign In",
+      "signingIn": "Signing in...",
+      "orDivider": "or continue with",
+      "googleButton": "Continue with Google"
+    },
+    "signUp": {
+      "title": "Create Your Account",
+      "subtitle": "Join thousands of mystery makers and start creating today",
+      "name": "Full Name",
+      "email": "Email Address",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "terms": "I agree to the",
+      "termsLink": "Terms of Service",
+      "privacy": "Privacy Policy",
+      "and": "and",
+      "hasAccount": "Already have an account?",
+      "signInLink": "Sign in here",
+      "submitButton": "Create Account",
+      "creatingAccount": "Creating account...",
+      "orDivider": "or continue with",
+      "googleButton": "Continue with Google"
+    },
+    "forgotPassword": {
+      "title": "Reset Your Password",
+      "subtitle": "Enter your email address and we'll send you a link to reset your password",
+      "email": "Email Address",
+      "submitButton": "Send Reset Link",
+      "sending": "Sending...",
+      "backToSignIn": "Back to sign in",
+      "checkEmail": {
+        "title": "Check Your Email",
+        "message": "We've sent a password reset link to",
+        "noEmail": "Didn't receive an email?",
+        "tryAgain": "Try again",
+        "returnToSignIn": "Return to Sign In"
+      }
+    },
+    "resetPassword": {
+      "title": "Set New Password",
+      "subtitle": "Create a new password for your account",
+      "password": "New Password",
+      "confirmPassword": "Confirm New Password",
+      "submitButton": "Update Password",
+      "updating": "Updating...",
+      "success": "Password updated successfully",
+      "backToSignIn": "Back to sign in"
+    },
+    "errors": {
+      "invalidCredentials": "Invalid email or password",
+      "emailAlreadyExists": "An account with this email already exists",
+      "weakPassword": "Password must be at least 6 characters",
+      "passwordMismatch": "Passwords do not match",
+      "invalidEmail": "Please enter a valid email address",
+      "requiredField": "This field is required",
+      "termsRequired": "You must accept the terms of service",
+      "networkError": "Network error. Please try again.",
+      "unknownError": "Something went wrong. Please try again."
+    },
+    "success": {
+      "accountCreated": "Account created successfully! Please check your email to verify your account.",
+      "passwordReset": "Password reset email sent successfully",
+      "passwordUpdated": "Password updated successfully",
+      "signedOut": "Signed out successfully"
+    }
+  },
+  "dashboard": {
+    "welcome": {
+      "title": "Welcome back",
+      "subtitle": "Ready to create your next mystery masterpiece?",
+      "noMysteries": "You haven't created any mysteries yet",
+      "getStarted": "Get started by creating your first mystery"
+    },
+    "mysteries": {
+      "title": "Your Mysteries",
+      "filter": {
+        "all": "All Mysteries",
+        "drafts": "Drafts",
+        "completed": "Completed",
+        "purchased": "Purchased"
+      },
+      "empty": {
+        "title": "No mysteries found",
+        "description": "Create your first mystery to get started"
+      },
+      "card": {
+        "players": "players",
+        "created": "Created",
+        "lastEdited": "Last edited",
+        "status": {
+          "draft": "Draft",
+          "completed": "Completed",
+          "purchased": "Purchased"
+        }
+      }
+    },
+    "stats": {
+      "totalMysteries": "Total Mysteries",
+      "completedMysteries": "Completed",
+      "purchasedMysteries": "Purchased",
+      "totalPlayers": "Total Players Hosted"
+    }
+  },
+  "account": {
+    "title": "Account Settings",
+    "tabs": {
+      "profile": "Profile",
+      "security": "Security"
+    },
+    "profile": {
+      "title": "Profile Information",
+      "description": "Update your account profile information",
+      "name": "Full Name",
+      "email": "Email Address",
+      "emailNote": "Email cannot be changed",
+      "saveButton": "Save Changes",
+      "saving": "Saving...",
+      "success": "Profile updated successfully"
+    },
+    "security": {
+      "password": {
+        "title": "Change Password",
+        "description": "Update your password to keep your account secure",
+        "currentPassword": "Current Password",
+        "newPassword": "New Password",
+        "confirmPassword": "Confirm New Password",
+        "updateButton": "Update Password",
+        "updating": "Updating...",
+        "success": "Password updated successfully"
+      },
+      "deleteAccount": {
+        "title": "Delete Account",
+        "description": "Permanently delete your account and all associated data",
+        "warning": "This action cannot be undone. All your mysteries and data will be permanently deleted.",
+        "confirmText": "Type DELETE to confirm",
+        "deleteButton": "Delete Account",
+        "deleting": "Deleting...",
+        "success": "Account deleted successfully"
+      }
+    }
+  },
+  "mysteryCreation": {
+    "wizard": {
+      "title": "Create Your Mystery",
+      "step1": {
+        "title": "Tell Us Your Vision",
+        "description": "Describe your ideal murder mystery party"
+      },
+      "step2": {
+        "title": "Review & Refine",
+        "description": "Perfect your mystery with our AI assistant"
+      },
+      "step3": {
+        "title": "Complete Package",
+        "description": "Get everything you need to host"
+      }
+    },
+    "editor": {
+      "title": "Mystery Editor",
+      "characters": "Characters",
+      "story": "Story",
+      "clues": "Clues",
+      "hostGuide": "Host Guide",
+      "save": "Save Draft",
+      "publish": "Complete Mystery",
+      "saving": "Saving...",
+      "publishing": "Publishing...",
+      "saved": "Draft saved",
+      "published": "Mystery completed"
+    },
+    "guidance": {
+      "describe": "Describe your mystery in detail - the more specific you are, the better we can create it for you",
+      "examples": "Try: 'A 1920s speakeasy murder mystery with 8 characters including a jazz singer, bartender, and mob boss'",
+      "playerCount": "How many players will participate?",
+      "theme": "What's the setting or theme?",
+      "special": "Any special requirements or constraints?"
+    }
+  },
+  "supportPage": {
+    "title": "Support Center",
+    "subtitle": "Find answers to common questions, contact our support team, and get everything you need to create amazing mystery parties.",
+    "tabs": {
+      "faqs": "FAQs",
+      "contact": "Contact Us"
+    },
+    "faqs": {
+      "title": "Frequently Asked Questions",
+      "description": "Find answers to common questions about Mystery Maker",
+      "categories": {
+        "aboutMysteryMaker": "About Mystery Maker",
+        "gameMechanics": "Game Mechanics",
+        "hostingPlanning": "Hosting & Planning",
+        "accountBilling": "Account & Billing"
+      },
+      "questions": {
+        "whatIsMysteryMaker": {
+          "question": "What is Mystery Maker and how does it work?",
+          "answer": "Mystery Maker is an AI-powered platform that creates custom murder mystery parties exactly how you want them. Tell us your unique vision - any theme, characters, or setting - and our AI generates everything you need: character profiles, clues, and host materials tailored specifically for your party."
+        },
+        "creationProcess": {
+          "question": "How does the creation and purchase process work?",
+          "answer": "Simple! First, describe your ideal murder mystery and we'll create a custom preview for free. When you're happy with your mystery, purchase the complete package for $11.99. You'll instantly get everything needed to host: detailed character profiles, host guide, and all game materials."
+        },
+        "saveWork": {
+          "question": "Can I save my work and come back to it later?",
+          "answer": "Yes! All your custom mysteries are saved to your account so you can return and edit them anytime."
+        },
+        "replayable": {
+          "question": "Are these murder mysteries replayable?",
+          "answer": "Absolutely! Our mysteries include variable elements so each playthrough feels fresh, even with the same group. You can host your custom mystery as many times as you want."
+        },
+        "playerCount": {
+          "question": "How many players do I need?",
+          "answer": "Our system creates mysteries for any group size you specify - from intimate gatherings of 4-6 players to larger parties of 15+ players. Just tell us your player count and we'll design accordingly."
+        },
+        "modifyMystery": {
+          "question": "Can I modify my mystery after creating it?",
+          "answer": "Of course! Use our editor to refine and adjust your mystery until it's exactly right for your group. Change characters, themes, or complexity anytime."
+        },
+        "lastMinuteChanges": {
+          "question": "What if I need to add or remove players at the last minute?",
+          "answer": "No problem! Our flexible system allows you to adjust your player count even after creating your mystery. The AI will adapt the story and characters to accommodate these changes."
+        },
+        "whatIncluded": {
+          "question": "What's included in my custom mystery package?",
+          "answer": "Everything you need: a comprehensive host guide with step-by-step instructions, detailed character profiles for each player, clues, evidence, and all game materials. No additional preparation required."
+        },
+        "gameDuration": {
+          "question": "How long does a typical game last?",
+          "answer": "Most mysteries run 2-3 hours, but you control the pacing. Our host guide includes timing suggestions that you can adjust to fit your schedule."
+        },
+        "themedMysteries": {
+          "question": "Do you offer themed mysteries for special occasions?",
+          "answer": "We create any theme you can imagine! From classic 1920s speakeasies to space stations to fairy tale kingdoms - tell us your vision and we'll make it happen."
+        },
+        "ageRecommendation": {
+          "question": "Is there an age recommendation for your mysteries?",
+          "answer": "Our standard mysteries work great for adults and teens (13+). You can also request family-friendly themes when creating your mystery for younger players."
+        },
+        "freePreview": {
+          "question": "What's included in the free preview?",
+          "answer": "You can create unlimited mystery previews for free, including the basic story premise and character concepts. This lets you explore different ideas before purchasing."
+        },
+        "purchaseIncludes": {
+          "question": "What do I get when I purchase a mystery?",
+          "answer": "For $11.99, you receive everything needed to host: comprehensive host guide, detailed character profiles for each player, clues, evidence, and all game materials ready to use."
+        },
+        "refund": {
+          "question": "Can I get a refund if I'm not satisfied?",
+          "answer": "Absolutely! If you're not completely satisfied with your purchase, contact us within 7 days and we'll issue a full refund, no questions asked."
+        }
+      }
+    },
+    "contact": {
+      "title": "Contact Us",
+      "description": "Need more help? We're here for you",
+      "intro": "Our support team is ready to help with any questions about creating your perfect mystery party with Mystery Maker.",
+      "form": {
+        "name": "Name",
+        "email": "Email Address",
+        "subject": "Subject",
+        "message": "Message",
+        "namePlaceholder": "Your name",
+        "emailPlaceholder": "your.email@example.com",
+        "subjectPlaceholder": "What is your message about?",
+        "messagePlaceholder": "How can we help you?",
+        "sendButton": "Send Message",
+        "sending": "Sending...",
+        "success": "Thank you for contacting us! We'll get back to you within 24 hours.",
+        "error": "Failed to send message. Please try again later."
+      }
+    }
+  },
   "common": {
     "buttons": {
       "createNew": "Create New Mystery",
@@ -136,20 +420,80 @@
       "save": "Save",
       "delete": "Delete",
       "edit": "Edit",
-      "close": "Close"
+      "close": "Close",
+      "back": "Back",
+      "next": "Next",
+      "previous": "Previous",
+      "finish": "Finish",
+      "submit": "Submit",
+      "confirm": "Confirm",
+      "yes": "Yes",
+      "no": "No"
     },
     "labels": {
       "loading": "Loading...",
+      "pleaseWait": "Please wait...",
       "error": "Error",
       "success": "Success",
       "warning": "Warning",
-      "info": "Information"
+      "info": "Information",
+      "required": "Required",
+      "optional": "Optional"
     },
     "messages": {
       "welcome": "Welcome!",
       "thankYou": "Thank you!",
       "comingSoon": "Coming Soon",
-      "notFound": "Not Found"
+      "notFound": "Not Found",
+      "somethingWentWrong": "Something went wrong",
+      "tryAgain": "Please try again",
+      "noResultsFound": "No results found",
+      "loadingContent": "Loading content...",
+      "savingChanges": "Saving changes...",
+      "changesSuccess": "Changes saved successfully",
+      "changesCanceled": "Changes canceled"
+    },
+    "validation": {
+      "required": "This field is required",
+      "invalidEmail": "Please enter a valid email address",
+      "passwordTooShort": "Password must be at least 6 characters",
+      "passwordMismatch": "Passwords do not match",
+      "invalidFormat": "Invalid format",
+      "tooShort": "Too short",
+      "tooLong": "Too long",
+      "invalidCharacters": "Contains invalid characters"
+    },
+    "states": {
+      "draft": "Draft",
+      "inProgress": "In Progress",
+      "completed": "Completed",
+      "published": "Published",
+      "archived": "Archived",
+      "deleted": "Deleted"
+    },
+    "modals": {
+      "confirmDelete": {
+        "title": "Confirm Deletion",
+        "message": "Are you sure you want to delete this item? This action cannot be undone.",
+        "confirmButton": "Delete",
+        "cancelButton": "Cancel"
+      },
+      "unsavedChanges": {
+        "title": "Unsaved Changes",
+        "message": "You have unsaved changes. Do you want to save them before leaving?",
+        "saveButton": "Save Changes",
+        "discardButton": "Discard Changes",
+        "cancelButton": "Cancel"
+      }
+    },
+    "notifications": {
+      "welcomeBack": "Welcome back!",
+      "signedOut": "You have been signed out",
+      "sessionExpired": "Your session has expired. Please sign in again.",
+      "connectionLost": "Connection lost. Trying to reconnect...",
+      "connectionRestored": "Connection restored",
+      "updateAvailable": "A new version is available. Refresh to update.",
+      "offlineMode": "You are currently offline"
     }
   }
 }
