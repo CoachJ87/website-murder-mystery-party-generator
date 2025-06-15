@@ -61,7 +61,7 @@ const Footer = () => {
         
         <div className="mt-12 pt-8 border-t flex flex-col md:flex-row justify-between items-center">
           <p className="text-muted-foreground text-sm">
-            &copy; {currentYear} Mystery Maker Inc. All rights reserved.
+            &copy; {currentYear} Mystery Maker Inc. {t('footer.copyright')}
           </p>
         </div>
       </div>
