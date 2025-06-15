@@ -1,4 +1,3 @@
-
 {
   "navigation": {
     "home": "Home",
@@ -9,8 +8,8 @@
     "account": "Account Settings"
   },
   "hero": {
-    "title": "Host a Killer Party Tonight.",
-    "subtitle": "Generate custom murder mysteries with characters, clues, and everything you need.",
+    "title": "Create Your Perfect Murder Mystery Party",
+    "subtitle": "Design custom mysteries exactly how you want them - any theme, any characters, any setting.",
     "subtitleAuth": "Tell us what you'd like to create and we'll make it happen.",
     "placeholder": "What kind of murder mystery would you like to host?",
     "placeholderAuth": "What kind of murder mystery would you like to create today?",
