@@ -1,453 +1,410 @@
-
 {
-  "navigation": {
-    "home": "홈",
-    "dashboard": "대시보드",
-    "signIn": "로그인",
-    "signUp": "회원가입",
-    "signOut": "로그아웃",
-    "account": "계정 설정"
-  },
-  "hero": {
-    "title": "몇 분 만에 살인 미스터리 파티 만들기",
-    "subtitle": "원하는 대로 맞춤형 미스터리를 디자인하세요 - 어떤 테마, 어떤 캐릭터, 어떤 배경이든.",
-    "subtitleAuth": "원하는 대로 맞춤형 미스터리를 디자인하세요 - 어떤 테마, 어떤 캐릭터, 어떤 배경이든.",
-    "placeholder": "재즈 뮤지션들이 등장하는 1920년대 밀주점 살인 미스터리...",
-    "placeholderAuth": "재즈 뮤지션들이 등장하는 1920년대 밀주점 살인 미스터리...",
-    "themes": {
-      "1920sSpeakeasy": "1920년대 밀주점",
-      "hollywoodMurder": "할리우드 살인 사건",
-      "castleMystery": "성의 미스터리",
-      "sciFiMystery": "SF 미스터리",
-      "artGalleryOpening": "미술관 개관식",
-      "bakeryCompetition": "베이커리 경연대회",
-      "mountainSkiResort": "산악 스키 리조트",
-      "luxuryTrainJourney": "럭셔리 기차 여행",
-      "historicUniversity": "역사적인 대학교",
-      "pokerTournament": "포커 토너먼트",
-      "barbieDreamworld": "바비 드림월드",
-      "dystopianWaterworld": "디스토피아 워터월드",
-      "jungleSteampunk": "정글 스팀펑크",
-      "magicalBakery": "마법의 베이커리",
-      "gamingTournament": "게임 토너먼트",
-      "synthwave80s": "신스웨이브 80년대",
-      "beachResort": "해변 리조트",
-      "operaHouse": "오페라 하우스",
-      "wineCountry": "와인 컨트리",
-      "safariAdventure": "사파리 어드벤처",
-      "fashionShow": "패션쇼",
-      "casinoNight": "카지노 나이트",
-      "fairyTaleKingdom": "동화 왕국",
-      "spaceColony": "우주 식민지",
-      "superheroAcademy": "슈퍼히어로 아카데미",
-      "underwaterCity": "수중 도시",
-      "wildWestSaloon": "서부 술집",
-      "vikingFeast": "바이킹 연회",
-      "candyKingdom": "사탕 왕국",
-      "dragonsLair": "용의 둥지",
-      "timeTravelersBall": "시간 여행자의 무도회",
-      "atlantisRising": "떠오르는 아틀란티스",
-      "toyBoxAdventure": "장난감 상자 모험",
-      "vampireMasquerade": "뱀파이어 가면무도회",
-      "dimensionHopping": "차원 이동",
-      "cyberpunkNightclub": "사이버펑크 나이트클럽",
-      "ghostShip": "유령선",
-      "sentientPlantColony": "지각 있는 식물 식민지"
-    }
-  },
-  "howItWorks": {
-    "step1": {
-      "title": "이상적인 살인 미스터리를 설명해주세요.",
-      "description": "원하는 테마, 캐릭터, 배경 등 당신만의 독특한 비전을 알려주세요."
-    },
-    "step2": {
-      "title": "맞춤형 미스터리를 즉시 만들어드립니다.",
-      "description": "AI가 원하는 대로 모든 것을 생성합니다 - 캐릭터, 단서, 스토리까지."
-    },
-    "step3": {
-      "title": "에디터로 미스터리를 완성하세요.",
-      "description": "그룹에 딱 맞도록 미스터리를 다듬고 조정하세요."
-    },
-    "step4": {
-      "title": "호스팅과 공유에 필요한 모든 것을 받으세요.",
-      "description": "모든 자료를 다운로드하고 플레이어들과 쉽게 공유하세요."
-    }
-  },
-  "features": {
-    "title": "필요한 모든 것이 포함되어 있습니다",
-    "step1": {
-      "step": "1단계",
-      "title": "무제한 커스터마이징",
-      "content": "어떤 테마, 어떤 캐릭터, 어떤 배경이든 - 상상하는 대로 미스터리를 만드세요."
-    },
-    "step2": {
-      "step": "2단계",
-      "title": "완전한 캐릭터 프로필",
-      "content": "미스터리에 맞춤 제작된 상세한 배경, 동기, 비밀들."
-    },
-    "step3": {
-      "step": "3단계",
-      "title": "쉬운 호스트 가이드",
-      "content": "맞춤형 미스터리를 자신 있게 진행할 수 있는 단계별 안내서."
-    }
-  },
-  "testimonials": {
-    "title": "다른 이용자들의 이야기",
-    "testimonial1": {
-      "text": "친구들이 아직도 우리 미스터리 파티 밤을 이야기해요. 캐릭터들이 너무 상세하고 반전이 완벽했어요!",
-      "author": "제시카 데이비스",
-      "role": "파티 호스트"
-    },
-    "testimonial2": {
-      "text": "정말 쉽게 준비할 수 있어요! 12명을 위한 호스팅이 걱정됐는데, 자료들 덕분에 간단했고 모두가 즐거워했어요.",
-      "author": "마크 클라인",
-      "role": "기업 이벤트 기획자"
-    },
-    "testimonial3": {
-      "text": "이 서비스로 세 번째 미스터리 파티를 했는데 계속 더 좋아지고 있어요. 커스터마이징 옵션이 놀라워요.",
-      "author": "아만다 스미스",
-      "role": "생일 파티 주인공"
-    }
-  },
-  "support": {
-    "title": "더 많은 도움이 필요하신가요?",
-    "description": "FAQ, 호스팅 팁, 살인 미스터리 생성기 사용법에 대한 자세한 정보를 위해 종합 지원 센터를 방문하세요.",
-    "button": "지원 센터 방문"
-  },
-  "footer": {
-    "tagline": "상상의 속도로 매혹적인 살인 미스터리를 만들어보세요.",
-    "quickLinks": "빠른 링크",
-    "company": "회사",
-    "links": {
-      "home": "홈",
-      "support": "지원",
-      "contact": "연락처",
-      "privacy": "개인정보 보호정책"
-    },
-    "copyright": "모든 권리 보유."
-  },
-  "auth": {
-    "signIn": {
-      "title": "다시 오신 것을 환영합니다",
-      "subtitle": "계정에 로그인하여 놀라운 미스터리 만들기를 계속하세요",
-      "email": "이메일 주소",
-      "password": "비밀번호",
-      "rememberMe": "로그인 상태 유지",
-      "forgotPassword": "비밀번호를 잊으셨나요?",
-      "noAccount": "계정이 없으신가요?",
-      "signUpLink": "여기서 가입하세요",
-      "submitButton": "로그인",
-      "signingIn": "로그인 중...",
-      "orDivider": "또는 다음으로 계속",
-      "googleButton": "Google로 계속하기"
-    },
-    "signUp": {
-      "title": "계정 만들기",
-      "subtitle": "수천 명의 미스터리 제작자들과 함께하고 오늘부터 시작하세요",
-      "name": "성명",
-      "email": "이메일 주소",
-      "password": "비밀번호",
-      "confirmPassword": "비밀번호 확인",
-      "terms": "다음에 동의합니다",
-      "termsLink": "서비스 약관",
-      "privacy": "개인정보 보호정책",
-      "and": "및",
-      "hasAccount": "이미 계정이 있으신가요?",
-      "signInLink": "여기서 로그인하세요",
-      "submitButton": "계정 생성",
-      "creatingAccount": "계정 생성 중...",
-      "orDivider": "또는 다음으로 계속",
-      "googleButton": "Google로 계속하기"
-    },
-    "forgotPassword": {
-      "title": "비밀번호 재설정",
-      "subtitle": "이메일 주소를 입력하시면 비밀번호 재설정 링크를 보내드립니다",
-      "email": "이메일 주소",
-      "submitButton": "재설정 링크 보내기",
-      "sending": "전송 중...",
-      "backToSignIn": "로그인으로 돌아가기",
-      "checkEmail": {
-        "title": "이메일을 확인하세요",
-        "message": "비밀번호 재설정 링크를 다음 주소로 보냈습니다",
-        "noEmail": "이메일을 받지 못하셨나요?",
-        "tryAgain": "다시 시도",
-        "returnToSignIn": "로그인으로 돌아가기"
-      }
-    },
-    "resetPassword": {
-      "title": "새 비밀번호 설정",
-      "subtitle": "계정의 새 비밀번호를 만드세요",
-      "password": "새 비밀번호",
-      "confirmPassword": "새 비밀번호 확인",
-      "submitButton": "비밀번호 업데이트",
-      "updating": "업데이트 중...",
-      "success": "비밀번호가 성공적으로 업데이트되었습니다",
-      "backToSignIn": "로그인으로 돌아가기"
-    },
-    "errors": {
-      "invalidCredentials": "잘못된 이메일 또는 비밀번호",
-      "emailAlreadyExists": "이 이메일로 된 계정이 이미 존재합니다",
-      "weakPassword": "비밀번호는 최소 6자 이상이어야 합니다",
-      "passwordMismatch": "비밀번호가 일치하지 않습니다",
-      "invalidEmail": "유효한 이메일 주소를 입력해주세요",
-      "requiredField": "이 필드는 필수입니다",
-      "termsRequired": "서비스 약관에 동의해야 합니다",
-      "networkError": "네트워크 오류입니다. 다시 시도해주세요.",
-      "unknownError": "문제가 발생했습니다. 다시 시도해주세요."
-    },
-    "success": {
-      "accountCreated": "계정이 성공적으로 생성되었습니다! 계정을 확인하려면 이메일을 확인해주세요.",
-      "passwordReset": "비밀번호 재설정 이메일이 성공적으로 전송되었습니다",
-      "passwordUpdated": "비밀번호가 성공적으로 업데이트되었습니다",
-      "signedOut": "성공적으로 로그아웃되었습니다"
-    }
-  },
-  "dashboard": {
-    "welcome": {
-      "title": "다시 오신 것을 환영합니다",
-      "subtitle": "다음 미스터리 걸작을 만들 준비가 되셨나요?",
-      "noMysteries": "아직 미스터리를 만들지 않았습니다",
-      "getStarted": "첫 번째 미스터리를 만들어 시작하세요"
-    },
-    "mysteries": {
-      "title": "내 미스터리",
-      "filter": {
-        "all": "모든 미스터리",
-        "drafts": "초안",
-        "completed": "완료됨",
-        "purchased": "구매됨"
-      },
-      "empty": {
-        "title": "미스터리를 찾을 수 없습니다",
-        "description": "시작하려면 첫 번째 미스터리를 만드세요"
-      },
-      "card": {
-        "players": "플레이어",
-        "created": "생성됨",
-        "lastEdited": "마지막 편집",
-        "status": {
-          "draft": "초안",
-          "completed": "완료됨",
-          "purchased": "구매됨"
-        }
-      }
-    },
-    "stats": {
-      "totalMysteries": "총 미스터리 수",
-      "completedMysteries": "완료됨",
-      "purchasedMysteries": "구매됨",
-      "totalPlayers": "총 호스팅한 플레이어 수"
-    }
-  },
-  "account": {
-    "title": "계정 설정",
-    "tabs": {
-      "profile": "프로필",
-      "security": "보안"
-    },
-    "profile": {
-      "title": "프로필 정보",
-      "description": "계정 프로필 정보를 업데이트하세요",
-      "name": "성명",
-      "email": "이메일 주소",
-      "emailNote": "이메일은 변경할 수 없습니다",
-      "saveButton": "변경사항 저장",
-      "saving": "저장 중...",
-      "success": "프로필이 성공적으로 업데이트되었습니다"
-    },
-    "security": {
-      "password": {
-        "title": "비밀번호 변경",
-        "description": "계정 보안을 위해 비밀번호를 업데이트하세요",
-        "currentPassword": "현재 비밀번호",
-        "newPassword": "새 비밀번호",
-        "confirmPassword": "새 비밀번호 확인",
-        "updateButton": "비밀번호 업데이트",
-        "updating": "업데이트 중...",
-        "success": "비밀번호가 성공적으로 업데이트되었습니다"
-      },
-      "deleteAccount": {
-        "title": "계정 삭제",
-        "description": "계정과 모든 관련 데이터를 영구적으로 삭제합니다",
-        "warning": "이 작업은 되돌릴 수 없습니다. 모든 미스터리와 데이터가 영구적으로 삭제됩니다.",
-        "confirmText": "확인하려면 DELETE를 입력하세요",
-        "deleteButton": "계정 삭제",
-        "deleting": "삭제 중...",
-        "success": "계정이 성공적으로 삭제되었습니다"
-      }
-    }
-  },
-  "mysteryCreation": {
-    "wizard": {
-      "title": "미스터리 만들기",
-      "step1": {
-        "title": "비전을 알려주세요",
-        "description": "이상적인 살인 미스터리 파티를 설명해보세요"
-      },
-      "step2": {
-        "title": "검토 및 다듬기",
-        "description": "AI 어시스턴트로 미스터리를 완성하세요"
-      },
-      "step3": {
-        "title": "완전한 패키지",
-        "description": "호스팅에 필요한 모든 것을 받으세요"
-      }
-    },
-    "editor": {
-      "title": "미스터리 에디터",
-      "characters": "캐릭터",
-      "story": "스토리",
-      "clues": "단서",
-      "hostGuide": "호스트 가이드",
-      "save": "초안 저장",
-      "publish": "미스터리 완성",
-      "saving": "저장 중...",
-      "publishing": "발행 중...",
-      "saved": "초안 저장됨",
-      "published": "미스터리 완성됨"
-    },
-    "guidance": {
-      "describe": "미스터리를 자세히 설명해주세요 - 구체적일수록 더 잘 만들어드릴 수 있습니다",
-      "examples": "예시: '재즈 가수, 바텐더, 마피아 보스를 포함한 8명의 캐릭터가 등장하는 1920년대 밀주점 살인 미스터리'",
-      "playerCount": "몇 명이 참여할 예정인가요?",
-      "theme": "배경이나 테마는 무엇인가요?",
-      "special": "특별한 요구사항이나 제약사항이 있나요?"
-    }
-  },
-  "supportPage": {
-    "title": "지원 센터",
-    "subtitle": "자주 묻는 질문에 대한 답변을 찾고, 지원팀에 문의하며, 놀라운 미스터리 파티를 만드는 데 필요한 모든 것을 얻으세요.",
-    "tabs": {
-      "faqs": "자주 묻는 질문",
-      "contact": "문의하기"
-    },
-    "faqs": {
-      "title": "자주 묻는 질문",
-      "description": "미스터리 메이커에 대한 일반적인 질문의 답변을 찾아보세요",
-      "categories": {
-        "aboutMysteryMaker": "미스터리 메이커 소개",
-        "gameMechanics": "게임 메커니즘",
-        "hostingPlanning": "호스팅 및 계획",
-        "accountBilling": "계정 및 결제"
-      },
-      "questions": {
-        "whatIsMysteryMaker": {
-          "question": "미스터리 메이커란 무엇이며 어떻게 작동하나요?",
-          "answer": "미스터리 메이커는 원하는 대로 맞춤형 살인 미스터리 파티를 만드는 AI 기반 플랫폼입니다. 원하는 테마, 캐릭터, 배경 등 독특한 비전을 알려주시면, AI가 파티에 특별히 맞춤 제작된 캐릭터 프로필, 단서, 호스트 자료 등 필요한 모든 것을 생성합니다."
-        },
-        "creationProcess": {
-          "question": "생성 및 구매 과정은 어떻게 되나요?",
-          "answer": "간단합니다! 먼저 이상적인 살인 미스터리를 설명하시면 무료로 맞춤형 미리보기를 만들어드립니다. 미스터리가 마음에 드시면 $11.99에 완전한 패키지를 구매하세요. 호스팅에 필요한 모든 것을 즉시 받으실 수 있습니다: 상세한 캐릭터 프로필, 호스트 가이드, 모든 게임 자료."
-        },
-        "saveWork": {
-          "question": "작업을 저장하고 나중에 다시 돌아올 수 있나요?",
-          "answer": "네! 모든 맞춤형 미스터리가 계정에 저장되어 언제든지 돌아와서 편집할 수 있습니다."
-        },
-        "replayable": {
-          "question": "이 살인 미스터리들은 재플레이할 수 있나요?",
-          "answer": "물론입니다! 미스터리에는 가변 요소가 포함되어 있어 같은 그룹과도 매번 새로운 느낌으로 플레이할 수 있습니다. 맞춤형 미스터리를 원하는 만큼 호스팅할 수 있습니다."
-        },
-        "playerCount": {
-          "question": "플레이어가 몇 명 필요한가요?",
-          "answer": "시스템이 지정하신 모든 그룹 크기에 맞춰 미스터리를 만듭니다 - 4-6명의 소규모 모임부터 15명 이상의 대규모 파티까지. 플레이어 수만 알려주시면 그에 맞게 디자인해드립니다."
-        },
-        "modifyMystery": {
-          "question": "미스터리를 만든 후 수정할 수 있나요?",
-          "answer": "물론입니다! 에디터를 사용해 그룹에 딱 맞도록 미스터리를 다듬고 조정하세요. 언제든지 캐릭터, 테마, 복잡성을 변경할 수 있습니다."
-        },
-        "lastMinuteChanges": {
-          "question": "막판에 플레이어를 추가하거나 제거해야 한다면 어떻게 하나요?",
-          "answer": "문제없습니다! 유연한 시스템으로 미스터리를 만든 후에도 플레이어 수를 조정할 수 있습니다. AI가 이러한 변경사항에 맞춰 스토리와 캐릭터를 조정합니다."
-        },
-        "whatIncluded": {
-          "question": "맞춤형 미스터리 패키지에는 무엇이 포함되나요?",
-          "answer": "필요한 모든 것이 포함됩니다: 단계별 안내가 포함된 종합적인 호스트 가이드, 각 플레이어를 위한 상세한 캐릭터 프로필, 단서, 증거, 모든 게임 자료. 추가 준비가 필요하지 않습니다."
-        },
-        "gameDuration": {
-          "question": "일반적인 게임 시간은 얼마나 되나요?",
-          "answer": "대부분의 미스터리는 2-3시간 정도 진행되지만, 진행 속도는 조절할 수 있습니다. 호스트 가이드에는 일정에 맞춰 조정할 수 있는 시간 제안이 포함되어 있습니다."
-        },
-        "themedMysteries": {
-          "question": "특별한 행사를 위한 테마 미스터리를 제공하나요?",
-          "answer": "상상할 수 있는 모든 테마를 만들어드립니다! 클래식한 1920년대 밀주점부터 우주 정거장, 동화 왕국까지 - 비전을 알려주시면 실현해드립니다."
-        },
-        "ageRecommendation": {
-          "question": "미스터리에 연령 권장사항이 있나요?",
-          "answer": "표준 미스터리는 성인과 청소년(13세 이상)에게 잘 맞습니다. 어린 플레이어를 위해서는 미스터리를 만들 때 가족 친화적인 테마를 요청할 수도 있습니다."
-        },
-        "freePreview": {
-          "question": "무료 미리보기에는 무엇이 포함되나요?",
-          "answer": "기본 스토리 전제와 캐릭터 컨셉을 포함한 미스터리 미리보기를 무료로 무제한 만들 수 있습니다. 구매하기 전에 다양한 아이디어를 탐색할 수 있습니다."
-        },
-        "purchaseIncludes": {
-          "question": "미스터리를 구매하면 무엇을 받나요?",
-          "answer": "$11.99에 호스팅에 필요한 모든 것을 받으실 수 있습니다: 종합적인 호스트 가이드, 각 플레이어를 위한 상세한 캐릭터 프로필, 단서, 증거, 바로 사용할 수 있는 모든 게임 자료."
-        },
-        "refund": {
-          "question": "만족하지 못한다면 환불받을 수 있나요?",
-          "answer": "물론입니다! 구매에 완전히 만족하지 못하신다면 7일 이내에 연락해주시면 질문 없이 전액 환불해드립니다."
-        }
-      }
-    },
-    "contact": {
-      "title": "문의하기",
-      "description": "더 도움이 필요하신가요? 저희가 도와드리겠습니다",
-      "intro": "지원팀이 미스터리 메이커로 완벽한 미스터리 파티를 만드는 것에 대한 모든 질문을 도와드릴 준비가 되어 있습니다.",
-      "form": {
-        "name": "이름",
-        "email": "이메일 주소",
-        "subject": "제목",
-        "message": "메시지",
-        "namePlaceholder": "이름을 입력하세요",
-        "emailPlaceholder": "your.email@example.com",
-        "subjectPlaceholder": "메시지 내용은 무엇인가요?",
-        "messagePlaceholder": "어떻게 도와드릴까요?",
-        "sendButton": "메시지 보내기",
-        "sending": "전송 중...",
-        "success": "문의해주셔서 감사합니다! 24시간 이내에 답변드리겠습니다.",
-        "error": "메시지 전송에 실패했습니다. 나중에 다시 시도해주세요."
-      }
-    }
-  },
-  "common": {
-    "buttons": {
-      "createNew": "새 미스터리 만들기",
-      "getStarted": "시작하기",
-      "learnMore": "더 알아보기",
-      "tryNow": "지금 시도하기",
-      "continue": "계속",
-      "cancel": "취소",
-      "save": "저장",
-      "delete": "삭제",
-      "edit": "편집",
-      "close": "닫기",
-      "back": "뒤로",
-      "next": "다음",
-      "previous": "이전",
-      "finish": "완료",
-      "submit": "제출",
-      "confirm": "확인",
-      "yes": "예",
-      "no": "아니오"
-    },
-    "labels": {
-      "loading": "로딩 중...",
-      "pleaseWait": "잠시만 기다려주세요...",
-      "error": "오류",
-      "success": "성공",
-      "warning": "경고",
-      "info": "정보",
-      "required": "필수",
-      "optional": "선택사항"
-    },
-    "messages": {
-      "welcome": "환영합니다!",
-      "thankYou": "감사합니다!"
-    },
-    "validation": {
-      "required": "이 필드는 필수입니다",
-      "invalidEmail": "유효한 이메일 주소를 입력해주세요",
-      "tooShort": "너무 짧습니다"
-    }
-  }
-}
+ "navigation": {
+   "home": "홈",
+   "dashboard": "대시보드",
+   "signIn": "로그인",
+   "signUp": "회원가입",
+   "signOut": "로그아웃",
+   "account": "계정 설정"
+ },
+ "hero": {
+   "title": "몇 분 만에 살인 미스터리 파티 만들기",
+   "subtitle": "원하는 대로 맞춤형 미스터리를 디자인하세요 - 어떤 테마, 캐릭터, 배경이든 가능합니다.",
+   "subtitleAuth": "원하는 대로 맞춤형 미스터리를 디자인하세요 - 어떤 테마, 캐릭터, 배경이든 가능합니다.",
+   "placeholder": "재즈 뮤지션들이 등장하는 1920년대 밀주점 살인 미스터리...",
+   "placeholderAuth": "재즈 뮤지션들이 등장하는 1920년대 밀주점 살인 미스터리...",
+   "themes": {
+     "1920sSpeakeasy": "1920년대 밀주점",
+     "hollywoodMurder": "할리우드 살인사건",
+     "castleMystery": "성 미스터리",
+     "sciFiMystery": "SF 미스터리",
+     "artGalleryOpening": "아트 갤러리 오프닝",
+     "bakeryCompetition": "베이커리 경연대회",
+     "mountainSkiResort": "산악 스키 리조트",
+     "luxuryTrainJourney": "럭셔리 기차 여행",
+     "historicUniversity": "역사적인 대학교",
+     "pokerTournament": "포커 토너먼트",
+     "barbieDreamworld": "바비 드림월드",
+     "dystopianWaterworld": "디스토피아 워터월드",
+     "jungleSteampunk": "정글 스팀펑크",
+     "magicalBakery": "마법의 베이커리",
+     "gamingTournament": "게임 토너먼트",
+     "synthwave80s": "신스웨이브 80년대",
+     "beachResort": "비치 리조트",
+     "operaHouse": "오페라 하우스",
+     "wineCountry": "와인 컨트리",
+     "safariAdventure": "사파리 어드벤처",
+     "fashionShow": "패션쇼",
+     "casinoNight": "카지노 나이트",
+     "fairyTaleKingdom": "동화 왕국",
+     "spaceColony": "우주 식민지",
+     "superheroAcademy": "슈퍼히어로 아카데미",
+     "underwaterCity": "수중 도시",
+     "wildWestSaloon": "서부 술집",
+     "vikingFeast": "바이킹 축제",
+     "candyKingdom": "캔디 왕국",
+     "dragonsLair": "용의 소굴",
+     "timeTravelersBall": "시간 여행자의 무도회",
+     "atlantisRising": "떠오르는 아틀란티스",
+     "toyBoxAdventure": "장난감 상자 어드벤처",
+     "vampireMasquerade": "뱀파이어 가면무도회",
+     "dimensionHopping": "차원 이동",
+     "cyberpunkNightclub": "사이버펑크 나이트클럽",
+     "ghostShip": "유령선",
+     "sentientPlantColony": "의식 있는 식물 식민지"
+   },
+   "prompts": {
+     "1920sSpeakeasy": "금주법 시대를 배경으로 한 1920년대 밀주점 테마의 살인 미스터리를 개최하고 싶습니다.",
+     "hollywoodMurder": "영화 황금기 할리우드 영화 세트장에서 벌어지는 살인 미스터리를 디자인해주세요.",
+     "castleMystery": "럭셔리 호텔로 개조된 외딴 중세 성을 배경으로 한 살인 미스터리를 개발해주세요.",
+     "sciFiMystery": "새로 발견된 외계행성을 공전하는 연구 우주정거장을 배경으로 한 살인 미스터리를 디자인해주세요.",
+     "artGalleryOpening": "유명한 전시회 개막식 중 권위 있는 아트 갤러리를 배경으로 한 살인 미스터리를 만들어주세요.",
+     "bakeryCompetition": "소도시 베이커리 경연대회를 중심으로 한 살인 미스터리를 디자인해주세요.",
+     "mountainSkiResort": "눈보라가 치는 고립된 산악 스키 리조트에서의 살인 미스터리를 개발해주세요.",
+     "luxuryTrainJourney": "스위스 알프스를 가로지르는 럭셔리 기차 여행을 배경으로 한 미스터리를 만들어주세요.",
+     "historicUniversity": "유령이 나온다는 과거를 가진 역사적인 대학교를 배경으로 한 살인 미스터리를 구축해주세요.",
+     "pokerTournament": "고액 포커 토너먼트에서의 미스터리를 만들어주세요.",
+     "barbieDreamworld": "모든 것이 핑크색이고 완벽한 바비에서 영감을 받은 드림월드에서의 살인 미스터리를 디자인해주세요.",
+     "dystopianWaterworld": "물이 가장 귀중한 자원인 디스토피아 미래의 미스터리를 만들어주세요.",
+     "jungleSteampunk": "스팀펑크 기술과 분위기가 있는 정글을 배경으로 한 살인 미스터리를 개발해주세요.",
+     "magicalBakery": "마법에 걸린 디저트가 특산인 마법의 베이커리에서의 살인 미스터리를 만들어주세요.",
+     "gamingTournament": "게임 토너먼트 참가자들을 중심으로 한 비디오 게임 테마 미스터리를 디자인해주세요.",
+     "synthwave80s": "신스웨이브 음악이 감정을 조절하는 대안적 1980년대를 배경으로 한 미스터리를 만들어주세요.",
+     "beachResort": "열대 해변 리조트에서의 살인 미스터리를 개발해주세요.",
+     "operaHouse": "역사적인 오페라 하우스 시사회 중에 벌어지는 미스터리를 만들어주세요.",
+     "wineCountry": "수확 시즌 중 명성 있는 포도원에서의 추리물을 디자인해주세요.",
+     "safariAdventure": "아프리카 사파리 탐험 중 벌어지는 살인 미스터리를 만들어주세요.",
+     "fashionShow": "유명 패션쇼 백스테이지에서의 미스터리를 구축해주세요.",
+     "casinoNight": "자선 카지노 나이트 모금 행사 중 벌어지는 미스터리를 만들어주세요.",
+     "fairyTaleKingdom": "마법에 걸린 동화 왕국에서의 살인 미스터리를 디자인해주세요.",
+     "spaceColony": "인류 최초의 화성 식민지에서의 미스터리를 만들어주세요.",
+     "superheroAcademy": "훈련 중인 젊은 슈퍼히어로들의 학교에서의 미스터리를 개발해주세요.",
+     "underwaterCity": "미래의 수중 도시에서의 살인 미스터리를 만들어주세요.",
+     "wildWestSaloon": "골드러시 시대 개척지 마을에서의 미스터리를 디자인해주세요.",
+     "vikingFeast": "전통적인 바이킹 축제 중 벌어지는 살인 미스터리를 만들어주세요.",
+     "candyKingdom": "모든 것이 과자와 설탕으로 만들어진 세상에서의 살인 미스터리를 만들어주세요.",
+     "dragonsLair": "인간과 용이 공존하는 중세 판타지 세계에서의 미스터리를 디자인해주세요.",
+     "timeTravelersBall": "서로 다른 시대에서 온 참석자들이 모이는 모임에서의 살인 미스터리를 만들어주세요.",
+     "atlantisRising": "최근 모습을 드러낸 고대 아틀란티스 도시에서의 미스터리를 개발해주세요.",
+     "toyBoxAdventure": "인간이 보지 않을 때 장난감들이 살아나는 미스터리를 만들어주세요.",
+     "vampireMasquerade": "독점적인 뱀파이어 사회의 연례 혈액 무도회에서의 미스터리를 디자인해주세요.",
+     "dimensionHopping": "여러 평행 우주에 걸쳐 벌어지는 미스터리를 만들어주세요.",
+     "cyberpunkNightclub": "네온이 물든 사이버펑크 나이트클럽에서의 살인 미스터리를 만들어주세요.",
+     "ghostShip": "수 세기 전 사라졌다가 신비롭게 다시 나타난 전설적인 선박에서의 미스터리를 디자인해주세요.",
+     "sentientPlantColony": "복잡한 사회 계층을 가진 지능적이고 이동 가능한 식물들의 사회에서의 살인 미스터리를 만들어주세요."
+   }
+ },
+ "howItWorks": {
+   "step1": {
+     "title": "이상적인 살인 미스터리를 설명해주세요.",
+     "description": "원하는 독특한 비전을 알려주세요 - 어떤 테마, 캐릭터, 배경이든 가능합니다."
+   },
+   "step2": {
+     "title": "맞춤형 미스터리를 즉시 생성합니다.",
+     "description": "AI가 원하는 대로 모든 것을 생성합니다 - 캐릭터, 단서, 스토리까지."
+   },
+   "step3": {
+     "title": "에디터로 미스터리를 완성하세요.",
+     "description": "그룹에 정확히 맞을 때까지 미스터리를 세밀하게 조정하세요."
+   },
+   "step4": {
+     "title": "진행과 공유에 필요한 모든 것을 받으세요.",
+     "description": "모든 자료를 다운로드하고 참가자들과 쉽게 공유하세요."
+   }
+ },
+ "features": {
+   "title": "필요한 모든 것이 포함되어 있습니다",
+   "step1": {
+     "step": "1단계",
+     "title": "무제한 커스터마이제이션",
+     "content": "어떤 테마, 캐릭터, 배경이든 - 상상하는 대로 정확히 미스터리를 만드세요."
+   },
+   "step2": {
+     "step": "2단계",
+     "title": "완전한 캐릭터 프로필",
+     "content": "미스터리에 특별히 맞춤화된 자세한 배경, 동기, 비밀들."
+   },
+   "step3": {
+     "step": "3단계",
+     "title": "쉬운 진행 가이드",
+     "content": "맞춤형 미스터리를 자신감 있게 진행할 수 있는 단계별 지침."
+   }
+ },
+ "testimonials": {
+   "title": "다른 분들의 평가",
+   "testimonial1": {
+     "text": "친구들이 아직도 우리 살인 미스터리 밤에 대해 이야기해요. 캐릭터들이 너무 자세하고 반전이 완벽했어요!",
+     "author": "제시카 데이비스",
+     "role": "파티 호스트"
+   },
+   "testimonial2": {
+     "text": "설정이 너무 쉬웠어요! 12명을 위한 진행이 걱정됐는데, 자료들 덕분에 간단했고 모두가 즐거워했어요.",
+     "author": "마크 클라인",
+     "role": "기업 이벤트 플래너"
+   },
+   "testimonial3": {
+     "text": "이 서비스를 이용한 세 번째 살인 미스터리 파티인데 계속 더 좋아져요. 커스터마이제이션 옵션이 놀라워요.",
+     "author": "아만다 스미스",
+     "role": "생일 주인공"
+   }
+ },
+ "support": {
+   "title": "더 많은 도움이 필요하신가요?",
+   "description": "FAQ, 진행 팁, 그리고 살인 미스터리 생성기 사용에 대한 더 많은 정보를 위해 포괄적인 지원 센터를 방문하세요.",
+   "button": "지원 센터 방문"
+ },
+ "footer": {
+   "tagline": "상상의 속도로 매혹적인 살인 미스터리를 만들어보세요.",
+   "quickLinks": "빠른 링크",
+   "company": "회사",
+   "links": {
+     "home": "홈",
+     "support": "지원",
+     "contact": "연락처",
+     "privacy": "개인정보보호정책"
+   },
+   "copyright": "Murder Mystery Generator, Inc. 모든 권리 보유."
+ },
+ "auth": {
+   "signIn": {
+     "title": "다시 오신 것을 환영합니다",
+     "subtitle": "계정에 로그인하여 놀라운 미스터리 만들기를 계속하세요",
+     "email": "이메일 주소",
+     "password": "비밀번호",
+     "rememberMe": "로그인 상태 유지",
+     "forgotPassword": "비밀번호를 잊으셨나요?",
+     "noAccount": "계정이 없으신가요?",
+     "signUpLink": "여기서 회원가입",
+     "submitButton": "로그인",
+     "signingIn": "로그인 중...",
+     "orDivider": "또는 다음으로 계속",
+     "googleButton": "Google로 계속하기"
+   },
+   "signUp": {
+     "title": "계정 만들기",
+     "subtitle": "수천 명의 미스터리 메이커들과 함께하고 오늘부터 시작하세요",
+     "name": "전체 이름",
+     "email": "이메일 주소",
+     "password": "비밀번호",
+     "confirmPassword": "비밀번호 확인",
+     "terms": "다음에 동의합니다",
+     "termsLink": "서비스 약관",
+     "privacy": "개인정보보호정책",
+     "and": "그리고",
+     "hasAccount": "이미 계정이 있으신가요?",
+     "signInLink": "여기서 로그인",
+     "submitButton": "계정 만들기",
+     "creatingAccount": "계정 생성 중...",
+     "orDivider": "또는 다음으로 계속",
+     "googleButton": "Google로 계속하기"
+   },
+   "forgotPassword": {
+     "title": "비밀번호 재설정",
+     "subtitle": "이메일 주소를 입력하시면 비밀번호 재설정 링크를 보내드립니다",
+     "email": "이메일 주소",
+     "submitButton": "재설정 링크 보내기",
+     "sending": "전송 중...",
+     "backToSignIn": "로그인으로 돌아가기",
+     "checkEmail": {
+       "title": "이메일을 확인하세요",
+       "message": "비밀번호 재설정 링크를 다음 주소로 보냈습니다",
+       "noEmail": "이메일을 받지 못하셨나요?",
+       "tryAgain": "다시 시도",
+       "returnToSignIn": "로그인으로 돌아가기"
+     }
+   },
+   "resetPassword": {
+     "title": "새 비밀번호 설정",
+     "subtitle": "계정의 새 비밀번호를 만드세요",
+     "password": "새 비밀번호",
+     "confirmPassword": "새 비밀번호 확인",
+     "submitButton": "비밀번호 업데이트",
+     "updating": "업데이트 중...",
+     "success": "비밀번호가 성공적으로 업데이트되었습니다",
+     "backToSignIn": "로그인으로 돌아가기"
+   },
+   "errors": {
+     "invalidCredentials": "잘못된 이메일 또는 비밀번호",
+     "emailAlreadyExists": "이 이메일로 이미 계정이 존재합니다",
+     "weakPassword": "비밀번호는 최소 6자 이상이어야 합니다",
+     "passwordMismatch": "비밀번호가 일치하지 않습니다",
+     "invalidEmail": "유효한 이메일 주소를 입력해주세요",
+     "requiredField": "이 필드는 필수입니다",
+     "termsRequired": "서비스 약관에 동의해야 합니다",
+     "networkError": "네트워크 오류. 다시 시도해주세요.",
+     "unknownError": "문제가 발생했습니다. 다시 시도해주세요."
+   },
+   "success": {
+     "accountCreated": "계정이 성공적으로 생성되었습니다! 계정 확인을 위해 이메일을 확인해주세요.",
+     "passwordReset": "비밀번호 재설정 이메일이 성공적으로 전송되었습니다",
+     "passwordUpdated": "비밀번호가 성공적으로 업데이트되었습니다",
+     "signedOut": "성공적으로 로그아웃되었습니다"
+   }
+ },
+ "dashboard": {
+   "title": "내 살인 미스터리",
+   "subtitle": "생성한 모든 미스터리를 보고, 편집하고, 관리하세요",
+   "welcome": {
+     "title": "다시 오신 것을 환영합니다",
+     "subtitle": "다음 미스터리 걸작을 만들 준비가 되셨나요?",
+     "noMysteries": "아직 미스터리를 만들지 않았습니다",
+     "getStarted": "첫 번째 미스터리를 만들어 시작하세요"
+   },
+   "mysteries": {
+     "title": "내 미스터리",
+     "searchPlaceholder": "미스터리 검색...",
+     "deleteSuccess": "미스터리가 보관함으로 이동되었습니다",
+     "deleteFailed": "미스터리 보관에 실패했습니다",
+     "filter": {
+       "all": "모든 미스터리",
+       "drafts": "초안",
+       "completed": "완성",
+       "purchased": "구매함"
+     },
+     "empty": {
+       "title": "미스터리를 찾을 수 없습니다",
+       "description": "시작하려면 첫 번째 미스터리를 만드세요",
+       "searchResult": "검색 조건에 맞는 미스터리가 없습니다"
+     },
+     "card": {
+       "players": "참가자",
+       "created": "생성일",
+       "lastEdited": "마지막 편집",
+       "status": {
+         "draft": "초안",
+         "completed": "완성",
+         "purchased": "구매함"
+       }
+     },
+     "showingCount": "전체 {{total}}개 중 {{count}}개 표시"
+   },
+   "stats": {
+     "totalMysteries": "전체 미스터리",
+     "completedMysteries": "완성됨",
+     "purchasedMysteries": "구매함",
+     "totalPlayers": "총 호스팅 참가자"
+   },
+   "backToDashboard": "대시보드로 돌아가기",
+   "buttons": {
+     "createFirstMystery": "첫 번째 미스터리 만들기"
+   },
+   "errors": {
+     "loadFailed": "미스터리를 불러오는데 실패했습니다"
+   }
+ },
+ "account": {
+   "title": "계정 설정",
+   "tabs": {
+     "profile": "프로필",
+     "security": "보안"
+   },
+   "profile": {
+     "title": "프로필 정보",
+     "description": "계정 프로필 정보를 업데이트하세요",
+     "name": "전체 이름",
+     "email": "이메일 주소",
+     "emailNote": "이메일은 변경할 수 없습니다",
+     "saveButton": "변경사항 저장",
+     "saving": "저장 중...",
+     "success": "프로필이 성공적으로 업데이트되었습니다"
+   },
+   "security": {
+     "password": {
+       "title": "비밀번호 변경",
+       "description": "계정 보안을 위해 비밀번호를 업데이트하세요",
+       "currentPassword": "현재 비밀번호",
+       "newPassword": "새 비밀번호",
+       "confirmPassword": "새 비밀번호 확인",
+       "updateButton": "비밀번호 업데이트",
+       "updating": "업데이트 중...",
+       "success": "비밀번호가 성공적으로 업데이트되었습니다"
+     },
+     "deleteAccount": {
+       "title": "계정 삭제",
+       "description": "계정과 모든 관련 데이터를 영구적으로 삭제합니다",
+       "warning": "이 작업은 되돌릴 수 없습니다. 모든 미스터리와 데이터가 영구적으로 삭제됩니다.",
+       "confirmText": "확인하려면 DELETE를 입력하세요",
+       "deleteButton": "계정 삭제",
+       "deleting": "삭제 중...",
+       "success": "계정이 성공적으로 삭제되었습니다"
+     }
+   }
+ },
+ "mysteryCreation": {
+   "wizard": {
+     "title": "미스터리 만들기",
+     "step1": {
+       "title": "비전을 알려주세요",
+       "description": "이상적인 살인 미스터리 파티를 설명해주세요"
+     },
+     "step2": {
+       "title": "검토 및 다듬기",
+       "description": "AI 어시스턴트와 함께 미스터리를 완성하세요"
+     },
+     "step3": {
+       "title": "완전한 패키지",
+       "description": "진행에 필요한 모든 것을 받으세요"
+     }
+   },
+   "editor": {
+     "title": "미스터리 에디터",
+     "characters": "캐릭터",
+     "story": "스토리",
+     "clues": "단서",
+     "hostGuide": "진행 가이드",
+     "save": "초안 저장",
+     "publish": "미스터리 완성",
+     "saving": "저장 중...",
+     "publishing": "게시 중...",
+     "saved": "초안 저장됨",
+     "published": "미스터리 완성됨"
+   },
+   "guidance": {
+     "describe": "미스터리를 자세히 설명해주세요 - 구체적일수록 더 잘 만들어드릴 수 있습니다",
+     "examples": "예시: '재즈 가수, 바텐더, 조직 보스를 포함한 8명의 캐릭터가 등장하는 1920년대 밀주점 살인 미스터리'",
+     "playerCount": "몇 명의 참가자가 참여하나요?",
+     "theme": "배경이나 테마는 무엇인가요?",
+     "special": "특별한 요구사항이나 제약이 있나요?",
+     "initialPrompt": {
+       "withTheme": "{{theme}} 테마의 살인 미스터리를 만들어봅시다. 이 미스터리를 단계별로 만드는 과정을 안내해주세요.",
+       "withoutTheme": "살인 미스터리를 만들어봅시다. 이 미스터리를 단계별로 만드는 과정을 안내해주세요."
+     }
+   },
+   "editTitle": "미스터리 편집",
+   "createTitle": "새 미스터리 만들기",
+   "form": {
+     "description": "아래 양식을 작성하여 맞춤형 살인 미스터리를 생성하세요"
+   },
+   "errors": {
+     "signInToSave": "미스터리를 저장하려면 로그인해주세요",
+     "saveFailed": "미스터리 저장에 실패했습니다",
+     "loadFailed": "미스터리를 불러오는데 실패했습니다",
+     "loadMessagesFailed": "대화 메시지를 불러오는데 실패했습니다",
+     "loadConversationFailed": "대화를 불러오는데 실패했습니다",
+     "initialPrompt": "미스터리에 대한 프롬프트를 제공해주세요",
+     "saveMessageFailed": "메시지 저장에 실패했습니다"
+   },
+   "success": {
+     "setupComplete": "미스터리 설정 완료! 채팅을 시작합니다..."
+   }
+ },
+ "supportPage": {
+   "title": "지원 센터",
+   "subtitle": "자주 묻는 질문에 대한 답변을 찾고, 지원팀에 문의하고, 놀라운 미스터리 파티를 만드는 데 필요한 모든 것을 얻으세요.",
+   "tabs": {
+     "faqs": "FAQ",
+     "contact": "문의하기"
+   },
+   "faqs": {
+     "title": "자주 묻는 질문",
+     "description": "Mystery Maker에 대한 일반적인 질문에 대한 답변을 찾아보세요",
+     "categories": {
+       "aboutMysteryMaker": "Mystery Maker 소개",
+       "gameMechanics": "게임 메커니즘",
+       "hostingPlanning": "진행 및 계획",
+       "accountBilling": "계정 및 결제"
+     },
+     "questions": {
+       "whatIsMysteryMaker": {
+         "question": "Mystery Maker는 무엇이고 어떻게 작동하나요?",
+         "answer": "Mystery Maker는 원하는 대로 맞춤형 살인 미스터리 파
