@@ -22,7 +22,7 @@ const Footer = () => {
               <span className="text-xl font-bold gradient-text">Mystery Maker</span>
             </Link>
             <p className="text-muted-foreground">
-              Craft custom murder mysteries at the speed of imagination.
+              {t('footer.tagline')}
             </p>
           </div>
           
@@ -61,7 +61,7 @@ const Footer = () => {
         
         <div className="mt-12 pt-8 border-t flex flex-col md:flex-row justify-between items-center">
           <p className="text-muted-foreground text-sm">
-            &copy; {currentYear} Mystery Maker Inc. All rights reserved.
+            &copy; {currentYear} {t('footer.copyright')}
           </p>
         </div>
       </div>

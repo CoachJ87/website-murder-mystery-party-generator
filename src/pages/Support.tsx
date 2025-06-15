@@ -22,20 +22,22 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
-
-const formSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  email: z.string().email({ message: "Please enter a valid email address." }),
-  subject: z.string().min(5, { message: "Subject must be at least 5 characters." }),
-  message: z.string().min(10, { message: "Message must be at least 10 characters." }),
-});
-
-type FormValues = z.infer<typeof formSchema>;
+import { useTranslation } from 'react-i18next';
 
 const Support = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("faqs");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isMobile = useIsMobile();
+  
+  const formSchema = z.object({
+    name: z.string().min(2, { message: t('common.validation.required') }),
+    email: z.string().email({ message: t('common.validation.invalidEmail') }),
+    subject: z.string().min(5, { message: t('common.validation.tooShort') }),
+    message: z.string().min(10, { message: t('common.validation.tooShort') }),
+  });
+
+  type FormValues = z.infer<typeof formSchema>;
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -57,11 +59,11 @@ const Support = () => {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      toast.success("Thank you for contacting us! We'll get back to you within 24 hours.");
+      toast.success(t('supportPage.contact.form.success'));
       form.reset();
     } catch (error) {
       console.error("Error submitting form:", error);
-      toast.error("Failed to send message. Please try again later.");
+      toast.error(t('supportPage.contact.form.error'));
     } finally {
       setIsSubmitting(false);
     }
@@ -69,78 +71,78 @@ const Support = () => {
   
   const faqCategories = [
     {
-      title: "About Mystery Maker",
+      title: t('supportPage.faqs.categories.aboutMysteryMaker'),
       items: [
         {
-          question: "What is Mystery Maker and how does it work?",
-          answer: "Mystery Maker is an AI-powered platform that creates custom murder mystery parties exactly how you want them. Tell us your unique vision - any theme, characters, or setting - and our AI generates everything you need: character profiles, clues, and host materials tailored specifically for your party."
+          question: t('supportPage.faqs.questions.whatIsMysteryMaker.question'),
+          answer: t('supportPage.faqs.questions.whatIsMysteryMaker.answer')
         },
         {
-          question: "How does the creation and purchase process work?",
-          answer: "Simple! First, describe your ideal murder mystery and we'll create a custom preview for free. When you're happy with your mystery, purchase the complete package for $11.99. You'll instantly get everything needed to host: detailed character profiles, host guide, and all game materials."
+          question: t('supportPage.faqs.questions.creationProcess.question'),
+          answer: t('supportPage.faqs.questions.creationProcess.answer')
         },
         {
-          question: "Can I save my work and come back to it later?",
-          answer: "Yes! All your custom mysteries are saved to your account so you can return and edit them anytime."
+          question: t('supportPage.faqs.questions.saveWork.question'),
+          answer: t('supportPage.faqs.questions.saveWork.answer')
         }
       ]
     },
     {
-      title: "Game Mechanics",
+      title: t('supportPage.faqs.categories.gameMechanics'),
       items: [
         {
-          question: "Are these murder mysteries replayable?",
-          answer: "Absolutely! Our mysteries include variable elements so each playthrough feels fresh, even with the same group. You can host your custom mystery as many times as you want."
+          question: t('supportPage.faqs.questions.replayable.question'),
+          answer: t('supportPage.faqs.questions.replayable.answer')
         },
         {
-          question: "How many players do I need?",
-          answer: "Our system creates mysteries for any group size you specify - from intimate gatherings of 4-6 players to larger parties of 15+ players. Just tell us your player count and we'll design accordingly."
+          question: t('supportPage.faqs.questions.playerCount.question'),
+          answer: t('supportPage.faqs.questions.playerCount.answer')
         },
         {
-          question: "Can I modify my mystery after creating it?",
-          answer: "Of course! Use our editor to refine and adjust your mystery until it's exactly right for your group. Change characters, themes, or complexity anytime."
+          question: t('supportPage.faqs.questions.modifyMystery.question'),
+          answer: t('supportPage.faqs.questions.modifyMystery.answer')
         },
         {
-          question: "What if I need to add or remove players at the last minute?",
-          answer: "No problem! Our flexible system allows you to adjust your player count even after creating your mystery. The AI will adapt the story and characters to accommodate these changes."
+          question: t('supportPage.faqs.questions.lastMinuteChanges.question'),
+          answer: t('supportPage.faqs.questions.lastMinuteChanges.answer')
         }
       ]
     },
     {
-      title: "Hosting & Planning",
+      title: t('supportPage.faqs.categories.hostingPlanning'),
       items: [
         {
-          question: "What's included in my custom mystery package?",
-          answer: "Everything you need: a comprehensive host guide with step-by-step instructions, detailed character profiles for each player, clues, evidence, and all game materials. No additional preparation required."
+          question: t('supportPage.faqs.questions.whatIncluded.question'),
+          answer: t('supportPage.faqs.questions.whatIncluded.answer')
         },
         {
-          question: "How long does a typical game last?",
-          answer: "Most mysteries run 2-3 hours, but you control the pacing. Our host guide includes timing suggestions that you can adjust to fit your schedule."
+          question: t('supportPage.faqs.questions.gameDuration.question'),
+          answer: t('supportPage.faqs.questions.gameDuration.answer')
         },
         {
-          question: "Do you offer themed mysteries for special occasions?",
-          answer: "We create any theme you can imagine! From classic 1920s speakeasies to space stations to fairy tale kingdoms - tell us your vision and we'll make it happen."
+          question: t('supportPage.faqs.questions.themedMysteries.question'),
+          answer: t('supportPage.faqs.questions.themedMysteries.answer')
         },
         {
-          question: "Is there an age recommendation for your mysteries?",
-          answer: "Our standard mysteries work great for adults and teens (13+). You can also request family-friendly themes when creating your mystery for younger players."
+          question: t('supportPage.faqs.questions.ageRecommendation.question'),
+          answer: t('supportPage.faqs.questions.ageRecommendation.answer')
         }
       ]
     },
     {
-      title: "Account & Billing",
+      title: t('supportPage.faqs.categories.accountBilling'),
       items: [
         {
-          question: "What's included in the free preview?",
-          answer: "You can create unlimited mystery previews for free, including the basic story premise and character concepts. This lets you explore different ideas before purchasing."
+          question: t('supportPage.faqs.questions.freePreview.question'),
+          answer: t('supportPage.faqs.questions.freePreview.answer')
         },
         {
-          question: "What do I get when I purchase a mystery?",
-          answer: "For $11.99, you receive everything needed to host: comprehensive host guide, detailed character profiles for each player, clues, evidence, and all game materials ready to use."
+          question: t('supportPage.faqs.questions.purchaseIncludes.question'),
+          answer: t('supportPage.faqs.questions.purchaseIncludes.answer')
         },
         {
-          question: "Can I get a refund if I'm not satisfied?",
-          answer: "Absolutely! If you're not completely satisfied with your purchase, contact us within 7 days and we'll issue a full refund, no questions asked."
+          question: t('supportPage.faqs.questions.refund.question'),
+          answer: t('supportPage.faqs.questions.refund.answer')
         }
       ]
     }
@@ -153,9 +155,9 @@ const Support = () => {
       <main className="flex-1 py-12 px-4">
         <div className="container mx-auto max-w-4xl">
           <div className="mb-8 text-center">
-            <h1 className="text-3xl font-bold mb-4">Support Center</h1>
+            <h1 className="text-3xl font-bold mb-4">{t('supportPage.title')}</h1>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Find answers to common questions, contact our support team, and get everything you need to create amazing mystery parties.
+              {t('supportPage.subtitle')}
             </p>
           </div>
           
@@ -172,7 +174,7 @@ const Support = () => {
                 )}
               >
                 <HelpCircle className="h-4 w-4" />
-                <span>FAQs</span>
+                <span>{t('supportPage.tabs.faqs')}</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="contact" 
@@ -182,15 +184,15 @@ const Support = () => {
                 )}
               >
                 <PenSquare className="h-4 w-4" />
-                <span>Contact Us</span>
+                <span>{t('supportPage.tabs.contact')}</span>
               </TabsTrigger>
             </TabsList>
             
             <TabsContent value="faqs" className="mt-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Frequently Asked Questions</CardTitle>
-                  <CardDescription>Find answers to common questions about Mystery Maker</CardDescription>
+                  <CardTitle>{t('supportPage.faqs.title')}</CardTitle>
+                  <CardDescription>{t('supportPage.faqs.description')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Accordion type="single" collapsible className="w-full">
@@ -215,12 +217,12 @@ const Support = () => {
             <TabsContent value="contact" className="mt-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Contact Us</CardTitle>
-                  <CardDescription>Need more help? We're here for you</CardDescription>
+                  <CardTitle>{t('supportPage.contact.title')}</CardTitle>
+                  <CardDescription>{t('supportPage.contact.description')}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <p>
-                    Our support team is ready to help with any questions about creating your perfect mystery party with Mystery Maker.
+                    {t('supportPage.contact.intro')}
                   </p>
                   
                   <Form {...form}>
@@ -231,9 +233,9 @@ const Support = () => {
                           name="name"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Name *</FormLabel>
+                              <FormLabel>{t('supportPage.contact.form.name')}</FormLabel>
                               <FormControl>
-                                <Input placeholder="Your name" {...field} />
+                                <Input placeholder={t('supportPage.contact.form.namePlaceholder')} {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -245,9 +247,9 @@ const Support = () => {
                           name="email"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Email Address *</FormLabel>
+                              <FormLabel>{t('supportPage.contact.form.email')}</FormLabel>
                               <FormControl>
-                                <Input placeholder="your.email@example.com" type="email" {...field} />
+                                <Input placeholder={t('supportPage.contact.form.emailPlaceholder')} type="email" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -260,9 +262,9 @@ const Support = () => {
                         name="subject"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Subject *</FormLabel>
+                            <FormLabel>{t('supportPage.contact.form.subject')}</FormLabel>
                             <FormControl>
-                              <Input placeholder="What is your message about?" {...field} />
+                              <Input placeholder={t('supportPage.contact.form.subjectPlaceholder')} {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -274,10 +276,10 @@ const Support = () => {
                         name="message"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Message *</FormLabel>
+                            <FormLabel>{t('supportPage.contact.form.message')}</FormLabel>
                             <FormControl>
                               <Textarea 
-                                placeholder="How can we help you?" 
+                                placeholder={t('supportPage.contact.form.messagePlaceholder')} 
                                 className="min-h-[120px]" 
                                 {...field} 
                               />
@@ -294,7 +296,7 @@ const Support = () => {
                           disabled={isSubmitting}
                           className="bg-[#8B1538] hover:bg-[#6B0F28] text-white"
                         >
-                          {isSubmitting ? "Sending..." : "Send Message"}
+                          {isSubmitting ? t('supportPage.contact.form.sending') : t('supportPage.contact.form.sendButton')}
                         </Button>
                       </div>
                     </form>

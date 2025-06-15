@@ -1,3 +1,4 @@
+
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Footer from "@/components/Footer";
@@ -160,10 +161,10 @@ const Index = () => {
             <section className="py-8 sm:py-12 px-2 sm:px-4 md:px-6 lg:px-8">
               <div className="w-full max-w-7xl mx-auto text-center">
                 <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 text-black font-playfair">
-                  Need More Help?
+                  {t('support.title')}
                 </h2>
                 <p className="text-muted-foreground mb-6 max-w-2xl mx-auto text-sm sm:text-base font-inter">
-                  Visit our comprehensive support center for hosting tips, troubleshooting guides, and everything you need to create amazing mystery parties with Mystery Maker.
+                  {t('support.description')}
                 </p>
                 <Button
                   asChild
@@ -171,7 +172,7 @@ const Index = () => {
                   className="bg-[#8B1538] hover:bg-[#6B0F28] text-white h-12 px-6 text-base font-inter"
                 >
                   <Link to="/support" className="no-underline">
-                    Visit Support Center
+                    {t('support.button')}
                   </Link>
                 </Button>
               </div>
