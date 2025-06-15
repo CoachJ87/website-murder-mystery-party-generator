@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +7,7 @@ import { Send } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Link } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
+import { useTranslation, Trans } from "react-i18next";
 
 type Message = {
   id: string;
@@ -26,8 +26,16 @@ const initialMessages: Message[] = [
 ];
 
 const ChatDemo = () => {
+  const { t } = useTranslation();
   const { isAuthenticated, isPublic, setIsPublic } = useAuth();
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const [messages, setMessages] = useState<Message[]>(() => [
+    {
+      id: "1",
+      role: "assistant",
+      content: t("chat.initialGreeting"),
+      timestamp: new Date(),
+    },
+  ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -77,13 +85,13 @@ const ChatDemo = () => {
         throw new Error(`Function call failed: ${error.message}`);
       }
 
-      let responseContent = "I'm having trouble responding right now. Please try again.";
+      let responseContent = t("chat.errorResponse");
       
       if (data?.choices?.[0]?.message?.content) {
         responseContent = data.choices[0].message.content;
       } else if (data?.error) {
         console.error("API error in response:", data.error);
-        responseContent = "I'm experiencing some technical difficulties. How many players do you want for your murder mystery?";
+        responseContent = t("chat.errorResponseWithFallback");
       }
 
       const assistantMessage: Message = {
@@ -101,7 +109,7 @@ const ChatDemo = () => {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: "I'm having trouble connecting right now. How many players do you want for your murder mystery?",
+        content: t("chat.connectionErrorResponse"),
         timestamp: new Date(),
       };
 
@@ -114,7 +122,7 @@ const ChatDemo = () => {
   return (
     <div className="w-full max-w-4xl mx-auto my-8 bg-card rounded-xl shadow-lg border overflow-hidden">
       <div className="flex justify-between items-center p-4 border-b">
-        <h2 className="text-xl font-semibold">Murder Mystery Creator</h2>
+        <h2 className="text-xl font-semibold">{t("chat.title")}</h2>
         <div className="flex items-center space-x-2">
           <Switch 
             id="public-mode" 
@@ -123,7 +131,7 @@ const ChatDemo = () => {
             disabled={!isAuthenticated}
           />
           <Label htmlFor="public-mode">
-            {isPublic ? "Public" : "Private"}
+            {isPublic ? t("chat.public") : t("chat.private")}
           </Label>
         </div>
       </div>
@@ -156,7 +164,7 @@ const ChatDemo = () => {
         <Input
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Type your message..."
+          placeholder={t("chat.inputPlaceholder")}
           disabled={isLoading || (!isAuthenticated && !isPublic)}
           className="flex-1"
         />
@@ -167,7 +175,9 @@ const ChatDemo = () => {
       
       {!isAuthenticated && !isPublic && (
         <div className="p-2 bg-muted text-center text-sm">
-          <span>Please <Button variant="link" asChild className="p-0 h-auto font-semibold"><Link to="/sign-in">sign in</Link></Button> to use private mode</span>
+          <Trans i18nKey="chat.signInPrompt">
+            <span>Please <Button variant="link" asChild className="p-0 h-auto font-semibold"><Link to="/sign-in">sign in</Link></Button> to use private mode</span>
+          </Trans>
         </div>
       )}
     </div>

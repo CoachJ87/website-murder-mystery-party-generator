@@ -1,4 +1,3 @@
-
 {
   "navigation": {
     "home": "Home",
@@ -277,7 +276,8 @@
       "completedMysteries": "Completed",
       "purchasedMysteries": "Purchased",
       "totalPlayers": "Total Players Hosted"
-    }
+    },
+    "backToDashboard": "Back to Dashboard"
   },
   "account": {
     "title": "Account Settings",
@@ -351,7 +351,27 @@
       "examples": "Try: 'A 1920s speakeasy murder mystery with 8 characters including a jazz singer, bartender, and mob boss'",
       "playerCount": "How many players will participate?",
       "theme": "What's the setting or theme?",
-      "special": "Any special requirements or constraints?"
+      "special": "Any special requirements or constraints?",
+      "initialPrompt": {
+        "withTheme": "Let's create a murder mystery with a {{theme}} theme. Please guide me through creating this mystery step by step.",
+        "withoutTheme": "Let's create a murder mystery. Please guide me through creating this mystery step by step."
+      }
+    },
+    "editTitle": "Edit Mystery",
+    "createTitle": "Create New Mystery",
+    "form": {
+      "description": "Fill out the form below to generate your custom murder mystery"
+    },
+    "errors": {
+      "signInToSave": "Please sign in to save your mystery",
+      "saveFailed": "Failed to save mystery",
+      "loadFailed": "Failed to load mystery",
+      "loadMessagesFailed": "Failed to load conversation messages",
+      "loadConversationFailed": "Failed to load conversation",
+      "initialPrompt": "Please provide a prompt for your mystery"
+    },
+    "success": {
+      "setupComplete": "Mystery setup complete! Starting chat..."
     }
   },
   "supportPage": {
@@ -449,6 +469,36 @@
       }
     }
   },
+  "chat": {
+    "title": "Murder Mystery Creator",
+    "public": "Public",
+    "private": "Private",
+    "initialGreeting": "Hello! I'm your AI development assistant. Let me help you create a murder mystery. How many players do you want for your murder mystery?",
+    "inputPlaceholder": "Type your message...",
+    "signInPrompt": "Please <1>sign in</1> to use private mode",
+    "errorResponse": "I'm having trouble responding right now. Please try again.",
+    "errorResponseWithFallback": "I'm experiencing some technical difficulties. How many players do you want for your murder mystery?",
+    "connectionErrorResponse": "I'm having trouble connecting right now. How many players do you want for your murder mystery?"
+  },
+  "sendToGuests": {
+    "title": "Send Character Guides to Your Guests",
+    "description": "Enter email addresses for each character to send personalized guides directly to your guests. Each guest will only receive their own character information.",
+    "status": {
+      "sent": "Sent"
+    },
+    "emailPlaceholder": "guest@example.com",
+    "buttons": {
+      "sending": "Sending...",
+      "send": "Send Character Guides"
+    },
+    "errors": {
+      "noValidEmails": "Please add at least one valid email address",
+      "sendFailed": "Failed to send some emails. Please try again."
+    },
+    "success": {
+      "sentCount": "Sent character guides to {{count}} guests"
+    }
+  },
   "common": {
     "buttons": {
       "createNew": "Create New Mystery",
@@ -491,7 +541,8 @@
       "loadingContent": "Loading content...",
       "savingChanges": "Saving changes...",
       "changesSuccess": "Changes saved successfully",
-      "changesCanceled": "Changes canceled"
+      "changesCanceled": "Changes canceled",
+      "aiThinking": "AI is thinking..."
     },
     "validation": {
       "required": "This field is required",

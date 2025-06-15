@@ -10,8 +10,10 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { Message } from "@/components/types";
 import { Loader2, Zap } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const MysteryChatPage = () => {
+    const { t } = useTranslation();
     const [messages, setMessages] = useState<Message[]>([]);
     const [conversationData, setConversationData] = useState<any>(null);
     const [isLoadingHistory, setIsLoadingHistory] = useState(true);
@@ -106,7 +108,7 @@ const MysteryChatPage = () => {
                 <main className="flex-1 flex items-center justify-center">
                     <div className="text-center px-4">
                         <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin mx-auto mb-4" />
-                        <p className="text-sm sm:text-base text-muted-foreground">Loading conversation...</p>
+                        <p className="text-sm sm:text-base text-muted-foreground">{t("common.messages.loadingContent")}</p>
                     </div>
                 </main>
             </div>

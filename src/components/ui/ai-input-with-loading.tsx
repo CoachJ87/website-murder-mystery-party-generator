@@ -1,4 +1,3 @@
-
 "use client";
 
 import { CornerRightUp } from "lucide-react";
@@ -6,6 +5,7 @@ import { useState, useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { useAutoResizeTextarea } from "@/components/hooks/use-auto-resize-textarea";
+import { useTranslation } from "react-i18next";
 
 interface AIInputWithLoadingProps {
   id?: string;
@@ -36,6 +36,7 @@ export function AIInputWithLoading({
   setValue,
   loading = false, // Add default value for loading
 }: AIInputWithLoadingProps) {
+  const { t } = useTranslation();
   const [inputValue, setInputValue] = useState(value || "");
   const [submitted, setSubmitted] = useState(autoAnimate || loading); // Update to use loading prop
   const [isAnimating, setIsAnimating] = useState(autoAnimate);
@@ -146,7 +147,7 @@ export function AIInputWithLoading({
           </button>
         </div>
         <p className="pl-4 h-4 text-xs mx-auto text-black/70 dark:text-white/70">
-          {submitted ? "AI is thinking..." : ""}
+          {submitted ? t("common.messages.aiThinking") : ""}
         </p>
       </div>
     </div>

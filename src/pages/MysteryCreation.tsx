@@ -11,8 +11,10 @@ import { useAuth } from "@/context/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { getAIResponse } from "@/services/aiService";
+import { useTranslation } from "react-i18next";
 
 const MysteryCreation = () => {
+    const { t } = useTranslation();
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState(null);
     const navigate = useNavigate();
@@ -65,7 +67,7 @@ const MysteryCreation = () => {
 
             if (error) {
                 console.error("Error loading mystery:", error);
-                toast.error("Failed to load mystery");
+                toast.error(t("mysteryCreation.errors.loadFailed"));
                 return;
             }
 
@@ -81,7 +83,7 @@ const MysteryCreation = () => {
             }
         } catch (error) {
             console.error("Error:", error);
-            toast.error("Failed to load mystery");
+            toast.error(t("mysteryCreation.errors.loadFailed"));
         }
     };
         
@@ -123,7 +125,7 @@ const MysteryCreation = () => {
         console.log("handleSave called with data:", data);
         
         if (!isAuthenticated || !user) {
-            toast.error("Please sign in to save your mystery");
+            toast.error(t("mysteryCreation.errors.signInToSave"));
             return;
         }
     
@@ -211,13 +213,13 @@ After presenting the mystery concept, ask if the concept works for them and expl
                     .eq("id", conversationId);
             }
 
-            toast.success("Mystery setup complete! Starting chat...");
+            toast.success(t("mysteryCreation.success.setupComplete"));
             // Navigate immediately to chat with needsInitialAIResponse flag
             navigate(`/mystery/chat/${conversationId}?initial=true`);
 
         } catch (error) {
             console.error("Error saving mystery:", error);
-            toast.error("Failed to save mystery");
+            toast.error(t("mysteryCreation.errors.saveFailed"));
         } finally {
             setLoading(false);
         }
@@ -230,10 +232,10 @@ After presenting the mystery concept, ask if the concept works for them and expl
                 <div className="container mx-auto max-w-full sm:max-w-4xl">
                     <div className="mb-4 sm:mb-6 md:mb-8">
                         <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">
-                            {isEditing ? "Edit Mystery" : "Create New Mystery"}
+                            {isEditing ? t("mysteryCreation.editTitle") : t("mysteryCreation.createTitle")}
                         </h1>
                         <p className="text-sm sm:text-base text-muted-foreground">
-                            Fill out the form below to generate your custom murder mystery
+                            {t("mysteryCreation.form.description")}
                         </p>
                     </div>
 
@@ -254,7 +256,7 @@ After presenting the mystery concept, ask if the concept works for them and expl
                             size="sm"
                             className="h-10 sm:h-auto text-sm sm:text-base px-4 sm:px-6"
                         >
-                            Back to Dashboard
+                            {t("dashboard.backToDashboard")}
                         </Button>
                     </div>
                 </div>

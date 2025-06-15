@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Send, Mail, Check } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 type Character = {
   name: string;
@@ -20,6 +21,7 @@ interface SendToGuestsDialogProps {
 }
 
 const SendToGuestsDialog: React.FC<SendToGuestsDialogProps> = ({ open, onOpenChange, characters }) => {
+  const { t } = useTranslation();
   const [emails, setEmails] = useState<Record<string, string>>({});
   const [sending, setSending] = useState(false);
   const [sentCharacters, setSentCharacters] = useState<string[]>([]);
@@ -45,7 +47,7 @@ const SendToGuestsDialog: React.FC<SendToGuestsDialogProps> = ({ open, onOpenCha
         }));
       
       if (charactersToSend.length === 0) {
-        toast.error("Please add at least one valid email address");
+        toast.error(t("sendToGuests.errors.noValidEmails"));
         setSending(false);
         return;
       }
@@ -59,9 +61,9 @@ const SendToGuestsDialog: React.FC<SendToGuestsDialogProps> = ({ open, onOpenCha
         ...charactersToSend.map(c => c.character?.name || "")
       ]);
       
-      toast.success(`Sent character guides to ${charactersToSend.length} guests`);
+      toast.success(t("sendToGuests.success.sentCount", { count: charactersToSend.length }));
     } catch (error) {
-      toast.error("Failed to send some emails. Please try again.");
+      toast.error(t("sendToGuests.errors.sendFailed"));
     } finally {
       setSending(false);
     }
@@ -78,14 +80,13 @@ const SendToGuestsDialog: React.FC<SendToGuestsDialogProps> = ({ open, onOpenCha
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Send className="h-5 w-5" />
-            <span>Send Character Guides to Your Guests</span>
+            <span>{t("sendToGuests.title")}</span>
           </DialogTitle>
         </DialogHeader>
         
         <div className="py-4">
           <p className="text-muted-foreground mb-6">
-            Enter email addresses for each character to send personalized guides directly to your guests.
-            Each guest will only receive their own character information.
+            {t("sendToGuests.description")}
           </p>
           
           <div className="space-y-4">
@@ -104,14 +105,14 @@ const SendToGuestsDialog: React.FC<SendToGuestsDialogProps> = ({ open, onOpenCha
                     {hasBeenSent(character.name) ? (
                       <div className="flex items-center text-green-500 gap-2">
                         <Check className="h-4 w-4" />
-                        <span className="text-sm">Sent</span>
+                        <span className="text-sm">{t("sendToGuests.status.sent")}</span>
                       </div>
                     ) : (
                       <>
                         <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                         <Input
                           type="email"
-                          placeholder="guest@example.com"
+                          placeholder={t("sendToGuests.emailPlaceholder")}
                           value={emails[character.name] || ""}
                           onChange={(e) => handleEmailChange(character.name, e.target.value)}
                         />
@@ -126,18 +127,18 @@ const SendToGuestsDialog: React.FC<SendToGuestsDialogProps> = ({ open, onOpenCha
         
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Close
+            {t("common.buttons.close")}
           </Button>
           <Button onClick={handleSendAll} disabled={sending}>
             {sending ? (
               <>
                 <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2"></div>
-                Sending...
+                {t("sendToGuests.buttons.sending")}
               </>
             ) : (
               <>
                 <Send className="h-4 w-4 mr-2" />
-                Send Character Guides
+                {t("sendToGuests.buttons.send")}
               </>
             )}
           </Button>

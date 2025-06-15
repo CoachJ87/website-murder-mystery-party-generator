@@ -5,6 +5,7 @@ import { Message, FormValues } from "@/components/types";
 import MysteryChat from "@/components/MysteryChat";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 const getScriptTypeDisplayText = (scriptType: string) => {
   if (scriptType === 'pointForm') return 'point form';
@@ -27,6 +28,7 @@ export const ConversationManager = ({
   userId,
   isEditing
 }: ConversationManagerProps) => {
+  const { t } = useTranslation();
   const [messages, setMessages] = useState<Message[]>([]);
   const [initialDataLoaded, setInitialDataLoaded] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
@@ -55,7 +57,7 @@ export const ConversationManager = ({
 
       if (error) {
         console.error("Error loading messages:", error);
-        toast.error("Failed to load conversation messages");
+        toast.error(t("mysteryCreation.errors.loadMessagesFailed"));
         return;
       }
 
@@ -109,7 +111,7 @@ export const ConversationManager = ({
       }
     } catch (error) {
       console.error("Error:", error);
-      toast.error("Failed to load conversation");
+      toast.error(t("mysteryCreation.errors.loadConversationFailed"));
     } finally {
       setIsLoadingHistory(false);
     }
@@ -118,13 +120,9 @@ export const ConversationManager = ({
   const constructInitialMessage = (data: FormValues): Message | null => {
     if (initialPromptSent.current) return null; // Don't create a new prompt if one already exists
     
-    // Simplify the initial message to only include the theme
-    let initialChatMessage = `Let's create a murder mystery`;
-    if (data.theme) {
-      initialChatMessage += ` with a ${data.theme} theme`;
-    }
-    // Remove other details to force the AI to ask for them
-    initialChatMessage += ". Please guide me through creating this mystery step by step.";
+    const initialChatMessage = data.theme
+      ? t("mysteryCreation.guidance.initialPrompt.withTheme", { theme: data.theme })
+      : t("mysteryCreation.guidance.initialPrompt.withoutTheme");
 
     return {
       id: "initial-message",
