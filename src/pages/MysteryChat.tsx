@@ -42,7 +42,7 @@ const MysteryChatPage = () => {
 
             if (error) {
                 console.error("Error loading conversation:", error);
-                toast.error("Failed to load conversation");
+                toast.error(t("mysteryCreation.errors.loadConversationFailed"));
                 return;
             }
 
@@ -63,7 +63,7 @@ const MysteryChatPage = () => {
             }
         } catch (error) {
             console.error("Error:", error);
-            toast.error("Failed to load conversation");
+            toast.error(t("mysteryCreation.errors.loadConversationFailed"));
         } finally {
             setIsLoadingHistory(false);
         }
@@ -90,7 +90,7 @@ const MysteryChatPage = () => {
             });
         } catch (error) {
             console.error("Error saving message:", error);
-            toast.error("Failed to save message");
+            toast.error(t("mysteryCreation.errors.saveMessageFailed"));
         }
     };
 

@@ -10,6 +10,7 @@ import { PlusCircle } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { HomeDashboard } from "@/components/dashboard/HomeDashboard";
+import { useTranslation } from "react-i18next";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ const Dashboard = () => {
   const [user, setUser] = useState<User | null>(null);
   const [mysteries, setMysteries] = useState([]);
   const [isLoadingMysteries, setIsLoadingMysteries] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -85,7 +87,7 @@ const Dashboard = () => {
       setMysteries(data || []);
     } catch (error) {
       console.error("Error fetching mysteries:", error);
-      toast.error("Failed to load your mysteries");
+      toast.error(t("dashboard.errors.loadFailed"));
     } finally {
       setIsLoadingMysteries(false);
     }
@@ -111,14 +113,14 @@ const Dashboard = () => {
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
               <div>
-                <h1 className="text-3xl font-bold">Your Murder Mysteries</h1>
+                <h1 className="text-3xl font-bold">{t("dashboard.title")}</h1>
                 <p className="text-muted-foreground mt-1">
-                  View, edit and manage all your created mysteries
+                  {t("dashboard.subtitle")}
                 </p>
               </div>
               <Button onClick={handleCreateNewMystery} className="sm:self-end">
                 <PlusCircle className="mr-2 h-4 w-4" />
-                Create New Mystery
+                {t("common.buttons.createNew")}
               </Button>
             </div>
             

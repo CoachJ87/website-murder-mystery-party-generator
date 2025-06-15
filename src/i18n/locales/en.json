@@ -242,6 +242,8 @@
     }
   },
   "dashboard": {
+    "title": "Your Murder Mysteries",
+    "subtitle": "View, edit and manage all your created mysteries",
     "welcome": {
       "title": "Welcome back",
       "subtitle": "Ready to create your next mystery masterpiece?",
@@ -250,6 +252,9 @@
     },
     "mysteries": {
       "title": "Your Mysteries",
+      "searchPlaceholder": "Search mysteries...",
+      "deleteSuccess": "Mystery moved to archive",
+      "deleteFailed": "Failed to archive mystery",
       "filter": {
         "all": "All Mysteries",
         "drafts": "Drafts",
@@ -258,7 +263,8 @@
       },
       "empty": {
         "title": "No mysteries found",
-        "description": "Create your first mystery to get started"
+        "description": "Create your first mystery to get started",
+        "searchResult": "No mysteries match your search"
       },
       "card": {
         "players": "players",
@@ -269,7 +275,8 @@
           "completed": "Completed",
           "purchased": "Purchased"
         }
-      }
+      },
+      "showingCount": "Showing {{count}} of {{total}} mysteries"
     },
     "stats": {
       "totalMysteries": "Total Mysteries",
@@ -277,7 +284,13 @@
       "purchasedMysteries": "Purchased",
       "totalPlayers": "Total Players Hosted"
     },
-    "backToDashboard": "Back to Dashboard"
+    "backToDashboard": "Back to Dashboard",
+    "buttons": {
+      "createFirstMystery": "Create Your First Mystery"
+    },
+    "errors": {
+      "loadFailed": "Failed to load your mysteries"
+    }
   },
   "account": {
     "title": "Account Settings",
@@ -368,7 +381,8 @@
       "loadFailed": "Failed to load mystery",
       "loadMessagesFailed": "Failed to load conversation messages",
       "loadConversationFailed": "Failed to load conversation",
-      "initialPrompt": "Please provide a prompt for your mystery"
+      "initialPrompt": "Please provide a prompt for your mystery",
+      "saveMessageFailed": "Failed to save message"
     },
     "success": {
       "setupComplete": "Mystery setup complete! Starting chat..."

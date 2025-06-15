@@ -1,3 +1,4 @@
+
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
@@ -8,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { Mystery } from "@/interfaces/mystery";
+import { useTranslation } from "react-i18next";
 
 interface Message {
   id: string;
@@ -25,6 +27,7 @@ interface MysteryListProps {
 const MysteryList = ({ mysteries, isLoading, onRefresh }: MysteryListProps) => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+  const { t } = useTranslation();
   
   // Filtered mysteries based on search query
   const filteredMysteries = useMemo(() => {
@@ -57,11 +60,11 @@ const MysteryList = ({ mysteries, isLoading, onRefresh }: MysteryListProps) => {
         throw error;
       }
       
-      toast.success("Mystery moved to archive");
+      toast.success(t("dashboard.mysteries.deleteSuccess"));
       onRefresh();
     } catch (error) {
       console.error("Error deleting mystery:", error);
-      toast.error("Failed to archive mystery");
+      toast.error(t("dashboard.mysteries.deleteFailed"));
     }
   };
 
@@ -81,7 +84,7 @@ const MysteryList = ({ mysteries, isLoading, onRefresh }: MysteryListProps) => {
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
-          placeholder="Search mysteries..."
+          placeholder={t("dashboard.mysteries.searchPlaceholder")}
           className="pl-10"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -115,17 +118,17 @@ const MysteryList = ({ mysteries, isLoading, onRefresh }: MysteryListProps) => {
         <div className="text-center py-12">
           <p className="text-muted-foreground mb-4">
             {mysteries.length > 0
-              ? "No mysteries match your search"
-              : "You haven't created any mysteries yet"}
+              ? t("dashboard.mysteries.empty.searchResult")
+              : t("dashboard.welcome.noMysteries")}
           </p>
-          <Button onClick={() => navigate("/mystery/new")}>Create Your First Mystery</Button>
+          <Button onClick={() => navigate("/mystery/new")}>{t("dashboard.buttons.createFirstMystery")}</Button>
         </div>
       )}
       
       {filteredMysteries.length > 0 && filteredMysteries.length < mysteries.length && (
         <div className="flex justify-center">
           <p className="text-sm text-muted-foreground">
-            Showing {filteredMysteries.length} of {mysteries.length} mysteries
+            {t("dashboard.mysteries.showingCount", { count: filteredMysteries.length, total: mysteries.length })}
           </p>
         </div>
       )}
