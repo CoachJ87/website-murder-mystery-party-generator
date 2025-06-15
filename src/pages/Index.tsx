@@ -168,7 +168,7 @@ const Index = () => {
                 <Button
                   asChild
                   size="lg"
-                  className="custom-button no-underline h-12 px-6 text-base font-inter"
+                  className="bg-[#8B1538] hover:bg-[#6B0F28] text-white h-12 px-6 text-base font-inter"
                 >
                   <Link to="/support" className="no-underline">
                     Visit Support Center

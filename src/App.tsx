@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -18,7 +19,6 @@ import MysteryChatPage from "./pages/MysteryChat";
 import MysteryPurchase from "./pages/MysteryPurchase";
 import MysteryView from "./pages/MysteryView";
 import Showcase from "./pages/Showcase";
-import Contact from "./pages/Contact";
 import Privacy from "./pages/Privacy";
 import Support from "./pages/Support";
 import NotFound from "./pages/NotFound";
@@ -74,7 +74,7 @@ const AppRoutes = () => {
         <Route path="/check-email" element={<CheckEmail />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/showcase" element={<Showcase />} />
-        <Route path="/contact" element={<Contact />} />
+        <Route path="/contact" element={<Navigate to="/support" replace />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/support" element={<Support />} />
         
