@@ -22,64 +22,49 @@ const Faq1 = ({
   heading = "Frequently asked questions",
   items = [
     {
-      question: "What is the Murder Mystery Creator and how does it work?",
+      question: "What is Mystery Maker and how does it work?",
       answer:
-        "Murder Mystery Creator is an AI-powered app that designs custom murder mystery party games. You answer a few questions about your preferences (theme, player count), and our AI generates a complete package with character guides, story elements, and game materials—all tailored to your specific event needs.",
+        "Mystery Maker is an AI-powered platform that creates custom murder mystery parties exactly how you want them. Tell us your unique vision - any theme, characters, or setting - and our AI generates everything you need: character profiles, clues, and host materials tailored specifically for your party.",
     },
     {
       question: "How does the creation and purchase process work?",
       answer:
-        "The process is simple: First, create your murder mystery story by answering a few questions about theme and player count. You'll get a preview of your story and characters for free. When you're satisfied with your creation, you can purchase the complete package for $4.99. This one-time purchase gives you instant access to downloadable PDFs including a comprehensive host guide and detailed character profiles for every player.",
+        "Simple! First, describe your ideal murder mystery and we'll create a custom preview for free. When you're happy with your mystery, purchase the complete package for $11.99. You'll instantly get everything needed to host: detailed character profiles, host guide, and all game materials.",
     },
     {
       question: "Can I save my work and come back to it later?",
       answer:
-        "Yes! All your murder mystery projects are saved to your account and you can return to edit them at any time.",
+        "Yes! All your custom mysteries are saved to your account so you can return and edit them anytime.",
     },
     {
       question: "Are these murder mysteries replayable?",
       answer:
-        "Yes! Our murder mysteries are designed with replayability in mind. The random murderer selection mechanism means that even with the same character set and scenario, you'll get a different experience each time you play. This allows you to host the same mystery multiple times with different groups or even with the same group for a fresh experience.",
+        "Absolutely! Our mysteries include variable elements so each playthrough feels fresh, even with the same group. You can host your custom mystery as many times as you want.",
     },
     {
-      question: "How many players do I need for a murder mystery game?",
+      question: "How many players do I need?",
       answer:
-        "Our murder mysteries are designed to accommodate various group sizes. We have options for small gatherings (5-6 players), medium-sized events (7-10 players), and larger parties (11+ players). The system will customize the character count and story complexity based on your specified player count.",
+        "Our system creates mysteries for any group size you specify - from intimate gatherings of 4-6 players to larger parties of 15+ players. Just tell us your player count and we'll design accordingly.",
     },
     {
-      question: "Can I customize the difficulty level of my mystery?",
+      question: "What's included in my custom mystery package?",
       answer:
-        "Absolutely! When creating your mystery, you can choose from three difficulty levels: Easy (perfect for first-time players and casual gatherings), Medium (balanced complexity with moderate sleuthing required), and Hard (intricate plots with complex clues for experienced mystery solvers).",
+        "Everything you need: a comprehensive host guide with step-by-step instructions, detailed character profiles for each player, clues, evidence, and all game materials. No additional preparation required.",
     },
     {
-      question: "Do I need to prepare anything else for my murder mystery party?",
+      question: "Can I modify my mystery after creating it?",
       answer:
-        "Our packages include everything needed for the game itself. You'll receive a host guide with setup instructions, individual character materials for each player, and all necessary clues and game elements. You may want to plan complementary aspects like themed food, decorations, or costume suggestions, but these are optional enhancements.",
+        "Of course! Use our editor to refine and adjust your mystery until it's exactly right for your group. Change characters, themes, or complexity anytime.",
     },
     {
-      question: "What if I need to add or remove players at the last minute?",
+      question: "How long does a typical game last?",
       answer:
-        "We understand plans can change! Our system allows you to adjust your player count even after creating your mystery. The AI will intelligently adapt the story and characters to accommodate these changes without compromising the quality or coherence of the mystery.",
-    },
-    {
-      question: "Can I run the same mystery multiple times with different groups?",
-      answer:
-        "Absolutely! Once you've purchased a mystery, it's yours to use as many times as you want. Many hosts find they can run the same mystery with different groups of friends, adding their own spin to it each time.",
+        "Most mysteries run 2-3 hours, but you control the pacing. Our host guide includes timing suggestions that you can adjust to fit your schedule.",
     },
     {
       question: "Do you offer themed mysteries for special occasions?",
       answer:
-        "Yes, we have specially designed themes for holidays, birthdays, corporate events, and more. You can also work with our AI to customize any theme to fit your specific occasion.",
-    },
-    {
-      question: "How long does a typical murder mystery game last?",
-      answer:
-        "Most of our mysteries are designed to run for 2-3 hours, but the timing is flexible. The host guide provides suggestions for pacing, and you can adjust the game length by extending casual conversation periods or shortening them to fit your schedule.",
-    },
-    {
-      question: "Is there an age recommendation for your murder mysteries?",
-      answer:
-        "We offer mysteries appropriate for various age groups. Our standard mysteries are designed for adults and teens (13+), but we also have family-friendly options suitable for players as young as 10. Each mystery listing clearly indicates the recommended minimum age.",
+        "We create any theme you can imagine! From classic 1920s speakeasies to space stations to fairy tale kingdoms - tell us your vision and we'll make it happen.",
     },
   ],
 }: Faq1Props) => {
