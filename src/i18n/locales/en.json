@@ -8,11 +8,11 @@
     "account": "Account Settings"
   },
   "hero": {
-    "title": "Create Your Perfect Murder Mystery Party",
+    "title": "Create Murder Mystery Parties in Minutes",
     "subtitle": "Design custom mysteries exactly how you want them - any theme, any characters, any setting.",
-    "subtitleAuth": "Tell us what you'd like to create and we'll make it happen.",
-    "placeholder": "What kind of murder mystery would you like to host?",
-    "placeholderAuth": "What kind of murder mystery would you like to create today?",
+    "subtitleAuth": "Design custom mysteries exactly how you want them - any theme, any characters, any setting.",
+    "placeholder": "A 1920s speakeasy murder mystery with jazz musicians...",
+    "placeholderAuth": "A 1920s speakeasy murder mystery with jazz musicians...",
     "themes": {
       "1920sSpeakeasy": "1920s Speakeasy",
       "hollywoodMurder": "Hollywood Murder",
@@ -44,7 +44,7 @@
       "vikingFeast": "Viking Feast",
       "candyKingdom": "Candy Kingdom",
       "dragonsLair": "Dragon's Lair",
-      "timeTravelersBall": "Time Travelers' Ball",
+      "timeTravelersBall": "Time Traveler's Ball",
       "atlantisRising": "Atlantis Rising",
       "toyBoxAdventure": "Toy Box Adventure",
       "vampireMasquerade": "Vampire Masquerade",
