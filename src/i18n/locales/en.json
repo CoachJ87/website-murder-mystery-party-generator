@@ -56,20 +56,20 @@
   },
   "howItWorks": {
     "step1": {
-      "title": "Describe ideal murder mystery.",
-      "description": "Tell us what theme and features you want in your mystery."
+      "title": "Describe your ideal murder mystery.",
+      "description": "Tell us your unique vision - any theme, characters, or setting you want."
     },
     "step2": {
-      "title": "The Mystery Machine creates your first version instantly.",
-      "description": "Our AI generates a complete mystery with characters and clues."
+      "title": "We create your custom mystery instantly.",
+      "description": "Our AI generates everything exactly how you want it - characters, clues, and story."
     },
     "step3": {
-      "title": "Talk to the editor to design and perfect your idea.",
-      "description": "Refine the mystery with the AI assistant until it's perfect."
+      "title": "Perfect your mystery with our editor.",
+      "description": "Refine and adjust until your mystery is exactly right for your group."
     },
     "step4": {
-      "title": "Generate PDF guides for you and your friends",
-      "description": "Download everything you need to host an amazing party."
+      "title": "Get everything you need to host and share.",
+      "description": "Download and easily share all materials with your players."
     }
   },
   "features": {
