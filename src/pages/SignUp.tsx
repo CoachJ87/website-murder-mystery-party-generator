@@ -8,8 +8,10 @@ import { Mail, User, Lock, ArrowRight } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useTranslation } from "react-i18next";
 
 const SignUp = () => {
+  const { t } = useTranslation();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,12 +24,12 @@ const SignUp = () => {
     e.preventDefault();
     
     if (!name || !email || !password) {
-      toast.error("Please fill in all fields");
+      toast.error(t("auth.errors.requiredField"));
       return;
     }
     
     if (password.length < 6) {
-      toast.error("Password must be at least 6 characters");
+      toast.error(t("auth.errors.weakPassword"));
       return;
     }
     
@@ -49,15 +51,15 @@ const SignUp = () => {
         console.error("Sign-up error:", error);
         
         if (error.message.includes('already registered')) {
-          toast.error("This email is already registered. Please sign in instead.");
+          toast.error(t("auth.errors.emailAlreadyExists"));
         } else {
-          toast.error(error.message || "Failed to create account");
+          toast.error(t("auth.errors.unknownError"));
         }
         return;
       }
       
       if (!data.user) {
-        toast.error("Failed to create account");
+        toast.error(t("auth.errors.unknownError"));
         return;
       }
 
@@ -66,7 +68,7 @@ const SignUp = () => {
       // For Supabase, by default email confirmation is required
       // Redirect to check email page regardless of session
       // This prevents the "Email not confirmed" error on auto-login attempts
-      toast.success("Account created! Please check your email to confirm your account.");
+      toast.success(t("auth.success.accountCreated"));
       
       // Add a small delay before navigation to ensure the toast is shown
       setTimeout(() => {
@@ -75,7 +77,7 @@ const SignUp = () => {
       
     } catch (error: any) {
       console.error("Sign-up catch block:", error);
-      toast.error("An unexpected error occurred. Please try again.");
+      toast.error(t("auth.errors.unknownError"));
     } finally {
       setIsLoading(false);
     }
@@ -112,7 +114,7 @@ const SignUp = () => {
       <main className="flex-1 flex items-center justify-center py-12 px-4">
         <div className="w-full max-w-md">
           <div className="bg-card rounded-lg shadow-lg border p-8">
-            <h1 className="text-2xl font-bold mb-6 text-center">Create an Account</h1>
+            <h1 className="text-2xl font-bold mb-6 text-center">{t('auth.signUp.title')}</h1>
             
             {/* TODO: Re-enable Google auth when OAuth issues are resolved */}
             {/* <div className="space-y-4 mb-6">
@@ -159,13 +161,13 @@ const SignUp = () => {
             
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
+                <Label htmlFor="name">{t('auth.signUp.name')}</Label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="name"
                     type="text"
-                    placeholder="Your name"
+                    placeholder={t('auth.signUp.name')}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="pl-10"
@@ -175,7 +177,7 @@ const SignUp = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('auth.signUp.email')}</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -191,7 +193,7 @@ const SignUp = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t('auth.signUp.password')}</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -205,7 +207,7 @@ const SignUp = () => {
                   />
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Password must be at least 6 characters
+                  {t('auth.errors.weakPassword')}
                 </p>
               </div>
               
@@ -215,15 +217,15 @@ const SignUp = () => {
                 ) : (
                   <ArrowRight className="h-4 w-4 mr-2" />
                 )}
-                {isLoading ? "Creating account..." : "Create Account"}
+                {isLoading ? t('auth.signUp.creatingAccount') : t('auth.signUp.submitButton')}
               </Button>
             </form>
             
             <div className="mt-6 text-center">
               <p className="text-sm text-muted-foreground">
-                Already have an account?{" "}
+                {t('auth.signUp.hasAccount')}{" "}
                 <Link to="/sign-in" className="text-primary hover:underline">
-                  Sign in
+                  {t('auth.signUp.signInLink')}
                 </Link>
               </p>
             </div>

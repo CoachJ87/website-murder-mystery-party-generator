@@ -8,8 +8,10 @@ import Footer from "@/components/Footer";
 import { toast } from "sonner";
 import { Mail, Lock, ArrowRight } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { useTranslation } from "react-i18next";
 
 const SignIn = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -21,7 +23,7 @@ const SignIn = () => {
     e.preventDefault();
     
     if (!email || !password) {
-      toast.error("Please fill in all fields");
+      toast.error(t("auth.errors.requiredField"));
       return;
     }
     
@@ -37,12 +39,12 @@ const SignIn = () => {
       if (error) {
         console.error("Direct signin error:", error.message);
         if (error.message.includes('Invalid login credentials')) {
-          toast.error("The email or password you entered is incorrect. Please try again.");
+          toast.error(t("auth.errors.invalidCredentials"));
         } else if (error.message.includes('Email not confirmed')) {
           toast.error("Please confirm your email before logging in. Check your inbox.");
           navigate("/check-email");
         } else {
-          toast.error(`Failed to sign in: ${error.message}`);
+          toast.error(t("auth.errors.unknownError"));
         }
         return;
       }
@@ -54,7 +56,7 @@ const SignIn = () => {
       }
     } catch (error: any) {
       console.error("Signin catch block error:", error);
-      toast.error(`An unexpected error occurred: ${error.message || "Unknown error"}`);
+      toast.error(t("auth.errors.unknownError"));
     } finally {
       setIsLoading(false);
     }
@@ -143,7 +145,7 @@ const SignIn = () => {
       <main className="flex-1 flex items-center justify-center py-12 px-4">
         <div className="w-full max-w-md">
           <div className="bg-card rounded-lg shadow-lg border p-8">
-            <h1 className="text-2xl font-bold mb-6 text-center">Sign In</h1>
+            <h1 className="text-2xl font-bold mb-6 text-center">{t('auth.signIn.title')}</h1>
             
             {/* TODO: Re-enable Google auth when OAuth issues are resolved */}
             {/* <div className="space-y-4 mb-6">
@@ -190,7 +192,7 @@ const SignIn = () => {
             
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('auth.signIn.email')}</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -207,9 +209,9 @@ const SignIn = () => {
               
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password">{t('auth.signIn.password')}</Label>
                   <Link to="/forgot-password" className="text-sm text-primary hover:underline">
-                    Forgot password?
+                    {t('auth.signIn.forgotPassword')}
                   </Link>
                 </div>
                 <div className="relative">
@@ -232,15 +234,15 @@ const SignIn = () => {
                 ) : (
                   <ArrowRight className="h-4 w-4 mr-2" />
                 )}
-                {isLoading ? "Signing in..." : "Sign In"}
+                {isLoading ? t('auth.signIn.signingIn') : t('auth.signIn.submitButton')}
               </Button>
             </form>
             
             <div className="mt-6 text-center">
               <p className="text-sm text-muted-foreground">
-                Don't have an account?{" "}
+                {t('auth.signIn.noAccount')}{" "}
                 <Link to="/sign-up" className="text-primary hover:underline">
-                  Sign up
+                  {t('auth.signIn.signUpLink')}
                 </Link>
               </p>
             </div>

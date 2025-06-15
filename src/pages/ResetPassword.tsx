@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,8 +9,10 @@ import Footer from "@/components/Footer";
 import { toast } from "sonner";
 import { Lock } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { useTranslation } from "react-i18next";
 
 const ResetPassword = () => {
+  const { t } = useTranslation();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -29,12 +32,12 @@ const ResetPassword = () => {
     e.preventDefault();
     
     if (!password || !confirmPassword) {
-      toast.error("Please fill in all fields");
+      toast.error(t("auth.errors.requiredField"));
       return;
     }
     
     if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
+      toast.error(t("auth.errors.passwordMismatch"));
       return;
     }
     
@@ -46,10 +49,10 @@ const ResetPassword = () => {
       
       if (error) throw error;
       
-      toast.success("Password has been reset successfully");
+      toast.success(t("auth.success.passwordUpdated"));
       navigate("/sign-in");
     } catch (error: any) {
-      toast.error(`Failed to reset password: ${error.message}`);
+      toast.error(t("auth.errors.unknownError"));
       console.error(error);
     } finally {
       setLoading(false);
@@ -63,12 +66,13 @@ const ResetPassword = () => {
       <main className="flex-1 flex items-center justify-center py-12 px-4">
         <div className="w-full max-w-md">
           <div className="bg-card rounded-lg shadow-lg border p-8">
-            <h1 className="text-2xl font-bold mb-6 text-center">Reset Your Password</h1>
+            <h1 className="text-2xl font-bold mb-2 text-center">{t('auth.resetPassword.title')}</h1>
+            <p className="text-muted-foreground text-center mb-6">{t('auth.resetPassword.subtitle')}</p>
             
             {hashPresent ? (
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="password">New Password</Label>
+                  <Label htmlFor="password">{t('auth.resetPassword.password')}</Label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -84,7 +88,7 @@ const ResetPassword = () => {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                  <Label htmlFor="confirmPassword">{t('auth.resetPassword.confirmPassword')}</Label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -100,7 +104,7 @@ const ResetPassword = () => {
                 </div>
                 
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Resetting Password..." : "Reset Password"}
+                  {loading ? t('auth.resetPassword.updating') : t('auth.resetPassword.submitButton')}
                 </Button>
               </form>
             ) : (
