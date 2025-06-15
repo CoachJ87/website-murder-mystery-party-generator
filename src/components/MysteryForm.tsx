@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -11,6 +10,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useTranslation } from "react-i18next";
 
 // Define the schema validation with updated scriptType enum:
 const formSchema = z.object({
@@ -41,6 +41,7 @@ const MysteryForm = ({
   isSaving = false,
   initialData
 }: MysteryFormProps) => {
+  const { t } = useTranslation();
   // Add debugging
   console.log("=== MysteryForm Debug ===");
   console.log("initialData received:", initialData);
@@ -91,12 +92,12 @@ const MysteryForm = ({
             name="userRequest"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm sm:text-base font-medium">What you want to create</FormLabel>
+                <FormLabel className="text-sm sm:text-base font-medium">{t('mysteryForm.userRequestLabel')}</FormLabel>
                 <FormControl>
                   <Input {...field} disabled className="bg-muted text-sm sm:text-base h-10 sm:h-auto" />
                 </FormControl>
                 <FormDescription className="text-xs sm:text-sm">
-                  Your original request from the homepage
+                  {t('mysteryForm.userRequestDescription')}
                 </FormDescription>
               </FormItem>
             )}
@@ -108,16 +109,16 @@ const MysteryForm = ({
           name="theme"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-sm sm:text-base font-medium">Theme/Setting Details (Optional)</FormLabel>
+              <FormLabel className="text-sm sm:text-base font-medium">{t('mysteryForm.themeLabel')}</FormLabel>
               <FormControl>
                 <Input 
-                  placeholder="e.g., time period, setting specifics, must-have's, etc." 
+                  placeholder={t('mysteryForm.themePlaceholder')} 
                   className="text-sm sm:text-base h-10 sm:h-auto"
                   {...field} 
                 />
               </FormControl>
               <FormDescription className="text-xs sm:text-sm">
-                Choose a specific theme or setting for your murder mystery
+                {t('mysteryForm.themeDescription')}
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -130,7 +131,7 @@ const MysteryForm = ({
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-sm sm:text-base font-medium">
-                How many players will participate?
+                {t('mysteryForm.playerCountLabel')}
               </FormLabel>
               <FormControl>
                 <Select 
@@ -138,19 +139,19 @@ const MysteryForm = ({
                   value={field.value?.toString()}
                 >
                   <SelectTrigger className="h-10 sm:h-auto text-sm sm:text-base">
-                    <SelectValue placeholder="Select number of players" />
+                    <SelectValue placeholder={t('mysteryForm.playerCountPlaceholder')} />
                   </SelectTrigger>
                   <SelectContent>
                     {Array.from({ length: 29 }, (_, i) => i + 4).map((num) => (
                       <SelectItem key={num} value={num.toString()} className="text-sm sm:text-base">
-                        {num} players
+                        {t('mysteryForm.playerCountItem', { count: num })}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </FormControl>
               <FormDescription className="text-xs sm:text-sm">
-                Choose between 4 and 32 players for your murder mystery.
+                {t('mysteryForm.playerCountDescription')}
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -164,10 +165,10 @@ const MysteryForm = ({
             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 sm:p-4">
               <div className="space-y-0.5 flex-1 pr-3">
                 <FormLabel className="text-sm sm:text-base font-medium">
-                  Include Accomplice Mechanism
+                  {t('mysteryForm.accompliceLabel')}
                 </FormLabel>
                 <FormDescription className="text-xs sm:text-sm">
-                  Best for games with 10 or more players
+                  {t('mysteryForm.accompliceDescription')}
                 </FormDescription>
               </div>
               <FormControl>
@@ -186,7 +187,7 @@ const MysteryForm = ({
           name="scriptType"
           render={({ field }) => (
             <FormItem className="space-y-3">
-              <FormLabel className="text-sm sm:text-base font-medium">Script Detail Level</FormLabel>
+              <FormLabel className="text-sm sm:text-base font-medium">{t('mysteryForm.scriptTypeLabel')}</FormLabel>
               <FormControl>
                 <RadioGroup 
                   onValueChange={field.onChange} 
@@ -196,19 +197,19 @@ const MysteryForm = ({
                   <div className="flex items-start space-x-3 py-2">
                     <RadioGroupItem value="full" id="full" className="mt-0.5 shrink-0" />
                     <Label htmlFor="full" className="text-sm sm:text-base leading-5 cursor-pointer">
-                      Full Scripts - Complete dialogue and detailed instructions
+                      {t('mysteryForm.scriptTypeFullLabel')}
                     </Label>
                   </div>
                   <div className="flex items-start space-x-3 py-2">
                     <RadioGroupItem value="pointForm" id="pointForm" className="mt-0.5 shrink-0" />
                     <Label htmlFor="pointForm" className="text-sm sm:text-base leading-5 cursor-pointer">
-                      Point Form - Key points and bullet summaries
+                      {t('mysteryForm.scriptTypePointFormLabel')}
                     </Label>
                   </div>
                   <div className="flex items-start space-x-3 py-2">
                     <RadioGroupItem value="both" id="both" className="mt-0.5 shrink-0" />
                     <Label htmlFor="both" className="text-sm sm:text-base leading-5 cursor-pointer">
-                      Both Formats - Full scripts AND point form notes
+                      {t('mysteryForm.scriptTypeBothLabel')}
                     </Label>
                   </div>
                 </RadioGroup>
@@ -223,16 +224,16 @@ const MysteryForm = ({
           name="additionalDetails"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-sm sm:text-base font-medium">Additional Details (Optional)</FormLabel>
+              <FormLabel className="text-sm sm:text-base font-medium">{t('mysteryForm.additionalDetailsLabel')}</FormLabel>
               <FormControl>
                 <Textarea 
-                  placeholder="Any specific requirements, special rules, or additional context for your mystery..." 
+                  placeholder={t('mysteryForm.additionalDetailsPlaceholder')} 
                   className="resize-none min-h-20 sm:min-h-24 text-sm sm:text-base" 
                   {...field} 
                 />
               </FormControl>
               <FormDescription className="text-xs sm:text-sm">
-                Provide any extra details or special requests for your mystery
+                {t('mysteryForm.additionalDetailsDescription')}
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -244,7 +245,7 @@ const MysteryForm = ({
           disabled={isSaving} 
           className="w-full h-12 text-base font-medium"
         >
-          {isSaving ? "Starting Chat..." : "Start AI Chat"}
+          {isSaving ? t('mysteryForm.startingChat') : t('mysteryForm.startChat')}
         </Button>
       </form>
     </Form>

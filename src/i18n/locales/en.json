@@ -1,3 +1,4 @@
+
 {
   "navigation": {
     "home": "Home",
@@ -390,6 +391,28 @@
     "success": {
       "setupComplete": "Mystery setup complete! Starting chat..."
     }
+  },
+  "mysteryForm": {
+    "userRequestLabel": "What you want to create",
+    "userRequestDescription": "Your original request from the homepage",
+    "themeLabel": "Theme/Setting Details (Optional)",
+    "themePlaceholder": "e.g., time period, setting specifics, must-have's, etc.",
+    "themeDescription": "Choose a specific theme or setting for your murder mystery",
+    "playerCountLabel": "How many players will participate?",
+    "playerCountPlaceholder": "Select number of players",
+    "playerCountItem": "{{count}} players",
+    "playerCountDescription": "Choose between 4 and 32 players for your murder mystery.",
+    "accompliceLabel": "Include Accomplice Mechanism",
+    "accompliceDescription": "Best for games with 10 or more players",
+    "scriptTypeLabel": "Script Detail Level",
+    "scriptTypeFullLabel": "Full Scripts - Complete dialogue and detailed instructions",
+    "scriptTypePointFormLabel": "Point Form - Key points and bullet summaries",
+    "scriptTypeBothLabel": "Both Formats - Full scripts AND point form notes",
+    "additionalDetailsLabel": "Additional Details (Optional)",
+    "additionalDetailsPlaceholder": "Any specific requirements, special rules, or additional context for your mystery...",
+    "additionalDetailsDescription": "Provide any extra details or special requests for your mystery",
+    "startChat": "Start AI Chat",
+    "startingChat": "Starting Chat..."
   },
   "supportPage": {
     "title": "Support Center",
