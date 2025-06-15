@@ -22,7 +22,7 @@ const Footer = () => {
               <span className="text-xl font-bold gradient-text">Mystery Maker</span>
             </Link>
             <p className="text-muted-foreground">
-              {t('footer.tagline')}
+              Craft custom murder mysteries at the speed of imagination.
             </p>
           </div>
           
