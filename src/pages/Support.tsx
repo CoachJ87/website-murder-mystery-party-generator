@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -166,7 +167,7 @@ const Support = () => {
               <TabsTrigger 
                 value="faqs" 
                 className={cn(
-                  "flex items-center gap-2 text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000]",
+                  "text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000]",
                   isMobile && "text-xs px-2 py-2 h-auto"
                 )}
               >
@@ -176,7 +177,7 @@ const Support = () => {
               <TabsTrigger 
                 value="contact" 
                 className={cn(
-                  "flex items-center gap-2 text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000]",
+                  "text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000]",
                   isMobile && "text-xs px-2 py-2 h-auto"
                 )}
               >
@@ -302,20 +303,6 @@ const Support = () => {
               </Card>
             </TabsContent>
           </Tabs>
-          
-          <div className="text-center">
-            <p className="mb-6 text-muted-foreground">
-              Didn't find what you were looking for? Visit our full documentation or contact our support team.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Button variant="outline" asChild>
-                <Link to="/">Return to Homepage</Link>
-              </Button>
-              <Button asChild className="bg-[#8B1538] hover:bg-[#6B0F28] text-white">
-                <Link to="/contact">Contact Support</Link>
-              </Button>
-            </div>
-          </div>
         </div>
       </main>
       

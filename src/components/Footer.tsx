@@ -19,7 +19,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="space-y-4">
             <Link to="/" className="flex items-center space-x-2 no-underline">
-              <span className="text-xl font-bold gradient-text">Murder Mystery Generator</span>
+              <span className="text-xl font-bold gradient-text">Mystery Maker</span>
             </Link>
             <p className="text-muted-foreground">
               {t('footer.tagline')}
