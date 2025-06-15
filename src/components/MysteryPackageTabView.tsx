@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -12,6 +11,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import MysteryGuestManager from "./MysteryGuestManager";
 import "../styles/mystery-package.css";
+import { useTranslation } from "react-i18next";
 
 interface MysteryPackageData {
   title?: string;
@@ -51,6 +51,7 @@ const MysteryPackageTabView = React.memo(({
   const [statusMessage, setStatusMessage] = useState("Starting generation...");
   const [showGuestManager, setShowGuestManager] = useState(false);
   const isMobile = useIsMobile();
+  const { t } = useTranslation();
 
   // Update status message based on generationStatus
   useEffect(() => {
@@ -335,7 +336,7 @@ const MysteryPackageTabView = React.memo(({
   }, [packageData, hostGuide, detectiveScript, evidenceCards, characters]);
 
   // Simplified loading component for individual tabs with mobile optimization
-  const LoadingTabContent = useCallback(({ message }: { message: React.ReactNode }) => (
+  const LoadingTabContent = useCallback(({ message }: { message: string }) => (
     <div className={cn(
       "loading-section",
       isMobile && "py-8"
@@ -349,17 +350,18 @@ const MysteryPackageTabView = React.memo(({
           "font-semibold",
           isMobile ? "text-base" : "text-lg"
         )}>
-          Generating...
+          {t('mysteryPackage.loading.generating')}
         </h3>
-        <p className={cn(
-          "text-muted-foreground text-center max-w-md",
-          isMobile && "text-sm px-4"
-        )}>
-          {message}
-        </p>
+        <p 
+          className={cn(
+            "text-muted-foreground text-center max-w-md",
+            isMobile && "text-sm px-4"
+          )}
+          dangerouslySetInnerHTML={{ __html: message }}
+        />
       </div>
     </div>
-  ), [statusMessage, isMobile]);
+  ), [isMobile, t]);
 
   // Enhanced table components for ReactMarkdown
   const tableComponents = useMemo(() => ({
@@ -429,7 +431,7 @@ const MysteryPackageTabView = React.memo(({
             )}
           >
             <Mail className="h-4 w-4" />
-            Share With Guests
+            {t('mysteryPackage.shareWithGuests')}
           </Button>
         )}
       </div>
@@ -446,7 +448,7 @@ const MysteryPackageTabView = React.memo(({
               isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
-            {isMobile ? "Host" : "Host Guide"}
+            {t(isMobile ? 'mysteryPackage.mobileTabs.host' : 'mysteryPackage.tabs.hostGuide')}
           </TabsTrigger>
           <TabsTrigger 
             value="characters" 
@@ -455,7 +457,7 @@ const MysteryPackageTabView = React.memo(({
               isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
-            {isMobile ? `Characters (${charactersList?.length || 0})` : `Characters (${charactersList?.length || 0})`}
+            {t(isMobile ? 'mysteryPackage.mobileTabs.characters' : 'mysteryPackage.tabs.characters', { count: charactersList?.length || 0 })}
           </TabsTrigger>
           <TabsTrigger 
             value="clues" 
@@ -464,7 +466,7 @@ const MysteryPackageTabView = React.memo(({
               isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
-            Evidence
+            {t('mysteryPackage.tabs.clues')}
           </TabsTrigger>
           <TabsTrigger 
             value="inspector" 
@@ -473,7 +475,7 @@ const MysteryPackageTabView = React.memo(({
               isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
-            {isMobile ? "Detective" : "Detective Guide"}
+            {t(isMobile ? 'mysteryPackage.mobileTabs.inspector' : 'mysteryPackage.tabs.inspector')}
           </TabsTrigger>
           <TabsTrigger 
             value="matrix" 
@@ -482,7 +484,7 @@ const MysteryPackageTabView = React.memo(({
               isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
-            {isMobile ? "Relations" : "Relationships"}
+            {t(isMobile ? 'mysteryPackage.mobileTabs.relations' : 'mysteryPackage.tabs.relationships')}
           </TabsTrigger>
         </TabsList>
 
@@ -552,13 +554,7 @@ const MysteryPackageTabView = React.memo(({
                 {hostGuide}
               </ReactMarkdown>
             ) : isGenerating ? (
-              <LoadingTabContent message={
-                <>
-                  Currently generating your complete mystery. This process will take around 3-5 minutes.
-                  <br />
-                  This page will automatically refresh once the mystery is complete.
-                </>
-              } />            
+              <LoadingTabContent message={t('mysteryPackage.loading.generatingMessage')} />            
             ) : (
               <div className={cn(
                 "text-center py-12 space-y-4",
@@ -572,13 +568,13 @@ const MysteryPackageTabView = React.memo(({
                   "font-semibold",
                   isMobile ? "text-lg" : "text-xl"
                 )}>
-                  Ready to Generate Your Mystery
+                  {t('mysteryPackage.placeholder.title')}
                 </h3>
                 <p className={cn(
                   "text-muted-foreground",
                   isMobile && "text-sm"
                 )}>
-                  Click the button below to start generating your complete mystery package with all materials included.
+                  {t('mysteryPackage.placeholder.description')}
                 </p>
                 {onGenerateClick && (
                   <Button 
@@ -588,7 +584,7 @@ const MysteryPackageTabView = React.memo(({
                       isMobile && "w-full text-sm h-11"
                     )}
                   >
-                    Generate Package
+                    {t('mysteryPackage.placeholder.button')}
                   </Button>
                 )}
               </div>
@@ -685,7 +681,7 @@ const MysteryPackageTabView = React.memo(({
                 })}
               </div>
             ) : isGenerating ? (
-              <LoadingTabContent message="Developing unique character profiles with backgrounds, motivations, and secrets for your mystery game." />
+              <LoadingTabContent message={t('mysteryPackage.loading.characters')} />
             ) : (
               <div className={cn(
                 "text-center py-6",
@@ -695,7 +691,7 @@ const MysteryPackageTabView = React.memo(({
                   "text-muted-foreground",
                   isMobile && "text-sm"
                 )}>
-                  Character guides will be available after generation starts.
+                  {t('mysteryPackage.placeholder.characters')}
                 </p>
               </div>
             )}
@@ -744,7 +740,7 @@ const MysteryPackageTabView = React.memo(({
                 {evidenceCards}
               </ReactMarkdown>
             ) : isGenerating ? (
-              <LoadingTabContent message="Crafting evidence cards, clues, and investigative materials that will help solve your mystery." />
+              <LoadingTabContent message={t('mysteryPackage.loading.clues')} />
             ) : (
               <div className={cn(
                 "text-center py-6",
@@ -754,7 +750,7 @@ const MysteryPackageTabView = React.memo(({
                   "text-muted-foreground",
                   isMobile && "text-sm"
                 )}>
-                  Evidence cards will be available after generation starts.
+                  {t('mysteryPackage.placeholder.clues')}
                 </p>
               </div>
             )}
@@ -819,7 +815,7 @@ const MysteryPackageTabView = React.memo(({
                 {detectiveScript}
               </ReactMarkdown>
             ) : isGenerating ? (
-              <LoadingTabContent message="Writing the detective's script and investigation timeline to guide the mystery solving process." />
+              <LoadingTabContent message={t('mysteryPackage.loading.inspector')} />
             ) : (
               <div className={cn(
                 "text-center py-6",
@@ -829,7 +825,7 @@ const MysteryPackageTabView = React.memo(({
                   "text-muted-foreground",
                   isMobile && "text-sm"
                 )}>
-                  Detective guide will be available after generation starts.
+                  {t('mysteryPackage.placeholder.inspector')}
                 </p>
               </div>
             )}
@@ -847,7 +843,7 @@ const MysteryPackageTabView = React.memo(({
                   "text-xl font-semibold mb-4",
                   isMobile && "text-lg mb-3"
                 )}>
-                  Character Relationship Matrix
+                  {t('mysteryPackage.matrix.title')}
                 </h2>
                 <div 
                   className="overflow-x-auto mb-4"
@@ -876,7 +872,7 @@ const MysteryPackageTabView = React.memo(({
                 />
               </div>
             ) : isGenerating ? (
-              <LoadingTabContent message="Building the character relationship matrix showing connections, conflicts, and hidden relationships." />
+              <LoadingTabContent message={t('mysteryPackage.loading.matrix')} />
             ) : (
               <div className={cn(
                 "text-center py-6",
@@ -886,7 +882,7 @@ const MysteryPackageTabView = React.memo(({
                   "text-muted-foreground",
                   isMobile && "text-sm"
                 )}>
-                  Relationship matrix will be available after generation starts.
+                  {t('mysteryPackage.placeholder.matrix')}
                 </p>
               </div>
             )}
