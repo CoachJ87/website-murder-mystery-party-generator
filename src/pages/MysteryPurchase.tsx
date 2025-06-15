@@ -472,7 +472,7 @@ const MysteryPurchase = () => {
                     )}>
                       {t("purchase.package.whatsIncluded")}
                     </h3>
-                    {t<string, string[]>('purchase.package.includes', { returnObjects: true }).map((item, index) => (
+                    {(t('purchase.package.includes', { returnObjects: true }) as string[]).map((item, index) => (
                       <div key={index} className="flex items-start gap-2">
                         <CheckCircle className={cn(
                           "text-green-500 shrink-0 mt-0.5",
@@ -528,7 +528,7 @@ const MysteryPurchase = () => {
                   "list-disc pl-5 space-y-1 text-muted-foreground",
                   isMobile ? "text-xs pl-4" : "text-sm"
                 )}>
-                  {t<string, string[]>('purchase.notes.items', { returnObjects: true }).map((item, index) => (
+                  {(t('purchase.notes.items', { returnObjects: true }) as string[]).map((item, index) => (
                     <li key={index}>{item}</li>
                   ))}
                 </ul>

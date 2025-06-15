@@ -349,7 +349,7 @@ const VercelChatbot = () => {
 
   // Generate fallback responses when API is unavailable
   const generateFallbackResponse = (userMessage: string, messageCount: number) => {
-    const fallbackResponses = t<string, string[]>('chatbot.fallbackResponses', { returnObjects: true });
+    const fallbackResponses = t('chatbot.fallbackResponses', { returnObjects: true }) as string[];
     if (messageCount <= 1) {
       return fallbackResponses[0];
     } else if (messageCount <= 3) {
