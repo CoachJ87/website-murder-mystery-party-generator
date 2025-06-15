@@ -7,6 +7,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Eye, Edit, MoreVertical, CheckCircle2, Archive, Trash2, Clock } from "lucide-react";
 import { formatDate } from "@/utils/formatDate";
+import { useTranslation } from "react-i18next";
 
 interface HomeMysteryCardProps {
   mystery: {
@@ -24,6 +25,7 @@ interface HomeMysteryCardProps {
 }
 
 export default function HomeMysteryCard({ mystery, onView, onEdit, onArchive, onDelete }: HomeMysteryCardProps) {
+  const { t } = useTranslation();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const isPurchased = mystery.display_status === 'purchased';
   const isGenerating = mystery.display_status === 'generating';
@@ -60,22 +62,22 @@ export default function HomeMysteryCard({ mystery, onView, onEdit, onArchive, on
       return (
         <Badge variant="secondary" className="flex items-center gap-1 bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 text-xs px-2 py-1">
           <Clock className="h-3 w-3 animate-pulse" />
-          <span className="hidden sm:inline">Generating...</span>
-          <span className="sm:hidden">Gen...</span>
+          <span className="hidden sm:inline">{t('dashboard.mysteries.status.generating')}</span>
+          <span className="sm:hidden">{t('dashboard.mysteries.status.generatingShort')}</span>
         </Badge>
       );
     } else if (isPurchased) {
       return (
         <Badge variant="default" className="flex items-center gap-1 text-xs px-2 py-1">
           <CheckCircle2 className="h-3 w-3" />
-          <span className="hidden sm:inline">Purchased</span>
-          <span className="sm:hidden">Bought</span>
+          <span className="hidden sm:inline">{t('dashboard.mysteries.status.purchased')}</span>
+          <span className="sm:hidden">{t('dashboard.mysteries.status.bought')}</span>
         </Badge>
       );
     } else {
       return (
         <Badge variant="secondary" className="text-xs px-2 py-1">
-          Draft
+          {t('dashboard.mysteries.status.draft')}
         </Badge>
       );
     }
@@ -86,24 +88,24 @@ export default function HomeMysteryCard({ mystery, onView, onEdit, onArchive, on
       return (
         <Button onClick={handleAction} className="w-full min-h-[44px] text-sm" variant="outline">
           <Clock className="h-4 w-4 mr-2" />
-          <span className="hidden sm:inline">View Progress</span>
-          <span className="sm:hidden">Progress</span>
+          <span className="hidden sm:inline">{t('dashboard.mysteries.card.actions.viewProgress')}</span>
+          <span className="sm:hidden">{t('dashboard.mysteries.card.actions.progress')}</span>
         </Button>
       );
     } else if (isPurchased) {
       return (
         <Button onClick={handleAction} className="w-full min-h-[44px] text-sm" variant="default">
           <Eye className="h-4 w-4 mr-2" />
-          <span className="hidden sm:inline">View Mystery</span>
-          <span className="sm:hidden">View</span>
+          <span className="hidden sm:inline">{t('dashboard.mysteries.card.actions.view')}</span>
+          <span className="sm:hidden">{t('dashboard.mysteries.card.actions.view')}</span>
         </Button>
       );
     } else {
       return (
         <Button onClick={handleAction} className="w-full min-h-[44px] text-sm" variant="outline">
           <Edit className="h-4 w-4 mr-2" />
-          <span className="hidden sm:inline">Edit Mystery</span>
-          <span className="sm:hidden">Edit</span>
+          <span className="hidden sm:inline">{t('dashboard.mysteries.card.actions.editMystery')}</span>
+          <span className="sm:hidden">{t('dashboard.mysteries.card.actions.edit')}</span>
         </Button>
       );
     }
@@ -126,12 +128,12 @@ export default function HomeMysteryCard({ mystery, onView, onEdit, onArchive, on
               {!isGenerating && (
                 <DropdownMenuItem onClick={handleArchive} className="min-h-[44px]">
                   <Archive className="h-4 w-4 mr-2" />
-                  Archive
+                  {t('dashboard.mysteries.card.actions.archive')}
                 </DropdownMenuItem>
               )}
               <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)} className="text-red-600 min-h-[44px]">
                 <Trash2 className="h-4 w-4 mr-2" />
-                Delete
+                {t('dashboard.mysteries.card.actions.delete')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -149,7 +151,7 @@ export default function HomeMysteryCard({ mystery, onView, onEdit, onArchive, on
         {/* Bottom Section */}
         <div className="space-y-3 flex-1 flex flex-col">
           <p className="text-sm text-muted-foreground flex-1">
-            {isGenerating ? "Generation in progress..." : `Edited ${formatDate(mystery.created_at)}`}
+            {isGenerating ? t('dashboard.mysteries.card.generationInProgress') : t('dashboard.mysteries.card.editedDate', { date: formatDate(mystery.created_at) })}
           </p>
           
           <div className="mt-auto">
@@ -162,18 +164,18 @@ export default function HomeMysteryCard({ mystery, onView, onEdit, onArchive, on
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent className="max-w-[90vw] sm:max-w-md">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-base sm:text-lg">Delete Mystery</AlertDialogTitle>
+            <AlertDialogTitle className="text-base sm:text-lg">{t('dashboard.mysteries.card.deleteDialog.title')}</AlertDialogTitle>
             <AlertDialogDescription className="text-sm">
-              Are you sure you want to delete this mystery? This action cannot be undone.
+              {t('dashboard.mysteries.card.deleteDialog.description')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-col sm:flex-row gap-2">
-            <AlertDialogCancel className="min-h-[44px] w-full sm:w-auto">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="min-h-[44px] w-full sm:w-auto">{t('common.buttons.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90 min-h-[44px] w-full sm:w-auto"
             >
-              Delete
+              {t('common.buttons.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

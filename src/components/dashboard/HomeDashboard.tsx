@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -11,6 +12,7 @@ import { Search, ArrowDown } from "lucide-react";
 import HomeMysteryCard from "./HomeMysteryCard";
 import { extractTitleFromMessages } from "@/utils/titleExtraction";
 import { getPackageGenerationStatus } from "@/services/mysteryPackageService";
+import { useTranslation } from "react-i18next";
 
 interface HomeDashboardProps {
   onCreateNew: () => void;
@@ -25,6 +27,7 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
   const [page, setPage] = useState(1);
   const [hasMorePages, setHasMorePages] = useState(true);
   const pageSize = 6;
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (user?.id) {
@@ -196,7 +199,7 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
       }
     } catch (error) {
       console.error("Error fetching mysteries:", error);
-      toast.error("Failed to load some mysteries. Please refresh the page.");
+      toast.error(t("homeDashboard.errors.loadFailed"));
     } finally {
       setLoading(false);
     }
@@ -233,11 +236,11 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
         throw error;
       }
       
-      toast.success("Mystery archived");
+      toast.success(t("common.notifications.archiveSuccess", { item: t("common.labels.mystery", { count: 1 }) }));
       fetchMysteries(1, true);
     } catch (error) {
       console.error("Error archiving mystery:", error);
-      toast.error("Failed to archive mystery");
+      toast.error(t("common.notifications.archiveFailed", { item: t("common.labels.mystery", { count: 1 }) }));
     }
   };
 
@@ -252,11 +255,11 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
         throw error;
       }
       
-      toast.success("Mystery deleted");
+      toast.success(t("common.notifications.deleteSuccess", { item: t("common.labels.mystery", { count: 1 }) }));
       fetchMysteries(1, true);
     } catch (error) {
       console.error("Error deleting mystery:", error);
-      toast.error("Failed to delete mystery");
+      toast.error(t("common.notifications.deleteFailed", { item: t("common.labels.mystery", { count: 1 }) }));
     }
   };
 
@@ -272,14 +275,14 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
     <div className="py-12 px-4 bg-card/30">
       <div className="container mx-auto max-w-5xl">
         <div className="mb-6">
-          <h2 className="text-2xl font-bold mb-4">Your Mysteries</h2>
+          <h2 className="text-2xl font-bold mb-4">{t('homeDashboard.title')}</h2>
           
           <div className="flex flex-col md:flex-row gap-4 mb-6">
             <div className="relative flex-grow">
               <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 className="pl-8"
-                placeholder="Search mysteries..."
+                placeholder={t('homeDashboard.searchPlaceholder')}
                 value={searchTerm}
                 onChange={handleSearchChange}
               />
@@ -304,9 +307,9 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
           </div>
         ) : mysteries.length === 0 ? (
           <div className="text-center py-12 bg-muted/20 rounded-lg">
-            <p className="text-xl font-medium mb-2">You haven't created any mysteries yet</p>
+            <p className="text-xl font-medium mb-2">{t('homeDashboard.empty.title')}</p>
             <p className="text-muted-foreground mb-4">
-              Use the input box above to start creating your first murder mystery!
+              {t('homeDashboard.empty.description')}
             </p>
           </div>
         ) : (
@@ -338,7 +341,7 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
                   variant="outline" 
                   disabled={loading}
                 >
-                  {loading ? "Loading..." : "Load More"}
+                  {loading ? t('homeDashboard.loading') : t('homeDashboard.loadMore')}
                   {!loading && <ArrowDown className="ml-2 h-4 w-4" />}
                 </Button>
               </div>

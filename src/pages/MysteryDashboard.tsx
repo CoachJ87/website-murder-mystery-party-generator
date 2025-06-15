@@ -12,6 +12,7 @@ import SignInPrompt from "@/components/SignInPrompt";
 import { MysteryFilters } from "@/components/dashboard/MysteryFilters";
 import MysteryList from "@/components/dashboard/MysteryList";
 import { Mystery } from "@/interfaces/mystery";
+import { useTranslation } from "react-i18next";
 
 const MysteryDashboard = () => {
   const navigate = useNavigate();
@@ -24,6 +25,7 @@ const MysteryDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [mysteryToDelete, setMysteryToDelete] = useState<string | null>(null);
   const [showSignInPrompt, setShowSignInPrompt] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -148,7 +150,7 @@ const MysteryDashboard = () => {
       setMysteries(mysteriesWithMessages);
     } catch (error) {
       console.error("Error fetching mysteries:", error);
-      toast.error("Failed to load your mysteries");
+      toast.error(t("dashboard.errors.loadFailed"));
     } finally {
       setLoading(false);
     }
@@ -192,11 +194,11 @@ const MysteryDashboard = () => {
       if (error) throw error;
       
       setMysteries(mysteries.filter(mystery => mystery.id !== id));
-      toast.success("Mystery deleted successfully");
+      toast.success(t("common.notifications.deleteSuccess", { item: t("common.labels.mystery", { count: 1 }) }));
       
     } catch (error) {
       console.error("Error deleting mystery:", error);
-      toast.error("Failed to delete mystery");
+      toast.error(t("common.notifications.deleteFailed", { item: t("common.labels.mystery", { count: 1 }) }));
     } finally {
       setMysteryToDelete(null);
     }
@@ -238,10 +240,14 @@ const MysteryDashboard = () => {
         )
       );
 
-      toast.success(`Mystery ${newStatus === "archived" ? "archived" : "updated"} successfully`);
+      const toastMessage = newStatus === 'archived' 
+        ? t("common.notifications.archiveSuccess", { item: t("common.labels.mystery", { count: 1 }) })
+        : t("common.notifications.updatedSuccess", { item: t("common.labels.mystery", { count: 1 }) });
+      toast.success(toastMessage);
+
     } catch (error) {
       console.error(`Error updating mystery status:`, error);
-      toast.error("Failed to update mystery");
+      toast.error(t("common.notifications.updateFailed", { item: t("common.labels.mystery", { count: 1 }) }));
     }
   };
 
@@ -264,16 +270,16 @@ const MysteryDashboard = () => {
         <div className="container mx-auto max-w-5xl">
           <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-              <h1 className="text-3xl font-bold mb-2">Mystery Dashboard</h1>
+              <h1 className="text-3xl font-bold mb-2">{t('mysteryDashboard.title')}</h1>
               <p className="text-muted-foreground">
-                Manage your created mysteries, start new ones, or explore sample content.
+                {t('mysteryDashboard.description')}
               </p>
             </div>
             <Button 
               onClick={handleNavigateToCreate}
               className="self-start md:self-auto"
             >
-              <PlusCircle className="mr-2 h-4 w-4" /> Create New Mystery
+              <PlusCircle className="mr-2 h-4 w-4" /> {t('common.buttons.createNew')}
             </Button>
           </div>
 
@@ -282,10 +288,10 @@ const MysteryDashboard = () => {
               <Tabs defaultValue="all" className="space-y-4" onValueChange={handleTabChange}>
                 <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
                   <TabsList className="w-full justify-start bg-muted/50 rounded-lg p-1 flex-nowrap overflow-x-auto">
-                    <TabsTrigger value="all" className="flex-shrink-0">All</TabsTrigger>
-                    <TabsTrigger value="draft" className="flex-shrink-0">Drafts</TabsTrigger>
-                    <TabsTrigger value="purchased" className="flex-shrink-0">Purchased</TabsTrigger>
-                    <TabsTrigger value="archived" className="flex-shrink-0">Archived</TabsTrigger>
+                    <TabsTrigger value="all">{t('mysteryDashboard.tabs.all')}</TabsTrigger>
+                    <TabsTrigger value="draft">{t('mysteryDashboard.tabs.drafts')}</TabsTrigger>
+                    <TabsTrigger value="purchased">{t('mysteryDashboard.tabs.purchased')}</TabsTrigger>
+                    <TabsTrigger value="archived">{t('mysteryDashboard.tabs.archived')}</TabsTrigger>
                   </TabsList>
                 </div>
 

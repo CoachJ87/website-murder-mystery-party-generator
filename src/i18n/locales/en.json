@@ -1,4 +1,3 @@
-
 {
   "navigation": {
     "home": "Home",
@@ -152,7 +151,8 @@
   "support": {
     "title": "Need More Help?",
     "description": "Visit our comprehensive support center for FAQs, hosting tips, and more information about using our Murder Mystery Generator.",
-    "button": "Visit Support Center"
+    "button": "Visit Support Center",
+    "email": "support@mysterymaker.party"
   },
   "footer": {
     "tagline": "Craft captivating murder mysteries at the speed of imagination.",
@@ -221,8 +221,7 @@
       "confirmPassword": "Confirm New Password",
       "submitButton": "Update Password",
       "updating": "Updating...",
-      "success": "Password updated successfully",
-      "backToSignIn": "Back to sign in"
+      "success": "Password updated successfully"
     },
     "errors": {
       "invalidCredentials": "Invalid email or password",
@@ -260,7 +259,8 @@
         "all": "All Mysteries",
         "drafts": "Drafts",
         "completed": "Completed",
-        "purchased": "Purchased"
+        "purchased": "Purchased",
+        "archived": "Archived"
       },
       "empty": {
         "title": "No mysteries found",
@@ -268,14 +268,37 @@
         "searchResult": "No mysteries match your search"
       },
       "card": {
-        "players": "players",
+        "players": "{{count}} players",
         "created": "Created",
         "lastEdited": "Last edited",
-        "status": {
-          "draft": "Draft",
-          "completed": "Completed",
-          "purchased": "Purchased"
-        }
+        "theme": "Theme: {{theme}}",
+        "actions": {
+          "view": "View",
+          "chat": "Chat",
+          "delete": "Delete",
+          "viewProgress": "View Progress",
+          "progress": "Progress",
+          "editMystery": "Edit Mystery",
+          "edit": "Edit",
+          "archive": "Archive",
+          "deleteTitle": "Delete"
+        },
+        "deleteDialog": {
+          "title": "Delete Mystery",
+          "description": "Are you sure you want to delete this mystery? This action cannot be undone."
+        },
+        "generationInProgress": "Generation in progress...",
+        "editedDate": "Edited {{date}}"
+      },
+      "status": {
+        "completed": "Completed",
+        "draft": "Draft",
+        "purchased": "Purchased",
+        "unknown": "Unknown",
+        "done": "Done",
+        "bought": "Bought",
+        "generating": "Generating...",
+        "generatingShort": "Gen..."
       },
       "showingCount": "Showing {{count}} of {{total}} mysteries"
     },
@@ -630,7 +653,13 @@
       "connectionLost": "Connection lost. Trying to reconnect...",
       "connectionRestored": "Connection restored",
       "updateAvailable": "A new version is available. Refresh to update.",
-      "offlineMode": "You are currently offline"
+      "offlineMode": "You are currently offline",
+      "deleteSuccess": "{{item}} deleted successfully",
+      "deleteFailed": "Failed to delete {{item}}",
+      "archiveSuccess": "{{item}} archived successfully",
+      "archiveFailed": "Failed to archive {{item}}",
+      "updatedSuccess": "{{item}} updated successfully",
+      "updateFailed": "Failed to update {{item}}"
     }
   },
   "purchase": {
@@ -675,7 +704,7 @@
         "This is a one-time purchase for this specific mystery package",
         "You'll have permanent access to download all materials",
         "Content is for personal use only, not for commercial redistribution",
-        "Need help? Contact our support at support@mysterymaker.party"
+        "Need help? Contact our support at {{email}}"
       ]
     },
     "preview": {
@@ -750,5 +779,28 @@
     "creatorTitle": "Murder Mystery Creator",
     "placeholder": "Type your ideas for the murder mystery...",
     "finalizePrompt": "When you're satisfied with your mystery, finalize it to continue."
+  },
+  "homeDashboard": {
+    "title": "Your Mysteries",
+    "searchPlaceholder": "Search mysteries...",
+    "loadMore": "Load More",
+    "loading": "Loading...",
+    "empty": {
+      "title": "You haven't created any mysteries yet",
+      "description": "Use the input box above to start creating your first murder mystery!"
+    },
+    "errors": {
+      "loadFailed": "Failed to load some mysteries. Please refresh the page."
+    }
+  },
+  "mysteryDashboard": {
+    "title": "Mystery Dashboard",
+    "description": "Manage your created mysteries, start new ones, or explore sample content.",
+    "tabs": {
+      "all": "All",
+      "drafts": "Drafts",
+      "purchased": "Purchased",
+      "archived": "Archived"
+    }
   }
 }
