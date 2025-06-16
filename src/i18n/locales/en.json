@@ -368,6 +368,12 @@
       "step3": {
         "title": "Complete Package",
         "description": "Get everything you need to host"
+      },
+      "prompt": {
+        "defaultStart": "I want to create a murder mystery",
+        "withTheme": "The theme/setting should be {{theme}} for {{playerCount}} players with {{scriptType}} scripts",
+        "withoutTheme": "This is for {{playerCount}} players with {{scriptType}} scripts", 
+        "additionalDetails": "Additional details include: {{details}}"
       }
     },
     "editor": {
