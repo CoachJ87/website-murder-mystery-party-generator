@@ -100,19 +100,28 @@ const MysteryCreation = () => {
             if (data.userRequest) {
                 message = data.userRequest.trim();
             } else {
-                message = "I want to create a murder mystery";
+                message = t("mysteryCreation.prompt.defaultStart");
             }
             
             // Add theme/setting if provided
             if (data.theme && data.theme.trim() !== "") {
-                message += ` The theme/setting should be ${data.theme} for ${data.playerCount} players with ${data.scriptType} scripts`;
+                message += " " + t("mysteryCreation.prompt.withTheme", { 
+                    theme: data.theme, 
+                    playerCount: data.playerCount, 
+                    scriptType: getScriptTypeDisplayText(data.scriptType) 
+                });
             } else {
-                message += ` This is for ${data.playerCount} players with ${getScriptTypeDisplayText(data.scriptType)} scripts`;
+                message += " " + t("mysteryCreation.prompt.withoutTheme", { 
+                    playerCount: data.playerCount, 
+                    scriptType: getScriptTypeDisplayText(data.scriptType) 
+                });
             }
             
             // Add additional details if provided
             if (data.additionalDetails && data.additionalDetails.trim() !== "") {
-                message += ` Additional details include: ${data.additionalDetails}`;
+                message += " " + t("mysteryCreation.prompt.additionalDetails", { 
+                    details: data.additionalDetails 
+                });
             }
             
             // Clean up: remove any trailing punctuation, then add exactly one period
