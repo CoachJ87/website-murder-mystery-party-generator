@@ -4,6 +4,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Users } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface MysteryPreviewCardProps {
   mystery: {
@@ -18,6 +19,7 @@ interface MysteryPreviewCardProps {
 }
 
 const MysteryPreviewCard = ({ mystery, parsedDetails }: MysteryPreviewCardProps) => {
+  const { t } = useTranslation();
   const isMobile = useIsMobile();
   
   // Extract first paragraph from premise as teaser
@@ -33,7 +35,7 @@ const MysteryPreviewCard = ({ mystery, parsedDetails }: MysteryPreviewCardProps)
           {mystery.title}
         </CardTitle>
         <CardDescription className={cn(isMobile && "text-sm")}>
-          Murder Mystery Preview
+          {t('purchase.preview.title')}
         </CardDescription>
       </CardHeader>
       
@@ -51,13 +53,13 @@ const MysteryPreviewCard = ({ mystery, parsedDetails }: MysteryPreviewCardProps)
               "mr-2 text-muted-foreground",
               isMobile ? "h-3 w-3" : "h-4 w-4"
             )} />
-            <span>Players</span>
+            <span>{t('purchase.preview.playersLabel')}</span>
           </div>
           <p className={cn(
             "font-medium",
             isMobile && "text-sm"
           )}>
-            {mystery.guests || "Unknown # of"} Players
+            {mystery.guests ? t('purchase.preview.playersCount', { count: mystery.guests }) : t('purchase.preview.unknownPlayers')}
           </p>
         </div>
         
@@ -68,7 +70,7 @@ const MysteryPreviewCard = ({ mystery, parsedDetails }: MysteryPreviewCardProps)
               "font-medium",
               isMobile ? "text-sm" : "text-base"
             )}>
-              Story Preview
+              {t('purchase.preview.storyTitle')}
             </h3>
             <p className={cn(
               "text-muted-foreground",
@@ -80,7 +82,7 @@ const MysteryPreviewCard = ({ mystery, parsedDetails }: MysteryPreviewCardProps)
               "italic text-muted-foreground mt-2",
               isMobile ? "text-xs" : "text-xs"
             )}>
-              Purchase to unlock the complete mystery package with all character details, clues, and materials.
+              {t('purchase.preview.unlockMessage')}
             </p>
           </div>
         )}
@@ -94,16 +96,15 @@ const MysteryPreviewCard = ({ mystery, parsedDetails }: MysteryPreviewCardProps)
             "font-medium mb-2",
             isMobile && "text-xs"
           )}>
-            What's included in the full package:
+            {t('purchase.preview.whatsIncluded')}
           </p>
           <ul className={cn(
             "list-disc space-y-1",
             isMobile ? "pl-3" : "pl-4"
           )}>
-            <li>Detailed host guide with complete setup instructions</li>
-            <li>Character guides for each player</li>
-            <li>Evidence cards and printable materials</li>
-            <li>Full gameplay script and timeline</li>
+            {(t('purchase.preview.packageIncludes', { returnObjects: true }) as string[]).map((item, index) => (
+              <li key={index}>{item}</li>
+            ))}
           </ul>
         </div>
       </CardContent>
