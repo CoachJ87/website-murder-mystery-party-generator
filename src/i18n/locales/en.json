@@ -748,8 +748,24 @@
       "matrix": "Relationship matrix will be available after generation starts."
     },
     "matrix": {
-      "title": "Character Relationship Matrix"
+      "title": "Character Relationship Matrix",
     }
+    "preview": {
+      "title": "Murder Mystery Preview",
+      "playersLabel": "Players",
+      "playersCount": "{{count}} Players",
+      "unknownPlayers": "Unknown # of Players",
+      "storyTitle": "Story Preview",
+      "unlockMessage": "Purchase to unlock the complete mystery package with all character details, clues, and materials.",
+      "whatsIncluded": "What's included in the full package:",
+      "packageIncludes": [
+        "Detailed host guide with complete setup instructions",
+        "Character guides for each player", 
+        "Evidence cards and printable materials",
+        "Full gameplay script and timeline"
+      ]
+    }
+}
   },
   "chatbot": {
     "toasts": {
