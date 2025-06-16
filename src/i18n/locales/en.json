@@ -668,6 +668,144 @@
       "updateFailed": "Failed to update {{item}}"
     }
   },
+  "character": {
+    "detail": {
+      "description": "Character Description",
+      "background": "Background", 
+      "relationships": "Relationships",
+      "secrets": "Secrets",
+      "whereabouts": "Whereabouts During the Murder",
+      "introduction": "Introduction",
+      "round1": "Round 1: Initial Investigation",
+      "round2": "Round 2: Deeper Revelations", 
+      "round3": "Round 3: Final Clues",
+      "finalStatement": "Final Statement",
+      "questioningOptions": "Questioning Options",
+      "askTarget": "Ask {{target}}: \"{{question}}\""
+    },
+    "import": {
+      "title": "Mystery Characters",
+      "description": "Manage the characters in your murder mystery",
+      "importButton": "Import Characters",
+      "loading": "Loading characters...",
+      "noCharacters": "No characters yet",
+      "importPrompt": "Import character data to populate your murder mystery.",
+      "foundCount": "{{count}} characters found in database",
+      "deleteConfirm": "Are you sure you want to delete {{name}}?",
+      "deleteSuccess": "Deleted character: {{name}}",
+      "deleteFailed": "Failed to delete character",
+      "refreshSuccess": "Character list refreshed",
+      "refreshFailed": "Failed to refresh character data",
+      "loadFailed": "Failed to load character data",
+      "table": {
+        "name": "Character Name",
+        "details": "Details", 
+        "scripts": "Scripts",
+        "actions": "Actions",
+        "badges": {
+          "description": "Description",
+          "background": "Background",
+          "relationships": "Relationships",
+          "secrets": "Secrets",
+          "intro": "Intro",
+          "round1": "Round 1",
+          "round2": "Round 2", 
+          "round3": "Round 3"
+        }
+      }
+    },
+    "access": {
+      "welcome": "Welcome, {{name}}!",
+      "subtitle": "Here's your character guide for the mystery game",
+      "loading": "Loading your character...",
+      "accessDenied": "Access Denied",
+      "notFound": "Character assignment not found.",
+      "guide": {
+        "yourCharacter": "{{name}} - Your Character",
+        "yourBackground": "Your Background",
+        "yourSecret": "Your Secret", 
+        "introduction": "Introduction",
+        "rumorsYouKnow": "Rumors You Know",
+        "round1": "Round 1: Initial Statement",
+        "round2": "Round 2: Motives",
+        "round3": "Round 3: Method",
+        "questionsToAsk": "Questions to Ask",
+        "ifInnocent": "If You're Innocent:",
+        "ifGuilty": "If You're Guilty:",
+        "ifAccomplice": "If You're an Accomplice:"
+      }
+    },
+    "dialog": {
+      "title": "Import Character Data",
+      "subtitle": "Paste your character data below:",
+      "pasteButton": "Paste from Clipboard",
+      "pasteSuccess": "Text pasted from clipboard",
+      "pasteError": "Could not access clipboard. Please paste manually.",
+      "placeholder": "Paste CHARACTER GUIDE content here...",
+      "instructions": "Character data should include sections for:",
+      "sections": [
+        "CHARACTER DESCRIPTION",
+        "BACKGROUND", 
+        "RELATIONSHIPS",
+        "SECRETS",
+        "WHEREABOUTS",
+        "Round statements (ROUND 1, ROUND 2, etc.)"
+      ],
+      "importButton": "Import Characters",
+      "importing": "Importing...",
+      "cancel": "Cancel",
+      "enterData": "Please enter or paste character data",
+      "importSuccess": "Characters imported successfully",
+      "importFailed": "Failed to import character data",
+      "importError": "An unexpected error occurred during import"
+    },
+    "guestManager": {
+      "title": "Share Characters with Guests",
+      "subtitle": "Assign each character to a guest and send via email",
+      "table": {
+        "character": "Character",
+        "guestName": "Guest Name", 
+        "email": "Email",
+        "action": "Action"
+      },
+      "placeholders": {
+        "guestName": "Guest's name",
+        "email": "guest@example.com"
+      },
+      "buttons": {
+        "edit": "Edit",
+        "send": "Send",
+        "sendAll": "Send All",
+        "close": "Close"
+      },
+      "status": {
+        "sent": "Sent"
+      },
+      "assignedCount": "{{count}} characters assigned",
+      "toasts": {
+        "characterSent": "Character sent to {{name}}!",
+        "sendFailed": "Failed to send character assignment",
+        "loadFailed": "Failed to load existing assignments",
+        "updateFailed": "Failed to update assignment",
+        "noValidAssignments": "No valid assignments to send",
+        "allSent": "Sent {{count}} character assignments!",
+        "sendSomeFailed": "Failed to send some assignments"
+      }
+    },
+    "roles": {
+      "title": "Character Roles",
+      "description": "Assign the murderer role for your mystery",
+      "murderer": "Murderer",
+      "required": "Required",
+      "noneSelected": "None selected",
+      "murdererDescription": "The character who committed the murder",
+      "saveRoles": "Save Roles",
+      "saving": "Saving...",
+      "saveSuccess": "Character roles saved successfully",
+      "saveFailed": "Failed to save character roles",
+      "loadFailed": "Failed to load character data"
+    }
+  },
   "purchase": {
     "toasts": {
       "success": "Purchase successful! You now have full access to this mystery package.",
