@@ -529,7 +529,12 @@ const MysteryPurchase = () => {
                   isMobile ? "text-xs pl-4" : "text-sm"
                 )}>
                   {(t('purchase.notes.items', { returnObjects: true }) as string[]).map((item, index) => (
-                    <li key={index}>{item}</li>
+                    <li key={index}>
+                      {item.includes('{{email}}') 
+                        ? item.replace('{{email}}', 'support@mysterymaker.party')
+                        : item
+                      }
+                    </li>
                   ))}
                 </ul>
               </div>
