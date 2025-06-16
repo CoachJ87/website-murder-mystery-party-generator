@@ -102,9 +102,23 @@ const MysteryPreviewCard = ({ mystery, parsedDetails }: MysteryPreviewCardProps)
             "list-disc space-y-1",
             isMobile ? "pl-3" : "pl-4"
           )}>
-            {(t('purchase.preview.packageIncludes', { returnObjects: true }) as string[]).map((item, index) => (
-              <li key={index}>{item}</li>
-            ))}
+            {(() => {
+              const items = t('purchase.preview.packageIncludes', { returnObjects: true });
+              if (Array.isArray(items)) {
+                return items.map((item: string, index: number) => (
+                  <li key={index}>{item}</li>
+                ));
+              }
+              // Fallback if translation fails
+              return [
+                "Detailed host guide with complete setup instructions",
+                "Character guides for each player", 
+                "Evidence cards and printable materials",
+                "Full gameplay script and timeline"
+              ].map((item, index) => (
+                <li key={index}>{item}</li>
+              ));
+            })()}
           </ul>
         </div>
       </CardContent>
