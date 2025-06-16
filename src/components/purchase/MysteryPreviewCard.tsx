@@ -104,12 +104,16 @@ const MysteryPreviewCard = ({ mystery, parsedDetails }: MysteryPreviewCardProps)
           )}>
             {(() => {
               const items = t('purchase.preview.packageIncludes', { returnObjects: true });
+              console.log('Translation items:', items, 'Type:', typeof items, 'Is Array:', Array.isArray(items));
+              
               if (Array.isArray(items)) {
                 return items.map((item: string, index: number) => (
                   <li key={index}>{item}</li>
                 ));
               }
-              // Fallback if translation fails
+              
+              // More defensive fallback
+              console.warn('Translation failed, using fallback');
               return [
                 "Detailed host guide with complete setup instructions",
                 "Character guides for each player", 
