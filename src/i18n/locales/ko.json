@@ -368,6 +368,12 @@
       "step3": {
         "title": "완전한 패키지",
         "description": "진행에 필요한 모든 것을 받으세요"
+      },
+      "prompt": {
+        "defaultStart": "살인 미스터리를 만들고 싶습니다",
+        "withTheme": "테마/설정은 {{theme}}이어야 하며 {{playerCount}}명의 플레이어와 {{scriptType}} 스크립트용입니다",
+        "withoutTheme": "이것은 {{playerCount}}명의 플레이어와 {{scriptType}} 스크립트용입니다",
+        "additionalDetails": "추가 세부사항: {{details}}"
       }
     },
     "editor": {
@@ -711,7 +717,20 @@
       "defaultTitle": "맞춤형 살인 미스터리",
       "characterPlaceholder": "인물 세부사항은 완전한 패키지에서 공개됩니다.",
       "characterPlaceholderFull": "완전한 인물 설명은 구매한 패키지에서 사용할 수 있습니다.",
-      "evidencePlaceholder": "증거 세부사항은 완전한 패키지에서 사용할 수 있습니다."
+      "evidencePlaceholder": "증거 세부사항은 완전한 패키지에서 사용할 수 있습니다.",
+      "title": "살인 미스터리 미리보기",
+      "playersLabel": "플레이어",
+      "playersCount": "{{count}}명의 플레이어",
+      "unknownPlayers": "알 수 없는 수의 플레이어",
+      "storyTitle": "스토리 미리보기",
+      "unlockMessage": "모든 인물 세부사항, 단서, 자료가 포함된 완전한 미스터리 패키지를 잠금 해제하려면 구매하세요.",
+      "whatsIncluded": "완전한 패키지에 포함된 내용:",
+      "packageIncludes": [
+        "완전한 설정 지침이 있는 자세한 진행자 가이드",
+        "각 플레이어를 위한 인물 가이드",
+        "증거 카드 및 인쇄 가능한 자료",
+        "완전한 게임플레이 스크립트 및 타임라인"
+      ]
     }
   },
   "mysteryPackage": {
