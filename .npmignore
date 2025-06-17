@@ -1,0 +1,8 @@
+
+# Explicitly ignore package manager files except npm
+pnpm-lock.yaml
+yarn.lock
+.pnp.*
+.yarn/
+.pnpm/
+node_modules/

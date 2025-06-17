@@ -1,0 +1,308 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Mystery Maker Color System - Sophisticated Burgundy & Cream */
+    /* Primary Colors */
+    --color-primary: 343 74% 32%;        /* Rich Burgundy #8B1538 */
+    --color-primary-foreground: 0 0% 100%;
+    --color-primary-hover: 343 74% 25%;
+    --color-primary-light: 343 74% 45%;
+    
+    --color-secondary: 343 74% 32%;      /* Rich Burgundy #8B1538 */
+    --color-secondary-foreground: 0 0% 100%;
+    --color-secondary-hover: 343 74% 25%;
+    --color-secondary-light: 343 74% 45%;
+    
+    /* Accent Colors */
+    --color-accent: 343 74% 32%;         /* Rich Burgundy #8B1538 */
+    --color-accent-foreground: 0 0% 100%;
+    --color-accent-hover: 343 74% 25%;
+    --color-accent-light: 343 74% 45%;
+    
+    --color-danger: 0 84% 49%;           /* Soft Red #DC2626 */
+    --color-danger-foreground: 0 0% 100%;
+    --color-danger-hover: 0 84% 40%;
+    --color-danger-light: 0 84% 65%;
+    
+    /* Background System - Sophisticated & Clean */
+    --color-surface: 35 27% 97%;         /* Soft Off-White #FEFCF8 */
+    --color-surface-foreground: 0 0% 17%; /* Charcoal Black #2A2A2A */
+    --color-surface-hover: 35 27% 95%;   /* Slightly darker off-white */
+    
+    --color-muted: 35 27% 97%;           /* Warm Cream #F7F3E9 */
+    --color-muted-foreground: 215 16% 47%; /* Medium Gray #6B7280 */
+    
+    --color-subtle: 35 27% 95%;          /* Darker Warm Cream #F7F3E9 */
+    --color-subtle-foreground: 0 0% 17%;
+    
+    --color-tertiary: 220 9% 68%;        /* Light Gray #9CA3AF */
+    
+    /* Semantic Tokens */
+    --background: var(--color-surface);
+    --foreground: var(--color-surface-foreground);
+    
+    --card: 35 27% 97%;
+    --card-foreground: var(--color-surface-foreground);
+    
+    --popover: 35 27% 97%;
+    --popover-foreground: var(--color-surface-foreground);
+    
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: var(--color-primary);
+    
+    --destructive: var(--color-danger);
+    --destructive-foreground: var(--color-danger-foreground);
+    
+    --radius: 0.5rem;
+    
+    /* Sidebar Colors */
+    --sidebar-background: var(--color-surface);
+    --sidebar-foreground: var(--color-surface-foreground);
+    --sidebar-primary: var(--color-primary);
+    --sidebar-primary-foreground: var(--color-primary-foreground);
+    --sidebar-accent: var(--color-subtle);
+    --sidebar-accent-foreground: var(--color-surface-foreground);
+    --sidebar-border: var(--border);
+    --sidebar-ring: var(--color-primary);
+  }
+  
+  /* Dark mode variants for future implementation */
+  .dark {
+    --color-surface: 0 0% 17%;           /* Charcoal Black */
+    --color-surface-foreground: 0 0% 100%; /* Pure White */
+    --color-surface-hover: 0 0% 20%;
+    
+    --color-muted: 0 0% 20%;             /* Dark surface */
+    --color-muted-foreground: 215 16% 65%; /* Lighter Medium Gray */
+    
+    --color-subtle: 0 0% 23%;            /* Darker surface */
+    
+    --background: var(--color-surface);
+    --foreground: var(--color-surface-foreground);
+    
+    --card: 0 0% 20%;
+    --card-foreground: var(--color-surface-foreground);
+    
+    --popover: 0 0% 20%;
+    --popover-foreground: var(--color-surface-foreground);
+    
+    --border: 0 0% 25%;
+    --input: 0 0% 25%;
+    
+    --sidebar-background: var(--color-surface);
+    --sidebar-foreground: var(--color-surface-foreground);
+    --sidebar-accent: var(--color-muted);
+    --sidebar-accent-foreground: var(--color-surface-foreground);
+    --sidebar-border: var(--border);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-inter;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-playfair;
+  }
+
+  a {
+    @apply text-foreground hover:text-primary transition-colors no-underline;
+  }
+  
+  .no-underline {
+    text-decoration: none !important;
+  }
+  
+  button a {
+    text-decoration: none !important;
+  }
+}
+
+/* Mystery Maker Utility Classes - Refined */
+@layer utilities {
+  /* Background Utilities */
+  .bg-primary-soft {
+    @apply bg-primary/10;
+  }
+  
+  .bg-secondary-soft {
+    @apply bg-secondary/10;
+  }
+  
+  .bg-accent-soft {
+    @apply bg-accent/10;
+  }
+  
+  .bg-section {
+    background-color: hsl(var(--color-muted));
+  }
+  
+  .bg-card-elevated {
+    background-color: hsl(var(--color-subtle));
+  }
+  
+  /* Text Utilities */
+  .text-primary-light {
+    color: hsl(var(--color-primary-light));
+  }
+  
+  .text-secondary-light {
+    color: hsl(var(--color-secondary-light));
+  }
+  
+  .text-tertiary {
+    color: hsl(var(--color-tertiary));
+  }
+  
+  /* Border Utilities */
+  .border-primary-light {
+    border-color: hsl(var(--color-primary-light));
+  }
+  
+  /* Hover States */
+  .hover-primary {
+    @apply hover:bg-primary/90 hover:text-primary-foreground transition-colors;
+  }
+  
+  .hover-secondary {
+    @apply hover:bg-secondary/90 hover:text-secondary-foreground transition-colors;
+  }
+  
+  .hover-accent {
+    @apply hover:bg-accent/90 hover:text-accent-foreground transition-colors;
+  }
+  
+  /* Status Colors */
+  .status-success {
+    @apply bg-accent/10 text-accent border-accent/20;
+  }
+  
+  .status-warning {
+    @apply bg-yellow-50 text-yellow-800 border-yellow-200;
+  }
+  
+  .status-error {
+    @apply bg-danger/10 text-danger border-danger/20;
+  }
+  
+  /* Interactive Elements */
+  .interactive-surface {
+    @apply bg-card hover:bg-section border border-border rounded-lg transition-colors;
+  }
+  
+  .mystery-card {
+    @apply bg-card border border-border/50 rounded-lg shadow-sm hover:shadow-md hover:bg-section transition-all duration-200;
+  }
+  
+  .mystery-button-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-2 focus:ring-primary/20 transition-all;
+  }
+  
+  .mystery-button-secondary {
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/90 focus:ring-2 focus:ring-secondary/20 transition-all;
+  }
+  
+  .mystery-button-accent {
+    @apply bg-accent text-accent-foreground hover:bg-accent/90 focus:ring-2 focus:ring-accent/20 transition-all;
+  }
+  
+  /* Premium surface styling */
+  .premium-surface {
+    @apply bg-card border border-border/30 rounded-lg shadow-sm;
+  }
+  
+  .sophisticated-gradient {
+    background: linear-gradient(135deg, hsl(var(--color-surface)) 0%, hsl(var(--color-muted)) 100%);
+  }
+  
+  /* Claude-style chat elements */
+  .claude-message-user {
+    @apply bg-[#8B1538] text-white rounded-2xl shadow-sm border-none;
+  }
+  
+  .claude-message-ai {
+    @apply bg-[#FEFCF8] text-[#2A2A2A] rounded-2xl shadow-sm border-none;
+  }
+  
+  .claude-input-container {
+    @apply bg-[#FEFCF8] shadow-md border-t-0 rounded-t-xl;
+  }
+  
+  .claude-input {
+    @apply bg-white rounded-xl shadow-sm border-0 focus-visible:ring-0;
+  }
+  
+  .claude-send-button {
+    @apply bg-[#8B1538] hover:bg-[#6B0F28] text-white rounded-lg;
+  }
+  
+  .claude-typing-indicator {
+    @apply bg-[#FEFCF8] rounded-2xl shadow-sm;
+  }
+  
+  .claude-typing-dot {
+    @apply bg-[#8B1538]/60 rounded-full animate-bounce;
+  }
+}
+
+/* Legacy gradient and chat styles for existing components */
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary font-playfair;
+}
+
+.chat-bubble {
+  @apply p-4 rounded-lg max-w-[80%] font-inter;
+}
+
+.user-bubble {
+  @apply chat-bubble bg-primary text-primary-foreground self-end;
+}
+
+.assistant-bubble {
+  @apply chat-bubble bg-card text-foreground self-start border border-border/30;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .chat-bubble {
+    @apply p-3 rounded-md max-w-[85%];
+  }
+  
+  .message-container {
+    @apply min-h-[70vh] p-2 border-0;
+  }
+  
+  .chat-card {
+    @apply border-0 shadow-none bg-transparent;
+  }
+  
+  .input-container {
+    @apply p-2 space-x-2;
+  }
+  
+  .mobile-vh-fix {
+    height: calc(100vh - 80px);
+  }
+  
+  .mobile-chat-container {
+    @apply min-h-[80vh] border-0 p-0;
+  }
+  
+  .mobile-borderless {
+    @apply border-0 shadow-none bg-transparent;
+  }
+  
+  .mobile-full-height {
+    height: calc(100vh - 100px);
+    max-height: none;
+  }
+}

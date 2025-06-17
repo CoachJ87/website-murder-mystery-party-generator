@@ -1,0 +1,156 @@
+
+{
+  "navigation": {
+    "home": "Inicio",
+    "dashboard": "Panel",
+    "signIn": "Iniciar Sesión",
+    "signUp": "Registrarse",
+    "signOut": "Cerrar Sesión",
+    "account": "Configuración de Cuenta"
+  },
+  "hero": {
+    "title": "Organiza una Fiesta Mortal Esta Noche.",
+    "subtitle": "Genera misterios de asesinatos personalizados con personajes, pistas y todo lo que necesitas.",
+    "subtitleAuth": "Dinos qué te gustaría crear y lo haremos realidad.",
+    "placeholder": "¿Qué tipo de misterio de asesinato te gustaría organizar?",
+    "placeholderAuth": "¿Qué tipo de misterio de asesinato te gustaría crear hoy?",
+    "themes": {
+      "1920sSpeakeasy": "Speakeasy de los 20s",
+      "hollywoodMurder": "Asesinato en Hollywood",
+      "castleMystery": "Misterio en el Castillo",
+      "sciFiMystery": "Misterio de Ciencia Ficción",
+      "artGalleryOpening": "Inauguración de Galería",
+      "bakeryCompetition": "Competencia de Panadería",
+      "mountainSkiResort": "Resort de Esquí Montañoso",
+      "luxuryTrainJourney": "Viaje en Tren de Lujo",
+      "historicUniversity": "Universidad Histórica",
+      "pokerTournament": "Torneo de Póker",
+      "barbieDreamworld": "Mundo de Ensueño Barbie",
+      "dystopianWaterworld": "Mundo Acuático Distópico",
+      "jungleSteampunk": "Selva Steampunk",
+      "magicalBakery": "Panadería Mágica",
+      "gamingTournament": "Torneo de Videojuegos",
+      "synthwave80s": "Synthwave de los 80",
+      "beachResort": "Resort de Playa",
+      "operaHouse": "Casa de Ópera",
+      "wineCountry": "Región Vinícola",
+      "safariAdventure": "Aventura Safari",
+      "fashionShow": "Desfile de Moda",
+      "casinoNight": "Noche de Casino",
+      "fairyTaleKingdom": "Reino de Cuentos",
+      "spaceColony": "Colonia Espacial",
+      "superheroAcademy": "Academia de Superhéroes",
+      "underwaterCity": "Ciudad Submarina",
+      "wildWestSaloon": "Cantina del Oeste",
+      "vikingFeast": "Banquete Vikingo",
+      "candyKingdom": "Reino de Dulces",
+      "dragonsLair": "Guarida del Dragón",
+      "timeTravelersBall": "Baile de Viajeros del Tiempo",
+      "atlantisRising": "El Resurgir de Atlántida",
+      "toyBoxAdventure": "Aventura en la Caja de Juguetes",
+      "vampireMasquerade": "Baile de Máscaras Vampírico",
+      "dimensionHopping": "Salto Dimensional",
+      "cyberpunkNightclub": "Club Nocturno Cyberpunk",
+      "ghostShip": "Barco Fantasma",
+      "sentientPlantColony": "Colonia de Plantas Conscientes"
+    }
+  },
+  "howItWorks": {
+    "step1": {
+      "title": "Describe tu misterio de asesinato ideal.",
+      "description": "Dinos qué tema y características quieres en tu misterio."
+    },
+    "step2": {
+      "title": "La Máquina del Misterio crea tu primera versión al instante.",
+      "description": "Nuestra IA genera un misterio completo con personajes y pistas."
+    },
+    "step3": {
+      "title": "Habla con el editor para diseñar y perfeccionar tu idea.",
+      "description": "Refina el misterio con el asistente de IA hasta que sea perfecto."
+    },
+    "step4": {
+      "title": "Genera guías PDF para ti y tus amigos",
+      "description": "Descarga todo lo que necesitas para organizar una fiesta increíble."
+    }
+  },
+  "features": {
+    "title": "Todo lo que Necesitas Incluido",
+    "step1": {
+      "step": "Paso 1",
+      "title": "Historias Personalizables",
+      "content": "Crea tu propio escenario único de misterio de asesinato, desde temas clásicos hasta realidades soñadas."
+    },
+    "step2": {
+      "step": "Paso 2",
+      "title": "Perfiles de Personajes",
+      "content": "Trasfondos detallados, motivaciones y secretos de personajes para todos los participantes."
+    },
+    "step3": {
+      "step": "Paso 3",
+      "title": "Guía del Anfitrión",
+      "content": "Instrucciones paso a paso fáciles de seguir para organizar un evento memorable de misterio de asesinato."
+    }
+  },
+  "testimonials": {
+    "title": "Lo que Dicen los Demás",
+    "testimonial1": {
+      "text": "Mis amigos aún hablan de nuestra noche de misterio de asesinato. ¡Los personajes estaban tan detallados y los giros de la trama fueron perfectos!",
+      "author": "Jessica Davis",
+      "role": "Anfitriona de Fiesta"
+    },
+    "testimonial2": {
+      "text": "¡Muy fácil de configurar! Estaba preocupado por organizar para 12 personas, pero los materiales lo hicieron simple y todos se divirtieron muchísimo.",
+      "author": "Mark Klein",
+      "role": "Planificador de Eventos Corporativos"
+    },
+    "testimonial3": {
+      "text": "Tercera fiesta de misterio de asesinato usando este servicio y siguen mejorando. Las opciones de personalización son increíbles.",
+      "author": "Amanda Smith",
+      "role": "Celebrante de Cumpleaños"
+    }
+  },
+  "support": {
+    "title": "¿Necesitas Más Ayuda?",
+    "description": "Visita nuestro centro de soporte integral para preguntas frecuentes, consejos de organización y más información sobre el uso de nuestro Generador de Misterios de Asesinato.",
+    "button": "Visitar Centro de Soporte"
+  },
+  "footer": {
+    "tagline": "Crea misterios de asesinatos cautivadores a la velocidad de la imaginación.",
+    "quickLinks": "Enlaces Rápidos",
+    "company": "Empresa",
+    "links": {
+      "home": "Inicio",
+      "support": "Soporte",
+      "contact": "Contacto",
+      "privacy": "Política de Privacidad"
+    },
+    "copyright": "Murder Mystery Generator, Inc. Todos los derechos reservados."
+  },
+  "common": {
+    "buttons": {
+      "createNew": "Crear Nuevo Misterio",
+      "getStarted": "Comenzar",
+      "learnMore": "Saber Más",
+      "tryNow": "Probar Ahora",
+      "continue": "Continuar",
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "delete": "Eliminar",
+      "edit": "Editar",
+      "close": "Cerrar"
+    },
+    "labels": {
+      "loading": "Cargando...",
+      "error": "Error",
+      "success": "Éxito",
+      "warning": "Advertencia",
+      "info": "Información"
+    },
+    "messages": {
+      "welcome": "¡Bienvenido!",
+      "thankYou": "¡Gracias!",
+      "comingSoon": "Próximamente",
+      "notFound": "No Encontrado"
+    }
+  }
+}

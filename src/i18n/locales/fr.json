@@ -1,0 +1,156 @@
+
+{
+  "navigation": {
+    "home": "Accueil",
+    "dashboard": "Tableau de Bord",
+    "signIn": "Se Connecter",
+    "signUp": "S'Inscrire",
+    "signOut": "Se Déconnecter",
+    "account": "Paramètres du Compte"
+  },
+  "hero": {
+    "title": "Organisez une Soirée Criminelle Ce Soir.",
+    "subtitle": "Générez des enquêtes policières personnalisées avec des personnages, des indices et tout ce dont vous avez besoin.",
+    "subtitleAuth": "Dites-nous ce que vous aimeriez créer et nous le réaliserons.",
+    "placeholder": "Quel type d'enquête policière aimeriez-vous organiser ?",
+    "placeholderAuth": "Quel type d'enquête policière aimeriez-vous créer aujourd'hui ?",
+    "themes": {
+      "1920sSpeakeasy": "Speakeasy des Années 20",
+      "hollywoodMurder": "Meurtre à Hollywood",
+      "castleMystery": "Mystère au Château",
+      "sciFiMystery": "Mystère Science-Fiction",
+      "artGalleryOpening": "Vernissage de Galerie",
+      "bakeryCompetition": "Concours de Boulangerie",
+      "mountainSkiResort": "Station de Ski de Montagne",
+      "luxuryTrainJourney": "Voyage en Train de Luxe",
+      "historicUniversity": "Université Historique",
+      "pokerTournament": "Tournoi de Poker",
+      "barbieDreamworld": "Monde de Rêve Barbie",
+      "dystopianWaterworld": "Monde Aquatique Dystopique",
+      "jungleSteampunk": "Jungle Steampunk",
+      "magicalBakery": "Boulangerie Magique",
+      "gamingTournament": "Tournoi de Jeux Vidéo",
+      "synthwave80s": "Synthwave des Années 80",
+      "beachResort": "Station Balnéaire",
+      "operaHouse": "Opéra",
+      "wineCountry": "Région Viticole",
+      "safariAdventure": "Aventure Safari",
+      "fashionShow": "Défilé de Mode",
+      "casinoNight": "Soirée Casino",
+      "fairyTaleKingdom": "Royaume de Contes de Fées",
+      "spaceColony": "Colonie Spatiale",
+      "superheroAcademy": "Académie de Super-Héros",
+      "underwaterCity": "Ville Sous-Marine",
+      "wildWestSaloon": "Saloon du Far West",
+      "vikingFeast": "Festin Viking",
+      "candyKingdom": "Royaume des Bonbons",
+      "dragonsLair": "Antre du Dragon",
+      "timeTravelersBall": "Bal des Voyageurs Temporels",
+      "atlantisRising": "Le Réveil d'Atlantis",
+      "toyBoxAdventure": "Aventure dans la Boîte à Jouets",
+      "vampireMasquerade": "Bal Masqué Vampirique",
+      "dimensionHopping": "Saut Dimensionnel",
+      "cyberpunkNightclub": "Club Cyberpunk",
+      "ghostShip": "Navire Fantôme",
+      "sentientPlantColony": "Colonie de Plantes Conscientes"
+    }
+  },
+  "howItWorks": {
+    "step1": {
+      "title": "Décrivez votre enquête policière idéale.",
+      "description": "Dites-nous quel thème et quelles fonctionnalités vous voulez dans votre mystère."
+    },
+    "step2": {
+      "title": "La Machine à Mystères crée votre première version instantanément.",
+      "description": "Notre IA génère un mystère complet avec des personnages et des indices."
+    },
+    "step3": {
+      "title": "Parlez à l'éditeur pour concevoir et perfectionner votre idée.",
+      "description": "Affinez le mystère avec l'assistant IA jusqu'à ce qu'il soit parfait."
+    },
+    "step4": {
+      "title": "Générez des guides PDF pour vous et vos amis",
+      "description": "Téléchargez tout ce dont vous avez besoin pour organiser une soirée incroyable."
+    }
+  },
+  "features": {
+    "title": "Tout ce Dont Vous Avez Besoin Inclus",
+    "step1": {
+      "step": "Étape 1",
+      "title": "Histoires Personnalisables",
+      "content": "Créez votre propre scénario unique d'enquête policière, des thèmes classiques aux réalités imaginées."
+    },
+    "step2": {
+      "step": "Étape 2",
+      "title": "Profils de Personnages",
+      "content": "Histoires détaillées, motivations et secrets des personnages pour tous les participants."
+    },
+    "step3": {
+      "step": "Étape 3",
+      "title": "Guide de l'Hôte",
+      "content": "Instructions étape par étape faciles à suivre pour organiser un événement mémorable d'enquête policière."
+    }
+  },
+  "testimonials": {
+    "title": "Ce que Disent les Autres",
+    "testimonial1": {
+      "text": "Mes amis parlent encore de notre soirée enquête policière. Les personnages étaient si détaillés et les rebondissements parfaits !",
+      "author": "Jessica Davis",
+      "role": "Hôtesse de Soirée"
+    },
+    "testimonial2": {
+      "text": "Si facile à organiser ! J'étais inquiet d'organiser pour 12 personnes, mais les matériaux ont rendu cela simple et tout le monde s'est amusé.",
+      "author": "Mark Klein",
+      "role": "Organisateur d'Événements d'Entreprise"
+    },
+    "testimonial3": {
+      "text": "Troisième soirée enquête policière avec ce service et elles ne cessent de s'améliorer. Les options de personnalisation sont incroyables.",
+      "author": "Amanda Smith",
+      "role": "Fêtarde d'Anniversaire"
+    }
+  },
+  "support": {
+    "title": "Besoin d'Aide Supplémentaire ?",
+    "description": "Visitez notre centre de support complet pour les FAQ, conseils d'organisation et plus d'informations sur l'utilisation de notre Générateur d'Enquêtes Policières.",
+    "button": "Visiter le Centre de Support"
+  },
+  "footer": {
+    "tagline": "Créez des enquêtes policières captivantes à la vitesse de l'imagination.",
+    "quickLinks": "Liens Rapides",
+    "company": "Entreprise",
+    "links": {
+      "home": "Accueil",
+      "support": "Support",
+      "contact": "Contact",
+      "privacy": "Politique de Confidentialité"
+    },
+    "copyright": "Murder Mystery Generator, Inc. Tous droits réservés."
+  },
+  "common": {
+    "buttons": {
+      "createNew": "Créer Nouveau Mystère",
+      "getStarted": "Commencer",
+      "learnMore": "En Savoir Plus",
+      "tryNow": "Essayer Maintenant",
+      "continue": "Continuer",
+      "cancel": "Annuler",
+      "save": "Sauvegarder",
+      "delete": "Supprimer",
+      "edit": "Modifier",
+      "close": "Fermer"
+    },
+    "labels": {
+      "loading": "Chargement...",
+      "error": "Erreur",
+      "success": "Succès",
+      "warning": "Avertissement",
+      "info": "Information"
+    },
+    "messages": {
+      "welcome": "Bienvenue !",
+      "thankYou": "Merci !",
+      "comingSoon": "Bientôt Disponible",
+      "notFound": "Non Trouvé"
+    }
+  }
+}
