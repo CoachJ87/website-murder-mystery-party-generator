@@ -47,7 +47,6 @@ export const getAIResponse = async (
     // Create a simplified request payload for all attempts
     const requestPayload = {
       messages: standardMessages,
-      system: systemInstruction,
       promptVersion,
       requireFormatValidation: promptVersion === 'free',
       testMode
