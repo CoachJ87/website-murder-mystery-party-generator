@@ -150,7 +150,7 @@
   },
   "support": {
     "title": "Need More Help?",
-    "description": "Visit our comprehensive support center for FAQs, hosting tips, and more information about using our Murder Mystery Generator.",
+    "description": "Visit our comprehensive support center for FAQs, hosting tips, and more information about using our Mystery Maker.",
     "button": "Visit Support Center",
     "email": "support@mysterymaker.party"
   },
@@ -164,7 +164,7 @@
       "contact": "Contact",
       "privacy": "Privacy Policy"
     },
-    "copyright": "Murder Mystery Generator, Inc. All rights reserved."
+    "copyright": "Mystery Maker, Inc. All rights reserved."
   },
   "auth": {
     "signIn": {

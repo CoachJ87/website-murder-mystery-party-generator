@@ -180,7 +180,21 @@ Only ask this question and wait for their response before proceeding.`;
           
           if (databasePrompt) {
             console.log("Using environment prompt for mystery creation");
-            systemPrompt = databasePrompt;
+            
+            // Detect language and build labels for database prompt
+            const firstUserMessage = messages.find(msg => msg.role === 'user')?.content || '';
+            const detectedLocale = detectLocale(firstUserMessage);
+            const labels = await buildLabels(detectedLocale);
+            
+            // Replace label placeholders in database prompt
+            systemPrompt = databasePrompt
+              .replace(/\{\{labels\.premise\}\}/g, labels.premise)
+              .replace(/\{\{labels\.victim\}\}/g, labels.victim)
+              .replace(/\{\{labels\.characterList\}\}/g, labels.characterList)
+              .replace(/\{\{labels\.playersWord\}\}/g, labels.playersWord)
+              .replace(/\{\{labels\.murderMethod\}\}/g, labels.murderMethod);
+              
+            console.log("Processed database prompt with multilingual labels");
           } else {
             // Fallback to inline prompt with proper confirmation message
             console.log("Using fallback prompt for mystery creation");
