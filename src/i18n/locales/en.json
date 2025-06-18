@@ -355,6 +355,18 @@
     }
   },
   "mysteryCreation": {
+    "scriptType": {
+      "full": "full",
+      "pointForm": "point form",
+      "both": "both full and point form"
+    },
+    "sections": {
+      "premise": "Premise",
+      "victim": "Victim",
+      "characterList": "Character List",
+      "players": "players",
+      "murderMethod": "Murder Method"
+    },
     "wizard": {
       "title": "Create Your Mystery",
       "step1": {

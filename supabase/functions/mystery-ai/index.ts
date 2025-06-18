@@ -1,7 +1,53 @@
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+type Locale = 'en' | 'es' | 'fr' | 'de' | 'ko' | 'ja' | 'zh-cn' | 'nl' | 'da' | 'sv' | 'fi' | 'it' | 'pt';
+
+function detectLocale(firstUserMsg: string): Locale {
+  if (/[가-힣]/.test(firstUserMsg)) return 'ko';
+  if (/[ひらがなカタカナ一-龯]/.test(firstUserMsg)) return 'ja';
+  if (/[一-龯]/.test(firstUserMsg)) return 'zh-cn';
+  if (/[ñáéíóúü¿¡]/.test(firstUserMsg)) return 'es';
+  if (/[àâäéèêëïîôöùûüÿç]/.test(firstUserMsg)) return 'fr';
+  if (/[äöüß]/.test(firstUserMsg)) return 'de';
+  if (/[àèéìíîòóù]/.test(firstUserMsg)) return 'it';
+  if (/[ãõáàâéêíóôúç]/.test(firstUserMsg)) return 'pt';
+  if (/[æøåäöü]/.test(firstUserMsg)) {
+    if (/[æø]/.test(firstUserMsg)) return 'da';
+    if (/[ä]/.test(firstUserMsg)) return 'sv';
+    return 'nl';
+  }
+  return 'en';
+}
+
+async function buildLabels(locale: Locale) {
+  try {
+    // Fetch from your deployed website
+    const response = await fetch(`https://murder-mystery.party/locales/${locale}.json`);
+    if (!response.ok) throw new Error('Failed to fetch locale');
+    
+    const localeData = await response.json();
+    const sec = localeData.mysteryCreation.sections;
+    return {
+      premise: sec.premise,
+      victim: sec.victim,
+      characterList: sec.characterList,
+      playersWord: sec.players,
+      murderMethod: sec.murderMethod,
+    };
+  } catch (error) {
+    console.error(`Failed to load locale ${locale}, falling back to English`);
+    // Fallback to hardcoded English
+    return {
+      premise: 'PREMISE',
+      victim: 'VICTIM',
+      characterList: 'CHARACTER LIST',
+      playersWord: 'PLAYERS',
+      murderMethod: 'MURDER METHOD',
+    };
+  }
+}
 
 // Comprehensive CORS headers to handle all possible browser requests
 const corsHeaders = {
@@ -138,37 +184,47 @@ Only ask this question and wait for their response before proceeding.`;
           } else {
             // Fallback to inline prompt with proper confirmation message
             console.log("Using fallback prompt for mystery creation");
-            
+
+            // Detect language from first user message
+            const firstUserMessage = messages.find(msg => msg.role === 'user')?.content || '';
+            const detectedLocale = detectLocale(firstUserMessage);
+            const labels = await buildLabels(detectedLocale);
+
             // Extract theme from conversation if available
             let theme = "murder mystery";
             const themeMatch = conversationText.match(/(?:theme|setting|style).*?([a-z\s]+)/i);
             if (themeMatch) {
               theme = themeMatch[1].trim();
             }
-            
             // Extract player count
             const playerCountMatch = conversationText.match(/\b([4-9]|[12][0-9]|3[0-2])\b/);
             const playerCount = playerCountMatch ? playerCountMatch[1] : "6";
-            
-            systemPrompt = `You are a murder mystery creator. The user has provided the necessary information. Create a complete mystery with this format:
 
-# "[CREATIVE TITLE]" - A MURDER MYSTERY
+            systemPrompt = `You are a murder mystery creator. The user has provided the necessary information. 
 
-## PREMISE
+<language_instruction>
+Always respond in the same language that the user writes to you.
+</language_instruction>
+
+Create a complete mystery with this format:
+
+# "[CREATIVE TITLE]"
+
+## ${labels.premise}
 [2-3 paragraphs setting the scene, describing the event where the murder takes place, and creating dramatic tension]
 
-## VICTIM
+## ${labels.victim}
 **[Victim Name]** - [Vivid description of the victim, their role in the story, personality traits, and why they might have made enemies]
 
-## CHARACTER LIST (${playerCount} PLAYERS)
+## ${labels.characterList} (${playerCount} ${labels.playersWord})
 1. **[Character 1 Name]** - [Engaging one-sentence description including profession and connection to victim]
 2. **[Character 2 Name]** - [Engaging one-sentence description including profession and connection to victim]
 [Continue for all ${playerCount} characters]
 
-## MURDER METHOD
+## ${labels.murderMethod}
 [Paragraph describing how the murder was committed, interesting details about the method, and what clues might be found]
 
-IMPORTANT: Always end your response with: "Does this ${theme} concept work for you? We can adjust any elements you'd like to change. Once you're satisfied with the concept, you can generate the complete mystery package with detailed character guides, host instructions, and game materials."`;
+IMPORTANT: Always end your response with: "Does this concept work for you? We can adjust any elements you'd like to change. Once you're satisfied with the concept, you can generate the complete mystery package with detailed character guides, host instructions, and game materials."`;
           }
         }
         

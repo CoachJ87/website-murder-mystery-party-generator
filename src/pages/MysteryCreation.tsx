@@ -113,7 +113,7 @@ const MysteryCreation = () => {
             } else {
                 message += " " + t("mysteryCreation.prompt.withoutTheme", { 
                     playerCount: data.playerCount, 
-                    scriptType: getScriptTypeDisplayText(data.scriptType) 
+                    scriptType: getScriptTypeDisplayText(data.scriptType || 'full')
                 });
             }
             

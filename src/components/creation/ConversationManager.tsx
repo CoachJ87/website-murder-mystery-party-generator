@@ -7,12 +7,6 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 
-const getScriptTypeDisplayText = (scriptType: string) => {
-  if (scriptType === 'pointForm') return 'point form';
-  if (scriptType === 'both') return 'both full and point form';
-  return 'full';
-};
-
 interface ConversationManagerProps {
   conversationId: string | null;
   formData: FormValues | null;
@@ -121,8 +115,15 @@ export const ConversationManager = ({
     if (initialPromptSent.current) return null; // Don't create a new prompt if one already exists
     
     const initialChatMessage = data.theme
-      ? t("mysteryCreation.prompt.withTheme", { theme: data.theme })
-      : t("mysteryCreation.prompt.withoutTheme");
+      ? t("mysteryCreation.prompt.withTheme", { 
+          theme: data.theme,
+          playerCount: data.playerCount || 6,
+          scriptType: t(`mysteryCreation.scriptType.${data.scriptType || 'full'}`)
+        })
+      : t("mysteryCreation.prompt.withoutTheme", {
+          playerCount: data.playerCount || 6,
+          scriptType: t(`mysteryCreation.scriptType.${data.scriptType || 'full'}`)
+        });
 
     return {
       id: "initial-message",
