@@ -183,28 +183,8 @@ export default function MysteryChat({
   };
 
   const createSystemMessage = (data: any) => {
-    // Use provided system instruction if available
-    if (systemInstruction) {
-      return systemInstruction;
-    }
-
-    let systemMsg = "You are a helpful mystery writer. Your job is to help the user create an exciting murder mystery game.";
-    
-    if (currentTheme) {
-      systemMsg += `\nThe user wants to create a murder mystery with theme: ${currentTheme}. `;
-    }
-    
-    if (currentPlayerCount) {
-      systemMsg += `The user wants to create a murder mystery with ${currentPlayerCount} players. `;
-    }
-    
-    systemMsg += `The user wants to create a murder mystery with a ${currentScriptType} script. `;
-    
-    if (currentAdditionalDetails) {
-      systemMsg += `\nAdditional details: ${currentAdditionalDetails}. `;
-    }
-    
-    return systemMsg;
+    // Let the Edge Function handle all system prompt logic
+    return "";
   };
 
   // Enhanced AI response function with retry logic
