@@ -100,18 +100,18 @@ const MysteryCreation = () => {
             if (data.userRequest) {
                 message = data.userRequest.trim();
             } else {
-                message = t("mysteryCreation.prompt.defaultStart");
+                message = t("mysteryCreation.wizard.prompt.defaultStart");
             }
             
             // Add theme/setting if provided
             if (data.theme && data.theme.trim() !== "") {
-                message += " " + t("mysteryCreation.prompt.withTheme", { 
+                message += " " + t("mysteryCreation.wizard.prompt.withTheme", { 
                     theme: data.theme, 
                     playerCount: data.playerCount, 
                     scriptType: getScriptTypeDisplayText(data.scriptType) 
                 });
             } else {
-                message += " " + t("mysteryCreation.prompt.withoutTheme", { 
+                message += " " + t("mysteryCreation.wizard.prompt.withoutTheme", { 
                     playerCount: data.playerCount, 
                     scriptType: getScriptTypeDisplayText(data.scriptType || 'full')
                 });
@@ -119,7 +119,7 @@ const MysteryCreation = () => {
             
             // Add additional details if provided
             if (data.additionalDetails && data.additionalDetails.trim() !== "") {
-                message += " " + t("mysteryCreation.prompt.additionalDetails", { 
+                message += " " + t("mysteryCreation.wizard.prompt.additionalDetails", { 
                     details: data.additionalDetails 
                 });
             }
