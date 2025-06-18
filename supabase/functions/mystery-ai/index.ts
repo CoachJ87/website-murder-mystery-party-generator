@@ -24,7 +24,7 @@ function detectLocale(firstUserMsg: string): Locale {
 async function buildLabels(locale: Locale) {
   try {
     // Fetch from your deployed website
-    const response = await fetch(`https://murder-mystery.party/locales/${locale}.json`);
+    const response = await fetch(`https://mysterymaker.party/locales/${locale}.json`);
     if (!response.ok) throw new Error('Failed to fetch locale');
     
     const localeData = await response.json();
