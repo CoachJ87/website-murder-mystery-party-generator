@@ -103,6 +103,9 @@ serve(async (req) => {
     }
 
     // Get database prompt from environment secrets instead of database
+    console.log("Available environment variables:", Object.keys(Deno.env.toObject()));
+    console.log("MYSTERY_FREE_PROMPT exists:", !!Deno.env.get('MYSTERY_FREE_PROMPT'));
+    console.log("MYSTERY_FREE_PROMPT length:", Deno.env.get('MYSTERY_FREE_PROMPT')?.length || 'undefined');
     let databasePrompt = Deno.env.get('MYSTERY_FREE_PROMPT');
     if (databasePrompt) {
       console.log("Retrieved database prompt from environment secrets");
