@@ -118,11 +118,7 @@ serve(async (req) => {
     
     if (!systemPrompt) {
       // Default behavior for new conversations without custom system prompt
-      console.log("No custom system prompt - analyzing conversation for next step");
-      
-      // Analyze the conversation to determine what step we're at
-      const conversationText = messages.map(msg => msg.content || '').join(' ').toLowerCase();
-      const lastUserMessage = messages.filter(msg => msg.role === 'user').pop()?.content?.toLowerCase() || '';
+      console.log("No custom system prompt - analyzing conversation");
       
       // Check if this looks like a brand new conversation (1 message, likely asking for mystery creation)
       if (messages.length === 1) {
@@ -136,54 +132,8 @@ serve(async (req) => {
                                        userMessage.toLowerCase().includes('theme');
         
         if (looksLikeInitialRequest) {
-          console.log("Detected initial mystery creation request - asking for player count");
-          systemPrompt = `You are a helpful murder mystery creator. Your first question should ALWAYS be: "How many players do you want for your murder mystery? (Choose between 4 and 32 players)"
-
-Be conversational and ask only this question first. Do not generate any mystery content until you know the player count.
-
-After getting the player count, proceed to ask about script preferences, then other details one at a time before creating the full mystery.`;
-        }
-      }
-      
-      // If still no system prompt, check conversation progress
-      if (!systemPrompt) {
-        // FIXED: Better player count detection - look for standalone numbers
-        const playerCountNumbers = lastUserMessage.match(/\b(\d+)\b/g) || conversationText.match(/\b(\d+)\b/g) || [];
-        const lastNumber = playerCountNumbers.length > 0 ? parseInt(playerCountNumbers[playerCountNumbers.length - 1]) : null;
-        
-        // Check if we have an invalid player count (including 3 which was mentioned)
-        if (lastNumber !== null && (lastNumber < 4 || lastNumber > 32)) {
-          console.log(`Detected invalid player count: ${lastNumber} - asking for correction`);
-          systemPrompt = `The user provided ${lastNumber} players, which is outside the valid range. You must ask them to choose a number between 4 and 32 players. Be polite but clear about the requirement.
-
-Say something like: "I need between 4 and 32 players for a murder mystery. Could you please choose a number in that range?"`;
-        }
-        
-        // Check if we have a valid player count but no script preference
-        const hasValidPlayerCount = conversationText.match(/\b([4-9]|[12][0-9]|3[0-2])\b/) && 
-                                   (conversationText.includes('player') || conversationText.includes('people') || conversationText.includes('guest'));
-        
-        // FIXED: More specific script preference detection
-        const hasScriptPreference = conversationText.includes('full script') || conversationText.includes('point form') || 
-                                   conversationText.includes('summaries') || conversationText.includes('both formats') ||
-                                   lastUserMessage.includes('full') || lastUserMessage.includes('point') ||
-                                   lastUserMessage.includes('script') || lastUserMessage.includes('summary') ||
-                                   lastUserMessage.includes('both');
-        
-        if (hasValidPlayerCount && !hasScriptPreference) {
-          console.log("Has valid player count but no script preference - asking for script preference");
-          systemPrompt = `Great! Now I need to know about character guidance format. Ask: "Would you prefer full scripts or point form summaries for character guidance? (You can also choose both if you'd like both formats)"
-
-Only ask this question and wait for their response before proceeding.`;
-        }
-        
-        // If we have both player count and script preference, use database prompt or create mystery
-        if (hasValidPlayerCount && hasScriptPreference) {
-          console.log("Has both player count and script preference - proceeding to mystery creation");
-          
+          console.log("Detected complete mystery creation request - using database prompt");
           if (databasePrompt) {
-            console.log("Using environment prompt for mystery creation");
-            
             // Detect language and build labels for database prompt
             const firstUserMessage = messages.find(msg => msg.role === 'user')?.content || '';
             const detectedLocale = detectLocale(firstUserMessage);
@@ -197,61 +147,15 @@ Only ask this question and wait for their response before proceeding.`;
               .replace(/\{\{labels\.playersWord\}\}/g, labels.playersWord)
               .replace(/\{\{labels\.murderMethod\}\}/g, labels.murderMethod);
               
-            console.log("Processed database prompt with multilingual labels");
-          } else {
-            // Fallback to inline prompt with proper confirmation message
-            console.log("Using fallback prompt for mystery creation");
-
-            // Detect language from first user message
-            const firstUserMessage = messages.find(msg => msg.role === 'user')?.content || '';
-            const detectedLocale = detectLocale(firstUserMessage);
-            const labels = await buildLabels(detectedLocale);
-
-            // Extract theme from conversation if available
-            let theme = "murder mystery";
-            const themeMatch = conversationText.match(/(?:theme|setting|style).*?([a-z\s]+)/i);
-            if (themeMatch) {
-              theme = themeMatch[1].trim();
-            }
-            // Extract player count
-            const playerCountMatch = conversationText.match(/\b([4-9]|[12][0-9]|3[0-2])\b/);
-            const playerCount = playerCountMatch ? playerCountMatch[1] : "6";
-
-            systemPrompt = `You are a murder mystery creator. The user has provided the necessary information. 
-
-<language_instruction>
-Always respond in the same language that the user writes to you.
-</language_instruction>
-
-Create a complete mystery with this format:
-
-# "[CREATIVE TITLE]"
-
-## ${labels.premise}
-[2-3 paragraphs setting the scene, describing the event where the murder takes place, and creating dramatic tension]
-
-## ${labels.victim}
-**[Victim Name]** - [Vivid description of the victim, their role in the story, personality traits, and why they might have made enemies]
-
-## ${labels.characterList} (${playerCount} ${labels.playersWord})
-1. **[Character 1 Name]** - [Engaging one-sentence description including profession and connection to victim]
-2. **[Character 2 Name]** - [Engaging one-sentence description including profession and connection to victim]
-[Continue for all ${playerCount} characters]
-
-## ${labels.murderMethod}
-[Paragraph describing how the murder was committed, interesting details about the method, and what clues might be found]
-
-IMPORTANT: Always end your response with: "Does this concept work for you? We can adjust any elements you'd like to change. Once you're satisfied with the concept, you can generate the complete mystery package with detailed character guides, host instructions, and game materials."`;
+            console.log("Using database prompt with multilingual labels for complete request");
           }
         }
-        
-        // Fallback: ask for player count
-        if (!systemPrompt) {
-          console.log("Fallback - asking for player count");
-          systemPrompt = `You are a helpful murder mystery creator. Your first question should ALWAYS be: "How many players do you want for your murder mystery? (Choose between 4 and 32 players)"
-
-Be conversational and ask only this question first. Do not generate any mystery content until you know the player count.`;
-        }
+      }
+      
+      // If still no system prompt, use a default prompt
+      if (!systemPrompt) {
+        console.log("No specific prompt determined - using default mystery creation prompt");
+        systemPrompt = `You are a helpful murder mystery creator. Help the user create an exciting murder mystery.`;
       }
     }
     
