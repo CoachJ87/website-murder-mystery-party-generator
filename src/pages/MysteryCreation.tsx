@@ -141,34 +141,6 @@ const MysteryCreation = () => {
         setLoading(true);
         
         try {
-            // Create system instruction for AI
-            const systemInstruction = `You are creating a murder mystery with these details:
-                - Theme: ${data.theme || 'General murder mystery'}
-                - Players: ${data.playerCount}
-                - Script Type: ${data.scriptType}
-                ${data.userRequest ? `- Original Request: ${data.userRequest}` : ''}
-                ${data.additionalDetails ? `- Additional Details: ${data.additionalDetails}` : ''}
-
-You MUST follow this exact output format:
-
-# "[CREATIVE TITLE]" - A MURDER MYSTERY
-
-## PREMISE
-[2-3 paragraphs setting the scene, describing the event where the murder takes place, and creating dramatic tension]
-
-## VICTIM
-**[Victim Name]** - [Vivid description of the victim, their role in the story, personality traits, and why they might have made enemies]
-
-## CHARACTER LIST (${data.playerCount} PLAYERS)
-1. **[Character 1 Name]** - [Engaging one-sentence description including profession and connection to victim]
-2. **[Character 2 Name]** - [Engaging one-sentence description including profession and connection to victim]
-[Continue for all ${data.playerCount} characters]
-
-## MURDER METHOD
-[Paragraph describing how the murder was committed, interesting details about the method, and what clues might be found]
-
-After presenting the mystery concept, ask if the concept works for them and explain that they can continue to make edits and that once they are done they can go to the preview page to purchase the complete game package.`;
-
             // Create the formatted initial message
             const initialMessage = createFormattedInitialMessage(data);
 
@@ -186,7 +158,6 @@ After presenting the mystery concept, ask if the concept works for them and expl
                         script_type: data.scriptType || 'full',
                         has_accomplice: data.hasAccomplice || false,
                         additional_details: data.additionalDetails || null,
-                        system_instruction: systemInstruction,
                         display_status: "draft",
                         is_completed: false
                     })
@@ -216,7 +187,6 @@ After presenting the mystery concept, ask if the concept works for them and expl
                         script_type: data.scriptType || 'full',
                         has_accomplice: data.hasAccomplice || false,
                         additional_details: data.additionalDetails || null,
-                        system_instruction: systemInstruction,
                         updated_at: new Date().toISOString()
                     })
                     .eq("id", conversationId);
