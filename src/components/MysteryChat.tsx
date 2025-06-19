@@ -199,7 +199,7 @@ export default function MysteryChat({
         'ko': 'Korean',
         'de': 'German', 
         'es': 'Spanish',
-        'fr': 'French'
+        'fr': 'French',
         'da': 'Danish',
         'fi': 'Finnish',
         'it': 'Italian',
