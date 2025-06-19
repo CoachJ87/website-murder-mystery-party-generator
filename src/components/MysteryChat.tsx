@@ -191,7 +191,7 @@ export default function MysteryChat({
     additionalDetails?: string;
     language?: string;
   }) => {
-    let systemInstruction = "You are a murder mystery creation assistant.";
+    let systemInstruction = "You are a murder mystery creation assistant. ";
     
     // Add language instruction based on current language
     if (data.language && data.language !== 'en') {
@@ -200,12 +200,29 @@ export default function MysteryChat({
         'de': 'German', 
         'es': 'Spanish',
         'fr': 'French'
+        'da': 'Danish',
+        'fi': 'Finnish',
+        'it': 'Italian',
+        'ja': 'Japanese',
+        'nl': 'Dutch',
+        'pt': 'Portuguese',
+        'sv': 'Swedish',
+        'zh-cn': 'Chinese'
       };
       const languageName = languageNames[data.language] || data.language;
-      systemInstruction += ` Please respond in ${languageName}. The user has provided all necessary information in their initial request, so do not ask for details they have already provided (like player count, theme, or accomplice preference).`;
-    } else {
-      systemInstruction += " The user has provided all necessary information in their initial request, so do not ask for details they have already provided (like player count, theme, or accomplice preference).";
+      systemInstruction += `CRITICAL: You MUST respond entirely in ${languageName} language. `;
     }
+    
+    systemInstruction += `The user has provided all necessary information in their initial request including player count, script type, and accomplice preference. 
+
+IMPORTANT RULES:
+1. DO NOT ask for player count, script type, or accomplice preferences - this information is already provided
+2. DO NOT ask clarifying questions about details already specified
+3. CREATE a complete murder mystery concept immediately
+4. Include: premise, victim, suspect list matching the player count, and murder method
+5. Follow their specifications exactly
+
+Create the mystery now based on their request.`;
     
     return systemInstruction;
   };
