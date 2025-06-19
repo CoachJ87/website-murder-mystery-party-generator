@@ -1,168 +1,977 @@
-
 {
   "navigation": {
     "home": "Startseite",
-    "dashboard": "Dashboard",
+    "dashboard": "Armaturenbrett",
     "signIn": "Anmelden",
     "signUp": "Registrieren",
     "signOut": "Abmelden",
     "account": "Kontoeinstellungen"
   },
   "hero": {
-    "title": "Veranstalten Sie Heute Abend eine Mörderische Party.",
-    "subtitle": "Erstellen Sie individuelle Kriminalrätsel mit Charakteren, Hinweisen und allem was Sie brauchen.",
-    "subtitleAuth": "Sagen Sie uns, was Sie erstellen möchten, und wir machen es möglich.",
-    "placeholder": "Welche Art von Kriminalrätsel möchten Sie veranstalten?",
-    "placeholderAuth": "Welche Art von Kriminalrätsel möchten Sie heute erstellen?",
+    "title": "Erstellen Sie Krimi-Partys in wenigen Minuten",
+    "subtitle": "Gestalten Sie individuelle Mysterien genau nach Ihren Vorstellungen - jedes Thema, jede Figur, jedes Setting.",
+    "subtitleAuth": "Gestalten Sie individuelle Mysterien genau nach Ihren Vorstellungen - jedes Thema, jede Figur, jedes Setting.",
+    "placeholder": "Ein Krimi-Mysterium in einer Speakeasy-Bar der 1920er Jahre mit Jazzmusikern...",
+    "placeholderAuth": "Ein Krimi-Mysterium in einer Speakeasy-Bar der 1920er Jahre mit Jazzmusikern...",
     "themes": {
-      "1920sSpeakeasy": "1920er Speakeasy",
-      "hollywoodMurder": "Hollywood Mord",
-      "castleMystery": "Schloss Mysterium",
-      "sciFiMystery": "Sci-Fi Mysterium",
-      "artGalleryOpening": "Galerie Eröffnung",
-      "bakeryCompetition": "Bäckerei Wettbewerb",
-      "mountainSkiResort": "Berg Skigebiet",
-      "luxuryTrainJourney": "Luxus Zugreise",
+      "1920sSpeakeasy": "Speakeasy der 1920er Jahre",
+      "hollywoodMurder": "Hollywood-Mord",
+      "castleMystery": "Schloss-Mysterium",
+      "sciFiMystery": "Sci-Fi-Mysterium",
+      "artGalleryOpening": "Kunstgalerie-Eröffnung",
+      "bakeryCompetition": "Backwettbewerb",
+      "mountainSkiResort": "Berg-Skigebiet",
+      "luxuryTrainJourney": "Luxus-Zugreise",
       "historicUniversity": "Historische Universität",
-      "pokerTournament": "Poker Turnier",
-      "barbieDreamworld": "Barbie Traumwelt",
+      "pokerTournament": "Pokerturnier",
+      "barbieDreamworld": "Barbies Traumwelt",
       "dystopianWaterworld": "Dystopische Wasserwelt",
-      "jungleSteampunk": "Dschungel Steampunk",
+      "jungleSteampunk": "Dschungel-Steampunk",
       "magicalBakery": "Magische Bäckerei",
-      "gamingTournament": "Gaming Turnier",
-      "synthwave80s": "Synthwave 80er",
-      "beachResort": "Strand Resort",
+      "gamingTournament": "Gaming-Turnier",
+      "synthwave80s": "Synthwave der 80er",
+      "beachResort": "Strandresort",
       "operaHouse": "Opernhaus",
       "wineCountry": "Weinland",
-      "safariAdventure": "Safari Abenteuer",
+      "safariAdventure": "Safari-Abenteuer",
       "fashionShow": "Modenschau",
-      "casinoNight": "Casino Nacht",
-      "fairyTaleKingdom": "Märchen Königreich",
-      "spaceColony": "Weltraum Kolonie",
-      "superheroAcademy": "Superhelden Akademie",
-      "underwaterCity": "Unterwasser Stadt",
-      "wildWestSaloon": "Wilder Westen Saloon",
-      "vikingFeast": "Wikinger Fest",
-      "candyKingdom": "Süßigkeiten Königreich",
-      "dragonsLair": "Drachen Höhle",
-      "timeTravelersBall": "Zeitreisenden Ball",
-      "atlantisRising": "Atlantis Erwachen",
-      "toyBoxAdventure": "Spielzeugkiste Abenteuer",
-      "vampireMasquerade": "Vampir Maskenball",
-      "dimensionHopping": "Dimensions Sprung",
-      "cyberpunkNightclub": "Cyberpunk Nachtclub",
+      "casinoNight": "Casino-Nacht",
+      "fairyTaleKingdom": "Märchenreich",
+      "spaceColony": "Weltraumkolonie",
+      "superheroAcademy": "Superhelden-Akademie",
+      "underwaterCity": "Unterwasserstadt",
+      "wildWestSaloon": "Wild-West-Saloon",
+      "vikingFeast": "Wikingerfest",
+      "candyKingdom": "Süßigkeiten-Königreich",
+      "dragonsLair": "Drachenhöhle",
+      "timeTravelersBall": "Zeitreiseball",
+      "atlantisRising": "Atlantis steigt auf",
+      "toyBoxAdventure": "Spielzeugkisten-Abenteuer",
+      "vampireMasquerade": "Vampir-Maskenball",
+      "dimensionHopping": "Dimensionssprung",
+      "cyberpunkNightclub": "Cyberpunk-Nachtclub",
       "ghostShip": "Geisterschiff",
-      "sentientPlantColony": "Bewusste Pflanzen Kolonie"
+      "sentientPlantColony": "Kolonie fühlender Pflanzen"
+    },
+    "prompts": {
+      "1920sSpeakeasy": "Ich möchte ein Krimi-Mysterium mit dem Thema einer Speakeasy-Bar der 1920er Jahre veranstalten, das in der Prohibitionszeit spielt.",
+      "hollywoodMurder": "Entwerfen Sie ein Krimi-Mysterium, das am Set eines Hollywood-Films in der goldenen Ära des Kinos spielt.",
+      "castleMystery": "Entwickeln Sie ein Krimi-Mysterium, das in einem abgelegenen mittelalterlichen Schloss spielt, das in ein Luxushotel umgewandelt wurde.",
+      "sciFiMystery": "Entwerfen Sie ein Krimi-Mysterium an Bord einer Weltraumforschungsstation, die einen neu entdeckten Exoplaneten umkreist.",
+      "artGalleryOpening": "Erstellen Sie ein Krimi-Mysterium, das in einer prestigeträchtigen Kunstgalerie während einer hochkarätigen Ausstellungseröffnung spielt.",
+      "bakeryCompetition": "Entwerfen Sie ein Krimi-Mysterium, das sich um einen Backwettbewerb in einer kleinen Stadt dreht.",
+      "mountainSkiResort": "Entwickeln Sie ein Krimi-Mysterium in einem abgelegenen Berg-Skigebiet während eines Schneesturms.",
+      "luxuryTrainJourney": "Erstellen Sie ein Mysterium, das auf einer luxuriösen Zugreise durch die Schweizer Alpen spielt.",
+      "historicUniversity": "Erstellen Sie ein Krimi-Mysterium, das in einer historischen Universität mit einer gespenstischen Vergangenheit spielt.",
+      "pokerTournament": "Erstellen Sie ein Mysterium bei einem Pokerturnier mit hohen Einsätzen.",
+      "barbieDreamworld": "Entwerfen Sie ein Krimi-Mysterium in einer Barbie-inspirierten Traumwelt, in der alles rosa und perfekt ist.",
+      "dystopianWaterworld": "Erstellen Sie ein dystopisches Zukunftsmysterium, in dem Wasser die kostbarste Ressource ist.",
+      "jungleSteampunk": "Entwickeln Sie ein Krimi-Mysterium, das im Dschungel mit Steampunk-Technologie und -Vibes spielt.",
+      "magicalBakery": "Erstellen Sie ein Krimi-Mysterium in einer magischen Bäckerei, in der verzauberte Desserts die Spezialität sind.",
+      "gamingTournament": "Entwerfen Sie ein Videospiel-Mysterium, in dem Spieler an einem Gaming-Turnier teilnehmen.",
+      "synthwave80s": "Erstellen Sie ein Mysterium, das in einem alternativen 80er-Jahre-Setting spielt, in dem Synthwave-Musik Emotionen steuert.",
+      "beachResort": "Entwickeln Sie ein Krimi-Mysterium in einem tropischen Strandresort.",
+      "operaHouse": "Erstellen Sie ein Mysterium, das während einer Premiere in einem historischen Opernhaus spielt.",
+      "wineCountry": "Entwerfen Sie ein Mysterium in einem prestigeträchtigen Weingut während der Erntesaison.",
+      "safariAdventure": "Erstellen Sie ein Krimi-Mysterium während einer afrikanischen Safari-Expedition.",
+      "fashionShow": "Erstellen Sie ein Mysterium hinter den Kulissen einer hochkarätigen Modenschau.",
+      "casinoNight": "Erstellen Sie ein Mysterium während einer Wohltätigkeits-Casino-Nacht.",
+      "fairyTaleKingdom": "Entwerfen Sie ein Krimi-Mysterium in einem verzauberten Märchenreich.",
+      "spaceColony": "Erstellen Sie ein Mysterium in der ersten menschlichen Kolonie auf dem Mars.",
+      "superheroAcademy": "Entwickeln Sie ein Mysterium in einer Schule für junge Superhelden in Ausbildung.",
+      "underwaterCity": "Erstellen Sie ein Krimi-Mysterium in einer futuristischen Unterwasserstadt.",
+      "wildWestSaloon": "Entwerfen Sie ein Mysterium in einer Grenzstadt während des Goldrauschs.",
+      "vikingFeast": "Erstellen Sie ein Krimi-Mysterium während eines traditionellen Wikingerfestes.",
+      "candyKingdom": "Erstellen Sie ein Krimi-Mysterium in einer Welt, in der alles aus Süßigkeiten und Zucker besteht.",
+      "dragonsLair": "Entwerfen Sie ein Mysterium in einer mittelalterlichen Fantasy-Welt, in der Menschen und Drachen koexistieren.",
+      "timeTravelersBall": "Erstellen Sie ein Krimi-Mysterium bei einem Treffen, bei dem die Anwesenden aus verschiedenen Zeitepochen stammen.",
+      "atlantisRising": "Entwickeln Sie ein Mysterium in der alten, neu aufgetauchten Stadt Atlantis.",
+      "toyBoxAdventure": "Erstellen Sie ein Mysterium, in dem Spielzeuge zum Leben erwachen, wenn die Menschen nicht zusehen.",
+      "vampireMasquerade": "Entwerfen Sie ein Mysterium auf dem jährlichen Blutball einer exklusiven Vampirgesellschaft.",
+      "dimensionHopping": "Erstellen Sie ein Mysterium, das sich über mehrere Paralleluniversen erstreckt.",
+      "cyberpunkNightclub": "Erstellen Sie ein Krimi-Mysterium in einem neongetränkten Cyberpunk-Nachtclub.",
+      "ghostShip": "Entwerfen Sie ein Mysterium an Bord eines legendären Schiffes, das vor Jahrhunderten verschwand und auf mysteriöse Weise wieder aufgetaucht ist.",
+      "sentientPlantColony": "Erstellen Sie ein Krimi-Mysterium in einer Gesellschaft intelligenter, mobiler Pflanzen mit einer komplexen sozialen Hierarchie."
     }
   },
   "howItWorks": {
     "step1": {
-      "title": "Beschreiben Sie Ihr ideales Kriminalrätsel.",
-      "description": "Sagen Sie uns, welches Thema und welche Funktionen Sie in Ihrem Mysterium wollen."
+      "title": "Beschreiben Sie Ihr ideales Krimi-Mysterium.",
+      "description": "Teilen Sie uns Ihre einzigartige Vision mit: jedes gewünschte Thema, jede Figur oder jedes Setting."
     },
     "step2": {
-      "title": "Die Mysterium-Maschine erstellt sofort Ihre erste Version.",
-      "description": "Unsere KI generiert ein vollständiges Mysterium mit Charakteren und Hinweisen."
+      "title": "Wir erstellen Ihr individuelles Mysterium sofort.",
+      "description": "Unsere KI generiert alles genau nach Ihren Wünschen: Charaktere, Hinweise und Handlung."
     },
     "step3": {
-      "title": "Sprechen Sie mit dem Editor, um Ihre Idee zu gestalten und zu perfektionieren.",
-      "description": "Verfeinern Sie das Mysterium mit dem KI-Assistenten, bis es perfekt ist."
+      "title": "Perfektionieren Sie Ihr Mysterium mit unserem Editor.",
+      "description": "Verfeinern und optimieren Sie, bis Ihr Mysterium perfekt für Ihre Gruppe ist."
     },
     "step4": {
-      "title": "Erstellen Sie PDF-Leitfäden für Sie und Ihre Freunde",
-      "description": "Laden Sie alles herunter, was Sie brauchen, um eine fantastische Party zu veranstalten."
+      "title": "Erhalten Sie alles, was Sie zum Hosten und Teilen benötigen.",
+      "description": "Laden Sie alle Materialien einfach herunter und teilen Sie sie mit Ihren Spielern."
     }
   },
   "features": {
-    "title": "Alles was Sie Brauchen Enthalten",
+    "title": "Alles Notwendige inklusive",
     "step1": {
       "step": "Schritt 1",
-      "title": "Anpassbare Geschichten",
-      "content": "Erstellen Sie Ihr eigenes einzigartiges Kriminalrätsel-Szenario, von klassischen Themen bis hin zu erträumten Realitäten."
+      "title": "Unbegrenzte Anpassung",
+      "content": "Jedes Thema, jede Figur, jedes Setting – erstellen Sie Mysterien genau so, wie Sie es sich vorstellen."
     },
     "step2": {
       "step": "Schritt 2",
-      "title": "Charakter Profile",
-      "content": "Detaillierte Charakterhintergründe, Motivationen und Geheimnisse für alle Teilnehmer."
+      "title": "Vollständige Charakterprofile",
+      "content": "Detaillierte Hintergründe, Motivationen und Geheimnisse, speziell auf Ihr Mysterium zugeschnitten."
     },
     "step3": {
       "step": "Schritt 3",
-      "title": "Gastgeber Leitfaden",
-      "content": "Einfach zu befolgende Schritt-für-Schritt-Anweisungen, um ein unvergessliches Kriminalrätsel-Event zu veranstalten."
+      "title": "Einfache Gastgeberanleitung",
+      "content": "Schritt-für-Schritt-Anleitung, um Ihr individuelles Mysterium souverän zu leiten."
     }
   },
   "testimonials": {
-    "title": "Was Andere Sagen",
+    "title": "Was andere sagen",
     "testimonial1": {
-      "text": "Meine Freunde sprechen immer noch über unseren Kriminalrätsel-Abend. Die Charaktere waren so detailliert und die Wendungen perfekt!",
+      "text": "Meine Freunde reden immer noch von unserer Krimi-Nacht. Die Charaktere waren so detailliert und die Wendungen waren perfekt!",
       "author": "Jessica Davis",
-      "role": "Party Gastgeberin"
+      "role": "Party-Gastgeberin"
     },
     "testimonial2": {
-      "text": "So einfach aufzubauen! Ich war besorgt, für 12 Personen zu organisieren, aber die Materialien machten es einfach und alle hatten Spaß.",
+      "text": "So einfach einzurichten! Ich machte mir Sorgen, eine Party für 12 Personen zu veranstalten, aber die Materialien machten es einfach und alle hatten eine fantastische Zeit.",
       "author": "Mark Klein",
-      "role": "Firmenveranstaltungs Planer"
+      "role": "Firmen-Eventplaner"
     },
     "testimonial3": {
-      "text": "Dritte Kriminalrätsel-Party mit diesem Service und sie werden immer besser. Die Anpassungsoptionen sind erstaunlich.",
+      "text": "Dritte Krimi-Party mit diesem Service und sie werden immer besser. Die Anpassungsmöglichkeiten sind unglaublich.",
       "author": "Amanda Smith",
-      "role": "Geburtstags Feiernde"
+      "role": "Geburtstagsfeiernde"
     }
   },
   "support": {
-    "title": "Brauchen Sie Mehr Hilfe?",
-    "description": "Besuchen Sie unser umfassendes Support-Center für FAQs, Gastgeber-Tipps und weitere Informationen zur Nutzung unseres Kriminalrätsel-Generators.",
-    "button": "Support-Center Besuchen"
+    "title": "Benötigen Sie weitere Hilfe?",
+    "description": "Besuchen Sie unser umfassendes Support-Center für häufig gestellte Fragen, Hosting-Tipps und weitere Informationen zur Verwendung unseres Mystery Creators.",
+    "button": "Support-Center besuchen",
+    "email": "support@mysterymaker.party"
   },
   "footer": {
-    "tagline": "Erstellen Sie fesselnde Kriminalrätsel mit der Geschwindigkeit der Vorstellungskraft.",
-    "quickLinks": "Schnelle Links",
+    "tagline": "Erstellen Sie fesselnde Krimi-Mysterien in der Geschwindigkeit Ihrer Vorstellungskraft.",
+    "quickLinks": "Schnellzugriffe",
     "company": "Unternehmen",
     "links": {
       "home": "Startseite",
       "support": "Support",
       "contact": "Kontakt",
-      "privacy": "Datenschutz-Bestimmungen"
+      "privacy": "Datenschutzrichtlinie"
     },
     "copyright": "Mystery Maker, Inc. Alle Rechte vorbehalten."
   },
+  "auth": {
+    "signIn": {
+      "title": "Willkommen zurück",
+      "subtitle": "Melden Sie sich bei Ihrem Konto an, um weiterhin erstaunliche Mysterien zu erstellen",
+      "email": "E-Mail",
+      "password": "Passwort",
+      "rememberMe": "Angemeldet bleiben",
+      "forgotPassword": "Passwort vergessen?",
+      "noAccount": "Noch kein Konto?",
+      "signUpLink": "Hier registrieren",
+      "submitButton": "Anmelden",
+      "signingIn": "Anmelden...",
+      "orDivider": "oder fortfahren mit",
+      "googleButton": "Mit Google fortfahren"
+    },
+    "signUp": {
+      "title": "Erstellen Sie Ihr Konto",
+      "subtitle": "Schließen Sie sich Tausenden von Mysterien-Erstellern an und beginnen Sie noch heute mit dem Erstellen",
+      "name": "Vollständiger Name",
+      "email": "E-Mail",
+      "password": "Passwort",
+      "confirmPassword": "Passwort bestätigen",
+      "terms": "Ich stimme den",
+      "termsLink": "Nutzungsbedingungen",
+      "privacy": "Datenschutzrichtlinie",
+      "and": "und",
+      "hasAccount": "Haben Sie bereits ein Konto?",
+      "signInLink": "Hier anmelden",
+      "submitButton": "Konto erstellen",
+      "creatingAccount": "Konto wird erstellt...",
+      "orDivider": "oder fortfahren mit",
+      "googleButton": "Mit Google fortfahren"
+    },
+    "forgotPassword": {
+      "title": "Passwort zurücksetzen",
+      "subtitle": "Geben Sie Ihre E-Mail-Adresse ein und wir senden Ihnen einen Link zum Zurücksetzen Ihres Passworts",
+      "email": "E-Mail",
+      "submitButton": "Link zum Zurücksetzen senden",
+      "sending": "Senden...",
+      "backToSignIn": "Zurück zur Anmeldung",
+      "checkEmail": {
+        "title": "Überprüfen Sie Ihre E-Mail",
+        "message": "Wir haben einen Link zum Zurücksetzen des Passworts an",
+        "noEmail": "Keine E-Mail erhalten?",
+        "tryAgain": "Erneut versuchen",
+        "returnToSignIn": "Zurück zur Anmeldung"
+      }
+    },
+    "resetPassword": {
+      "title": "Neues Passwort festlegen",
+      "subtitle": "Erstellen Sie ein neues Passwort für Ihr Konto",
+      "password": "Neues Passwort",
+      "confirmPassword": "Neues Passwort bestätigen",
+      "submitButton": "Passwort aktualisieren",
+      "updating": "Wird aktualisiert...",
+      "success": "Passwort erfolgreich aktualisiert"
+    },
+    "errors": {
+      "invalidCredentials": "Ungültige E-Mail-Adresse oder Passwort",
+      "emailAlreadyExists": "Ein Konto mit dieser E-Mail-Adresse existiert bereits",
+      "weakPassword": "Das Passwort muss mindestens 6 Zeichen lang sein",
+      "passwordMismatch": "Passwörter stimmen nicht überein",
+      "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+      "requiredField": "Dieses Feld ist erforderlich",
+      "termsRequired": "Sie müssen den Nutzungsbedingungen zustimmen",
+      "networkError": "Netzwerkfehler. Bitte versuchen Sie es erneut.",
+      "unknownError": "Etwas ist schief gelaufen. Bitte versuchen Sie es erneut."
+    },
+    "success": {
+      "accountCreated": "Konto erfolgreich erstellt! Bitte überprüfen Sie Ihre E-Mails, um Ihr Konto zu verifizieren.",
+      "passwordReset": "E-Mail zum Zurücksetzen des Passworts erfolgreich gesendet",
+      "passwordUpdated": "Passwort erfolgreich aktualisiert",
+      "signedOut": "Erfolgreich abgemeldet"
+    }
+  },
+  "dashboard": {
+    "title": "Ihre Krimi-Mysterien",
+    "subtitle": "Alle Ihre erstellten Mysterien anzeigen, bearbeiten und verwalten",
+    "welcome": {
+      "title": "Willkommen zurück",
+      "subtitle": "Bereit, Ihr nächstes Mystery-Meisterwerk zu erstellen?",
+      "noMysteries": "Sie haben noch keine Mysterien erstellt",
+      "getStarted": "Beginnen Sie, indem Sie Ihr erstes Mysterium erstellen"
+    },
+    "mysteries": {
+      "title": "Ihre Mysterien",
+      "searchPlaceholder": "Mysterien suchen...",
+      "deleteSuccess": "Mysterium archiviert",
+      "deleteFailed": "Fehler beim Archivieren des Mysteriums",
+      "filter": {
+        "all": "Alle Mysterien",
+        "drafts": "Entwürfe",
+        "completed": "Abgeschlossen",
+        "purchased": "Gekauft",
+        "archived": "Archiviert"
+      },
+      "empty": {
+        "title": "Keine Mysterien gefunden",
+        "description": "Erstellen Sie Ihr erstes Mysterium, um loszulegen",
+        "searchResult": "Keine Mysterien stimmen mit Ihrer Suche überein"
+      },
+      "card": {
+        "players": "{{count}} Spieler",
+        "created": "Erstellt",
+        "lastEdited": "Zuletzt bearbeitet",
+        "theme": "Thema: {{theme}}",
+        "actions": {
+          "view": "Anzeigen",
+          "chat": "Chat",
+          "delete": "Löschen",
+          "viewProgress": "Fortschritt anzeigen",
+          "progress": "Fortschritt",
+          "editMystery": "Mysterium bearbeiten",
+          "edit": "Bearbeiten",
+          "archive": "Archivieren",
+          "deleteTitle": "Löschen"
+        },
+        "deleteDialog": {
+          "title": "Mysterium löschen",
+          "description": "Sind Sie sicher, dass Sie dieses Mysterium löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden."
+        },
+        "generationInProgress": "Generierung läuft...",
+        "editedDate": "Bearbeitet am {{date}}"
+      },
+      "status": {
+        "completed": "Abgeschlossen",
+        "draft": "Entwurf",
+        "purchased": "Gekauft",
+        "unknown": "Unbekannt",
+        "done": "Fertig",
+        "bought": "Gekauft",
+        "generating": "Wird generiert...",
+        "generatingShort": "Gen..."
+      },
+      "showingCount": "Zeige {{count}} von {{total}} Mysterien"
+    },
+    "stats": {
+      "totalMysteries": "Gesamte Mysterien",
+      "completedMysteries": "Abgeschlossen",
+      "purchasedMysteries": "Gekauft",
+      "totalPlayers": "Gesamte gehostete Spieler"
+    },
+    "backToDashboard": "Zurück zum Dashboard",
+    "buttons": {
+      "createFirstMystery": "Erstellen Sie Ihr erstes Mysterium"
+    },
+    "errors": {
+      "loadFailed": "Fehler beim Laden Ihrer Mysterien"
+    }
+  },
+  "account": {
+    "title": "Kontoeinstellungen",
+    "tabs": {
+      "profile": "Profil",
+      "security": "Sicherheit"
+    },
+    "profile": {
+      "title": "Profilinformationen",
+      "description": "Aktualisieren Sie Ihre Kontoprofilinformationen",
+      "name": "Vollständiger Name",
+      "email": "E-Mail",
+      "emailNote": "E-Mail kann nicht geändert werden",
+      "saveButton": "Änderungen speichern",
+      "saving": "Speichern...",
+      "success": "Profil erfolgreich aktualisiert"
+    },
+    "security": {
+      "password": {
+        "title": "Passwort ändern",
+        "description": "Aktualisieren Sie Ihr Passwort, um Ihr Konto sicher zu halten",
+        "currentPassword": "Aktuelles Passwort",
+        "newPassword": "Neues Passwort",
+        "confirmPassword": "Neues Passwort bestätigen",
+        "updateButton": "Passwort aktualisieren",
+        "updating": "Wird aktualisiert...",
+        "success": "Passwort erfolgreich aktualisiert"
+      },
+      "deleteAccount": {
+        "title": "Konto löschen",
+        "description": "Löschen Sie Ihr Konto und alle zugehörigen Daten dauerhaft",
+        "warning": "Diese Aktion kann nicht rückgängig gemacht werden. Alle Ihre Mysterien und Daten werden dauerhaft gelöscht.",
+        "confirmText": "Geben Sie LÖSCHEN ein, um zu bestätigen",
+        "deleteButton": "Konto löschen",
+        "deleting": "Wird gelöscht...",
+        "success": "Konto erfolgreich gelöscht"
+      }
+    }
+  },
+  "mysteryCreation": {
+    "scriptType": {
+      "full": "vollständig",
+      "pointForm": "Stichpunkt",
+      "both": "beide (vollständig und Stichpunkt)"
+    },
+    "sections": {
+      "premise": "Prämisse",
+      "victim": "Opfer",
+      "characterList": "Charakterliste",
+      "players": "Spieler",
+      "murderMethod": "Mordmethode"
+    },
+    "wizard": {
+      "title": "Erstellen Sie Ihr Mysterium",
+      "step1": {
+        "title": "Erzählen Sie uns Ihre Vision",
+        "description": "Beschreiben Sie Ihre ideale Krimi-Party"
+      },
+      "step2": {
+        "title": "Überprüfen und Verfeinern",
+        "description": "Perfektionieren Sie Ihr Mysterium mit unserem KI-Assistenten"
+      },
+      "step3": {
+        "title": "Komplettpaket",
+        "description": "Erhalten Sie alles, was Sie zum Hosten benötigen"
+      },
+      "prompt": {
+        "defaultStart": "Ich möchte ein Krimi-Mysterium erstellen",
+        "withTheme": "Das Thema/Setting sollte {{theme}} für {{playerCount}} Spieler mit Skripten im {{scriptType}}-Format sein",
+        "withoutTheme": "Dies ist für {{playerCount}} Spieler mit Skripten im {{scriptType}}-Format",
+        "withAccomplice": "Einen Komplizenmechanismus in das Mysterium aufnehmen",
+        "withoutAccomplice": "Keinen Komplizenmechanismus in das Mysterium aufnehmen",
+        "additionalDetails": "Zusätzliche Details sind: {{details}}"
+      }
+    },
+    "editor": {
+      "title": "Mysterien-Editor",
+      "characters": "Charaktere",
+      "story": "Geschichte",
+      "clues": "Hinweise",
+      "hostGuide": "Gastgeberanleitung",
+      "save": "Entwurf speichern",
+      "publish": "Mysterium abschließen",
+      "saving": "Speichern...",
+      "publishing": "Veröffentlichen...",
+      "saved": "Entwurf gespeichert",
+      "published": "Mysterium abgeschlossen"
+    },
+    "guidance": {
+      "describe": "Beschreiben Sie Ihr Mysterium detailliert; je spezifischer Sie sind, desto besser können wir es für Sie erstellen",
+      "examples": "Beispiel: 'Ein Krimi-Mysterium in einer Speakeasy-Bar der 1920er Jahre mit 8 Charakteren, darunter eine Jazzsängerin, ein Barkeeper und ein Mafiaboss'",
+      "playerCount": "Wie viele Spieler werden teilnehmen?",
+      "theme": "Was ist das Setting oder Thema?",
+      "special": "Gibt es besondere Anforderungen oder Einschränkungen?",
+      "initialPrompt": {
+        "withTheme": "Lassen Sie uns ein Krimi-Mysterium mit dem Thema {{theme}} erstellen. Bitte führen Sie mich Schritt für Schritt durch die Erstellung dieses Mysteriums.",
+        "withoutTheme": "Lassen Sie uns ein Krimi-Mysterium erstellen. Bitte führen Sie mich Schritt für Schritt durch die Erstellung dieses Mysteriums."
+      }
+    },
+    "editTitle": "Mysterium bearbeiten",
+    "createTitle": "Neues Mysterium erstellen",
+    "form": {
+      "description": "Füllen Sie das untenstehende Formular aus, um Ihr individuelles Krimi-Mysterium zu generieren"
+    },
+    "buttons": {
+      "generateFullMystery": "Vollständiges Mysterium generieren"
+    },
+    "errors": {
+      "signInToSave": "Bitte melden Sie sich an, um Ihr Mysterium zu speichern",
+      "saveFailed": "Fehler beim Speichern des Mysteriums",
+      "loadFailed": "Fehler beim Laden des Mysteriums",
+      "loadMessagesFailed": "Fehler beim Laden der Chat-Nachrichten",
+      "loadConversationFailed": "Fehler beim Laden der Konversation",
+      "initialPrompt": "Bitte geben Sie einen Prompt für Ihr Mysterium an",
+      "saveMessageFailed": "Fehler beim Speichern der Nachricht"
+    },
+    "success": {
+      "setupComplete": "Mysterien-Setup abgeschlossen! Chat wird gestartet..."
+    }
+  },
+  "mysteryForm": {
+    "userRequestLabel": "Was Sie erstellen möchten",
+    "userRequestDescription": "Ihre ursprüngliche Anfrage von der Startseite",
+    "themeLabel": "Thema/Umgebungsdetails (Optional)",
+    "themePlaceholder": "Z.B. Zeitperiode, spezifische Umgebungsdetails, Must-Haves, etc.",
+    "themeDescription": "Wählen Sie ein spezifisches Thema oder eine Umgebung für Ihr Krimi-Mysterium",
+    "playerCountLabel": "Wie viele Spieler werden teilnehmen?",
+    "playerCountPlaceholder": "Anzahl der Spieler auswählen",
+    "playerCountItem": "{{count}} Spieler",
+    "playerCountDescription": "Wählen Sie zwischen 4 und 32 Spielern für Ihr Krimi-Mysterium.",
+    "accompliceLabel": "Komplizenmechanismus einschließen",
+    "accompliceDescription": "Ideal für Spiele mit 10 oder mehr Spielern",
+    "scriptTypeLabel": "Detailgrad des Skripts",
+    "scriptTypeFullLabel": "Vollständige Skripte – Vollständige Dialoge und detaillierte Anweisungen",
+    "scriptTypePointFormLabel": "Stichpunkte – Wichtige Stichpunkte und zusammenfassende Aufzählungen",
+    "scriptTypeBothLabel": "Beide Formate – Vollständige Skripte UND Stichpunktnotizen",
+    "additionalDetailsLabel": "Zusätzliche Details (Optional)",
+    "additionalDetailsPlaceholder": "Alle spezifischen Anforderungen, besonderen Regeln oder zusätzlichen Kontext für Ihr Mysterium...",
+    "additionalDetailsDescription": "Geben Sie zusätzliche Details oder spezielle Anfragen für Ihr Mysterium an",
+    "startChat": "Chat mit KI starten",
+    "startingChat": "Chat wird gestartet..."
+  },
+  "supportPage": {
+    "title": "Support-Center",
+    "subtitle": "Finden Sie Antworten auf häufig gestellte Fragen, kontaktieren Sie unser Support-Team und erhalten Sie alles, was Sie zum Erstellen unglaublicher Mysterienpartys benötigen.",
+    "tabs": {
+      "faqs": "FAQs",
+      "contact": "Kontakt"
+    },
+    "faqs": {
+      "title": "Häufig gestellte Fragen",
+      "description": "Finden Sie Antworten auf häufig gestellte Fragen zu Mystery Maker",
+      "categories": {
+        "aboutMysteryMaker": "Über Mystery Maker",
+        "gameMechanics": "Spielmechaniken",
+        "hostingPlanning": "Hosting & Planung",
+        "accountBilling": "Konto & Abrechnung"
+      },
+      "questions": {
+        "whatIsMysteryMaker": {
+          "question": "Was ist Mystery Maker und wie funktioniert es?",
+          "answer": "Mystery Maker ist eine KI-gestützte Plattform, die individuelle Krimi-Partys genau nach Ihren Vorstellungen erstellt. Teilen Sie uns Ihre einzigartige Vision mit – jedes Thema, jede Figur oder jedes Setting – und unsere KI generiert alles, was Sie benötigen: Charakterprofile, Hinweise und Host-Materialien, die speziell auf Ihre Party zugeschnitten sind."
+        },
+        "creationProcess": {
+          "question": "Wie funktioniert der Erstellungs- und Kaufprozess?",
+          "answer": "Ganz einfach! Zuerst beschreiben Sie Ihr ideales Krimi-Mysterium und wir erstellen eine individuelle Vorschau kostenlos. Wenn Sie mit Ihrem Mysterium zufrieden sind, kaufen Sie das Komplettpaket für 11,99 $. Sie erhalten sofort alles Notwendige zum Hosten: detaillierte Charakterprofile, eine Host-Anleitung und alle Spielmaterialien."
+        },
+        "saveWork": {
+          "question": "Kann ich meine Arbeit speichern und später darauf zurückgreifen?",
+          "answer": "Ja! Alle Ihre individuellen Mysterien werden in Ihrem Konto gespeichert, sodass Sie jederzeit darauf zurückgreifen und sie bearbeiten können."
+        },
+        "replayable": {
+          "question": "Sind diese Krimi-Mysterien wiederholbar?",
+          "answer": "Absolut! Unsere Mysterien enthalten variable Elemente, sodass sich jedes Spiel frisch anfühlt, auch mit derselben Gruppe. Sie können Ihr individuelles Mysterium so oft veranstalten, wie Sie möchten."
+        },
+        "playerCount": {
+          "question": "Wie viele Spieler brauche ich?",
+          "answer": "Unser System erstellt Mysterien für jede von Ihnen angegebene Gruppengröße, von intimen Treffen mit 4 bis 6 Spielern bis hin zu größeren Partys mit über 15 Spielern. Sagen Sie uns einfach, wie viele Spieler, und wir werden entsprechend entwerfen."
+        },
+        "modifyMystery": {
+          "question": "Kann ich mein Mysterium nach der Erstellung ändern?",
+          "answer": "Ja, natürlich! Verwenden Sie unseren Editor, um Ihr Mysterium zu verfeinern und anzupassen, bis es perfekt für Ihre Gruppe ist. Ändern Sie Charaktere, Themen oder Komplexität jederzeit."
+        },
+        "lastMinuteChanges": {
+          "question": "Was passiert, wenn ich in letzter Minute Spieler hinzufügen oder entfernen muss?",
+          "answer": "Kein Problem! Unser flexibles System ermöglicht es Ihnen, die Anzahl der Spieler auch nach der Erstellung Ihres Mysteriums anzupassen. Die KI passt die Geschichte und die Charaktere an diese Änderungen an."
+        },
+        "whatIncluded": {
+          "question": "Was ist in meinem benutzerdefinierten Mystery-Paket enthalten?",
+          "answer": "Alles, was Sie brauchen: eine umfassende Gastgeberanleitung mit Schritt-für-Schritt-Anleitungen, detaillierte Charakterprofile für jeden Spieler, Hinweise, Beweise und alle Spielmaterialien. Keine zusätzliche Vorbereitung erforderlich."
+        },
+        "gameDuration": {
+          "question": "Wie lange dauert ein typisches Spiel?",
+          "answer": "Die meisten Mysterien dauern 2 bis 3 Stunden, aber Sie bestimmen das Tempo. Unsere Gastgeberanleitung enthält Zeitvorschläge, die Sie an Ihren Zeitplan anpassen können."
+        },
+        "themedMysteries": {
+          "question": "Bieten Sie thematische Mysterien für besondere Anlässe an?",
+          "answer": "Wir erstellen jedes Thema, das Sie sich vorstellen können! Von klassischen Speakeasy-Bars der 1920er Jahre bis hin zu Raumstationen oder Märchenreichen – teilen Sie uns Ihre Vision mit, und wir werden sie zum Leben erwecken."
+        },
+        "ageRecommendation": {
+          "question": "Gibt es eine Altersempfehlung für Ihre Mysterien?",
+          "answer": "Unsere Standard-Mysterien sind ideal für Erwachsene und Jugendliche (ab 13 Jahren). Sie können auch familienfreundliche Themen anfordern, wenn Sie Ihr Mysterium für jüngere Spieler erstellen."
+        },
+        "freePreview": {
+          "question": "Was beinhaltet die kostenlose Vorschau?",
+          "answer": "Sie können unbegrenzt kostenlose Mysterienvorschauen erstellen, einschließlich der grundlegenden Handlung und Charakterkonzepte. So können Sie verschiedene Ideen erkunden, bevor Sie kaufen."
+        },
+        "purchaseIncludes": {
+          "question": "Was erhalte ich, wenn ich ein Mysterium kaufe?",
+          "answer": "Für 11,99 $ erhalten Sie alles, was Sie zum Hosten benötigen: eine umfassende Gastgeberanleitung, detaillierte Charakterprofile für jeden Spieler, Hinweise, Beweise und alle spielfertigen Materialien."
+        },
+        "refund": {
+          "question": "Kann ich eine Rückerstattung erhalten, wenn ich nicht zufrieden bin?",
+          "answer": "Absolut! Wenn Sie mit Ihrem Kauf nicht vollständig zufrieden sind, kontaktieren Sie uns innerhalb von 7 Tagen und wir erstatten Ihnen den vollen Betrag, ohne Fragen zu stellen."
+        }
+      }
+    },
+    "contact": {
+      "title": "Kontaktieren Sie uns",
+      "description": "Benötigen Sie weitere Hilfe? Wir sind für Sie da",
+      "intro": "Unser Support-Team hilft Ihnen gerne bei allen Fragen rund um die Gestaltung Ihrer perfekten Mystery-Party mit Mystery Maker.",
+      "form": {
+        "name": "Name",
+        "email": "E-Mail",
+        "subject": "Betreff",
+        "message": "Nachricht",
+        "namePlaceholder": "Ihr Name",
+        "emailPlaceholder": "ihre.email@example.com",
+        "subjectPlaceholder": "Worum geht es in Ihrer Nachricht?",
+        "messagePlaceholder": "Wie können wir Ihnen helfen?",
+        "sendButton": "Nachricht senden",
+        "sending": "Senden...",
+        "success": "Vielen Dank für Ihre Kontaktaufnahme! Wir werden Ihnen innerhalb von 24 Stunden antworten.",
+        "error": "Fehler beim Senden der Nachricht. Bitte versuchen Sie es später erneut."
+      }
+    }
+  },
+  "chat": {
+    "title": "Krimi-Mysterien-Ersteller",
+    "public": "Öffentlich",
+    "private": "Privat",
+    "initialGreeting": "Hallo! Ich bin Ihr KI-Entwicklungsassistent. Lassen Sie mich Ihnen helfen, ein Krimi-Mysterium zu erstellen. Wie viele Spieler möchten Sie für Ihr Krimi-Mysterium?",
+    "inputPlaceholder": "Geben Sie Ihre Nachricht ein...",
+    "signInPrompt": "Bitte <1>melden Sie sich an</1>, um den privaten Modus zu verwenden",
+    "errorResponse": "Ich habe derzeit Probleme zu antworten. Bitte versuchen Sie es erneut.",
+    "errorResponseWithFallback": "Ich habe technische Schwierigkeiten. Wie viele Spieler möchten Sie für Ihr Krimi-Mysterium?",
+    "connectionErrorResponse": "Ich habe derzeit Verbindungsprobleme. Wie viele Spieler möchten Sie für Ihr Krimi-Mysterium?",
+    "placeholder": "Teilen Sie Ihre Mysterien-Ideen mit...",
+    "loadingMessages": "Alte Nachrichten werden geladen...",
+    "errors": {
+      "responseFailed": "Fehler beim Abrufen der KI-Antwort. Bitte versuchen Sie es erneut.",
+      "aiUnavailable": "Es tut mir leid, aber ich habe derzeit Probleme zu antworten. Bitte versuchen Sie es in Kürze erneut."
+    }
+  },
+  "sendToGuests": {
+    "title": "Senden Sie Charakteranleitungen an Ihre Gäste",
+    "description": "Geben Sie die E-Mail-Adressen für jeden Charakter ein, um personalisierte Anleitungen direkt an Ihre Gäste zu senden. Jeder Gast erhält nur die Informationen zu seinem eigenen Charakter.",
+    "status": {
+      "sent": "Gesendet"
+    },
+    "emailPlaceholder": "gast@beispiel.com",
+    "buttons": {
+      "sending": "Senden...",
+      "send": "Charakteranleitungen senden"
+    },
+    "errors": {
+      "noValidEmails": "Bitte fügen Sie mindestens eine gültige E-Mail-Adresse hinzu",
+      "sendFailed": "Fehler beim Senden einiger E-Mails. Bitte versuchen Sie es erneut."
+    },
+    "success": {
+      "sentCount": "Charakteranleitungen an {{count}} Gäste gesendet"
+    }
+  },
   "common": {
     "buttons": {
-      "createNew": "Neues Mysterium Erstellen",
+      "createNew": "Neues Mysterium erstellen",
       "getStarted": "Loslegen",
-      "learnMore": "Mehr Erfahren",
-      "tryNow": "Jetzt Probieren",
+      "learnMore": "Mehr erfahren",
+      "tryNow": "Jetzt ausprobieren",
       "continue": "Weiter",
       "cancel": "Abbrechen",
       "save": "Speichern",
       "delete": "Löschen",
       "edit": "Bearbeiten",
-      "close": "Schließen"
+      "close": "Schließen",
+      "back": "Zurück",
+      "next": "Weiter",
+      "previous": "Zurück",
+      "finish": "Fertigstellen",
+      "submit": "Absenden",
+      "confirm": "Bestätigen",
+      "yes": "Ja",
+      "no": "Nein"
     },
     "labels": {
-      "loading": "Lädt...",
+      "loading": "Wird geladen...",
+      "pleaseWait": "Bitte warten...",
       "error": "Fehler",
       "success": "Erfolg",
       "warning": "Warnung",
-      "info": "Information"
+      "info": "Information",
+      "required": "Erforderlich",
+      "optional": "Optional"
     },
     "messages": {
       "welcome": "Willkommen!",
       "thankYou": "Danke!",
-      "comingSoon": "Bald Verfügbar",
-      "notFound": "Nicht Gefunden"
+      "comingSoon": "Kommt bald",
+      "notFound": "Nicht gefunden",
+      "somethingWentWrong": "Etwas ist schief gelaufen",
+      "tryAgain": "Bitte versuchen Sie es erneut",
+      "noResultsFound": "Keine Ergebnisse gefunden",
+      "loadingContent": "Inhalt wird geladen...",
+      "savingChanges": "Änderungen werden gespeichert...",
+      "changesSuccess": "Änderungen erfolgreich gespeichert",
+      "changesCanceled": "Änderungen abgebrochen",
+      "aiThinking": "KI denkt nach..."
+    },
+    "validation": {
+      "required": "Dieses Feld ist erforderlich",
+      "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+      "passwordTooShort": "Das Passwort muss mindestens 6 Zeichen lang sein",
+      "passwordMismatch": "Passwörter stimmen nicht überein",
+      "invalidFormat": "Ungültiges Format",
+      "tooShort": "Zu kurz",
+      "tooLong": "Zu lang",
+      "invalidCharacters": "Enthält ungültige Zeichen"
+    },
+    "states": {
+      "draft": "Entwurf",
+      "inProgress": "In Bearbeitung",
+      "completed": "Abgeschlossen",
+      "published": "Veröffentlicht",
+      "archived": "Archiviert",
+      "deleted": "Gelöscht"
+    },
+    "modals": {
+      "confirmDelete": {
+        "title": "Löschen bestätigen",
+        "message": "Sind Sie sicher, dass Sie dieses Element löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+        "confirmButton": "Löschen",
+        "cancelButton": "Abbrechen"
+      },
+      "unsavedChanges": {
+        "title": "Ungespeicherte Änderungen",
+        "message": "Sie haben ungespeicherte Änderungen. Möchten Sie diese speichern, bevor Sie gehen?",
+        "saveButton": "Änderungen speichern",
+        "discardButton": "Änderungen verwerfen",
+        "cancelButton": "Abbrechen"
+      }
+    },
+    "notifications": {
+      "welcomeBack": "Willkommen zurück!",
+      "signedOut": "Sie wurden abgemeldet",
+      "sessionExpired": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
+      "connectionLost": "Verbindung verloren. Erneuter Verbindungsversuch...",
+      "connectionRestored": "Verbindung wiederhergestellt",
+      "updateAvailable": "Ein Update ist verfügbar. Bitte aktualisieren Sie, um es zu sehen.",
+      "offlineMode": "Sie sind derzeit offline",
+      "deleteSuccess": "{{item}} erfolgreich gelöscht",
+      "deleteFailed": "Fehler beim Löschen von {{item}}",
+      "archiveSuccess": "{{item}} erfolgreich archiviert",
+      "archiveFailed": "Fehler beim Archivieren von {{item}}",
+      "updatedSuccess": "{{item}} erfolgreich aktualisiert",
+      "updateFailed": "Fehler beim Aktualisieren von {{item}}"
     }
   },
-  "mysteryCreation": {
-    "wizard": {
-      "prompt": {
-        "defaultStart": "Ich möchte ein Murder Mystery erstellen",
-        "withTheme": "Das Thema/Schauplatz sollte {{theme}} für {{playerCount}} Spieler mit {{scriptType}} Skripten sein",
-        "withoutTheme": "Dies ist für {{playerCount}} Spieler mit {{scriptType}} Skripten",
-        "withAccomplice": "Bitte fügen Sie einen Komplizen-Mechanismus in das Rätsel ein.",
-        "withoutAccomplice": "Bitte fügen Sie keinen Komplizen-Mechanismus in das Rätsel ein.",
-        "additionalDetails": "Zusätzliche Details: {{details}}"
+  "character": {
+    "detail": {
+      "description": "Charakterbeschreibung",
+      "background": "Hintergrund",
+      "relationships": "Beziehungen",
+      "secrets": "Geheimnisse",
+      "whereabouts": "Aufenthaltsort während des Mordes",
+      "introduction": "Einführung",
+      "round1": "Runde 1: Erste Untersuchung",
+      "round2": "Runde 2: Tiefere Enthüllungen",
+      "round3": "Runde 3: Letzte Hinweise",
+      "finalStatement": "Abschließende Erklärung",
+      "questioningOptions": "Befragungsmöglichkeiten",
+      "askTarget": "{{target}} fragen: \"{{question}}\""
+    },
+    "import": {
+      "title": "Mysterien-Charaktere",
+      "description": "Verwalten Sie die Charaktere Ihres Krimi-Mysteriums",
+      "importButton": "Charaktere importieren",
+      "loading": "Charaktere werden geladen...",
+      "noCharacters": "Noch keine Charaktere",
+      "importPrompt": "Importieren Sie Charakterdaten, um Ihr Krimi-Mysterium zu füllen.",
+      "foundCount": "{{count}} Charaktere in der Datenbank gefunden",
+      "deleteConfirm": "Sind Sie sicher, dass Sie {{name}} löschen möchten?",
+      "deleteSuccess": "Charakter gelöscht: {{name}}",
+      "deleteFailed": "Fehler beim Löschen des Charakters",
+      "refreshSuccess": "Charakterliste aktualisiert",
+      "refreshFailed": "Fehler beim Aktualisieren der Charakterdaten",
+      "loadFailed": "Fehler beim Laden der Charakterdaten",
+      "table": {
+        "name": "Charaktername",
+        "details": "Details",
+        "scripts": "Skripte",
+        "actions": "Aktionen",
+        "badges": {
+          "description": "Beschreibung",
+          "background": "Hintergrund",
+          "relationships": "Beziehungen",
+          "secrets": "Geheimnisse",
+          "intro": "Intro",
+          "round1": "Runde 1",
+          "round2": "Runde 2",
+          "round3": "Runde 3"
+        }
       }
+    },
+    "access": {
+      "welcome": "Willkommen, {{name}}!",
+      "subtitle": "Hier ist Ihr Charakterleitfaden für das Mysterium",
+      "loading": "Ihr Charakter wird geladen...",
+      "accessDenied": "Zugriff verweigert",
+      "notFound": "Charakterzuweisung nicht gefunden.",
+      "guide": {
+        "yourCharacter": "{{name}} – Ihr Charakter",
+        "yourBackground": "Ihr Hintergrund",
+        "yourSecret": "Ihr Geheimnis",
+        "introduction": "Einführung",
+        "rumorsYouKnow": "Gerüchte, die Sie kennen",
+        "round1": "Runde 1: Erste Erklärung",
+        "round2": "Runde 2: Motive",
+        "round3": "Runde 3: Methode",
+        "questionsToAsk": "Fragen zum Stellen",
+        "ifInnocent": "Wenn Sie unschuldig sind:",
+        "ifGuilty": "Wenn Sie schuldig sind:",
+        "ifAccomplice": "Wenn Sie ein Komplize sind:"
+      }
+    },
+    "dialog": {
+      "title": "Charakterdaten importieren",
+      "subtitle": "Fügen Sie Ihre Charakterdaten unten ein:",
+      "pasteButton": "Aus Zwischenablage einfügen",
+      "pasteSuccess": "Text aus Zwischenablage eingefügt",
+      "pasteError": "Zugriff auf Zwischenablage fehlgeschlagen. Bitte manuell einfügen.",
+      "placeholder": "Fügen Sie den Inhalt des CHARAKTERLEITFADENS hier ein...",
+      "instructions": "Charakterdaten müssen Abschnitte enthalten für:",
+      "sections": [
+        "CHARAKTERBESCHREIBUNG",
+        "HINTERGRUND",
+        "BEZIEHUNGEN",
+        "GEHEIMNISSE",
+        "AUFENTHALTSORT",
+        "Runden-Statements (RUNDE 1, RUNDE 2 usw.)"
+      ],
+      "importButton": "Charaktere importieren",
+      "importing": "Wird importiert...",
+      "cancel": "Abbrechen",
+      "enterData": "Bitte geben Sie die Charakterdaten ein oder fügen Sie sie ein",
+      "importSuccess": "Charaktere erfolgreich importiert",
+      "importFailed": "Fehler beim Importieren der Charakterdaten",
+      "importError": "Beim Import ist ein unerwarteter Fehler aufgetreten"
+    },
+    "guestManager": {
+      "title": "Charaktere mit Gästen teilen",
+      "subtitle": "Weisen Sie jedem Charakter einen Gast zu und senden Sie ihn per E-Mail",
+      "table": {
+        "character": "Charakter",
+        "guestName": "Gastname",
+        "email": "E-Mail",
+        "action": "Aktion"
+      },
+      "placeholders": {
+        "guestName": "Gastname",
+        "email": "gast@beispiel.com"
+      },
+      "buttons": {
+        "edit": "Bearbeiten",
+        "send": "Senden",
+        "sendAll": "Alle senden",
+        "close": "Schließen"
+      },
+      "status": {
+        "sent": "Gesendet"
+      },
+      "assignedCount": "{{count}} Charaktere zugewiesen",
+      "toasts": {
+        "characterSent": "Charakter an {{name}} gesendet!",
+        "sendFailed": "Fehler beim Senden der Charakterzuweisung",
+        "loadFailed": "Fehler beim Laden bestehender Zuweisungen",
+        "updateFailed": "Fehler beim Aktualisieren der Zuweisung",
+        "noValidAssignments": "Keine gültigen Zuweisungen zum Senden vorhanden",
+        "allSent": "{{count}} Charakterzuweisungen gesendet!",
+        "sendSomeFailed": "Fehler beim Senden einiger Zuweisungen"
+      }
+    },
+    "roles": {
+      "title": "Charakterrollen",
+      "description": "Weisen Sie die Mörderrolle für Ihr Mysterium zu",
+      "murderer": "Mörder",
+      "required": "Erforderlich",
+      "noneSelected": "Keine ausgewählt",
+      "murdererDescription": "Die Figur, die den Mord begangen hat",
+      "saveRoles": "Rollen speichern",
+      "saving": "Wird gespeichert...",
+      "saveSuccess": "Charakterrollen erfolgreich gespeichert",
+      "saveFailed": "Fehler beim Speichern der Charakterrollen",
+      "loadFailed": "Fehler beim Laden der Charakterdaten"
+    }
+  },
+  "purchase": {
+    "toasts": {
+      "success": "Kauf erfolgreich! Sie haben jetzt vollen Zugriff auf dieses Mysterienpaket.",
+      "cancel": "Kauf abgebrochen. Sie können es erneut versuchen, wenn Sie bereit sind.",
+      "loadFailed": "Fehler beim Laden der Mysterien-Details.",
+      "notFound": "Mysterium nicht gefunden.",
+      "devPurchaseSim": "Kauf wird im Entwicklungsmodus simuliert...",
+      "devPurchaseSuccess": "Kauf simuliert! Weiterleitung zur Paketerstellung...",
+      "devPurchaseFailed": "Fehler beim Simulieren des Kaufs.",
+      "signInRequired": "Bitte melden Sie sich an, um dieses Mysterium zu kaufen.",
+      "checkoutRedirect": "Weiterleitung zum sicheren Checkout...",
+      "checkoutFailed": "Fehler bei der Weiterleitung zum Checkout. Bitte versuchen Sie es erneut.",
+      "genericError": "Beim Laden der Mysterien-Details ist ein Fehler aufgetreten."
+    },
+    "title": "Schließen Sie Ihren Kauf ab",
+    "subtitle": "Erhalten Sie vollen Zugriff auf Ihr Krimi-Mysterienpaket",
+    "package": {
+      "title": "Krimi-Mysterienpaket",
+      "description": "Einmaliger Kauf, sofortiger Zugriff",
+      "priceDescription": "Vollständiges Krimi-Mysterienpaket mit allen Charaktermaterialien, Hinweisen und Host-Anweisungen.",
+      "whatsIncluded": "Was ist enthalten:",
+      "includes": [
+        "Vollständige Charakterprofile für alle Verdächtigen",
+        "Gastgeberanleitung mit Schritt-für-Schritt-Anleitung",
+        "Druckbare Charakterbögen",
+        "Beweis- und Hinweiskarten",
+        "Zeitleiste der Ereignisse",
+        "Lösungs-Enthüllungs-Skript",
+        "PDF-Downloads aller Materialien"
+      ]
+    },
+    "buttons": {
+      "processing": "Wird verarbeitet...",
+      "complete": "Kauf abschließen",
+      "backToDesign": "Zurück zum Mysterien-Design"
+    },
+    "notes": {
+      "title": "Wichtige Hinweise",
+      "items": [
+        "Dies ist ein einmaliger Kauf für dieses spezifische Mysterienpaket",
+        "Sie haben dauerhaften Zugang zum Herunterladen aller Materialien",
+        "Der Inhalt ist nur für den persönlichen Gebrauch bestimmt, nicht für die kommerzielle Weitergabe",
+        "Benötigen Sie Hilfe? Kontaktieren Sie unseren Support unter {{email}}"
+      ]
+    },
+    "preview": {
+      "defaultTitle": "Individuelles Krimi-Mysterium",
+      "characterPlaceholder": "Charakterdetails werden im vollständigen Paket enthüllt.",
+      "characterPlaceholderFull": "Vollständige Charakterbeschreibung im gekauften Paket verfügbar.",
+      "evidencePlaceholder": "Beweisdetails im vollständigen Paket verfügbar.",
+      "title": "Krimi-Mysterien-Vorschau",
+      "playersLabel": "Spieler",
+      "playersCount": "{{count}} Spieler",
+      "unknownPlayers": "Unbekannte Spieleranzahl",
+      "storyTitle": "Story-Vorschau",
+      "unlockMessage": "Kaufen Sie, um das vollständige Mysterienpaket mit allen Charakterdetails, Hinweisen und Materialien freizuschalten.",
+      "whatsIncluded": "Was das vollständige Paket beinhaltet:",
+      "packageIncludes": [
+        "Detaillierte Gastgeberanleitung mit vollständigen Setup-Anweisungen",
+        "Charakteranleitungen für jeden Spieler",
+        "Beweiskarten und druckbare Materialien",
+        "Vollständiges Spielskript und Zeitleiste"
+      ]
+    }
+  },
+  "mysteryPackage": {
+    "shareWithGuests": "Mit Gästen teilen",
+    "tabs": {
+      "hostGuide": "Gastgeberanleitung",
+      "characters": "Charaktere ({{count}})",
+      "clues": "Beweise",
+      "inspector": "Detektivanleitung",
+      "relationships": "Beziehungen"
+    },
+    "mobileTabs": {
+      "host": "Gastgeber",
+      "characters": "Charaktere ({{count}})",
+      "clues": "Beweise",
+      "inspector": "Detektiv",
+      "relations": "Beziehungen"
+    },
+    "loading": {
+      "generating": "Wird generiert...",
+      "generatingMessage": "Ihr vollständiges Mysterium wird gerade generiert. Dieser Vorgang dauert 3 bis 5 Minuten.<br />Diese Seite wird automatisch aktualisiert, sobald das Mysterium abgeschlossen ist.",
+      "characters": "Entwicklung einzigartiger Charakterprofile mit Hintergründen, Motivationen und Geheimnissen für Ihr Mysterium.",
+      "clues": "Erstellung von Beweiskarten, Hinweisen und Ermittlungsmaterialien, die zur Lösung Ihres Mysteriums beitragen.",
+      "inspector": "Verfassen des Detektivskripts und der Ermittlungszeitleiste zur Führung des Mysterienlösungsprozesses.",
+      "matrix": "Erstellung der Charakterbeziehungsmatrix, die Verbindungen, Konflikte und versteckte Beziehungen zeigt."
+    },
+    "placeholder": {
+      "title": "Bereit zum Generieren Ihres Mysteriums",
+      "description": "Klicken Sie auf die Schaltfläche unten, um die Generierung Ihres vollständigen Mysterienpakets mit allen enthaltenen Materialien zu starten.",
+      "button": "Paket generieren",
+      "characters": "Charakteranleitungen werden nach Beginn der Generierung verfügbar sein.",
+      "clues": "Beweiskarten werden nach Beginn der Generierung verfügbar sein.",
+      "inspector": "Die Detektivanleitung wird nach Beginn der Generierung verfügbar sein.",
+      "matrix": "Die Beziehungsmatrix wird nach Beginn der Generierung verfügbar sein."
+    },
+    "matrix": {
+      "title": "Charakterbeziehungsmatrix"
+    }
+  },
+  "chatbot": {
+    "toasts": {
+      "invalidId": "Ungültige Konversations-ID",
+      "loadFailed": "Ihre frühere Konversation konnte nicht geladen werden",
+      "offlineMode": "Offline-Modus wird verwendet – einige Funktionen sind möglicherweise eingeschränkt",
+      "requestError": "Fehler beim Verarbeiten Ihrer Anfrage",
+      "generationSuccess": "Mysterium erfolgreich generiert!",
+      "urlUnavailable": "Chatbot-URL noch nicht verfügbar"
+    },
+    "welcomeMessage": "Willkommen beim Krimi-Mysterien-Ersteller! Beschreiben Sie die Art des Mysteriums, das Sie erstellen möchten, oder bitten Sie mich um Vorschläge.",
+    "newConversationTitle": "Neues Krimi-Mysterium",
+    "fallbackResponses": [
+      "Ich würde Ihnen gerne helfen, ein Krimi-Mysterium zu erstellen. Welches Thema oder Setting möchten Sie für Ihr Mysterium?",
+      "Das ist eine gute Wahl! Nun, lassen Sie uns über das Opfer nachdenken. Wer soll das Opfer sein?",
+      "Interessant! Jetzt brauchen wir ein paar Verdächtige. Können Sie 2-3 Charaktere beschreiben, die Motive für dieses Verbrechen haben könnten?",
+      "Das sind überzeugende Verdächtige. Fügen wir einige Hinweise hinzu. Welche Art von Beweisen könnte am Tatort gefunden werden?",
+      "Ihr Mysterium nimmt Gestalt an! Um die Details Ihrer Geschichte weiter zu entwickeln, lassen Sie uns überlegen, welche weiteren Elemente wir aufnehmen könnten."
+    ],
+    "title": "Erstellen Sie Ihr Krimi-Mysterium",
+    "buttons": {
+      "external": "Extern",
+      "openFull": "Vollständigen Chatbot öffnen",
+      "finalize": "Abschließen",
+      "finalizeMystery": "Mysterium abschließen"
+    },
+    "creatorTitle": "Krimi-Mysterien-Ersteller",
+    "placeholder": "Geben Sie Ihre Ideen für das Krimi-Mysterium ein...",
+    "finalizePrompt": "Wenn Sie mit Ihrem Mysterium zufrieden sind, schließen Sie es ab, um fortzufahren."
+  },
+  "homeDashboard": {
+    "title": "Ihre Mysterien",
+    "searchPlaceholder": "Mysterien suchen...",
+    "loadMore": "Mehr laden",
+    "loading": "Wird geladen...",
+    "empty": {
+      "title": "Sie haben noch keine Mysterien erstellt",
+      "description": "Verwenden Sie das Eingabefeld oben, um Ihr erstes Krimi-Mysterium zu erstellen!"
+    },
+    "errors": {
+      "loadFailed": "Fehler beim Laden einiger Mysterien. Bitte aktualisieren Sie die Seite."
+    }
+  },
+  "mysteryDashboard": {
+    "title": "Mysterien-Dashboard",
+    "description": "Verwalten Sie Ihre erstellten Mysterien, starten Sie neue oder erkunden Sie Beispielinhalte.",
+    "tabs": {
+      "all": "Alle",
+      "drafts": "Entwürfe",
+      "purchased": "Gekauft",
+      "archived": "Archiviert"
     }
   }
 }

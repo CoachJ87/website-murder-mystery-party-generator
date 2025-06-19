@@ -1,2 +1,977 @@
-
-{}
+{
+    "navigation": {
+      "home": "Home",
+      "dashboard": "Dashboard",
+      "signIn": "Inloggen",
+      "signUp": "Registreren",
+      "signOut": "Uitloggen",
+      "account": "Accountinstellingen"
+    },
+    "hero": {
+      "title": "Creëer Moordmysteriefeesten in Minuten",
+      "subtitle": "Ontwerp aangepaste mysteries precies zoals jij ze wilt – elk thema, elke personage, elke setting.",
+      "subtitleAuth": "Ontwerp aangepaste mysteries precies zoals jij ze wilt – elk thema, elke personage, elke setting.",
+      "placeholder": "Een moordmysterie uit de jaren 20 in een speakeasy met jazzmuzikanten...",
+      "placeholderAuth": "Een moordmysterie uit de jaren 20 in een speakeasy met jazzmuzikanten...",
+      "themes": {
+        "1920sSpeakeasy": "Jaren 20 Speakeasy",
+        "hollywoodMurder": "Hollywood Moord",
+        "castleMystery": "Kasteel Mysterie",
+        "sciFiMystery": "Sci-Fi Mysterie",
+        "artGalleryOpening": "Kunstgalerie Opening",
+        "bakeryCompetition": "Bakwedstrijd",
+        "mountainSkiResort": "Berghotel",
+        "luxuryTrainJourney": "Luxe Treinreis",
+        "historicUniversity": "Historische Universiteit",
+        "pokerTournament": "Pokertoernooi",
+        "barbieDreamworld": "Barbie Droomwereld",
+        "dystopianWaterworld": "Dystopische Waterwereld",
+        "jungleSteampunk": "Jungle Steampunk",
+        "magicalBakery": "Magische Bakkerij",
+        "gamingTournament": "Gaming Toernooi",
+        "synthwave80s": "Synthwave Jaren 80",
+        "beachResort": "Strandresort",
+        "operaHouse": "Operahuis",
+        "wineCountry": "Wijnstreek",
+        "safariAdventure": "Safari Avontuur",
+        "fashionShow": "Modeshow",
+        "casinoNight": "Casino Avond",
+        "fairyTaleKingdom": "Sprookjeskoninkrijk",
+        "spaceColony": "Ruimtekolonie",
+        "superheroAcademy": "Superhelden Academie",
+        "underwaterCity": "Onderwaterstad",
+        "wildWestSaloon": "Wildwest Saloon",
+        "vikingFeast": "Viking Feest",
+        "candyKingdom": "Snoepkoninkrijk",
+        "dragonsLair": "Drakenhol",
+        "timeTravelersBall": "Tijdreizigersbal",
+        "atlantisRising": "Opkomst van Atlantis",
+        "toyBoxAdventure": "Speelgoeddoos Avontuur",
+        "vampireMasquerade": "Vampieren Maskerade",
+        "dimensionHopping": "Dimensiespringen",
+        "cyberpunkNightclub": "Cyberpunk Nachtclub",
+        "ghostShip": "Spookschip",
+        "sentientPlantColony": "Kolonie van Intelligente Planten"
+      },
+      "prompts": {
+        "1920sSpeakeasy": "Ik wil een moordmysterie organiseren met een jaren 20 Speakeasy thema, gesitueerd in het verbodstijdperk.",
+        "hollywoodMurder": "Ontwerp een moordmysterie dat zich afspeelt op een Hollywood filmset in de gouden eeuw van de cinema.",
+        "castleMystery": "Ontwikkel een moordmysterie dat zich afspeelt in een afgelegen middeleeuws kasteel dat is omgebouwd tot een luxehotel.",
+        "sciFiMystery": "Ontwerp een moordmysterie aan boord van een onderzoekruimtestation dat in een baan om een nieuw ontdekte exoplaneet draait.",
+        "artGalleryOpening": "Creëer een moordmysterie in een prestigieuze kunstgalerie tijdens een high-profile opening van een tentoonstelling.",
+        "bakeryCompetition": "Ontwerp een moordmysterie rondom een bakwedstrijd in een klein stadje.",
+        "mountainSkiResort": "Ontwikkel een moordmysterie in een afgelegen bergskiresort tijdens een sneeuwstorm.",
+        "luxuryTrainJourney": "Creëer een mysterie dat zich afspeelt tijdens een luxe treinreis door de Zwitserse Alpen.",
+        "historicUniversity": "Bouw een moordmysterie dat zich afspeelt op een historische universiteit met een spookachtig verleden.",
+        "pokerTournament": "Creëer een mysterie tijdens een pokertoernooi met hoge inzetten.",
+        "barbieDreamworld": "Ontwerp een moordmysterie in een Barbie-geïnspireerde droomwereld waar alles roze en perfect is.",
+        "dystopianWaterworld": "Creëer een dystopische toekomstige mysterie waar water de meest kostbare hulpbron is.",
+        "jungleSteampunk": "Ontwikkel een moordmysterie dat zich afspeelt in de jungle met steampunk technologie en vibes.",
+        "magicalBakery": "Creëer een moordmysterie in een magische bakkerij waar betoverde desserts de specialiteit zijn.",
+        "gamingTournament": "Ontwerp een videogame-thema mysterie waar spelers op een gamingtoernooi.",
+        "synthwave80s": "Creëer een mysterie dat zich afspeelt in een alternatieve jaren 80 waar synthwave muziek emoties beheerst.",
+        "beachResort": "Ontwikkel een moordmysterie in een tropisch strandresort.",
+        "operaHouse": "Creëer een mysterie dat zich afspeelt tijdens een première in een historisch operahuis.",
+        "wineCountry": "Ontwerp een whodunit op een prestigieuze wijngaard tijdens de oogsttijd.",
+        "safariAdventure": "Creëer een moordmysterie tijdens een Afrikaanse safari-expeditie.",
+        "fashionShow": "Bouw een mysterie backstage bij een high-profile modeshow.",
+        "casinoNight": "Creëer een mysterie tijdens een liefdadigheids-casinonacht.",
+        "fairyTaleKingdom": "Ontwerp een moordmysterie in een betoverd sprookjeskoninkrijk.",
+        "spaceColony": "Creëer een mysterie op de eerste Marskolonie van de mensheid.",
+        "superheroAcademy": "Ontwikkel een mysterie op een school voor jonge superhelden in opleiding.",
+        "underwaterCity": "Creëer een moordmysterie in een futuristische onderwaterstad.",
+        "wildWestSaloon": "Ontwerp een mysterie in een grensstad tijdens de goudkoorts.",
+        "vikingFeast": "Creëer een moordmysterie tijdens een traditionele Vikingviering.",
+        "candyKingdom": "Creëer een moordmysterie in een wereld waar alles is gemaakt van snoep en suiker.",
+        "dragonsLair": "Ontwerp een mysterie in een middeleeuwse fantasiewereld waar mensen en draken naast elkaar bestaan.",
+        "timeTravelersBall": "Creëer een moordmysterie op een bijeenkomst waar deelnemers uit verschillende tijdsperioden komen.",
+        "atlantisRising": "Ontwikkel een mysterie in de recentelijk opgedoken oude stad Atlantis.",
+        "toyBoxAdventure": "Creëer een mysterie waar speelgoed tot leven komt als mensen niet kijken.",
+        "vampireMasquerade": "Ontwerp een mysterie op het jaarlijkse bloedbal van een exclusieve vampierenvereniging.",
+        "dimensionHopping": "Creëer een mysterie dat meerdere parallelle universums omvat.",
+        "cyberpunkNightclub": "Creëer een moordmysterie in een neon-doordrenkte cyberpunk nachtclub.",
+        "ghostShip": "Ontwerp een mysterie aan boord van een legendarisch schip dat eeuwen geleden verdween en mysterieus is teruggekeerd.",
+        "sentientPlantColony": "Creëer een moordmysterie in een samenleving van intelligente, mobiele planten met een complexe sociale hiërarchie."
+      }
+    },
+    "howItWorks": {
+      "step1": {
+        "title": "Beschrijf uw ideale moordmysterie.",
+        "description": "Vertel ons uw unieke visie - elk thema, personages of omgeving die u wilt."
+      },
+      "step2": {
+        "title": "Wij creëren uw aangepaste mysterie direct.",
+        "description": "Onze AI genereert alles precies zoals u het wilt – personages, aanwijzingen en verhaal."
+      },
+      "step3": {
+        "title": "Perfectioneer uw mysterie met onze editor.",
+        "description": "Verfijn en pas aan totdat uw mysterie precies goed is voor uw groep."
+      },
+      "step4": {
+        "title": "Krijg alles wat u nodig heeft om te hosten en te delen.",
+        "description": "Download en deel eenvoudig alle materialen met uw spelers."
+      }
+    },
+    "features": {
+      "title": "Alles wat u nodig heeft is inbegrepen",
+      "step1": {
+        "step": "Stap 1",
+        "title": "Onbeperkte Aanpassing",
+        "content": "Elk thema, elke personage, elke setting - creëer mysteries precies zoals u ze voor ogen heeft."
+      },
+      "step2": {
+        "step": "Stap 2",
+        "title": "Complete Personageprofielen",
+        "content": "Gedetailleerde achtergronden, motivaties en geheimen, specifiek afgestemd op uw mysterie."
+      },
+      "step3": {
+        "step": "Stap 3",
+        "title": "Eenvoudige Host Gids",
+        "content": "Stapsgewijze instructies om uw aangepaste mysterie vol vertrouwen te leiden."
+      }
+    },
+    "testimonials": {
+      "title": "Wat Anderen Zeggen",
+      "testimonial1": {
+        "text": "Mijn vrienden praten nog steeds over onze moordmysterienacht. De personages waren zo gedetailleerd en de plotwendingen waren perfect!",
+        "author": "Jessica Davis",
+        "role": "Feestgastvrouw"
+      },
+      "testimonial2": {
+        "text": "Zo makkelijk op te zetten! Ik maakte me zorgen over het hosten voor 12 mensen, maar de materialen maakten het eenvoudig en iedereen had een geweldige tijd.",
+        "author": "Mark Klein",
+        "role": "Bedrijfsevenementplanner"
+      },
+      "testimonial3": {
+        "text": "Derde moordmysteriefeest met deze service en ze worden steeds beter. De aanpassingsmogelijkheden zijn geweldig.",
+        "author": "Amanda Smith",
+        "role": "Verjaardagsvierder"
+      }
+    },
+    "support": {
+      "title": "Meer Hulp Nodig?",
+      "description": "Bezoek ons uitgebreide supportcentrum voor veelgestelde vragen, hostingtips en meer informatie over het gebruik van onze Mystery Maker.",
+      "button": "Bezoek Supportcentrum",
+      "email": "support@mysterymaker.party"
+    },
+    "footer": {
+      "tagline": "Creëer boeiende moordmysteries met de snelheid van de verbeelding.",
+      "quickLinks": "Snelle Links",
+      "company": "Bedrijf",
+      "links": {
+        "home": "Home",
+        "support": "Support",
+        "contact": "Contact",
+        "privacy": "Privacybeleid"
+      },
+      "copyright": "Mystery Maker, Inc. Alle rechten voorbehouden."
+    },
+    "auth": {
+      "signIn": {
+        "title": "Welkom Terug",
+        "subtitle": "Log in op uw account om door te gaan met het creëren van geweldige mysteries",
+        "email": "E-mailadres",
+        "password": "Wachtwoord",
+        "rememberMe": "Onthoud mij",
+        "forgotPassword": "Wachtwoord vergeten?",
+        "noAccount": "Nog geen account?",
+        "signUpLink": "Meld u hier aan",
+        "submitButton": "Inloggen",
+        "signingIn": "Inloggen...",
+        "orDivider": "of ga verder met",
+        "googleButton": "Verdergaan met Google"
+      },
+      "signUp": {
+        "title": "Maak Uw Account Aan",
+        "subtitle": "Sluit u aan bij duizenden mysteriemakers en begin vandaag nog met creëren",
+        "name": "Volledige Naam",
+        "email": "E-mailadres",
+        "password": "Wachtwoord",
+        "confirmPassword": "Wachtwoord Bevestigen",
+        "terms": "Ik ga akkoord met de",
+        "termsLink": "Servicevoorwaarden",
+        "privacy": "Privacybeleid",
+        "and": "en",
+        "hasAccount": "Heeft u al een account?",
+        "signInLink": "Log hier in",
+        "submitButton": "Account Aanmaken",
+        "creatingAccount": "Account aanmaken...",
+        "orDivider": "of ga verder met",
+        "googleButton": "Verdergaan met Google"
+      },
+      "forgotPassword": {
+        "title": "Wachtwoord Herstellen",
+        "subtitle": "Voer uw e-mailadres in en we sturen u een link om uw wachtwoord te herstellen",
+        "email": "E-mailadres",
+        "submitButton": "Herstellink Sturen",
+        "sending": "Verzenden...",
+        "backToSignIn": "Terug naar inloggen",
+        "checkEmail": {
+          "title": "Controleer Uw E-mail",
+          "message": "We hebben een link voor wachtwoordherstel gestuurd naar",
+          "noEmail": "Geen e-mail ontvangen?",
+          "tryAgain": "Probeer opnieuw",
+          "returnToSignIn": "Terug naar Inloggen"
+        }
+      },
+      "resetPassword": {
+        "title": "Nieuw Wachtwoord Instellen",
+        "subtitle": "Maak een nieuw wachtwoord aan voor uw account",
+        "password": "Nieuw Wachtwoord",
+        "confirmPassword": "Nieuw Wachtwoord Bevestigen",
+        "submitButton": "Wachtwoord Bijwerken",
+        "updating": "Bijwerken...",
+        "success": "Wachtwoord succesvol bijgewerkt"
+      },
+      "errors": {
+        "invalidCredentials": "Ongeldig e-mailadres of wachtwoord",
+        "emailAlreadyExists": "Een account met dit e-mailadres bestaat al",
+        "weakPassword": "Wachtwoord moet minimaal 6 tekens lang zijn",
+        "passwordMismatch": "Wachtwoorden komen niet overeen",
+        "invalidEmail": "Voer een geldig e-mailadres in",
+        "requiredField": "Dit veld is verplicht",
+        "termsRequired": "U moet de servicevoorwaarden accepteren",
+        "networkError": "Netwerkfout. Probeer het opnieuw.",
+        "unknownError": "Er is iets misgegaan. Probeer het opnieuw."
+      },
+      "success": {
+        "accountCreated": "Account succesvol aangemaakt! Controleer uw e-mail om uw account te verifiëren.",
+        "passwordReset": "E-mail voor wachtwoordherstel succesvol verzonden",
+        "passwordUpdated": "Wachtwoord succesvol bijgewerkt",
+        "signedOut": "Succesvol uitgelogd"
+      }
+    },
+    "dashboard": {
+      "title": "Uw Moordmysteries",
+      "subtitle": "Bekijk, bewerk en beheer al uw gemaakte mysteries",
+      "welcome": {
+        "title": "Welkom terug",
+        "subtitle": "Klaar om uw volgende mysterie meesterwerk te creëren?",
+        "noMysteries": "U heeft nog geen mysteries gemaakt",
+        "getStarted": "Begin met het creëren van uw eerste mysterie"
+      },
+      "mysteries": {
+        "title": "Uw Mysteries",
+        "searchPlaceholder": "Zoek mysteries...",
+        "deleteSuccess": "Mysterie verplaatst naar archief",
+        "deleteFailed": "Niet gelukt om mysterie te archiveren",
+        "filter": {
+          "all": "Alle Mysteries",
+          "drafts": "Concepten",
+          "completed": "Voltooid",
+          "purchased": "Gekocht",
+          "archived": "Gearchiveerd"
+        },
+        "empty": {
+          "title": "Geen mysteries gevonden",
+          "description": "Creëer uw eerste mysterie om te beginnen",
+          "searchResult": "Geen mysteries komen overeen met uw zoekopdracht"
+        },
+        "card": {
+          "players": "{{count}} spelers",
+          "created": "Gemaakt",
+          "lastEdited": "Laatst bewerkt",
+          "theme": "Thema: {{theme}}",
+          "actions": {
+            "view": "Bekijken",
+            "chat": "Chatten",
+            "delete": "Verwijderen",
+            "viewProgress": "Voortgang Bekijken",
+            "progress": "Voortgang",
+            "editMystery": "Mysterie Bewerken",
+            "edit": "Bewerken",
+            "archive": "Archiveren",
+            "deleteTitle": "Verwijderen"
+          },
+          "deleteDialog": {
+            "title": "Mysterie Verwijderen",
+            "description": "Weet u zeker dat u dit mysterie wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt."
+          },
+          "generationInProgress": "Generatie bezig...",
+          "editedDate": "Bewerkt {{date}}"
+        },
+        "status": {
+          "completed": "Voltooid",
+          "draft": "Concept",
+          "purchased": "Gekocht",
+          "unknown": "Onbekend",
+          "done": "Klaar",
+          "bought": "Gekocht",
+          "generating": "Genereren...",
+          "generatingShort": "Gen..."
+        },
+        "showingCount": "Toont {{count}} van {{total}} mysteries"
+      },
+      "stats": {
+        "totalMysteries": "Totaal Mysteries",
+        "completedMysteries": "Voltooid",
+        "purchasedMysteries": "Gekocht",
+        "totalPlayers": "Totaal Aantal Spelers Gehost"
+      },
+      "backToDashboard": "Terug naar Dashboard",
+      "buttons": {
+        "createFirstMystery": "Creëer Uw Eerste Mysterie"
+      },
+      "errors": {
+        "loadFailed": "Niet gelukt om uw mysteries te laden"
+      }
+    },
+    "account": {
+      "title": "Accountinstellingen",
+      "tabs": {
+        "profile": "Profiel",
+        "security": "Beveiliging"
+      },
+      "profile": {
+        "title": "Profielinformatie",
+        "description": "Werk uw accountprofielinformatie bij",
+        "name": "Volledige Naam",
+        "email": "E-mailadres",
+        "emailNote": "E-mail kan niet worden gewijzigd",
+        "saveButton": "Wijzigingen Opslaan",
+        "saving": "Opslaan...",
+        "success": "Profiel succesvol bijgewerkt"
+      },
+      "security": {
+        "password": {
+          "title": "Wachtwoord Wijzigen",
+          "description": "Werk uw wachtwoord bij om uw account veilig te houden",
+          "currentPassword": "Huidig Wachtwoord",
+          "newPassword": "Nieuw Wachtwoord",
+          "confirmPassword": "Nieuw Wachtwoord Bevestigen",
+          "updateButton": "Wachtwoord Bijwerken",
+          "updating": "Bijwerken...",
+          "success": "Wachtwoord succesvol bijgewerkt"
+        },
+        "deleteAccount": {
+          "title": "Account Verwijderen",
+          "description": "Verwijder uw account en alle bijbehorende gegevens permanent",
+          "warning": "Deze actie kan niet ongedaan worden gemaakt. Al uw mysteries en gegevens worden permanent verwijderd.",
+          "confirmText": "Typ VERWIJDEREN om te bevestigen",
+          "deleteButton": "Account Verwijderen",
+          "deleting": "Verwijderen...",
+          "success": "Account succesvol verwijderd"
+        }
+      }
+    },
+    "mysteryCreation": {
+      "scriptType": {
+        "full": "volledig",
+        "pointForm": "puntvorm",
+        "both": "zowel volledig als puntvorm"
+      },
+      "sections": {
+        "premise": "Premisse",
+        "victim": "Slachtoffer",
+        "characterList": "Personagelijst",
+        "players": "spelers",
+        "murderMethod": "Moordmethode"
+      },
+      "wizard": {
+        "title": "Creëer Uw Mysterie",
+        "step1": {
+          "title": "Vertel ons uw visie",
+          "description": "Beschrijf uw ideale moordmysteriefeest"
+        },
+        "step2": {
+          "title": "Beoordelen & Verfijnen",
+          "description": "Perfectioneer uw mysterie met onze AI-assistent"
+        },
+        "step3": {
+          "title": "Compleet Pakket",
+          "description": "Krijg alles wat u nodig heeft om te hosten"
+        },
+        "prompt": {
+          "defaultStart": "Ik wil een moordmysterie creëren",
+          "withTheme": "Het thema/de setting moet {{theme}} zijn voor {{playerCount}} spelers met {{scriptType}} scripts",
+          "withoutTheme": "Dit is voor {{playerCount}} spelers met {{scriptType}} scripts",
+          "withAccomplice": "Voeg een handlanger-mechanisme toe aan het mysterie",
+          "withoutAccomplice": "Voeg geen handlanger-mechanisme toe aan het mysterie",
+          "additionalDetails": "Extra details zijn: {{details}}"
+        }
+      },
+      "editor": {
+        "title": "Mysterie Editor",
+        "characters": "Personages",
+        "story": "Verhaal",
+        "clues": "Aanwijzingen",
+        "hostGuide": "Host Gids",
+        "save": "Concept Opslaan",
+        "publish": "Mysterie Voltooien",
+        "saving": "Opslaan...",
+        "publishing": "Publiceren...",
+        "saved": "Concept opgeslagen",
+        "published": "Mysterie voltooid"
+      },
+      "guidance": {
+        "describe": "Beschrijf uw mysterie gedetailleerd - hoe specifieker u bent, hoe beter wij het voor u kunnen creëren",
+        "examples": "Probeer: 'Een jaren 20 speakeasy moordmysterie met 8 personages waaronder een jazzzangeres, barman en maffiabaas'",
+        "playerCount": "Hoeveel spelers zullen deelnemen?",
+        "theme": "Wat is de setting of het thema?",
+        "special": "Speciale vereisten of beperkingen?",
+        "initialPrompt": {
+          "withTheme": "Laten we een moordmysterie creëren met een {{theme}} thema. Leid me alstublieft stap voor stap door het creëren van dit mysterie.",
+          "withoutTheme": "Laten we een moordmysterie creëren. Leid me alstublieft stap voor stap door het creëren van dit mysterie."
+        }
+      },
+      "editTitle": "Mysterie Bewerken",
+      "createTitle": "Nieuw Mysterie Creëren",
+      "form": {
+        "description": "Vul het onderstaande formulier in om uw aangepaste moordmysterie te genereren"
+      },
+      "buttons": {
+        "generateFullMystery": "Volledig Mysterie Genereren"
+      },
+      "errors": {
+        "signInToSave": "Gelieve in te loggen om uw mysterie op te slaan",
+        "saveFailed": "Opslaan van mysterie mislukt",
+        "loadFailed": "Laden van mysterie mislukt",
+        "loadMessagesFailed": "Laden van conversatieberichten mislukt",
+        "loadConversationFailed": "Laden van conversatie mislukt",
+        "initialPrompt": "Gelieve een prompt voor uw mysterie op te geven",
+        "saveMessageFailed": "Opslaan van bericht mislukt"
+      },
+      "success": {
+        "setupComplete": "Mysterie setup voltooid! Chat wordt gestart..."
+      }
+    },
+    "mysteryForm": {
+      "userRequestLabel": "Wat u wilt creëren",
+      "userRequestDescription": "Uw originele aanvraag vanaf de startpagina",
+      "themeLabel": "Thema/Setting Details (Optioneel)",
+      "themePlaceholder": "bijv. tijdsperiode, specifieke setting, must-haves, etc.",
+      "themeDescription": "Kies een specifiek thema of setting voor uw moordmysterie",
+      "playerCountLabel": "Hoeveel spelers zullen deelnemen?",
+      "playerCountPlaceholder": "Selecteer aantal spelers",
+      "playerCountItem": "{{count}} spelers",
+      "playerCountDescription": "Kies tussen 4 en 32 spelers voor uw moordmysterie.",
+      "accompliceLabel": "Inclusief Handlanger Mechanisme",
+      "accompliceDescription": "Het beste voor spellen met 10 of meer spelers",
+      "scriptTypeLabel": "Script Detailniveau",
+      "scriptTypeFullLabel": "Volledige Scripts - Complete dialoog en gedetailleerde instructies",
+      "scriptTypePointFormLabel": "Puntvorm - Kernpunten en samenvattingen in opsommingstekens",
+      "scriptTypeBothLabel": "Beide Formaten - Volledige scripts EN puntvormige notities",
+      "additionalDetailsLabel": "Aanvullende Details (Optioneel)",
+      "additionalDetailsPlaceholder": "Eventuele specifieke vereisten, speciale regels of aanvullende context voor uw mysterie...",
+      "additionalDetailsDescription": "Geef eventuele extra details of speciale verzoeken voor uw mysterie op",
+      "startChat": "Start AI Chat",
+      "startingChat": "Chat starten..."
+    },
+    "supportPage": {
+      "title": "Supportcentrum",
+      "subtitle": "Vind antwoorden op veelgestelde vragen, neem contact op met ons supportteam en krijg alles wat u nodig heeft om geweldige mysteriefeesten te creëren.",
+      "tabs": {
+        "faqs": "Veelgestelde Vragen",
+        "contact": "Neem Contact Op"
+      },
+      "faqs": {
+        "title": "Veelgestelde Vragen",
+        "description": "Vind antwoorden op veelgestelde vragen over Mystery Maker",
+        "categories": {
+          "aboutMysteryMaker": "Over Mystery Maker",
+          "gameMechanics": "Spelmechanica",
+          "hostingPlanning": "Hosten & Plannen",
+          "accountBilling": "Account & Facturering"
+        },
+        "questions": {
+          "whatIsMysteryMaker": {
+            "question": "Wat is Mystery Maker en hoe werkt het?",
+            "answer": "Mystery Maker is een AI-gestuurd platform dat aangepaste moordmysteriefeesten creëert precies zoals u ze wilt. Vertel ons uw unieke visie - elk thema, personages of omgeving - en onze AI genereert alles wat u nodig heeft: personageprofielen, aanwijzingen en hostmaterialen die specifiek zijn afgestemd op uw feest."
+          },
+          "creationProcess": {
+            "question": "Hoe werkt het aanmaak- en aankoopproces?",
+            "answer": "Eenvoudig! Beschrijf eerst uw ideale moordmysterie en we maken gratis een aangepaste preview. Als u tevreden bent met uw mysterie, koopt u het complete pakket voor $11,99. U krijgt direct alles wat u nodig heeft om te hosten: gedetailleerde personageprofielen, een hostgids en alle spelmaterialen."
+          },
+          "saveWork": {
+            "question": "Kan ik mijn werk opslaan en er later op terugkomen?",
+            "answer": "Ja! Al uw aangepaste mysteries worden opgeslagen in uw account, zodat u ze op elk moment kunt terugvinden en bewerken."
+          },
+          "replayable": {
+            "question": "Zijn deze moordmysteries herspeelbaar?",
+            "answer": "Absoluut! Onze mysteries bevatten variabele elementen, zodat elke speelbeurt fris aanvoelt, zelfs met dezelfde groep. U kunt uw aangepaste mysterie zo vaak hosten als u wilt."
+          },
+          "playerCount": {
+            "question": "Hoeveel spelers heb ik nodig?",
+            "answer": "Ons systeem creëert mysteries voor elke groepsgrootte die u opgeeft - van intieme bijeenkomsten van 4-6 spelers tot grotere feesten van 15+ spelers. Vertel ons gewoon uw spelersaantal en wij ontwerpen dienovereenkomstig."
+          },
+          "modifyMystery": {
+            "question": "Kan ik mijn mysterie wijzigen nadat ik het heb gemaakt?",
+            "answer": "Natuurlijk! Gebruik onze editor om uw mysterie te verfijnen en aan te passen totdat het precies goed is voor uw groep. Wijzig personages, thema's of complexiteit op elk moment."
+          },
+          "lastMinuteChanges": {
+            "question": "Wat als ik op het laatste moment spelers moet toevoegen of verwijderen?",
+            "answer": "Geen probleem! Ons flexibele systeem stelt u in staat om uw spelersaantal aan te passen, zelfs nadat u uw mysterie heeft gemaakt. De AI past het verhaal en de personages aan om deze wijzigingen op te vangen."
+          },
+          "whatIncluded": {
+            "question": "Wat zit er in mijn aangepaste mysteriepakket?",
+            "answer": "Alles wat u nodig heeft: een uitgebreide hostgids met stapsgewijze instructies, gedetailleerde personageprofielen voor elke speler, aanwijzingen, bewijsmateriaal en alle spelmaterialen. Geen extra voorbereiding vereist."
+          },
+          "gameDuration": {
+            "question": "Hoe lang duurt een typisch spel?",
+            "answer": "De meeste mysteries duren 2-3 uur, maar u bepaalt het tempo. Onze hostgids bevat tijdsuggesties die u kunt aanpassen aan uw schema."
+          },
+          "themedMysteries": {
+            "question": "Bieden jullie themamysteries aan voor speciale gelegenheden?",
+            "answer": "We creëren elk thema dat u zich kunt voorstellen! Van klassieke jaren 20 speakeasies tot ruimtestations tot sprookjeskoninkrijken - vertel ons uw visie en wij maken het waar."
+          },
+          "ageRecommendation": {
+            "question": "Is er een leeftijdsadvies voor jullie mysteries?",
+            "answer": "Onze standaard mysteries werken geweldig voor volwassenen en tieners (13+). U kunt ook gezinsvriendelijke thema's aanvragen bij het creëren van uw mysterie voor jongere spelers."
+          },
+          "freePreview": {
+            "question": "Wat is inbegrepen in de gratis preview?",
+            "answer": "U kunt onbeperkt mysterie-previews gratis aanmaken, inclusief de basisverhaallijn en personageconcepten. Dit stelt u in staat om verschillende ideeën te verkennen voordat u koopt."
+          },
+          "purchaseIncludes": {
+            "question": "Wat krijg ik als ik een mysterie koop?",
+            "answer": "Voor $11,99 ontvangt u alles wat nodig is om te hosten: een uitgebreide hostgids, gedetailleerde personageprofielen voor elke speler, aanwijzingen, bewijsmateriaal en alle spelmaterialen, klaar voor gebruik."
+          },
+          "refund": {
+            "question": "Kan ik een terugbetaling krijgen als ik niet tevreden ben?",
+            "answer": "Absoluut! Als u niet volledig tevreden bent met uw aankoop, neem dan binnen 7 dagen contact met ons op en wij zullen een volledige terugbetaling uitvoeren, zonder vragen."
+          }
+        }
+      },
+      "contact": {
+        "title": "Neem Contact Op",
+        "description": "Meer hulp nodig? Wij zijn er voor u",
+        "intro": "Ons supportteam staat klaar om u te helpen met al uw vragen over het creëren van uw perfecte mysteriefeest met Mystery Maker.",
+        "form": {
+          "name": "Naam",
+          "email": "E-mailadres",
+          "subject": "Onderwerp",
+          "message": "Bericht",
+          "namePlaceholder": "Uw naam",
+          "emailPlaceholder": "uw.email@voorbeeld.com",
+          "subjectPlaceholder": "Waar gaat uw bericht over?",
+          "messagePlaceholder": "Hoe kunnen we u helpen?",
+          "sendButton": "Verstuur Bericht",
+          "sending": "Verzenden...",
+          "success": "Bedankt voor uw bericht! We nemen binnen 24 uur contact met u op.",
+          "error": "Bericht kon niet worden verzonden. Probeer het later opnieuw."
+        }
+      }
+    },
+    "chat": {
+      "title": "Moordmysterie Creator",
+      "public": "Openbaar",
+      "private": "Privé",
+      "initialGreeting": "Hallo! Ik ben uw AI-ontwikkelingsassistent. Laat me u helpen een moordmysterie te creëren. Hoeveel spelers wilt u voor uw moordmysterie?",
+      "inputPlaceholder": "Typ uw bericht...",
+      "signInPrompt": "Gelieve <1>in te loggen</1> om de privémodus te gebruiken",
+      "errorResponse": "Ik heb momenteel moeite met reageren. Probeer het opnieuw.",
+      "errorResponseWithFallback": "Ik ervaar momenteel enkele technische problemen. Hoeveel spelers wilt u voor uw moordmysterie?",
+      "connectionErrorResponse": "Ik heb momenteel moeite met verbinden. Hoeveel spelers wilt u voor uw moordmysterie?",
+      "placeholder": "Deel uw ideeën voor het mysterie...",
+      "loadingMessages": "Vorige berichten laden...",
+      "errors": {
+        "responseFailed": "AI-reactie ophalen mislukt. Probeer het opnieuw.",
+        "aiUnavailable": "Mijn excuses, maar ik heb momenteel moeite met reageren. Probeer het over een moment opnieuw."
+      }
+    },
+    "sendToGuests": {
+      "title": "Stuur Personagegidsen naar Uw Gasten",
+      "description": "Voer e-mailadressen in voor elk personage om gepersonaliseerde gidsen rechtstreeks naar uw gasten te sturen. Elke gast ontvangt alleen zijn eigen personage-informatie.",
+      "status": {
+        "sent": "Verzonden"
+      },
+      "emailPlaceholder": "gast@voorbeeld.com",
+      "buttons": {
+        "sending": "Verzenden...",
+        "send": "Stuur Personagegidsen"
+      },
+      "errors": {
+        "noValidEmails": "Voeg ten minste één geldig e-mailadres toe",
+        "sendFailed": "Sommige e-mails konden niet worden verzonden. Probeer het opnieuw."
+      },
+      "success": {
+        "sentCount": "Personagegidsen verzonden naar {{count}} gasten"
+      }
+    },
+    "common": {
+      "buttons": {
+        "createNew": "Nieuw Mysterie Creëren",
+        "getStarted": "Aan de Slag",
+        "learnMore": "Meer Leren",
+        "tryNow": "Probeer Nu",
+        "continue": "Doorgaan",
+        "cancel": "Annuleren",
+        "save": "Opslaan",
+        "delete": "Verwijderen",
+        "edit": "Bewerken",
+        "close": "Sluiten",
+        "back": "Terug",
+        "next": "Volgende",
+        "previous": "Vorige",
+        "finish": "Voltooien",
+        "submit": "Verzenden",
+        "confirm": "Bevestigen",
+        "yes": "Ja",
+        "no": "Nee"
+      },
+      "labels": {
+        "loading": "Laden...",
+        "pleaseWait": "Even geduld a.u.b.",
+        "error": "Fout",
+        "success": "Succes",
+        "warning": "Waarschuwing",
+        "info": "Informatie",
+        "required": "Vereist",
+        "optional": "Optioneel"
+      },
+      "messages": {
+        "welcome": "Welkom!",
+        "thankYou": "Dank u!",
+        "comingSoon": "Binnenkort Beschikbaar",
+        "notFound": "Niet Gevonden",
+        "somethingWentWrong": "Er is iets misgegaan",
+        "tryAgain": "Probeer het opnieuw",
+        "noResultsFound": "Geen resultaten gevonden",
+        "loadingContent": "Inhoud laden...",
+        "savingChanges": "Wijzigingen opslaan...",
+        "changesSuccess": "Wijzigingen succesvol opgeslagen",
+        "changesCanceled": "Wijzigingen geannuleerd",
+        "aiThinking": "AI denkt na..."
+      },
+      "validation": {
+        "required": "Dit veld is verplicht",
+        "invalidEmail": "Voer een geldig e-mailadres in",
+        "passwordTooShort": "Wachtwoord moet minimaal 6 tekens lang zijn",
+        "passwordMismatch": "Wachtwoorden komen niet overeen",
+        "invalidFormat": "Ongeldig formaat",
+        "tooShort": "Te kort",
+        "tooLong": "Te lang",
+        "invalidCharacters": "Bevat ongeldige tekens"
+      },
+      "states": {
+        "draft": "Concept",
+        "inProgress": "In Behandeling",
+        "completed": "Voltooid",
+        "published": "Gepubliceerd",
+        "archived": "Gearchiveerd",
+        "deleted": "Verwijderd"
+      },
+      "modals": {
+        "confirmDelete": {
+          "title": "Verwijdering Bevestigen",
+          "message": "Weet u zeker dat u dit item wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.",
+          "confirmButton": "Verwijderen",
+          "cancelButton": "Annuleren"
+        },
+        "unsavedChanges": {
+          "title": "Niet-opgeslagen Wijzigingen",
+          "message": "U heeft niet-opgeslagen wijzigingen. Wilt u deze opslaan voordat u weggaat?",
+          "saveButton": "Wijzigingen Opslaan",
+          "discardButton": "Wijzigingen Verwerpen",
+          "cancelButton": "Annuleren"
+        }
+      },
+      "notifications": {
+        "welcomeBack": "Welkom terug!",
+        "signedOut": "U bent uitgelogd",
+        "sessionExpired": "Uw sessie is verlopen. Log opnieuw in.",
+        "connectionLost": "Verbinding verbroken. Poging tot herverbinding...",
+        "connectionRestored": "Verbinding hersteld",
+        "updateAvailable": "Een nieuwe versie is beschikbaar. Vernieuwen om bij te werken.",
+        "offlineMode": "U bent momenteel offline",
+        "deleteSuccess": "{{item}} succesvol verwijderd",
+        "deleteFailed": "Verwijderen van {{item}} mislukt",
+        "archiveSuccess": "{{item}} succesvol gearchiveerd",
+        "archiveFailed": "Archiveren van {{item}} mislukt",
+        "updatedSuccess": "{{item}} succesvol bijgewerkt",
+        "updateFailed": "Bijwerken van {{item}} mislukt"
+      }
+    },
+    "character": {
+      "detail": {
+        "description": "Personagebeschrijving",
+        "background": "Achtergrond",
+        "relationships": "Relaties",
+        "secrets": "Geheimen",
+        "whereabouts": "Waarabouts Tijdens de Moord",
+        "introduction": "Introductie",
+        "round1": "Ronde 1: Initieel Onderzoek",
+        "round2": "Ronde 2: Diepere Onthullingen",
+        "round3": "Ronde 3: Laatste Aanwijzingen",
+        "finalStatement": "Definitieve Verklaring",
+        "questioningOptions": "Vragenopties",
+        "askTarget": "Vraag {{target}}: \"{{question}}\""
+      },
+      "import": {
+        "title": "Mysterie Personages",
+        "description": "Beheer de personages in uw moordmysterie",
+        "importButton": "Personages Importeren",
+        "loading": "Personages laden...",
+        "noCharacters": "Nog geen personages",
+        "importPrompt": "Importeer personagegegevens om uw moordmysterie te vullen.",
+        "foundCount": "{{count}} personages gevonden in database",
+        "deleteConfirm": "Weet u zeker dat u {{name}} wilt verwijderen?",
+        "deleteSuccess": "Personage verwijderd: {{name}}",
+        "deleteFailed": "Verwijderen van personage mislukt",
+        "refreshSuccess": "Personagelijst vernieuwd",
+        "refreshFailed": "Vernieuwen van personagegegevens mislukt",
+        "loadFailed": "Laden van personagegegevens mislukt",
+        "table": {
+          "name": "Personagenaam",
+          "details": "Details",
+          "scripts": "Scripts",
+          "actions": "Acties",
+          "badges": {
+            "description": "Beschrijving",
+            "background": "Achtergrond",
+            "relationships": "Relaties",
+            "secrets": "Geheimen",
+            "intro": "Intro",
+            "round1": "Ronde 1",
+            "round2": "Ronde 2",
+            "round3": "Ronde 3"
+          }
+        }
+      },
+      "access": {
+        "welcome": "Welkom, {{name}}!",
+        "subtitle": "Hier is uw personagegids voor het mysteriespel",
+        "loading": "Uw personage laden...",
+        "accessDenied": "Toegang geweigerd",
+        "notFound": "Personagetoewijzing niet gevonden.",
+        "guide": {
+          "yourCharacter": "{{name}} - Uw Personage",
+          "yourBackground": "Uw Achtergrond",
+          "yourSecret": "Uw Geheim",
+          "introduction": "Introductie",
+          "rumorsYouKnow": "Geruchten die u Kent",
+          "round1": "Ronde 1: Eerste Verklaring",
+          "round2": "Ronde 2: Motieven",
+          "round3": "Ronde 3: Methode",
+          "questionsToAsk": "Vragen om te Stellen",
+          "ifInnocent": "Als U Onschuldig Bent:",
+          "ifGuilty": "Als U Schuldig Bent:",
+          "ifAccomplice": "Als U een Handlanger Bent:"
+        }
+      },
+      "dialog": {
+        "title": "Personagegegevens Importeren",
+        "subtitle": "Plak hieronder uw personagegegevens:",
+        "pasteButton": "Plakken vanaf Klembord",
+        "pasteSuccess": "Tekst van klembord geplakt",
+        "pasteError": "Geen toegang tot klembord. Plak handmatig.",
+        "placeholder": "Plak hier de inhoud van de PERSONAGEGIDS...",
+        "instructions": "Personagegegevens moeten de volgende secties bevatten:",
+        "sections": [
+          "PERSONAGEBESCHRIJVING",
+          "ACHTERGROND",
+          "RELATIES",
+          "GEHEIMEN",
+          "WAARABOUTS",
+          "Ronde verklaringen (RONDE 1, RONDE 2, etc.)"
+        ],
+        "importButton": "Personages Importeren",
+        "importing": "Importeren...",
+        "cancel": "Annuleren",
+        "enterData": "Gelieve personagegegevens in te voeren of te plakken",
+        "importSuccess": "Personages succesvol geïmporteerd",
+        "importFailed": "Importeren van personagegegevens mislukt",
+        "importError": "Een onverwachte fout is opgetreden tijdens het importeren"
+      },
+      "guestManager": {
+        "title": "Deel Personages met Gasten",
+        "subtitle": "Wijs elk personage toe aan een gast en verstuur via e-mail",
+        "table": {
+          "character": "Personage",
+          "guestName": "Gastnaam",
+          "email": "E-mail",
+          "action": "Actie"
+        },
+        "placeholders": {
+          "guestName": "Naam van de gast",
+          "email": "gast@voorbeeld.com"
+        },
+        "buttons": {
+          "edit": "Bewerken",
+          "send": "Versturen",
+          "sendAll": "Alles Versturen",
+          "close": "Sluiten"
+        },
+        "status": {
+          "sent": "Verzonden"
+        },
+        "assignedCount": "{{count}} personages toegewezen",
+        "toasts": {
+          "characterSent": "Personage verzonden naar {{name}}!",
+          "sendFailed": "Verzenden van personagetoewijzing mislukt",
+          "loadFailed": "Laden van bestaande toewijzingen mislukt",
+          "updateFailed": "Bijwerken van toewijzing mislukt",
+          "noValidAssignments": "Geen geldige toewijzingen om te verzenden",
+          "allSent": "{{count}} personagetoewijzingen verzonden!",
+          "sendSomeFailed": "Verzenden van sommige toewijzingen mislukt"
+        }
+      },
+      "roles": {
+        "title": "Personagerollen",
+        "description": "Wijs de moordenaarsrol toe voor uw mysterie",
+        "murderer": "Moordenaar",
+        "required": "Vereist",
+        "noneSelected": "Niets geselecteerd",
+        "murdererDescription": "Het personage dat de moord heeft gepleegd",
+        "saveRoles": "Rollen Opslaan",
+        "saving": "Opslaan...",
+        "saveSuccess": "Personagerollen succesvol opgeslagen",
+        "saveFailed": "Opslaan van personagerollen mislukt",
+        "loadFailed": "Laden van personagegegevens mislukt"
+      }
+    },
+    "purchase": {
+      "toasts": {
+        "success": "Aankoop succesvol! U heeft nu volledige toegang tot dit mysteriepakket.",
+        "cancel": "Aankoop geannuleerd. U kunt het opnieuw proberen wanneer u er klaar voor bent.",
+        "loadFailed": "Niet gelukt om mysterie details te laden.",
+        "notFound": "Mysterie niet gevonden.",
+        "devPurchaseSim": "Aankoop simuleren in ontwikkelmodus...",
+        "devPurchaseSuccess": "Aankoop gesimuleerd! Doorverwijzen naar pakketgeneratie...",
+        "devPurchaseFailed": "Simuleren van aankoop mislukt.",
+        "signInRequired": "Gelieve in te loggen om dit mysterie te kopen.",
+        "checkoutRedirect": "Doorverwijzen naar beveiligde checkout...",
+        "checkoutFailed": "Doorverwijzen naar checkout mislukt. Probeer het opnieuw.",
+        "genericError": "Er is een fout opgetreden bij het laden van mysterie details."
+      },
+      "title": "Voltooi Uw Aankoop",
+      "subtitle": "Krijg volledige toegang tot uw moordmysteriepakket",
+      "package": {
+        "title": "Moordmysterie Pakket",
+        "description": "Eenmalige aankoop, directe toegang",
+        "priceDescription": "Compleet moordmysteriepakket met alle personagematerialen, aanwijzingen en hostinginstructies.",
+        "whatsIncluded": "Wat is inbegrepen:",
+        "includes": [
+          "Volledige personageprofielen voor alle verdachten",
+          "Hostgids met stapsgewijze instructies",
+          "Afdrukbare personagebladen",
+          "Bewijsmateriaal en aanwijzingskaarten",
+          "Tijdlijn van gebeurtenissen",
+          "Oplossingsonthullingsscript",
+          "PDF-downloads van alle materialen"
+        ]
+      },
+      "buttons": {
+        "processing": "Verwerken...",
+        "complete": "Aankoop Voltooien",
+        "backToDesign": "Terug naar Mysterie Ontwerp"
+      },
+      "notes": {
+        "title": "Belangrijke Opmerkingen",
+        "items": [
+          "Dit is een eenmalige aankoop voor dit specifieke mysteriepakket",
+          "U heeft permanent toegang om alle materialen te downloaden",
+          "Inhoud is alleen voor persoonlijk gebruik, niet voor commerciële herdistributie",
+          "Hulp nodig? Neem contact op met onze support via {{email}}"
+        ]
+      },
+      "preview": {
+        "defaultTitle": "Aangepast Moordmysterie",
+        "characterPlaceholder": "Personagegegevens worden onthuld in het volledige pakket.",
+        "characterPlaceholderFull": "Volledige personagebeschrijving beschikbaar in het gekochte pakket.",
+        "evidencePlaceholder": "Bewijsdetails beschikbaar in het volledige pakket.",
+        "title": "Moordmysterie Preview",
+        "playersLabel": "Spelers",
+        "playersCount": "{{count}} Spelers",
+        "unknownPlayers": "Onbekend aantal spelers",
+        "storyTitle": "Verhaal Preview",
+        "unlockMessage": "Koop om het complete mysteriepakket te ontgrendelen met alle personagedetails, aanwijzingen en materialen.",
+        "whatsIncluded": "Wat zit er in het complete pakket:",
+        "packageIncludes": [
+          "Gedetailleerde hostgids met complete setup instructies",
+          "Personagegidsen voor elke speler",
+          "Bewijskaarten en printbaar materiaal",
+          "Volledig gameplay script en tijdlijn"
+        ]
+      }
+    },
+    "mysteryPackage": {
+      "shareWithGuests": "Delen met Gasten",
+      "tabs": {
+        "hostGuide": "Host Gids",
+        "characters": "Personages ({{count}})",
+        "clues": "Bewijs",
+        "inspector": "Detective Gids",
+        "relationships": "Relaties"
+      },
+      "mobileTabs": {
+        "host": "Host",
+        "characters": "Personages ({{count}})",
+        "clues": "Bewijs",
+        "inspector": "Detective",
+        "relations": "Relaties"
+      },
+      "loading": {
+        "generating": "Genereren...",
+        "generatingMessage": "Momenteel wordt uw complete mysterie gegenereerd. Dit proces duurt ongeveer 3-5 minuten.<br />Deze pagina wordt automatisch vernieuwd zodra het mysterie is voltooid.",
+        "characters": "Unieke personageprofielen ontwikkelen met achtergronden, motivaties en geheimen voor uw mysteriespel.",
+        "clues": "Bewijskaarten, aanwijzingen en onderzoeksmaterialen creëren die zullen helpen bij het oplossen van uw mysterie.",
+        "inspector": "Het script van de detective en de onderzoekstijdlijn schrijven om het oplossen van het mysterie te begeleiden.",
+        "matrix": "De personage-relatiematrix bouwen die verbindingen, conflicten en verborgen relaties toont."
+      },
+      "placeholder": {
+        "title": "Klaar om uw Mysterie te Genereren",
+        "description": "Klik op de knop hieronder om uw complete mysteriepakket met alle materialen te genereren.",
+        "button": "Pakket Genereren",
+        "characters": "Personagegidsen zijn beschikbaar nadat de generatie is gestart.",
+        "clues": "Bewijskaarten zijn beschikbaar nadat de generatie is gestart.",
+        "inspector": "Detectivegids is beschikbaar nadat de generatie is gestart.",
+        "matrix": "Relatiematrix is beschikbaar nadat de generatie is gestart."
+      },
+      "matrix": {
+        "title": "Personage Relatie Matrix"
+      }
+    },
+    "chatbot": {
+      "toasts": {
+        "invalidId": "Ongeldige conversatie ID",
+        "loadFailed": "Uw vorige conversatie kon niet worden geladen",
+        "offlineMode": "Offlinemodus in gebruik - sommige functies kunnen beperkt zijn",
+        "requestError": "Fout bij het verwerken van uw verzoek",
+        "generationSuccess": "Mysterie succesvol gegenereerd!",
+        "urlUnavailable": "Chatbot URL nog niet beschikbaar"
+      },
+      "welcomeMessage": "Welkom bij de Moordmysterie Creator! Beschrijf het type mysterie dat u wilt creëren, of vraag me om suggesties.",
+      "newConversationTitle": "Nieuw Moordmysterie",
+      "fallbackResponses": [
+        "Ik help u graag een moordmysterie te creëren. Welk thema of welke setting wilt u voor uw mysterie?",
+        "Dat is een geweldige keuze! Laten we nu nadenken over het slachtoffer. Wie wilt u dat het slachtoffer is?",
+        "Interessant! Nu hebben we wat verdachten nodig. Kunt u 2-3 personages beschrijven die motieven kunnen hebben om deze misdaad te plegen?",
+        "Dat zijn overtuigende verdachten. Laten we wat aanwijzingen toevoegen. Wat voor bewijsmateriaal zou er op de plaats delict kunnen worden gevonden?",
+        "Uw mysterie krijgt vorm! Om de details van uw verhaal verder te ontwikkelen, laten we nadenken over welke andere elementen we zouden kunnen opnemen."
+      },
+      "title": "Creëer Uw Moordmysterie",
+      "buttons": {
+        "external": "Extern",
+        "openFull": "Open Volledige Chatbot",
+        "finalize": "Finaliseren",
+        "finalizeMystery": "Mysterie Finaliseren"
+      },
+      "creatorTitle": "Moordmysterie Creator",
+      "placeholder": "Typ uw ideeën voor het moordmysterie...",
+      "finalizePrompt": "Wanneer u tevreden bent met uw mysterie, finaliseert u het om verder te gaan."
+    },
+    "homeDashboard": {
+      "title": "Uw Mysteries",
+      "searchPlaceholder": "Zoek mysteries...",
+      "loadMore": "Meer Laden",
+      "loading": "Laden...",
+      "empty": {
+        "title": "U heeft nog geen mysteries gecreëerd",
+        "description": "Gebruik het invoerveld hierboven om uw eerste moordmysterie te creëren!"
+      },
+      "errors": {
+        "loadFailed": "Laden van sommige mysteries mislukt. Vernieuw de pagina."
+      }
+    },
+    "mysteryDashboard": {
+      "title": "Mysterie Dashboard",
+      "description": "Beheer uw gecreëerde mysteries, start nieuwe, of verken voorbeeldinhoud.",
+      "tabs": {
+        "all": "Alle",
+        "drafts": "Concepten",
+        "purchased": "Gekocht",
+        "archived": "Gearchiveerd"
+      }
+    }
+  }
