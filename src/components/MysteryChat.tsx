@@ -191,7 +191,7 @@ export default function MysteryChat({
     additionalDetails?: string;
     language?: string;
   }) => {
-    let systemInstruction = "You are a murder mystery creation assistant. ";
+    let behavioralInstructions = "";
     
     // Add language instruction based on current language
     if (data.language && data.language !== 'en') {
@@ -199,7 +199,7 @@ export default function MysteryChat({
         'ko': 'Korean',
         'de': 'German', 
         'es': 'Spanish',
-        'fr': 'French'
+        'fr': 'French',
         'da': 'Danish',
         'fi': 'Finnish',
         'it': 'Italian',
@@ -210,21 +210,18 @@ export default function MysteryChat({
         'zh-cn': 'Chinese'
       };
       const languageName = languageNames[data.language] || data.language;
-      systemInstruction += `CRITICAL: You MUST respond entirely in ${languageName} language. `;
+      behavioralInstructions += `CRITICAL: You MUST respond entirely in ${languageName} language. `;
     }
     
-    systemInstruction += `The user has provided all necessary information in their initial request including player count, script type, and accomplice preference. 
-
-IMPORTANT RULES:
+    behavioralInstructions += `BEHAVIORAL RULES:
 1. DO NOT ask for player count, script type, or accomplice preferences - this information is already provided
-2. DO NOT ask clarifying questions about details already specified
+2. DO NOT ask clarifying questions about details already specified  
 3. CREATE a complete murder mystery concept immediately
-4. Include: premise, victim, suspect list matching the player count, and murder method
-5. Follow their specifications exactly
+4. Follow their specifications exactly
 
-Create the mystery now based on their request.`;
+`;
     
-    return systemInstruction;
+    return behavioralInstructions;
   };
 
   // Enhanced AI response function with retry logic
