@@ -386,6 +386,14 @@
       "step3": {
         "title": "완성 패키지",
         "description": "호스팅에 필요한 모든 것을 받으세요"
+      },
+      "prompt": {
+        "defaultStart": "살인 미스터리를 만들고 싶습니다",
+        "withTheme": "{{theme}} 테마의 살인 미스터리를 만들어 주세요. {{playerCount}}명의 플레이어와 {{scriptType}} 스크립트용입니다",
+        "withoutTheme": "{{playerCount}}명의 플레이어와 {{scriptType}} 스크립트용 살인 미스터리를 만들어 주세요",
+        "withAccomplice": "이 미스터리에 공범 메커니즘을 포함해 주세요.",
+        "withoutAccomplice": "이 미스터리에는 공범 메커니즘을 포함하지 마세요.",
+        "additionalDetails": "추가 세부사항: {{details}}"
       }
     },
     "editor": {

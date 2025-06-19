@@ -191,23 +191,10 @@ export default function MysteryChat({
     additionalDetails?: string;
     language?: string;
   }) => {
-    let systemInstruction = "You are a murder mystery creation assistant.";
-    
-    // Add language instruction based on current language
-    if (data.language && data.language !== 'en') {
-      const languageNames: {[key: string]: string} = {
-        'ko': 'Korean',
-        'de': 'German', 
-        'es': 'Spanish',
-        'fr': 'French'
-      };
-      const languageName = languageNames[data.language] || data.language;
-      systemInstruction += ` Please respond in ${languageName}. The user has provided all necessary information in their initial request, so do not ask for details they have already provided (like player count, theme, or accomplice preference).`;
-    } else {
-      systemInstruction += " The user has provided all necessary information in their initial request, so do not ask for details they have already provided (like player count, theme, or accomplice preference).";
-    }
-    
-    return systemInstruction;
+    // Let the Edge Function handle all system prompt logic
+    // The language parameter is now included in the data object
+    // The language will be used by the Edge Function to format the response
+    return "";
   };
 
   // Enhanced AI response function with retry logic
@@ -274,7 +261,7 @@ export default function MysteryChat({
         content: msg.content
       }));
 
-      const aiResponse = await callAIWithRetry(messagesToSend, systemPrompt, 0, currentLanguage);
+      const aiResponse = await callAIWithRetry(messagesToSend, systemPrompt);
       console.log("AI response content:", aiResponse);
 
       const aiMessage: Message = {
@@ -355,7 +342,7 @@ export default function MysteryChat({
         content: msg.content
       }));
 
-      const aiResponse = await callAIWithRetry(messagesToSend, systemPrompt, 0, currentLanguage);
+      const aiResponse = await callAIWithRetry(messagesToSend, systemPrompt);
 
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),

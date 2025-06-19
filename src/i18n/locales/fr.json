@@ -152,5 +152,17 @@
       "comingSoon": "Bientôt Disponible",
       "notFound": "Non Trouvé"
     }
+  },
+  "mysteryCreation": {
+    "wizard": {
+      "prompt": {
+        "defaultStart": "Je veux créer un mystère de meurtre",
+        "withTheme": "Le thème/cadre devrait être {{theme}} pour {{playerCount}} joueurs avec des scripts {{scriptType}}",
+        "withoutTheme": "Ceci est pour {{playerCount}} joueurs avec des scripts {{scriptType}}",
+        "withAccomplice": "Veuillez inclure un mécanisme de complice dans le mystère.",
+        "withoutAccomplice": "Ne pas inclure de mécanisme de complice dans le mystère.",
+        "additionalDetails": "Détails supplémentaires : {{details}}"
+      }
+    }
   }
 }

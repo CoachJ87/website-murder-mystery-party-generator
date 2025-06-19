@@ -117,6 +117,13 @@ const MysteryCreation = () => {
                 });
             }
             
+            // Add accomplice mechanism specification
+            if (data.hasAccomplice) {
+                message += ". " + t("mysteryCreation.wizard.prompt.withAccomplice");
+            } else {
+                message += ". " + t("mysteryCreation.wizard.prompt.withoutAccomplice");
+            }
+            
             // Add additional details if provided
             if (data.additionalDetails && data.additionalDetails.trim() !== "") {
                 message += " " + t("mysteryCreation.wizard.prompt.additionalDetails", { 
