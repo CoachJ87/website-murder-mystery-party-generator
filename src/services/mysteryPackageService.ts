@@ -372,22 +372,25 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
 
     // Enhanced webhook payload with callback information
     const webhookPayload = {
+      // Required parameters for Make.com webhook
+      model: "claude-3-sonnet-20240229",
+      max_tokens: 4000,
+      
+      // Conversation and user info
       userId: conversation.user_id,
       conversationId: mysteryId,
       
-      // NEW: Add callback domain and URL for webhook response
+      // Callback configuration
       callback_domain: currentDomain,
       callback_url: `${currentDomain}/api/generation-complete`,
       environment: process.env.NODE_ENV || 'production',
       
-      // Existing payload fields
+      // Conversation data
       title: conversation.title || null,
       systemInstruction: conversation.system_instruction || null,
       messages: conversation.messages ? conversation.messages.map((msg: any) => ({
         role: msg.role,
-        content: msg.content,
-        timestamp: msg.created_at,
-        is_ai: msg.is_ai || msg.role === "assistant"
+        content: msg.content
       })) : [],
       content: conversationContent,
       playerCount: conversation.player_count || null,
