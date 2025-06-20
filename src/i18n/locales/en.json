@@ -820,6 +820,13 @@
       "loadFailed": "Failed to load character data"
     }
   },
+  "payment": {
+    "success": {
+      "message": "Payment successful! Your purchase is complete.",
+      "verifying": "Verifying your payment...",
+      "redirecting": "Redirecting you to your mystery..."
+    }
+  },
   "purchase": {
     "toasts": {
       "success": "Purchase successful! You now have full access to this mystery package.",

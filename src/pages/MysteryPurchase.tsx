@@ -351,7 +351,7 @@ const MysteryPurchase = () => {
       
       // Construct Stripe URL with conversation ID in metadata
       const baseUrl = window.location.origin;
-      const successUrl = `${baseUrl}/mystery/${id}?purchase=success`;
+      const successUrl = `${baseUrl}/payment-success?conversation_id=${id}`;
       const cancelUrl = `${baseUrl}/mystery/purchase/${id}?purchase=cancel`;
       
       // Add client_reference_id to pass conversation ID to Stripe
