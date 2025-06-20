@@ -370,49 +370,71 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
     const currentDomain = getCurrentDomain();
     console.log("Detected domain for webhook callback:", currentDomain);
 
-    // Enhanced webhook payload with callback information
+    // Format messages to ensure they match the expected structure
+    const formattedMessages = conversation.messages 
+      ? conversation.messages.map(msg => ({
+          role: msg.role || 'user',
+          content: String(msg.content || '')
+        }))
+      : [];
+
+    // Webhook payload with required parameters at root level
     const webhookPayload = {
-      // Required parameters for Make.com webhook
+      // Required parameters for Make.com webhook at root level
       model: "claude-3-sonnet-20240229",
       max_tokens: 4000,
-      
-      // Conversation and user info
-      userId: conversation.user_id,
-      conversationId: mysteryId,
-      
-      // Callback configuration
-      callback_domain: currentDomain,
-      callback_url: `${currentDomain}/api/generation-complete`,
-      environment: process.env.NODE_ENV || 'production',
-      
-      // Conversation data
-      title: conversation.title || null,
-      systemInstruction: conversation.system_instruction || null,
-      messages: conversation.messages ? conversation.messages.map((msg: any) => ({
-        role: msg.role,
-        content: msg.content
-      })) : [],
-      content: conversationContent,
-      playerCount: conversation.player_count || null,
-      theme: conversation.theme || null,
-      scriptType: conversation.script_type || 'full',
-      additionalDetails: conversation.additional_details || null,
-      hasAccomplice: conversation.has_accomplice || false,
-      createdAt: conversation.created_at,
-      updatedAt: conversation.updated_at,
-      testMode: testMode || false
+      messages: formattedMessages,
+
+      // All other parameters grouped under metadata
+      metadata: {
+        // User and conversation info
+        userId: conversation.user_id,
+        conversationId: mysteryId,
+        
+        // Callback configuration
+        callback_domain: currentDomain,
+        callback_url: `${currentDomain}/api/generation-complete`,
+        environment: process.env.NODE_ENV || 'production',
+        
+        // Conversation data
+        title: conversation.title || null,
+        systemInstruction: conversation.system_instruction || null,
+        content: conversationContent,
+        playerCount: conversation.player_count || null,
+        theme: conversation.theme || null,
+        scriptType: conversation.script_type || 'full',
+        additionalDetails: conversation.additional_details || null,
+        hasAccomplice: conversation.has_accomplice || false,
+        createdAt: conversation.created_at,
+        updatedAt: conversation.updated_at,
+        testMode: testMode || false
+      }
     };
 
+    // Enhanced debug logging of the payload structure
     console.log("=== ENHANCED WEBHOOK PAYLOAD DEBUG ===");
-    console.log("Conversation ID:", webhookPayload.conversationId);
-    console.log("User ID:", webhookPayload.userId);
-    console.log("Callback Domain:", webhookPayload.callback_domain);
-    console.log("Callback URL:", webhookPayload.callback_url);
-    console.log("Environment:", webhookPayload.environment);
-    console.log("Messages count:", webhookPayload.messages?.length || 0);
-    console.log("Theme:", webhookPayload.theme);
-    console.log("Player count:", webhookPayload.playerCount);
-    console.log("Test Mode:", webhookPayload.testMode);
+    console.log("Root level parameters:", {
+      model: webhookPayload.model,
+      max_tokens: webhookPayload.max_tokens,
+      messages_count: webhookPayload.messages.length
+    });
+    
+    console.log("Metadata:", {
+      conversationId: webhookPayload.metadata.conversationId,
+      userId: webhookPayload.metadata.userId,
+      callback_domain: webhookPayload.metadata.callback_domain,
+      callback_url: webhookPayload.metadata.callback_url,
+      environment: webhookPayload.metadata.environment,
+      theme: webhookPayload.metadata.theme,
+      playerCount: webhookPayload.metadata.playerCount,
+      testMode: webhookPayload.metadata.testMode
+    });
+    
+    console.log("First message preview:", webhookPayload.messages[0] ? {
+      role: webhookPayload.messages[0].role,
+      content: webhookPayload.messages[0].content?.substring(0, 50) + '...'
+    } : 'No messages');
+    
     console.log("Payload size (chars):", JSON.stringify(webhookPayload).length);
     console.log("=== END ENHANCED WEBHOOK PAYLOAD DEBUG ===");
 
