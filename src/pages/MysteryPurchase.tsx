@@ -356,6 +356,16 @@ const MysteryPurchase = () => {
       
       // Add client_reference_id to pass conversation ID to Stripe
       const stripeUrl = `https://buy.stripe.com/dRmdRa2uC2ZS3DW1gd2Nq02?prefilled_email=${encodeURIComponent(user?.email || '')}&client_reference_id=${id}&success_url=${encodeURIComponent(successUrl)}&cancel_url=${encodeURIComponent(cancelUrl)}`;
+      
+      // Debug logging
+      console.log('=== STRIPE URL DEBUG ===');
+      console.log('Conversation ID from useParams:', id);
+      console.log('ID type:', typeof id);
+      console.log('Base URL:', baseUrl);
+      console.log('Success URL being constructed:', successUrl);
+      console.log('Final Stripe URL:', stripeUrl);
+      console.log('=== END STRIPE DEBUG ===');
+      
       // Redirect to Stripe
       window.location.href = stripeUrl;
       
