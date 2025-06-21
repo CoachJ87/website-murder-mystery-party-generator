@@ -39,15 +39,16 @@ jobs:
 
       - name: Update browserslist database
         run: |
-          # Force use of npm instead of bun
+          # Force use of npm and avoid bun detection
           export BROWSERSLIST_DISABLE_CACHE=1
+          export FORCE_COLOR=0
           
           # Debug output
           echo "Using Node.js $(node -v)"
           echo "Using npm $(npm -v)"
           
-          # Update browserslist using npm
-          npx update-browserslist-db@latest --no-install --no-bun
+          # Direct npm update of caniuse-lite instead of using update-browserslist-db
+          npm update caniuse-lite
           
           echo "Browserslist database updated successfully"
 

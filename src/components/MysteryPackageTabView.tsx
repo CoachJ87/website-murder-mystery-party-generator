@@ -131,175 +131,78 @@ const MysteryPackageTabView = React.memo(({
 
   // Function to build complete character guide content
   const buildCharacterGuideContent = useCallback((character: MysteryCharacter): string => {
-    const relationships = getRelationshipsArray(character.relationships);
-    const secrets = getSecretsArray(character.secrets);
-    
     let content = `# ${character.character_name} - Character Guide\n\n`;
     
-    // Character Description (content already has its own headers)
+    // All content is pre-formatted in database - just concatenate in logical order
     if (character.description) {
       content += `${character.description}\n\n`;
     }
     
-    // Background (content already has its own headers)
     if (character.background) {
       content += `${character.background}\n\n`;
     }
     
-    // Introduction / Opening Script
-    const intro = character.introduction || character.round_scripts?.introduction;
-    if (intro) {
-      content += `## INTRODUCTION\n\n${intro}\n\n`;
+    if (character.relationships) {
+      content += `${character.relationships}\n\n`;
     }
     
-    // Relationships
-    if (relationships.length > 0) {
-      content += `## YOUR RELATIONSHIPS\n\n`;
-      relationships.forEach(rel => {
-        if (rel.character && rel.description) {
-          content += `- **${rel.character}**: ${rel.description}\n`;
-        }
-      });
-      content += '\n';
+    if (character.rumors) {
+      content += `${character.rumors}\n\n`;
     }
     
-    // Rumors / Gossip to spread
-    if (character.rumors && Array.isArray(character.rumors) && character.rumors.length) {
-      content += `## RUMORS TO SPREAD\n\n`;
-      character.rumors.forEach((r: string) => {
-        content += `- ${r}\n`;
-      });
-      content += '\n';
-    } else if (character.rumors_to_spread) {
-      const rumorsArr = Array.isArray(character.rumors_to_spread) ? character.rumors_to_spread : [character.rumors_to_spread];
-      if (rumorsArr.length) {
-        content += `## RUMORS TO SPREAD\n\n`;
-        rumorsArr.forEach((r: string) => content += `- ${r}\n`);
-        content += '\n';
-      }
+    if (character.secret) {
+      content += `${character.secret}\n\n`;
     }
     
-    // Secrets
-    const secret = character.secret || (secrets.length > 0 ? secrets[0] : '');
-    if (secret) {
-      content += `## YOUR SECRET\n\n${secret}\n\n`;
+    if (character.introduction) {
+      content += `${character.introduction}\n\n`;
     }
     
-    // Round Scripts Helper - Enhanced to handle all database fields
-    const appendRound = (roundNum: number, roundData: any) => {
-      // First try to use the passed roundData
-      if (roundData) {
-        const roundHeader = `## ROUND ${roundNum}`;
-        
-        // If scripts is string treat as single statement
-        if (typeof roundData === 'string') {
-          content += `${roundHeader}\n\n${roundData}\n\n`;
-          return;
-        }
-        
-        // Otherwise treat as object with keys
-        const { question, innocent, guilty, statement, questions, innocent_response, guilty_response } = roundData;
-        if (question || statement || questions || innocent || guilty || innocent_response || guilty_response) {
-          content += `${roundHeader}\n\n`;
-          
-          if (statement) {
-            content += `${statement}\n\n`;
-          }
-          
-          if (question) {
-            content += `### QUESTIONS YOU ASK\n\n- ${question}\n\n`;
-          }
-          
-          if (questions && Array.isArray(questions)) {
-            content += `### QUESTIONS YOU ASK\n\n`;
-            questions.forEach((q: string) => content += `- ${q}\n`);
-            content += '\n';
-          }
-          
-          const innocentText = innocent || innocent_response;
-          const guiltyText = guilty || guilty_response;
-          if (innocentText || guiltyText) {
-            content += `### ANSWERS FOR WHEN YOU ARE QUESTIONED\n\n`;
-            if (innocentText) content += `**If Innocent:** ${innocentText}\n\n`;
-            if (guiltyText) content += `**If Guilty:** ${guiltyText}\n\n`;
-          }
-        }
-        return;
-      }
-      
-      // If no roundData, try to build from individual database fields
-      const questions = (character as any)[`round${roundNum}_questions`];
-      const innocent = (character as any)[`round${roundNum}_innocent`];
-      const guilty = (character as any)[`round${roundNum}_guilty`];
-      const statement = (character as any)[`round${roundNum}_statement`];
-      
-      if (statement || questions || innocent || guilty) {
-        content += `## ROUND ${roundNum}\n\n`;
-        
-        if (statement) {
-          content += `${statement}\n\n`;
-        }
-        
-        if (questions) {
-          const questionsArray = Array.isArray(questions) ? questions : [questions];
-          content += `### QUESTIONS YOU ASK\n\n`;
-          questionsArray.forEach((q: string) => {
-            content += `- ${q}\n`;
-          });
-          content += '\n';
-        }
-        
-        if (innocent || guilty) {
-          content += `### ANSWERS FOR WHEN YOU ARE QUESTIONED\n\n`;
-          if (innocent) {
-            content += `**If Innocent:** ${innocent}\n\n`;
-          }
-          if (guilty) {
-            content += `**If Guilty:** ${guilty}\n\n`;
-          }
-        }
-      }
-    };
-    
-    // Process all rounds (1-4)
-    appendRound(1, character.round1_statement || character.round_scripts?.round1);
-    appendRound(2, character.round2_statement || character.round_scripts?.round2 || {
-      questions: character.round2_questions,
-      innocent_response: character.round2_innocent,
-      guilty_response: character.round2_guilty
-    });
-    appendRound(3, character.round3_statement || character.round_scripts?.round3 || {
-      questions: character.round3_questions,
-      innocent_response: character.round3_innocent,
-      guilty_response: character.round3_guilty
-    });
-    appendRound(4, character.round_scripts?.round4 || {
-      questions: character.round4_questions,
-      innocent_response: character.round4_innocent,
-      guilty_response: character.round4_guilty,
-      statement: character.round4_statement
-    });
-    
-    // Final / Closing Statements with all possible fields
-    const final = character.round_scripts?.final || character.final_statement || character.final;
-    const finalInnocent = (character as any).final_innocent;
-    const finalGuilty = (character as any).final_guilty;
-    
-    if (final || finalInnocent || finalGuilty) {
-      content += `## FINAL STATEMENT\n\n`;
-      
-      if (final) {
-        content += `${final}\n\n`;
-      }
-      
-      if (finalInnocent || finalGuilty) {
-        content += `### FINAL ANSWERS\n\n`;
-        if (finalInnocent) content += `**If Innocent:** ${finalInnocent}\n\n`;
-        if (finalGuilty) content += `**If Guilty:** ${finalGuilty}\n\n`;
-      }
+    if (character.round2_questions) {
+      content += `${character.round2_questions}\n\n`;
     }
     
-    // Convert any escaped newlines (\\n) into real newline characters for proper markdown rendering
+    if (character.round2_innocent) {
+      content += `${character.round2_innocent}\n\n`;
+    }
+    
+    if (character.round2_guilty) {
+      content += `${character.round2_guilty}\n\n`;
+    }
+    
+    if (character.round3_questions) {
+      content += `${character.round3_questions}\n\n`;
+    }
+    
+    if (character.round3_innocent) {
+      content += `${character.round3_innocent}\n\n`;
+    }
+    
+    if (character.round3_guilty) {
+      content += `${character.round3_guilty}\n\n`;
+    }
+    
+    if (character.round4_questions) {
+      content += `${character.round4_questions}\n\n`;
+    }
+    
+    if (character.round4_innocent) {
+      content += `${character.round4_innocent}\n\n`;
+    }
+    
+    if (character.round4_guilty) {
+      content += `${character.round4_guilty}\n\n`;
+    }
+    
+    if (character.final_innocent) {
+      content += `${character.final_innocent}\n\n`;
+    }
+    
+    if (character.final_guilty) {
+      content += `${character.final_guilty}\n\n`;
+    }
+    
+    // Convert any escaped newlines to actual newlines for proper markdown rendering
     const normalizedContent = content.replace(/\\n/g, '\n');
     return normalizedContent;
   }, [getRelationshipsArray, getSecretsArray]);
