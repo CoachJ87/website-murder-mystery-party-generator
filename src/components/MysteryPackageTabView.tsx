@@ -61,13 +61,31 @@ const MysteryPackageTabView = React.memo(({
   }, [generationStatus]);
 
   // Clean table processing function
-  const processRelationshipMatrix = useCallback((rawMatrix: string): string => {
-    if (!rawMatrix || typeof rawMatrix !== 'string') {
+  const processRelationshipMatrix = useCallback((rawMatrix: any): string => {
+    // Enhanced type checking and conversion
+    if (!rawMatrix) {
       return "";
     }
-  
+    
+    // Convert to string if it's not already
+    let matrixString: string;
+    if (typeof rawMatrix === 'string') {
+      matrixString = rawMatrix;
+    } else if (typeof rawMatrix === 'object') {
+      // Handle case where it might be an object
+      matrixString = JSON.stringify(rawMatrix);
+    } else {
+      // Convert any other type to string
+      matrixString = String(rawMatrix);
+    }
+    
+    // Additional safety check
+    if (!matrixString || matrixString.length === 0) {
+      return "";
+    }
+
     // Convert escaped newlines to actual newlines
-    const withLineBreaks = rawMatrix.replace(/\\n/g, '\n');
+    const withLineBreaks = matrixString.replace(/\\n/g, '\n');
     
     // Extract just the table part (lines starting with |)
     const lines = withLineBreaks.split('\n');
