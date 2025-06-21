@@ -136,14 +136,14 @@ const MysteryPackageTabView = React.memo(({
     
     let content = `# ${character.character_name} - Character Guide\n\n`;
     
-    // Character Description
+    // Character Description (content already has its own headers)
     if (character.description) {
-      content += `**Description:** ${character.description}\n\n`;
+      content += `${character.description}\n\n`;
     }
     
-    // Background
+    // Background (content already has its own headers)
     if (character.background) {
-      content += `**Background:** ${character.background}\n\n`;
+      content += `${character.background}\n\n`;
     }
     
     // Introduction / Opening Script
@@ -231,7 +231,9 @@ const MysteryPackageTabView = React.memo(({
       content += `## FINAL STATEMENT\n\n${final}\n\n`;
     }
     
-    return content;
+    // Convert any escaped newlines (\\n) into real newline characters for proper markdown rendering
+    const normalizedContent = content.replace(/\\n/g, '\n');
+    return normalizedContent;
   }, [getRelationshipsArray, getSecretsArray]);
 
   // Function to build complete host guide content
