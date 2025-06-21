@@ -429,7 +429,7 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
     console.log('=== END FINAL PAYLOAD ===');
 
     // Send to Make.com webhook as JSON
-    const response = await fetch("https://hook.eu2.make.com/uannnuc9hc79vorh1iyxwb9t5lp484n3", {
+    const response = await fetch("https://hook.eu2.make.com/lso1g2u34qe45p0pdyteaqkqw7o8shbp", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
