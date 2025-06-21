@@ -411,7 +411,7 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
     // Debug logging of the final payload
     console.log('=== WEBHOOK PAYLOAD DEBUG ===');
     console.log('Payload being sent to Make.com:', JSON.stringify(webhookPayload, null, 2));
-    console.log('=== END WEBHOOK PAYLOAD DEBUG ===');
+    console.log('=== END WEBHOOK PAYLOAD ===');
     
     // Log individual parameter verification
     console.log('=== PARAMETER VERIFICATION ===');
@@ -423,13 +423,22 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
     console.log('message_1_content exists:', 'message_1_content' in webhookPayload);
     console.log('=== END PARAMETER VERIFICATION ===');
 
-    // Send to Make.com webhook
+    // Convert payload to URL-encoded form data
+    const formBody = Object.entries(webhookPayload)
+      .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(String(value ?? ''))}`)
+      .join('&');
+
+    console.log('=== FORM BODY ===');
+    console.log(formBody);
+    console.log('=== END FORM BODY ===');
+
+    // Send to Make.com webhook as form-urlencoded
     const response = await fetch("https://hook.eu2.make.com/uannnuc9hc79vorh1iyxwb9t5lp484n3", {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify(webhookPayload)
+      body: formBody
     });
     
     if (!response.ok) {
