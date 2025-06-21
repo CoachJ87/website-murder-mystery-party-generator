@@ -17,7 +17,7 @@ const PaymentSuccess = () => {
     console.log('PaymentSuccess - All search params:', Object.fromEntries(searchParams.entries()));
   }, [location.search, searchParams]);
   
-  // Get and log conversation_id from URL or sessionStorage
+  // Get and log conversation_id from URL or localStorage
   const conversationId = useMemo(() => {
     // First try to get from URL params
     const fromUrl = searchParams.get('conversation_id');
@@ -26,14 +26,14 @@ const PaymentSuccess = () => {
       return fromUrl;
     }
 
-    // If not in URL, try to get from sessionStorage
-    const fromStorage = sessionStorage.getItem('pendingConversationId');
+    // If not in URL, try to get from localStorage
+    const fromStorage = localStorage.getItem('pendingConversationId');
     if (fromStorage) {
-      console.log('PaymentSuccess - Recovered conversation_id from sessionStorage:', fromStorage);
+      console.log('PaymentSuccess - Recovered conversation_id from localStorage:', fromStorage);
       return fromStorage;
     }
 
-    console.log('PaymentSuccess - No conversation_id found in URL or sessionStorage');
+    console.log('PaymentSuccess - No conversation_id found in URL or localStorage');
     return null;
   }, [searchParams]);
 
@@ -50,12 +50,12 @@ const PaymentSuccess = () => {
         const targetUrl = `/mystery/${conversationId}?purchase=success`;
         console.log('PaymentSuccess - Navigating to:', targetUrl);
         // Clear the stored ID before navigating
-        sessionStorage.removeItem('pendingConversationId');
+        localStorage.removeItem('pendingConversationId');
         navigate(targetUrl, { replace: true });
       } else {
         console.log('PaymentSuccess - No conversation_id, navigating to dashboard');
         // Clear any stored ID before navigating
-        sessionStorage.removeItem('pendingConversationId');
+        localStorage.removeItem('pendingConversationId');
         navigate('/dashboard', { replace: true });
       }
     }, 1500); // 1.5 second delay to show the toast

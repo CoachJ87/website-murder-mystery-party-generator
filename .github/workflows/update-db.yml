@@ -41,6 +41,8 @@ jobs:
         run: |
           npx update-browserslist-db
           echo "Browserslist database updated successfully"
+        env:
+          BROWSERSLIST_DONT_USE_BUN: 'true'
 
       - name: Check for changes
         id: verify-changed-files

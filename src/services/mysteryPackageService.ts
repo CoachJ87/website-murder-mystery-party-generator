@@ -378,30 +378,32 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
         }))
       : [];
 
-    // Webhook payload with all parameters at root level
+    // Flatten the payload structure for Make.com compatibility
     const webhookPayload = {
-      // Required parameters for Make.com webhook at root level
+      // Required parameters at root level
       model: "claude-3-sonnet-20240229",
       max_tokens: 4000,
-      messages: formattedMessages,
       
-      // Direct parameters at root level
+      // Flatten messages array into individual parameters
+      message_count: conversation.messages?.length || 0,
+      message_1_role: conversation.messages?.[0]?.role || "user",
+      message_1_content: conversation.messages?.[0]?.content || "",
+      message_2_role: conversation.messages?.[1]?.role || "",
+      message_2_content: conversation.messages?.[1]?.content || "",
+      
+      // All other data as flat parameters
       userId: conversation.user_id,
       conversationId: mysteryId,
       callback_domain: currentDomain,
       callback_url: `${currentDomain}/api/generation-complete`,
       environment: process.env.NODE_ENV || 'production',
       title: conversation.title || null,
-      system_instruction: conversation.system_instruction || null,
       content: conversationContent,
-      player_count: conversation.player_count || null,
+      playerCount: conversation.player_count || null,
       theme: conversation.theme || null,
-      script_type: conversation.script_type || 'full',
-      additional_details: conversation.additional_details || null,
-      has_accomplice: conversation.has_accomplice || false,
-      created_at: conversation.created_at,
-      updated_at: conversation.updated_at,
-      test_mode: testMode || false
+      scriptType: conversation.script_type || 'full',
+      hasAccomplice: conversation.has_accomplice || false,
+      testMode: testMode || false
     };
 
     // Debug logging of the final payload
@@ -413,12 +415,9 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
     console.log('=== PARAMETER VERIFICATION ===');
     console.log('model exists:', 'model' in webhookPayload);
     console.log('max_tokens exists:', 'max_tokens' in webhookPayload);
-    console.log('messages exists:', 'messages' in webhookPayload);
-    console.log('messages is array:', Array.isArray(webhookPayload.messages));
-    console.log('messages count:', webhookPayload.messages.length);
-    if (webhookPayload.messages.length > 0) {
-      console.log('First message keys:', Object.keys(webhookPayload.messages[0]));
-    }
+    console.log('message_count:', webhookPayload.message_count);
+    console.log('message_1_role exists:', 'message_1_role' in webhookPayload);
+    console.log('message_1_content exists:', 'message_1_content' in webhookPayload);
     console.log('=== END PARAMETER VERIFICATION ===');
 
     // Send to Make.com webhook

@@ -357,10 +357,10 @@ const MysteryPurchase = () => {
       // Add client_reference_id to pass conversation ID to Stripe
       const stripeUrl = `https://buy.stripe.com/dRmdRa2uC2ZS3DW1gd2Nq02?prefilled_email=${encodeURIComponent(user?.email || '')}&client_reference_id=${id}&success_url=${encodeURIComponent(successUrl)}&cancel_url=${encodeURIComponent(cancelUrl)}`;
       
-      // Store conversation ID in sessionStorage as fallback in case URL params are lost
+      // Store conversation ID in localStorage as fallback in case URL params are lost
       if (id) {
-        sessionStorage.setItem('pendingConversationId', id);
-        console.log('Stored conversation ID in sessionStorage:', id);
+        localStorage.setItem('pendingConversationId', id);
+        console.log('Stored conversation ID in localStorage:', id);
       }
 
       // Debug logging
