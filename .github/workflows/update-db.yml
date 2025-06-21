@@ -39,10 +39,9 @@ jobs:
 
       - name: Update browserslist database
         run: |
-          npx update-browserslist-db
+          export BROWSERSLIST_DONT_USE_BUN=true
+          npx update-browserslist-db@latest
           echo "Browserslist database updated successfully"
-        env:
-          BROWSERSLIST_DONT_USE_BUN: 'true'
 
       - name: Check for changes
         id: verify-changed-files

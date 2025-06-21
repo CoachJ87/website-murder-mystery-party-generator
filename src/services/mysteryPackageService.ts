@@ -383,6 +383,8 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
       // Required parameters at root level
       model: "claude-3-sonnet-20240229",
       max_tokens: 4000,
+      // Provide messages as JSON string to maintain flat structure while meeting required param
+      messages: JSON.stringify(formattedMessages),
       
       // Flatten messages array into individual parameters
       message_count: conversation.messages?.length || 0,
@@ -415,6 +417,7 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
     console.log('=== PARAMETER VERIFICATION ===');
     console.log('model exists:', 'model' in webhookPayload);
     console.log('max_tokens exists:', 'max_tokens' in webhookPayload);
+    console.log('messages exists:', 'messages' in webhookPayload);
     console.log('message_count:', webhookPayload.message_count);
     console.log('message_1_role exists:', 'message_1_role' in webhookPayload);
     console.log('message_1_content exists:', 'message_1_content' in webhookPayload);
