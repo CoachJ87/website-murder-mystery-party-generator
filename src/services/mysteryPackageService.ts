@@ -283,6 +283,22 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
   try {
     console.log("Starting package generation for conversation ID:", mysteryId);
     
+    // Prevent duplicate generation attempts
+    const { data: existingPackage, error: existingPackageErr } = await supabase
+      .from("mystery_packages")
+      .select("generation_status, generation_started_at")
+      .eq("conversation_id", mysteryId)
+      .order('updated_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    
+    if (existingPackageErr) {
+      console.error("Error checking for existing generation:", existingPackageErr);
+    } else if (existingPackage?.generation_status?.status === 'in_progress') {
+      console.warn("Generation already in progress – aborting duplicate webhook call");
+      return "already_in_progress";
+    }
+    
     // Get conversation data
     const { data: conversation, error: conversationError } = await supabase
       .from("conversations")
