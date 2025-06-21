@@ -138,15 +138,21 @@ const MysteryPackageTabView = React.memo(({
     
     // Character Description
     if (character.description) {
-      content += `${character.description}\n\n`;
+      content += `**Description:** ${character.description}\n\n`;
     }
     
-    // Your Background
+    // Background
     if (character.background) {
-      content += `${character.background}\n\n`;
+      content += `**Background:** ${character.background}\n\n`;
     }
     
-    // Your Relationships
+    // Introduction / Opening Script
+    const intro = character.introduction || character.round_scripts?.introduction;
+    if (intro) {
+      content += `## INTRODUCTION\n\n${intro}\n\n`;
+    }
+    
+    // Relationships
     if (relationships.length > 0) {
       content += `## YOUR RELATIONSHIPS\n\n`;
       relationships.forEach(rel => {
@@ -157,10 +163,72 @@ const MysteryPackageTabView = React.memo(({
       content += '\n';
     }
     
-    // Your Secret
+    // Rumors / Gossip to spread
+    if (character.rumors && Array.isArray(character.rumors) && character.rumors.length) {
+      content += `## RUMORS TO SPREAD\n\n`;
+      character.rumors.forEach((r: string) => {
+        content += `- ${r}\n`;
+      });
+      content += '\n';
+    } else if (character.rumors_to_spread) {
+      const rumorsArr = Array.isArray(character.rumors_to_spread) ? character.rumors_to_spread : [character.rumors_to_spread];
+      if (rumorsArr.length) {
+        content += `## RUMORS TO SPREAD\n\n`;
+        rumorsArr.forEach((r: string) => content += `- ${r}\n`);
+        content += '\n';
+      }
+    }
+    
+    // Secrets
     const secret = character.secret || (secrets.length > 0 ? secrets[0] : '');
     if (secret) {
-      content += `${secret}\n\n`;
+      content += `## YOUR SECRET\n\n${secret}\n\n`;
+    }
+    
+    // Round Scripts Helper
+    const appendRound = (roundNum: number, scripts: any) => {
+      if (!scripts) return;
+      const roundHeader = `## ROUND ${roundNum}`;
+      // If scripts is string treat as single statement
+      if (typeof scripts === 'string') {
+        content += `${roundHeader}\n\n${scripts}\n\n`;
+        return;
+      }
+      // Otherwise treat as object with keys
+      const { question, innocent, guilty, statement, questions, innocent_response, guilty_response } = scripts;
+      if (question || statement || questions || innocent || guilty || innocent_response || guilty_response) {
+        content += `${roundHeader}\n\n`;
+        if (statement) content += `${statement}\n\n`;
+        if (question) content += `*Question:* ${question}\n\n`;
+        if (questions && Array.isArray(questions)) {
+          questions.forEach((q: string) => content += `- ${q}\n`);
+          content += '\n';
+        }
+        const innocentText = innocent || innocent_response;
+        const guiltyText = guilty || guilty_response;
+        if (innocentText) content += `*Innocent Response:* ${innocentText}\n\n`;
+        if (guiltyText) content += `*Guilty Response:* ${guiltyText}\n\n`;
+      }
+    };
+    
+    // Attach round 1/2/3/4 scripts
+    appendRound(1, character.round1_statement || character.round_scripts?.round1);
+    appendRound(2, character.round2_statement || character.round_scripts?.round2 || {
+      questions: character.round2_questions,
+      innocent_response: character.round2_innocent,
+      guilty_response: character.round2_guilty
+    });
+    appendRound(3, character.round3_statement || character.round_scripts?.round3 || {
+      questions: character.round3_questions,
+      innocent_response: character.round3_innocent,
+      guilty_response: character.round3_guilty
+    });
+    appendRound(4, character.round_scripts?.round4);
+    
+    // Final / Closing Statements
+    const final = character.round_scripts?.final || character.final_statement || character.final;
+    if (final) {
+      content += `## FINAL STATEMENT\n\n${final}\n\n`;
     }
     
     return content;
