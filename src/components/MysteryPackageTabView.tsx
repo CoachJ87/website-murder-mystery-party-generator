@@ -62,7 +62,7 @@ const MysteryPackageTabView = React.memo(({
 
   // Clean table processing function
   const processRelationshipMatrix = useCallback((rawMatrix: string): string => {
-    if (!rawMatrix) {
+    if (!rawMatrix || typeof rawMatrix !== 'string') {
       return "";
     }
   
@@ -300,7 +300,7 @@ const MysteryPackageTabView = React.memo(({
   const relationshipMatrix = useMemo(() => {
     let rawMatrix = packageData?.relationshipMatrix || extractCharacterMatrix();
     
-    if (!rawMatrix) {
+    if (!rawMatrix || typeof rawMatrix !== 'string') {
       return "";
     }
 
