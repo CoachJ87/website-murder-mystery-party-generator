@@ -185,33 +185,83 @@ const MysteryPackageTabView = React.memo(({
       content += `## YOUR SECRET\n\n${secret}\n\n`;
     }
     
-    // Round Scripts Helper
-    const appendRound = (roundNum: number, scripts: any) => {
-      if (!scripts) return;
-      const roundHeader = `## ROUND ${roundNum}`;
-      // If scripts is string treat as single statement
-      if (typeof scripts === 'string') {
-        content += `${roundHeader}\n\n${scripts}\n\n`;
+    // Round Scripts Helper - Enhanced to handle all database fields
+    const appendRound = (roundNum: number, roundData: any) => {
+      // First try to use the passed roundData
+      if (roundData) {
+        const roundHeader = `## ROUND ${roundNum}`;
+        
+        // If scripts is string treat as single statement
+        if (typeof roundData === 'string') {
+          content += `${roundHeader}\n\n${roundData}\n\n`;
+          return;
+        }
+        
+        // Otherwise treat as object with keys
+        const { question, innocent, guilty, statement, questions, innocent_response, guilty_response } = roundData;
+        if (question || statement || questions || innocent || guilty || innocent_response || guilty_response) {
+          content += `${roundHeader}\n\n`;
+          
+          if (statement) {
+            content += `${statement}\n\n`;
+          }
+          
+          if (question) {
+            content += `### QUESTIONS YOU ASK\n\n- ${question}\n\n`;
+          }
+          
+          if (questions && Array.isArray(questions)) {
+            content += `### QUESTIONS YOU ASK\n\n`;
+            questions.forEach((q: string) => content += `- ${q}\n`);
+            content += '\n';
+          }
+          
+          const innocentText = innocent || innocent_response;
+          const guiltyText = guilty || guilty_response;
+          if (innocentText || guiltyText) {
+            content += `### ANSWERS FOR WHEN YOU ARE QUESTIONED\n\n`;
+            if (innocentText) content += `**If Innocent:** ${innocentText}\n\n`;
+            if (guiltyText) content += `**If Guilty:** ${guiltyText}\n\n`;
+          }
+        }
         return;
       }
-      // Otherwise treat as object with keys
-      const { question, innocent, guilty, statement, questions, innocent_response, guilty_response } = scripts;
-      if (question || statement || questions || innocent || guilty || innocent_response || guilty_response) {
-        content += `${roundHeader}\n\n`;
-        if (statement) content += `${statement}\n\n`;
-        if (question) content += `*Question:* ${question}\n\n`;
-        if (questions && Array.isArray(questions)) {
-          questions.forEach((q: string) => content += `- ${q}\n`);
+      
+      // If no roundData, try to build from individual database fields
+      const questions = (character as any)[`round${roundNum}_questions`];
+      const innocent = (character as any)[`round${roundNum}_innocent`];
+      const guilty = (character as any)[`round${roundNum}_guilty`];
+      const statement = (character as any)[`round${roundNum}_statement`];
+      
+      if (statement || questions || innocent || guilty) {
+        content += `## ROUND ${roundNum}\n\n`;
+        
+        if (statement) {
+          content += `${statement}\n\n`;
+        }
+        
+        if (questions) {
+          const questionsArray = Array.isArray(questions) ? questions : [questions];
+          content += `### QUESTIONS YOU ASK\n\n`;
+          questionsArray.forEach((q: string) => {
+            content += `- ${q}\n`;
+          });
           content += '\n';
         }
-        const innocentText = innocent || innocent_response;
-        const guiltyText = guilty || guilty_response;
-        if (innocentText) content += `*Innocent Response:* ${innocentText}\n\n`;
-        if (guiltyText) content += `*Guilty Response:* ${guiltyText}\n\n`;
+        
+        if (innocent || guilty) {
+          content += `### ANSWERS FOR WHEN YOU ARE QUESTIONED\n\n`;
+          if (innocent) {
+            content += `**If Innocent:** ${innocent}\n\n`;
+          }
+          if (guilty) {
+            content += `**If Guilty:** ${guilty}\n\n`;
+          }
+        }
       }
     };
     
-    // Attach round 1/2/3/4 scripts
+    // Process all rounds (1-4)
     appendRound(1, character.round1_statement || character.round_scripts?.round1);
     appendRound(2, character.round2_statement || character.round_scripts?.round2 || {
       questions: character.round2_questions,
@@ -223,12 +273,30 @@ const MysteryPackageTabView = React.memo(({
       innocent_response: character.round3_innocent,
       guilty_response: character.round3_guilty
     });
-    appendRound(4, character.round_scripts?.round4);
+    appendRound(4, character.round_scripts?.round4 || {
+      questions: character.round4_questions,
+      innocent_response: character.round4_innocent,
+      guilty_response: character.round4_guilty,
+      statement: character.round4_statement
+    });
     
-    // Final / Closing Statements
+    // Final / Closing Statements with all possible fields
     const final = character.round_scripts?.final || character.final_statement || character.final;
-    if (final) {
-      content += `## FINAL STATEMENT\n\n${final}\n\n`;
+    const finalInnocent = (character as any).final_innocent;
+    const finalGuilty = (character as any).final_guilty;
+    
+    if (final || finalInnocent || finalGuilty) {
+      content += `## FINAL STATEMENT\n\n`;
+      
+      if (final) {
+        content += `${final}\n\n`;
+      }
+      
+      if (finalInnocent || finalGuilty) {
+        content += `### FINAL ANSWERS\n\n`;
+        if (finalInnocent) content += `**If Innocent:** ${finalInnocent}\n\n`;
+        if (finalGuilty) content += `**If Guilty:** ${finalGuilty}\n\n`;
+      }
     }
     
     // Convert any escaped newlines (\\n) into real newline characters for proper markdown rendering
