@@ -41,14 +41,13 @@ jobs:
         run: |
           # Force use of npm instead of bun
           export BROWSERSLIST_DISABLE_CACHE=1
-          export BROWSERSLIST_DONT_USE_BUN=true
           
           # Debug output
           echo "Using Node.js $(node -v)"
           echo "Using npm $(npm -v)"
           
           # Update browserslist using npm
-          BROWSERSLIST_DONT_USE_BUN=true npx update-browserslist-db@latest --no-install
+          npx update-browserslist-db@latest --no-install --no-bun
           
           echo "Browserslist database updated successfully"
 
