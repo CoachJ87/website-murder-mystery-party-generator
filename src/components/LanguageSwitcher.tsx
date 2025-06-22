@@ -32,16 +32,7 @@ const LanguageSwitcher = () => {
   // Listen for language changes
   useEffect(() => {
     const handleLanguageChanged = (lng: string) => {
-      console.log(`Language changed to: ${lng}`);
       setCurrentLang(lng);
-      
-      // Debug: Check translations after a short delay
-      setTimeout(() => {
-        console.log('--- After language change ---');
-        console.log('Current language:', i18n.language);
-        console.log('t(navigation.home):', i18n.t('navigation.home'));
-        console.log('i18n store:', i18n.store.data);
-      }, 100);
     };
     
     i18n.on('languageChanged', handleLanguageChanged);
@@ -51,38 +42,9 @@ const LanguageSwitcher = () => {
   }, [i18n]);
 
   const handleLanguageChange = async (languageCode: string) => {
-    console.log(`\n=== Starting language change to: ${languageCode} ===`);
-    
-    // Log initial state
-    console.log('Before change - current language:', i18n.language);
-    console.log('Before change - t(navigation.home):', i18n.t('navigation.home'));
-    
     try {
-      // Change the language
       await i18n.changeLanguage(languageCode);
-      console.log('\n--- After changeLanguage() ---');
-      console.log('Current language:', i18n.language);
-      console.log('t(navigation.home):', i18n.t('navigation.home'));
-      
-      // Test after a short delay
-      setTimeout(() => {
-        console.log('\n--- After 500ms delay ---');
-        console.log('Current language:', i18n.language);
-        console.log('t(navigation.home):', i18n.t('navigation.home'));
-        
-        // Test direct resource access
-        const resources = i18n.store.data;
-        console.log('\n--- Direct Resource Access ---');
-        console.log('zh-cn resources:', resources['zh-cn']?.translation);
-        
-        // Test getResource
-        console.log('\n--- i18n.getResource ---');
-        console.log('getResource:', i18n.getResource('zh-cn', 'translation', 'navigation.home'));
-        
-        // Force re-render to check if it helps
-        setCurrentLang(i18n.language);
-      }, 500);
-      
+      setCurrentLang(i18n.language);
     } catch (error) {
       console.error('Error changing language:', error);
     }
