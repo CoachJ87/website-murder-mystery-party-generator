@@ -1,246 +1,31 @@
+/* Base Tailwind directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Minimal base styles */
 @layer base {
   :root {
-    /* Neon Noir Color System */
-    /* Primary Colors */
-    --color-primary: 330 100% 50%;       /* Hot Pink #FF0080 */
-    --color-primary-foreground: 0 0% 100%;
-    --color-primary-hover: 330 100% 45%;
-    --color-primary-light: 330 100% 60%;
+    /* Simplified color system */
+    --color-primary: 330 100% 50%;
+    --color-surface: 240 67% 6%;
+    --color-surface-foreground: 0 0% 100%;
     
-    --color-secondary: 180 100% 50%;     /* Cyan #00FFFF */
-    --color-secondary-foreground: 240 100% 5%;
-    --color-secondary-hover: 180 100% 45%;
-    --color-secondary-light: 180 100% 70%;
-    
-    /* Accent Colors */
-    --color-accent: 180 100% 50%;       /* Cyan #00FFFF */
-    --color-accent-foreground: 240 100% 5%;
-    --color-accent-hover: 180 100% 45%;
-    --color-accent-light: 180 100% 70%;
-    
-    --color-danger: 0 84% 49%;           /* Soft Red #DC2626 */
-    --color-danger-foreground: 0 0% 100%;
-    --color-danger-hover: 0 84% 40%;
-    --color-danger-light: 0 84% 65%;
-    
-    --color-success: 114 100% 54%;      /* Neon Green #39FF14 */
-    --color-success-foreground: 240 100% 5%;
-    --color-success-hover: 114 100% 45%;
-    
-    /* Background System - Neon Noir */
-    --color-surface: 240 67% 6%;         /* Deep Black #0A0A0F */
-    --color-surface-foreground: 0 0% 100%; /* Pure White */
-    --color-surface-hover: 240 30% 12%;  /* Slightly lighter black */
-    
-    --color-muted: 240 30% 12%;         /* Dark Purple #1A1A2E */
-    --color-muted-foreground: 0 0% 90%;  /* Light Gray */
-    
-    --color-subtle: 240 35% 15%;        /* Slightly lighter dark purple */
-    --color-subtle-foreground: 0 0% 95%;
-    
-    --color-tertiary: 180 100% 50%;     /* Cyan #00FFFF */
-    
-    /* Semantic Tokens */
+    /* Core tokens */
     --background: var(--color-surface);
     --foreground: var(--color-surface-foreground);
-    
-    --card: 240 25% 15%;
-    --card-foreground: var(--color-surface-foreground);
-    
-    --popover: 240 25% 15%;
-    --popover-foreground: var(--color-surface-foreground);
-    
     --border: 240 20% 25%;
     --input: 240 20% 25%;
     --ring: var(--color-primary);
-    
-    --destructive: var(--color-danger);
-    --destructive-foreground: var(--color-danger-foreground);
-    
     --radius: 0.5rem;
-    
-    /* Sidebar Colors */
-    --sidebar-background: var(--color-surface);
-    --sidebar-foreground: var(--color-surface-foreground);
-    --sidebar-primary: var(--color-primary);
-    --sidebar-primary-foreground: var(--color-primary-foreground);
-    --sidebar-accent: var(--color-subtle);
-    --sidebar-accent-foreground: var(--color-surface-foreground);
-    --sidebar-border: var(--border);
-    --sidebar-ring: var(--color-primary);
   }
-  
-  .dark {
-    /* Slightly brighter dark mode for better readability */
-    --color-surface: 240 30% 10%;         /* Slightly lighter deep black */
-    --color-surface-foreground: 0 0% 98%;  /* Off-white */
-    --color-surface-hover: 240 25% 15%;
-    
-    --color-muted: 240 25% 15%;         /* Slightly lighter dark purple */
-    --color-muted-foreground: 0 0% 90%;  /* Lighter gray */
-    
-    --color-subtle: 240 30% 18%;        /* Even lighter dark purple */
-    
-    --background: var(--color-surface);
-    --foreground: var(--color-surface-foreground);
-    
-    --card: 240 25% 15%;
-    --card-foreground: var(--color-surface-foreground);
-    
-    --popover: 240 25% 15%;
-    --popover-foreground: var(--color-surface-foreground);
-    
-    --border: 240 20% 25%;             /* Slightly purple-tinged borders */
-    --input: 240 20% 25%;
-    
-    --sidebar-background: var(--color-surface);
-    --sidebar-foreground: var(--color-surface-foreground);
-    --sidebar-accent: var(--color-muted);
-    --sidebar-accent-foreground: var(--color-surface-foreground);
-    --sidebar-border: var(--border);
-  }
-}
 
-@layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
   }
 
   body {
-    @apply bg-background text-foreground font-inter antialiased;
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-playfair;
-  }
-
-  a {
-    @apply text-foreground hover:text-primary transition-colors duration-200 no-underline;
-  }
-  
-  .no-underline {
-    text-decoration: none !important;
-  }
-  
-  button a {
-    text-decoration: none !important;
-  }
-}
-
-/* Neon Noir Utility Classes */
-@layer utilities {
-  /* Background Utilities */
-  .bg-primary-soft {
-    @apply bg-primary/10;
-  }
-  
-  .bg-secondary-soft {
-    @apply bg-secondary/10;
-  }
-  
-  .bg-accent-soft {
-    @apply bg-accent/10;
-  }
-  
-  .bg-section {
-    background-color: hsl(var(--color-muted));
-  }
-  
-  .bg-card-elevated {
-    background-color: hsl(var(--color-subtle));
-  }
-  
-  /* Text Utilities */
-  .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
-  }
-  
-  /* Border Utilities */
-  .border-accent {
-    @apply border-accent/30 hover:border-accent/50 transition-colors;
-  }
-  
-  /* Animation Utilities */
-  .neon-glow {
-    text-shadow: 0 0 5px hsl(var(--color-primary) / 0.8),
-                 0 0 10px hsl(var(--color-primary) / 0.6),
-                 0 0 15px hsl(var(--color-primary) / 0.4);
-  }
-  
-  .neon-glow-accent {
-    text-shadow: 0 0 5px hsl(var(--color-accent) / 0.8),
-                 0 0 10px hsl(var(--color-accent) / 0.6),
-                 0 0 15px hsl(var(--color-accent) / 0.4);
-  }
-  
-  /* Button Styles */
-  .btn-primary {
-    @apply bg-primary text-primary-foreground hover:bg-primary-hover transition-colors duration-200;
-  }
-  
-  .btn-secondary {
-    @apply bg-secondary text-secondary-foreground hover:bg-secondary-hover transition-colors duration-200;
-  }
-  
-  .btn-accent {
-    @apply bg-accent text-accent-foreground hover:bg-accent-hover transition-colors duration-200;
-  }
-  
-  .btn-outline {
-    @apply border border-border bg-transparent hover:bg-muted/50 transition-colors duration-200;
-  }
-  
-  /* Card Styles */
-  .card {
-    @apply bg-card text-card-foreground rounded-lg border border-border overflow-hidden;
-  }
-  
-  .card-header {
-    @apply p-4 border-b border-border;
-  }
-  
-  .card-content {
-    @apply p-4;
-  }
-  
-  .card-footer {
-    @apply p-4 border-t border-border;
-  }
-  
-  /* Form Elements */
-  .input {
-    @apply flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
-  }
-  
-  .btn {
-    @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background h-10 py-2 px-4;
-  }
-  
-  /* Custom Scrollbar */
-  .custom-scrollbar {
-    scrollbar-width: thin;
-    scrollbar-color: hsl(var(--color-muted-foreground) / 0.3) transparent;
-  }
-  
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: hsl(var(--color-muted-foreground) / 0.3);
-    border-radius: 3px;
-  }
-  
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background-color: hsl(var(--color-muted-foreground) / 0.5);
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
   }
 }
