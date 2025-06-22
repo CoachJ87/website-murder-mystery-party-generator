@@ -432,7 +432,7 @@ export default function MysteryChat({
     )}>
       {/* Chat Messages Area */}
       <div className={cn(
-        "space-y-4 sm:space-y-6 bg-[#F7F3E9]",
+        "space-y-4 sm:space-y-6 bg-muted",
         usePageScroll ? "pb-32" : "overflow-y-auto h-80 p-3 sm:h-96 sm:p-4"
       )}>
         {/* Loading History */}
@@ -461,8 +461,8 @@ export default function MysteryChat({
               className={cn(
                 "rounded-2xl px-4 py-3 sm:px-5 sm:py-4 max-w-[85%] sm:max-w-[80%] shadow-lg",
                 message.is_ai
-                  ? "bg-[#FEFCF8] text-[#2A2A2A] border-none"
-                  : "bg-[#8B1538] text-white border-none"
+                  ? "bg-background text-foreground border-none"
+                  : "bg-primary text-white border-none"
               )}
             >
               {message.is_ai ? (
@@ -474,18 +474,18 @@ export default function MysteryChat({
                     rehypePlugins={[rehypeRaw]}
                     components={{
                       h1: ({node, ...props}) => <h1 className={cn(
-                        "font-bold mt-3 mb-2 text-[#8B1538]",
+                        "font-bold mt-3 mb-2 text-[bg-primary]",
                         isMobile ? "text-lg" : "text-2xl"
                       )} {...props} />,
                       h2: ({node, ...props}) => <h2 className={cn(
-                        "font-semibold mt-2 mb-1 text-[#8B1538]",
+                        "font-semibold mt-2 mb-1 text-[bg-primary]",
                         isMobile ? "text-base" : "text-xl"
                       )} {...props} />,
                       h3: ({node, ...props}) => <h3 className={cn(
-                        "font-medium mt-2 mb-1 text-[#8B1538]",
+                        "font-medium mt-2 mb-1 text-[bg-primary]",
                         isMobile ? "text-sm" : "text-lg"
                       )} {...props} />,
-                      p: ({node, ...props}) => <p className="my-1 leading-relaxed text-[#2A2A2A]" {...props} />,
+                      p: ({node, ...props}) => <p className="my-1 leading-relaxed text-foreground" {...props} />,
                       ul: ({node, ...props}) => <ul className={cn(
                         "list-disc my-2",
                         isMobile ? "pl-4" : "pl-6"
@@ -494,10 +494,10 @@ export default function MysteryChat({
                         "list-decimal my-2",
                         isMobile ? "pl-4" : "pl-6"
                       )} {...props} />,
-                      li: ({node, ...props}) => <li className="my-1 text-[#2A2A2A]" {...props} />,
-                      strong: ({node, ...props}) => <strong className="font-bold text-[#8B1538]" {...props} />,
+                      li: ({node, ...props}) => <li className="my-1 text-foreground" {...props} />,
+                      strong: ({node, ...props}) => <strong className="font-bold text-[bg-primary]" {...props} />,
                       em: ({node, ...props}) => <em className="italic" {...props} />,
-                      blockquote: ({node, ...props}) => <blockquote className="pl-3 border-l-3 border-[#8B1538] bg-[#F7F3E9] italic my-2 rounded-r-md p-2" {...props} />
+                      blockquote: ({node, ...props}) => <blockquote className="pl-3 border-l-3 border-[bg-primary] bg-muted italic my-2 rounded-r-md p-2" {...props} />
                     }}
                   >
                     {message.content}
@@ -516,11 +516,11 @@ export default function MysteryChat({
         {/* AI Typing Indicator - Mobile Optimized */}
         {isAiTyping && (
           <div className="flex justify-start">
-            <div className="bg-[#FEFCF8] rounded-2xl px-4 py-3 sm:px-5 sm:py-4 max-w-[85%] sm:max-w-[80%] shadow-lg">
+            <div className="bg-background rounded-2xl px-4 py-3 sm:px-5 sm:py-4 max-w-[85%] sm:max-w-[80%] shadow-lg">
               <div className="flex space-x-1">
-                <div className="h-2 w-2 bg-[#8B1538]/60 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                <div className="h-2 w-2 bg-[#8B1538]/60 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                <div className="h-2 w-2 bg-[#8B1538]/60 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
+                <div className="h-2 w-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                <div className="h-2 w-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                <div className="h-2 w-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
               </div>
             </div>
           </div>
@@ -530,7 +530,7 @@ export default function MysteryChat({
 
       {/* Fixed Bottom Generate Button and Text Input */}
       <div className={cn(
-        "fixed bottom-0 left-0 right-0 z-20 bg-[#F7F3E9] border-t border-[#F7F3E9]",
+        "fixed bottom-0 left-0 right-0 z-20 bg-muted border-t border-muted",
         isMobile ? "px-3 py-2" : "px-4 py-3"
       )}>
         <div className={cn(
@@ -565,7 +565,7 @@ export default function MysteryChat({
               disabled={isAiTyping || !input.trim()}
               size={isMobile ? "default" : "icon"}
               className={cn(
-                "shrink-0 bg-[#8B1538] hover:bg-[#6B0F28] text-white rounded-lg",
+                "shrink-0 bg-primary hover:bg-primary/90 text-white rounded-lg",
                 isMobile ? "h-11 w-11" : "h-9 w-9"
               )}
             >
@@ -584,7 +584,7 @@ export default function MysteryChat({
               disabled={!hasAIResponse}
               size={isMobile ? "default" : "lg"}
               className={cn(
-                "w-full bg-[#8B1538] hover:bg-[#6B0F28] text-white font-medium shadow-sm rounded-xl",
+                "w-full bg-primary hover:bg-primary/90 text-white font-medium shadow-sm rounded-xl",
                 isMobile ? "h-12 text-base" : "px-6"
               )}
             >

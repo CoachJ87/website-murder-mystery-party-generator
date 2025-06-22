@@ -116,7 +116,7 @@ const MysteryChatPage = () => {
     }
 
     return (
-        <div className="min-h-screen flex flex-col bg-[#F7F3E9]">
+        <div className="min-h-screen flex flex-col bg-muted">
             <Header />
             <main className={cn(
                 "flex-1 pb-32", // Add padding at the bottom for fixed elements

@@ -163,13 +163,13 @@ const Support = () => {
           
           <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
             <TabsList className={cn(
-              "bg-[#8B0000] p-1 overflow-hidden grid grid-cols-2",
+              "bg-success p-1 overflow-hidden grid grid-cols-2",
               isMobile && "h-auto"
             )}>
               <TabsTrigger 
                 value="faqs" 
                 className={cn(
-                  "text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000]",
+                  "text-white data-[state=active]:bg-success/80 data-[state=active]:text-white hover:bg-success/90",
                   isMobile && "text-xs px-2 py-2 h-auto"
                 )}
               >
@@ -179,7 +179,7 @@ const Support = () => {
               <TabsTrigger 
                 value="contact" 
                 className={cn(
-                  "text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000]",
+                  "text-white data-[state=active]:bg-success/80 data-[state=active]:text-white hover:bg-success/90",
                   isMobile && "text-xs px-2 py-2 h-auto"
                 )}
               >
@@ -198,10 +198,10 @@ const Support = () => {
                   <Accordion type="single" collapsible className="w-full">
                     {faqCategories.map((category, categoryIndex) => (
                       <div key={categoryIndex} className="mb-6">
-                        <h3 className="text-lg font-semibold mb-2 text-[#8B1538]">{category.title}</h3>
+                        <h3 className="text-lg font-semibold mb-2 text-[bg-primary]">{category.title}</h3>
                         {category.items.map((faq, faqIndex) => (
                           <AccordionItem key={faqIndex} value={`${categoryIndex}-${faqIndex}`}>
-                            <AccordionTrigger className="hover:text-[#8B1538]">{faq.question}</AccordionTrigger>
+                            <AccordionTrigger className="hover:text-[bg-primary]">{faq.question}</AccordionTrigger>
                             <AccordionContent>
                               <p>{faq.answer}</p>
                             </AccordionContent>
@@ -294,7 +294,7 @@ const Support = () => {
                           type="submit" 
                           size="lg" 
                           disabled={isSubmitting}
-                          className="bg-[#8B1538] hover:bg-[#6B0F28] text-white"
+                          className="bg-primary hover:bg-primary/90 text-white"
                         >
                           {isSubmitting ? t('supportPage.contact.form.sending') : t('supportPage.contact.form.sendButton')}
                         </Button>

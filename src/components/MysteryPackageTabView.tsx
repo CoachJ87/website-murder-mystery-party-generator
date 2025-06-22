@@ -485,7 +485,7 @@ const MysteryPackageTabView = React.memo(({
           <Button
             onClick={() => setShowGuestManager(true)}
             className={cn(
-              "gap-2 bg-[#8B0000] hover:bg-[#7A0000] text-white",
+              "gap-2 bg-success hover:bg-success/90 text-white",
               isMobile && "w-full"
             )}
           >
@@ -497,13 +497,13 @@ const MysteryPackageTabView = React.memo(({
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="">
         <TabsList className={cn(
-          "w-full mb-4 bg-[#8B0000] p-1 overflow-hidden",
+          "w-full mb-4 bg-success p-1 overflow-hidden",
           isMobile ? "grid grid-cols-2 gap-1 h-auto" : "grid grid-cols-2 md:grid-cols-5"
         )}>
           <TabsTrigger 
             value="host-guide" 
             className={cn(
-              "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000]",
+              "whitespace-nowrap text-white data-[state=active]:bg-success/80 data-[state=active]:text-white hover:bg-success/90",
               isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
@@ -512,7 +512,7 @@ const MysteryPackageTabView = React.memo(({
           <TabsTrigger 
             value="characters" 
             className={cn(
-              "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000]",
+              "whitespace-nowrap text-white data-[state=active]:bg-success/80 data-[state=active]:text-white hover:bg-success/90",
               isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
@@ -521,7 +521,7 @@ const MysteryPackageTabView = React.memo(({
           <TabsTrigger 
             value="clues" 
             className={cn(
-              "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000]",
+              "whitespace-nowrap text-white data-[state=active]:bg-success/80 data-[state=active]:text-white hover:bg-success/90",
               isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
@@ -530,7 +530,7 @@ const MysteryPackageTabView = React.memo(({
           <TabsTrigger 
             value="inspector" 
             className={cn(
-              "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000]",
+              "whitespace-nowrap text-white data-[state=active]:bg-success/80 data-[state=active]:text-white hover:bg-success/90",
               isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
@@ -539,7 +539,7 @@ const MysteryPackageTabView = React.memo(({
           <TabsTrigger 
             value="matrix" 
             className={cn(
-              "whitespace-nowrap text-white data-[state=active]:bg-[#5A0000] data-[state=active]:text-white hover:bg-[#7A0000]",
+              "whitespace-nowrap text-white data-[state=active]:bg-success/80 data-[state=active]:text-white hover:bg-success/90",
               isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
