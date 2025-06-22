@@ -149,7 +149,7 @@ export default {
                             marginBottom: '0.75em',
                             lineHeight: '1.3',
                             fontWeight: '600',
-                            fontFamily: 'Playfair Display, serif',
+                            fontFamily: 'Orbitron, sans-serif',
                         },
                         h1: {
                             fontSize: '1.875rem',

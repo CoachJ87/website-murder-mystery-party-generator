@@ -485,7 +485,7 @@ const MysteryPackageTabView = React.memo(({
           <Button
             onClick={() => setShowGuestManager(true)}
             className={cn(
-              "gap-2 bg-success hover:bg-success/90 text-white",
+              "gap-2 bg-primary hover:bg-primary/90 text-primary-foreground",
               isMobile && "w-full"
             )}
           >
@@ -497,13 +497,13 @@ const MysteryPackageTabView = React.memo(({
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="">
         <TabsList className={cn(
-          "w-full mb-4 bg-success p-1 overflow-hidden",
+          "w-full mb-4 bg-muted/20 p-1 overflow-hidden border border-border",
           isMobile ? "grid grid-cols-2 gap-1 h-auto" : "grid grid-cols-2 md:grid-cols-5"
         )}>
           <TabsTrigger 
             value="host-guide" 
             className={cn(
-              "whitespace-nowrap text-white data-[state=active]:bg-success/80 data-[state=active]:text-white hover:bg-success/90",
+              "whitespace-nowrap text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground hover:bg-muted/50",
               isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
@@ -512,7 +512,7 @@ const MysteryPackageTabView = React.memo(({
           <TabsTrigger 
             value="characters" 
             className={cn(
-              "whitespace-nowrap text-white data-[state=active]:bg-success/80 data-[state=active]:text-white hover:bg-success/90",
+              "whitespace-nowrap text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground hover:bg-muted/50",
               isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
@@ -521,7 +521,7 @@ const MysteryPackageTabView = React.memo(({
           <TabsTrigger 
             value="clues" 
             className={cn(
-              "whitespace-nowrap text-white data-[state=active]:bg-success/80 data-[state=active]:text-white hover:bg-success/90",
+              "whitespace-nowrap text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground hover:bg-muted/50",
               isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
@@ -530,7 +530,7 @@ const MysteryPackageTabView = React.memo(({
           <TabsTrigger 
             value="inspector" 
             className={cn(
-              "whitespace-nowrap text-white data-[state=active]:bg-success/80 data-[state=active]:text-white hover:bg-success/90",
+              "whitespace-nowrap text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground hover:bg-muted/50",
               isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
@@ -539,7 +539,7 @@ const MysteryPackageTabView = React.memo(({
           <TabsTrigger 
             value="matrix" 
             className={cn(
-              "whitespace-nowrap text-white data-[state=active]:bg-success/80 data-[state=active]:text-white hover:bg-success/90",
+              "whitespace-nowrap text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground hover:bg-muted/50",
               isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
@@ -916,16 +916,16 @@ const MysteryPackageTabView = React.memo(({
                           return cell.trim().replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                         });
                         if (index === 0) {
-                          return `<tr>${cells.map(cell => `<th class="border border-gray-300 px-3 py-2 text-left font-medium bg-gray-100">${cell}</th>`).join('')}</tr>`;
+                          return `<tr>${cells.map(cell => `<th class="border border-border px-3 py-2 text-left font-medium bg-muted">${cell}</th>`).join('')}</tr>`;
                         } else if (index === 1) {
                           return ''; // Skip separator row
                         } else {
-                          return `<tr class="hover:bg-gray-50">${cells.map(cell => `<td class="border border-gray-300 px-3 py-2">${cell}</td>`).join('')}</tr>`;
+                          return `<tr class="hover:bg-muted/25">${cells.map(cell => `<td class="border border-border px-3 py-2">${cell}</td>`).join('')}</tr>`;
                         }
                       })
                       .filter(row => row)
                       .join('')
-                      .replace(/^/, '<table class="w-full border-collapse border border-gray-300 bg-white">')
+                      .replace(/^/, '<table class="w-full border-collapse border border-border bg-background">')
                       .replace(/$/, '</table>')
                   }}
                 />
