@@ -20,10 +20,10 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				'playfair': ['Playfair Display', 'serif'],
+				'playfair': ['Orbitron', 'sans-serif'],
 				'inter': ['Inter', 'sans-serif'],
 				'sans': ['Inter', 'sans-serif'],
-				'serif': ['Playfair Display', 'serif'],
+				'serif': ['Orbitron', 'sans-serif'],
 			},
 			colors: {
 				/* Mystery Maker Color System - Sophisticated Burgundy & Cream */

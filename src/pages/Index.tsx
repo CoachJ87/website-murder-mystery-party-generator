@@ -169,7 +169,7 @@ const Index = () => {
                 <Button
                   asChild
                   size="lg"
-                  className="bg-primary hover:bg-primary-hover text-primary-foreground h-12 px-6 text-base font-inter"
+                  className="bg-[#8B1538] hover:bg-[#6B0F28] text-white h-12 px-6 text-base font-inter"
                 >
                   <Link to="/support" className="no-underline">
                     {t('support.button')}
