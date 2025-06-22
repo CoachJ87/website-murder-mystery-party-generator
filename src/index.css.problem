@@ -1,0 +1,127 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Primary Colors */
+    --color-primary: 330 100% 50%;        /* Hot Pink #FF0080 */
+    --color-primary-foreground: 0 0% 100%;
+    --color-primary-hover: 330 100% 45%;
+    --color-primary-light: 330 100% 60%;
+    
+    /* Secondary Colors */
+    --color-secondary: 180 100% 50%;      /* Cyan #00FFFF */
+    --color-secondary-foreground: 240 100% 5%;
+    --color-secondary-hover: 180 100% 45%;
+    --color-secondary-light: 180 100% 70%;
+    
+    /* Accent Colors */
+    --color-accent: 180 100% 50%;         /* Cyan #00FFFF */
+    --color-accent-foreground: 240 100% 5%;
+    --color-accent-hover: 180 100% 45%;
+    --color-accent-light: 180 100% 70%;
+    
+    /* Danger Colors */
+    --color-danger: 0 84% 49%;            /* Soft Red #DC2626 */
+    --color-danger-foreground: 0 0% 100%;
+    --color-danger-hover: 0 84% 40%;
+    --color-danger-light: 0 84% 65%;
+    
+    /* Success Colors */
+    --color-success: 114 100% 54%;        /* Neon Green #39FF14 */
+    --color-success-foreground: 240 100% 5%;
+    --color-success-hover: 114 100% 45%;
+    
+    /* Background System */
+    --color-surface: 240 67% 6%;          /* Deep Black #0A0A0F */
+    --color-surface-foreground: 0 0% 100%;
+    --color-surface-hover: 240 30% 12%;
+    
+    /* Muted Colors */
+    --color-muted: 240 30% 12%;           /* Dark Purple #1A1A2E */
+    --color-muted-foreground: 0 0% 90%;
+    
+    /* Subtle Colors */
+    --color-subtle: 240 35% 15%;
+    --color-subtle-foreground: 0 0% 95%;
+    
+    /* Tertiary Color */
+    --color-tertiary: 180 100% 50%;       /* Cyan #00FFFF */
+    
+    /* Semantic Tokens */
+    --background: var(--color-surface);
+    --foreground: var(--color-surface-foreground);
+    
+    --card: 240 25% 15%;
+    --card-foreground: var(--color-surface-foreground);
+    
+    --popover: 240 25% 15%;
+    --popover-foreground: var(--color-surface-foreground);
+    
+    --border: 240 20% 25%;
+    --input: 240 20% 25%;
+    --ring: var(--color-primary);
+    
+    --destructive: var(--color-danger);
+    --destructive-foreground: var(--color-danger-foreground);
+    
+    --radius: 0.5rem;
+    
+    /* Sidebar Colors */
+    --sidebar-background: var(--color-surface);
+    --sidebar-foreground: var(--color-surface-foreground);
+    --sidebar-primary: var(--color-primary);
+    --sidebar-primary-foreground: var(--color-primary-foreground);
+    --sidebar-accent: var(--color-subtle);
+    --sidebar-accent-foreground: var(--color-surface-foreground);
+    --sidebar-border: var(--border);
+    --sidebar-ring: var(--color-primary);
+  }
+
+  .dark {
+    --color-surface: 240 30% 10%;
+    --color-surface-foreground: 0 0% 98%;
+    --color-surface-hover: 240 25% 15%;
+    --color-muted: 240 25% 15%;
+    --color-muted-foreground: 0 0% 90%;
+    --color-subtle: 240 30% 18%;
+    --background: var(--color-surface);
+    --foreground: var(--color-surface-foreground);
+    --card: 240 25% 15%;
+    --card-foreground: var(--color-surface-foreground);
+    --popover: 240 25% 15%;
+    --popover-foreground: var(--color-surface-foreground);
+    --border: 240 20% 25%;
+    --input: 240 20% 25%;
+    --sidebar-background: var(--color-surface);
+    --sidebar-foreground: var(--color-surface-foreground);
+    --sidebar-accent: var(--color-muted);
+    --sidebar-accent-foreground: var(--color-surface-foreground);
+    --sidebar-border: var(--border);
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-inter antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-playfair;
+  }
+
+  a {
+    @apply text-foreground hover:text-primary transition-colors duration-200 no-underline;
+  }
+  
+  .no-underline {
+    text-decoration: none !important;
+  }
+  
+  button a {
+    text-decoration: none !important;
+  }
+}
