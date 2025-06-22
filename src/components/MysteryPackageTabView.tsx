@@ -427,7 +427,7 @@ const MysteryPackageTabView = React.memo(({
     table: ({ children }: any) => (
       <div className="overflow-x-auto mb-4">
         <table className={cn(
-          "w-full border-collapse border border-border bg-background",
+          "w-full border-collapse border border-gray-300 bg-white",
           isMobile && "text-xs"
         )}>
           {children}
@@ -435,7 +435,7 @@ const MysteryPackageTabView = React.memo(({
       </div>
     ),
     thead: ({ children }: any) => (
-      <thead className="bg-muted/50">
+      <thead className="bg-gray-100">
         {children}
       </thead>
     ),
@@ -445,13 +445,13 @@ const MysteryPackageTabView = React.memo(({
       </tbody>
     ),
     tr: ({ children }: any) => (
-      <tr className="border-b border-border hover:bg-muted/25">
+      <tr className="border-b border-gray-300 hover:bg-gray-50">
         {children}
       </tr>
     ),
     th: ({ children }: any) => (
       <th className={cn(
-        "border border-border px-3 py-2 text-left font-medium text-foreground bg-muted/30",
+        "border border-gray-300 px-3 py-2 text-left font-medium text-foreground bg-gray-100",
         isMobile && "px-2 py-1 text-xs"
       )}>
         {children}
@@ -459,7 +459,7 @@ const MysteryPackageTabView = React.memo(({
     ),
     td: ({ children }: any) => (
       <td className={cn(
-        "border border-border px-3 py-2 text-foreground",
+        "border border-gray-300 px-3 py-2 text-foreground",
         isMobile && "px-2 py-1 text-xs"
       )}>
         {children}
@@ -497,13 +497,13 @@ const MysteryPackageTabView = React.memo(({
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="">
         <TabsList className={cn(
-          "w-full mb-4 bg-muted/20 p-1 overflow-hidden border border-border",
+          "w-full mb-4 bg-primary p-1 overflow-hidden",
           isMobile ? "grid grid-cols-2 gap-1 h-auto" : "grid grid-cols-2 md:grid-cols-5"
         )}>
           <TabsTrigger 
             value="host-guide" 
             className={cn(
-              "whitespace-nowrap text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground hover:bg-muted/50",
+              "whitespace-nowrap text-primary-foreground data-[state=active]:bg-primary-hover data-[state=active]:text-primary-foreground hover:bg-primary/90",
               isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
@@ -512,7 +512,7 @@ const MysteryPackageTabView = React.memo(({
           <TabsTrigger 
             value="characters" 
             className={cn(
-              "whitespace-nowrap text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground hover:bg-muted/50",
+              "whitespace-nowrap text-primary-foreground data-[state=active]:bg-primary-hover data-[state=active]:text-primary-foreground hover:bg-primary/90",
               isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
@@ -521,7 +521,7 @@ const MysteryPackageTabView = React.memo(({
           <TabsTrigger 
             value="clues" 
             className={cn(
-              "whitespace-nowrap text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground hover:bg-muted/50",
+              "whitespace-nowrap text-primary-foreground data-[state=active]:bg-primary-hover data-[state=active]:text-primary-foreground hover:bg-primary/90",
               isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
@@ -530,7 +530,7 @@ const MysteryPackageTabView = React.memo(({
           <TabsTrigger 
             value="inspector" 
             className={cn(
-              "whitespace-nowrap text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground hover:bg-muted/50",
+              "whitespace-nowrap text-primary-foreground data-[state=active]:bg-primary-hover data-[state=active]:text-primary-foreground hover:bg-primary/90",
               isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
@@ -539,7 +539,7 @@ const MysteryPackageTabView = React.memo(({
           <TabsTrigger 
             value="matrix" 
             className={cn(
-              "whitespace-nowrap text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground hover:bg-muted/50",
+              "whitespace-nowrap text-primary-foreground data-[state=active]:bg-primary-hover data-[state=active]:text-primary-foreground hover:bg-primary/90",
               isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
@@ -916,16 +916,16 @@ const MysteryPackageTabView = React.memo(({
                           return cell.trim().replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                         });
                         if (index === 0) {
-                          return `<tr>${cells.map(cell => `<th class="border border-border px-3 py-2 text-left font-medium bg-muted">${cell}</th>`).join('')}</tr>`;
+                          return `<tr>${cells.map(cell => `<th class="border border-gray-300 px-3 py-2 text-left font-medium bg-gray-100">${cell}</th>`).join('')}</tr>`;
                         } else if (index === 1) {
                           return ''; // Skip separator row
                         } else {
-                          return `<tr class="hover:bg-muted/25">${cells.map(cell => `<td class="border border-border px-3 py-2">${cell}</td>`).join('')}</tr>`;
+                          return `<tr class="hover:bg-gray-50">${cells.map(cell => `<td class="border border-gray-300 px-3 py-2">${cell}</td>`).join('')}</tr>`;
                         }
                       })
                       .filter(row => row)
                       .join('')
-                      .replace(/^/, '<table class="w-full border-collapse border border-border bg-background">')
+                      .replace(/^/, '<table class="w-full border-collapse border border-gray-300 bg-white">')
                       .replace(/$/, '</table>')
                   }}
                 />

@@ -20,10 +20,10 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				'playfair': ['Orbitron', 'sans-serif'],
+				'playfair': ['Playfair Display', 'serif'],
 				'inter': ['Inter', 'sans-serif'],
 				'sans': ['Inter', 'sans-serif'],
-				'serif': ['Orbitron', 'sans-serif'],
+				'serif': ['Playfair Display', 'serif'],
 			},
 			colors: {
 				/* Mystery Maker Color System - Sophisticated Burgundy & Cream */
@@ -149,7 +149,7 @@ export default {
                             marginBottom: '0.75em',
                             lineHeight: '1.3',
                             fontWeight: '600',
-                            fontFamily: 'Orbitron, sans-serif',
+                            fontFamily: 'Playfair Display, serif',
                         },
                         h1: {
                             fontSize: '1.875rem',
