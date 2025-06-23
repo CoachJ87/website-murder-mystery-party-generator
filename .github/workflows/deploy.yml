@@ -32,6 +32,23 @@ jobs:
 
       - name: Install dependencies with npm
         run: npm install
+        
+      - name: Build project
+        run: |
+          echo "=== Build Environment ==="
+          node --version
+          npm --version
+          echo "=== Package.json build script ==="
+          npm run build --verbose
+          echo "=== Build completed, checking output ==="
+          ls -la dist/
+          echo "=== Verifying index.html exists ==="
+          if [ -f dist/index.html ]; then
+            echo "✓ index.html found"
+            wc -l dist/index.html
+          else
+            echo "✗ index.html missing"
+          fi
 
       - name: Create SPA 404.html
         run: |
