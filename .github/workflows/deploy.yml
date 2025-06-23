@@ -35,6 +35,7 @@ jobs:
 
       - name: Create SPA 404.html
         run: |
+          mkdir -p dist
           cat > dist/404.html << 'EOF'
           <!DOCTYPE html>
           <html>
@@ -47,6 +48,11 @@ jobs:
             <body></body>
           </html>
           EOF
+
+      - name: Copy index.html to 404.html
+        run: |
+          mkdir -p dist
+          cp dist/index.html dist/404.html
 
       - name: Update index.html for SPA routing
         run: |
