@@ -2,7 +2,6 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
-import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 // List of routes to prerender for SEO
 const routesToPrerender = [
@@ -27,14 +26,6 @@ export default defineConfig(({ mode }) => ({
     react(),
     mode === 'development' &&
     componentTagger(),
-    viteStaticCopy({
-      targets: [
-        {
-          src: 'src/i18n/locales/*.json',
-          dest: 'locales'
-        }
-      ]
-    })
   ].filter(Boolean),
   resolve: {
     alias: {
