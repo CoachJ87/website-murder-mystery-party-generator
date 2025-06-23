@@ -132,7 +132,7 @@ const Index = () => {
                       <div className="flex items-center">
                         <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary flex items-center justify-center mr-3">
                           <span className="font-medium text-xs sm:text-sm text-primary-foreground font-inter">
-                            {["JD", "MK", "AS"][i-1]}
+                            {["J", "LB", "A"][i-1]}
                           </span>
                         </div>
                         <div>
@@ -140,7 +140,6 @@ const Index = () => {
                             {t(`testimonials.testimonial${i}.author`)}
                           </p>
                           <p className="text-xs sm:text-sm text-muted-foreground font-inter">
-                            {t(`testimonials.testimonial${i}.role`)}
                           </p>
                         </div>
                       </div>

@@ -133,19 +133,16 @@
   "testimonials": {
     "title": "What Others Are Saying",
     "testimonial1": {
-      "text": "My friends still talk about our murder mystery night. The characters were so detailed and the plot twists were perfect!",
-      "author": "Jessica Davis",
-      "role": "Party Host"
+      "text": "My friends and I still talk about our murder mystery night. The characters were so detailed and the plot twists were perfect!",
+      "author": "Jed"
     },
     "testimonial2": {
       "text": "So easy to set up! I was worried about hosting for 12 people, but the materials made it simple and everyone had a blast.",
-      "author": "Mark Klein",
-      "role": "Corporate Event Planner"
+      "author": "Laura"
     },
     "testimonial3": {
       "text": "Third murder mystery party using this service and they keep getting better. The customization options are amazing.",
-      "author": "Amanda Smith",
-      "role": "Birthday Celebrant"
+      "author": "Alex"
     }
   },
   "support": {
