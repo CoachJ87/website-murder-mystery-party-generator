@@ -31,7 +31,9 @@ jobs:
         run: npm cache clean --force
 
       - name: Install dependencies with npm
-        run: npm install      - name: Create SPA 404.html
+        run: npm install
+
+      - name: Create SPA 404.html
         run: |
           cat > dist/404.html << 'EOF'
           <!DOCTYPE html>
