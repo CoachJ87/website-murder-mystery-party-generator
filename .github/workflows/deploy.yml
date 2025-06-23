@@ -51,8 +51,13 @@ jobs:
 
       - name: Copy index.html to 404.html
         run: |
-          mkdir -p dist
-          cp dist/index.html dist/404.html
+          if [ -f dist/index.html ]; then
+            cp dist/index.html dist/404.html
+          else
+            echo "dist/index.html not found, build may have failed"
+            ls -la dist/
+            exit 1
+          fi
 
       - name: Update index.html for SPA routing
         run: |
