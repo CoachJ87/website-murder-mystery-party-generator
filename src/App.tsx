@@ -3,10 +3,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { HelmetProvider } from "react-helmet-async";
 import LoadingBoundary from "@/components/LoadingBoundary";
+import { useEffect } from "react";
+import { initGA, trackPageView } from "@/lib/analytics";
 import Index from "./pages/Index";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
@@ -44,10 +46,28 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+// Track route changes
+const RouteTracker = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    // Initialize GA on first load
+    initGA();
+  }, []);
+
+  useEffect(() => {
+    // Track page view on route change
+    trackPageView(location.pathname + location.search);
+  }, [location]);
+
+  return null;
+};
+
 // Main App component with simplified structure
 const App = () => (
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
+      <RouteTracker />
       <BrowserRouter>
         <AuthProvider>
           <TooltipProvider>

@@ -23,6 +23,7 @@ import Footer from "@/components/Footer";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { useTranslation } from 'react-i18next';
+import { trackEvent } from '@/lib/analytics';
 
 const Support = () => {
   const { t } = useTranslation();
@@ -53,6 +54,16 @@ const Support = () => {
     setIsSubmitting(true);
     
     try {
+      // Track form submission
+      trackEvent('contact_form_submit', {
+        form_name: 'support_contact',
+        form_data: {
+          subject: data.subject,
+          name_length: data.name.length,
+          email_domain: data.email.split('@')[1] || ''
+        }
+      });
+      
       // In a real implementation, this would send an email or create a database entry
       console.log("Form submitted:", data);
       
@@ -61,9 +72,18 @@ const Support = () => {
       
       toast.success(t('supportPage.contact.form.success'));
       form.reset();
+      
+      // Track successful form submission
+      trackEvent('contact_form_success', { form_name: 'support_contact' });
     } catch (error) {
       console.error("Error submitting form:", error);
       toast.error(t('supportPage.contact.form.error'));
+      
+      // Track form submission error
+      trackEvent('contact_form_error', {
+        form_name: 'support_contact',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -161,25 +181,25 @@ const Support = () => {
             </p>
           </div>
           
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-10">
             <TabsList className={cn(
-              "bg-success p-1 overflow-hidden grid grid-cols-2",
+              "w-full bg-primary p-1 overflow-hidden grid grid-cols-2",
               isMobile && "h-auto"
             )}>
               <TabsTrigger 
                 value="faqs" 
                 className={cn(
-                  "text-white data-[state=active]:bg-success/80 data-[state=active]:text-white hover:bg-success/90",
+                  "text-primary-foreground data-[state=active]:bg-primary-hover data-[state=active]:text-primary-foreground hover:bg-primary/90 gap-2 flex items-center px-4 py-2 transition-colors",
                   isMobile && "text-xs px-2 py-2 h-auto"
                 )}
               >
-                <HelpCircle className="h-4 w-4" />
-                <span>{t('supportPage.tabs.faqs')}</span>
+                <HelpCircle className="h-4 w-4 flex-shrink-0" />
+                <span className="whitespace-nowrap">{t('supportPage.tabs.faqs')}</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="contact" 
                 className={cn(
-                  "text-white data-[state=active]:bg-success/80 data-[state=active]:text-white hover:bg-success/90",
+                  "text-primary-foreground data-[state=active]:bg-primary-hover data-[state=active]:text-primary-foreground hover:bg-primary/90 gap-2 flex items-center px-4 py-2 transition-colors",
                   isMobile && "text-xs px-2 py-2 h-auto"
                 )}
               >
