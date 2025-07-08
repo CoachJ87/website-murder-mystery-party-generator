@@ -67,8 +67,8 @@ const RouteTracker = () => {
 const App = () => (
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
-      <RouteTracker />
       <BrowserRouter>
+        <RouteTracker />
         <AuthProvider>
           <TooltipProvider>
             <Toaster />
