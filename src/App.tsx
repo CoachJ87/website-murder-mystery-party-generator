@@ -26,6 +26,8 @@ import Support from "./pages/Support";
 import NotFound from "./pages/NotFound";
 import AuthCallback from "./pages/AuthCallback";
 import CharacterAccess from "./pages/CharacterAccess";
+import BlogIndex from "./pages/BlogIndex";
+import BlogPost from "./pages/BlogPost";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import React from "react";
 
@@ -148,6 +150,8 @@ const AppRoutes = () => {
           element={<MysteryPurchase />} 
         />
         <Route path="/mystery/:id" element={<MysteryView />} />
+        <Route path="/blog" element={<BlogIndex />} />
+        <Route path="/blog/:slug" element={<BlogPost />} />
         
         <Route path="*" element={<NotFound />} />
       </Routes>
