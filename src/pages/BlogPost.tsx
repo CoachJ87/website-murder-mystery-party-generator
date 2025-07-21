@@ -369,3 +369,5 @@ export default function BlogPost() {
       
       <Footer />
     </div>
+  );
+}
