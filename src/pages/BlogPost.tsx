@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { format } from 'date-fns';
@@ -65,6 +65,8 @@ export default function BlogPost() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [viewingTime, setViewingTime] = useState(0);
+  const [showStickyCTA, setShowStickyCTA] = useState(true);
+  const ctaSectionRef = useRef<HTMLDivElement>(null);
 
   // Track time on page for conversion optimization
   useEffect(() => {
@@ -73,6 +75,25 @@ export default function BlogPost() {
     }, 5000);
 
     return () => clearInterval(timer);
+  }, []);
+
+  // Set up Intersection Observer for CTA visibility
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          // Hide sticky CTA when article CTA is visible
+          setShowStickyCTA(!entry.isIntersecting);
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    if (ctaSectionRef.current) {
+      observer.observe(ctaSectionRef.current);
+    }
+
+    return () => observer.disconnect();
   }, []);
 
   // Show CTA after 30 seconds or when scrolled to bottom
@@ -104,14 +125,34 @@ export default function BlogPost() {
         if (fetchError) throw fetchError;
         if (!data) throw new Error('Post not found');
 
-        // Fetch related posts
-        const { data: related } = await supabase
+        // Step 1: Try to get related posts with the same theme
+        const { data: themeRelated } = await supabase
           .from('blog_posts')
-          .select('id, slug, title, reading_time')
+          .select('id, slug, title, reading_time, theme')
+          .eq('theme', data.theme)
           .neq('id', data.id)
           .eq('status', 'published')
           .order('published_at', { ascending: false })
           .limit(3);
+
+        let related = [...(themeRelated || [])];
+
+        // Step 2: If we don't have enough theme-related posts, get recent posts to fill the gap
+        if (related.length < 3) {
+          const { data: recentPosts } = await supabase
+            .from('blog_posts')
+            .select('id, slug, title, reading_time, theme')
+            .neq('id', data.id)
+            .eq('status', 'published')
+            .order('published_at', { ascending: false })
+            .limit(3 - related.length);
+          
+          // Combine theme-related and recent posts, removing any duplicates
+          const recentUnique = (recentPosts || []).filter(
+            (post) => !related.some(rp => rp.id === post.id)
+          );
+          related = [...related, ...recentUnique];
+        }
 
         const postData = { ...data, related_posts: related || [] };
         setPost(postData);
@@ -213,117 +254,118 @@ export default function BlogPost() {
           </script>
         </Helmet>
         <article className="max-w-4xl mx-auto">
-        <header className="mb-12">
-          <Link 
-            to="/blog" 
-            className="inline-flex items-center text-[#8B1538] hover:underline mb-4"
-          >
-            <ChevronRight className="h-4 w-4 rotate-180 mr-1" />
-            Back to Blog
-          </Link>
-          
-          <h1 className="text-4xl md:text-5xl font-bold text-[#8B1538] mb-6">
-            {post.title}
-          </h1>
-          
-          <div className="flex flex-wrap items-center text-gray-600 text-sm gap-4 mb-6">
-            <div className="flex items-center">
-              <User className="h-4 w-4 mr-1 text-[#8B1538]" />
-              {post.author_name}
-            </div>
-            <div className="flex items-center">
-              <Clock className="h-4 w-4 mr-1 text-[#8B1538]" />
-              {format(new Date(post.published_at), 'MMMM d, yyyy')}
-            </div>
-            <div className="flex items-center">
-              <BookOpen className="h-4 w-4 mr-1 text-[#8B1538]" />
-              {post.reading_time} min read
-            </div>
-          </div>
-          
-          {post.featured_image && (
-            <img 
-              src={post.featured_image} 
-              alt={post.title} 
-              className="w-full h-auto rounded-lg mb-8 shadow-lg"
-            />
-          )}
-        </header>
-
-        <div className="prose prose-lg max-w-none mb-12">
-          <div dangerouslySetInnerHTML={{ __html: post.content }} />
-        </div>
-
-        <CTA_SECTION />
-
-        {post.related_posts && post.related_posts.length > 0 && (
-          <section className="mt-16">
-            <h2 className="text-2xl font-bold text-[#8B1538] mb-6">
-              You might also like
-            </h2>
-            <div className="grid md:grid-cols-3 gap-6">
-              {post.related_posts.map((related) => (
-                <Card key={related.id} className="border-[#8B1538] hover:shadow-md transition-shadow">
-                  <CardContent className="p-6">
-                    <h3 className="font-bold text-lg mb-2 text-[#8B1538]">
-                      <Link to={`/blog/${related.slug}`} className="hover:underline">
-                        {related.title}
-                      </Link>
-                    </h3>
-                    <div className="flex items-center text-sm text-gray-500 mt-2">
-                      <Clock className="h-3 w-3 mr-1" />
-                      {related.reading_time} min read
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </section>
-        )}
-
-        <div className="mt-16 pt-8 border-t border-gray-200">
-          <div className="flex items-center">
-            {post.author_image && (
-              <img 
-                src={post.author_image} 
-                alt={post.author_name} 
-                className="h-16 w-16 rounded-full mr-4"
-              />
-            )}
-            <div>
-              <h3 className="font-bold text-lg">{post.author_name}</h3>
-              {post.author_bio && (
-                <p className="text-gray-600">{post.author_bio}</p>
-              )}
-            </div>
-          </div>
-        </div>
-      </article>
-
-      {/* Bottom CTA for scrollers */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg p-4 border-t border-gray-200">
-        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center">
-          <div className="mb-4 sm:mb-0">
-            <h3 className="font-bold text-[#8B1538]">
-              Ready to create your own mystery?
-            </h3>
-            <p className="text-center mb-6 text-gray-600">
-              Get started today and create an unforgettable experience for your friends and family.
-            </p>
-          </div>
-          <Button 
-            asChild 
-            className="bg-[#8B1538] hover:bg-[#6d102c] text-white py-2 px-6 font-medium transition-colors"
-          >
-            <Link to="/mystery/create">
-              Start Now
-              <ArrowRight className="ml-2 h-4 w-4" />
+          <header className="mb-12">
+            <Link 
+              to="/blog" 
+              className="inline-flex items-center text-[#8B1538] hover:underline mb-4"
+            >
+              <ChevronRight className="h-4 w-4 rotate-180 mr-1" />
+              Back to Blog
             </Link>
-          </Button>
-        </div>
-      </div>
+            
+            <h1 className="text-4xl md:text-5xl font-bold text-[#8B1538] mb-6">
+              {post.title}
+            </h1>
+            
+            <div className="flex flex-wrap items-center text-gray-600 text-sm gap-4 mb-6">
+              <div className="flex items-center">
+                <User className="h-4 w-4 mr-1 text-[#8B1538]" />
+                {post.author_name}
+              </div>
+              <div className="flex items-center">
+                <Clock className="h-4 w-4 mr-1 text-[#8B1538]" />
+                {post.reading_time} min read
+              </div>
+            </div>
+            
+            {post.featured_image && (
+              <div className="mb-8 rounded-lg overflow-hidden">
+                <img 
+                  src={post.featured_image} 
+                  alt={post.title}
+                  className="w-full h-auto object-cover"
+                />
+              </div>
+            )}
+          </header>
+
+          <div className="prose prose-lg max-w-none mb-12">
+            <div dangerouslySetInnerHTML={{ __html: post.content }} />
+          </div>
+
+          <div ref={ctaSectionRef}>
+            <CTA_SECTION />
+          </div>
+
+          {post.related_posts && post.related_posts.length > 0 && (
+            <section className="mt-16">
+              <h2 className="text-2xl font-bold text-[#8B1538] mb-6">
+                You might also like
+              </h2>
+              <div className="grid md:grid-cols-3 gap-6">
+                {post.related_posts.map((related) => (
+                  <Card key={related.id} className="border-[#8B1538] hover:shadow-md transition-shadow">
+                    <CardContent className="p-6">
+                      <h3 className="font-bold text-lg mb-2 text-[#8B1538]">
+                        <Link to={`/blog/${related.slug}`} className="hover:underline">
+                          {related.title}
+                        </Link>
+                      </h3>
+                      <div className="flex items-center text-sm text-gray-500 mt-2">
+                        <Clock className="h-3 w-3 mr-1" />
+                        {related.reading_time} min read
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </section>
+          )}
+
+          <div className="mt-16 pt-8 border-t border-gray-200">
+            <div className="flex items-center">
+              {post.author_image && (
+                <img 
+                  src={post.author_image} 
+                  alt={post.author_name} 
+                  className="h-16 w-16 rounded-full mr-4"
+                />
+              )}
+              <div>
+                <h3 className="font-bold text-lg">{post.author_name}</h3>
+                {post.author_bio && (
+                  <p className="text-gray-600">{post.author_bio}</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </article>
       </main>
+      
+      {/* Bottom CTA for scrollers */}
+      {showStickyCTA && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg p-4 border-t border-gray-200">
+          <div className="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center">
+            <div className="mb-4 sm:mb-0">
+              <h3 className="font-bold text-[#8B1538]">
+                Ready to create your own mystery?
+              </h3>
+              <p className="text-center mb-6 text-gray-600">
+                Get started today and create an unforgettable experience for your friends and family.
+              </p>
+            </div>
+            <Button 
+              asChild 
+              className="bg-[#8B1538] hover:bg-[#6d102c] text-white py-2 px-6 font-medium transition-colors"
+            >
+              <Link to="/mystery/create">
+                Start Now
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      )}
+      
       <Footer />
     </div>
-  );
-}

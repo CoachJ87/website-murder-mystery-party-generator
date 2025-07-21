@@ -444,6 +444,13 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
     console.log(JSON.stringify(webhookPayload, null, 2));
     console.log('=== END FINAL PAYLOAD ===');
 
+    // Log request details before making the call
+    console.log("=== WEBHOOK REQUEST DEBUG ===");
+    console.log("Making request to:", "https://hook.eu2.make.com/lso1g2u34qe45p0pdyteaqkqw7o8shbp");
+    console.log("Payload size:", JSON.stringify(webhookPayload).length, "characters");
+    console.log("Request headers:", { 'Content-Type': 'application/json' });
+    console.log("=== END WEBHOOK REQUEST DEBUG ===");
+
     // Send to Make.com webhook as JSON
     const response = await fetch("https://hook.eu2.make.com/lso1g2u34qe45p0pdyteaqkqw7o8shbp", {
       method: 'POST',
@@ -455,7 +462,13 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
     
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Make.com webhook error:", response.status, errorText);
+      console.error("=== WEBHOOK ERROR DEBUG ===");
+      console.error("Status:", response.status);
+      console.error("Status Text:", response.statusText);
+      console.error("Error Response:", errorText);
+      console.error("Request URL:", response.url);
+      console.error("Response Headers:", Object.fromEntries(response.headers.entries()));
+      console.error("=== END WEBHOOK ERROR DEBUG ===");
       
       // Update status to failed
       await supabase
