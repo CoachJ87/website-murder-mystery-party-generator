@@ -422,50 +422,7 @@ const MysteryPackageTabView = React.memo(({
     </div>
   ), [isMobile, t]);
 
-  // Enhanced table components for ReactMarkdown
-  const tableComponents = useMemo(() => ({
-    table: ({ children }: any) => (
-      <div className="overflow-x-auto mb-4">
-        <table className={cn(
-          "w-full border-collapse border border-gray-300 bg-white",
-          isMobile && "text-xs"
-        )}>
-          {children}
-        </table>
-      </div>
-    ),
-    thead: ({ children }: any) => (
-      <thead className="bg-gray-100">
-        {children}
-      </thead>
-    ),
-    tbody: ({ children }: any) => (
-      <tbody>
-        {children}
-      </tbody>
-    ),
-    tr: ({ children }: any) => (
-      <tr className="border-b border-gray-300 hover:bg-gray-50">
-        {children}
-      </tr>
-    ),
-    th: ({ children }: any) => (
-      <th className={cn(
-        "border border-gray-300 px-3 py-2 text-left font-medium text-foreground bg-gray-100",
-        isMobile && "px-2 py-1 text-xs"
-      )}>
-        {children}
-      </th>
-    ),
-    td: ({ children }: any) => (
-      <td className={cn(
-        "border border-gray-300 px-3 py-2 text-foreground",
-        isMobile && "px-2 py-1 text-xs"
-      )}>
-        {children}
-      </td>
-    ),
-  }), [isMobile]);
+  // ...
 
   return (
     <div className="w-full">
@@ -553,65 +510,9 @@ const MysteryPackageTabView = React.memo(({
             isMobile && "text-sm"
           )}>
             {hostGuide ? (
-              <ReactMarkdown 
-                components={{
-                  table: ({ children }) => (
-                    <div className="overflow-x-auto">
-                      <table className={cn(isMobile && "text-xs")}>{children}</table>
-                    </div>
-                  ),
-                  h1: ({ children }) => (
-                    <h1 className={cn(
-                      "text-2xl font-bold mb-4",
-                      isMobile && "text-lg mb-3"
-                    )}>
-                      {children}
-                    </h1>
-                  ),
-                  h2: ({ children }) => (
-                    <h2 className={cn(
-                      "text-xl font-semibold mb-3",
-                      isMobile && "text-base mb-2"
-                    )}>
-                      {children}
-                    </h2>
-                  ),
-                  h3: ({ children }) => (
-                    <h3 className={cn(
-                      "text-lg font-medium mb-2",
-                      isMobile && "text-sm mb-2"
-                    )}>
-                      {children}
-                    </h3>
-                  ),
-                  p: ({ children }) => (
-                    <p className={cn(
-                      "mb-4",
-                      isMobile && "mb-3 text-sm leading-relaxed"
-                    )}>
-                      {children}
-                    </p>
-                  ),
-                  ul: ({ children }) => (
-                    <ul className={cn(
-                      "list-disc pl-6 mb-4",
-                      isMobile && "pl-4 mb-3 text-sm"
-                    )}>
-                      {children}
-                    </ul>
-                  ),
-                  ol: ({ children }) => (
-                    <ol className={cn(
-                      "list-decimal pl-6 mb-4",
-                      isMobile && "pl-4 mb-3 text-sm"
-                    )}>
-                      {children}
-                    </ol>
-                  ),
-                }}
-              >
-                {hostGuide}
-              </ReactMarkdown>
+              <div className={cn("prose prose-slate max-w-none", isMobile && "prose-sm")}>
+                <ReactMarkdown>{hostGuide}</ReactMarkdown>
+              </div>
             ) : isGenerating ? (
               <LoadingTabContent message={t('mysteryPackage.loading.generatingMessage')} />            
             ) : (
@@ -682,57 +583,9 @@ const MysteryPackageTabView = React.memo(({
                           "text-foreground",
                           isMobile && "text-sm"
                         )}>
-                          <ReactMarkdown 
-                            components={{
-                              table: ({ children }) => (
-                                <div className="overflow-x-auto">
-                                  <table className={cn(isMobile && "text-xs")}>{children}</table>
-                                </div>
-                              ),
-                              h1: ({ children }) => (
-                                <h1 className={cn(
-                                  "text-xl font-bold mb-3",
-                                  isMobile && "text-base mb-2"
-                                )}>
-                                  {children}
-                                </h1>
-                              ),
-                              h2: ({ children }) => (
-                                <h2 className={cn(
-                                  "text-lg font-semibold mb-3",
-                                  isMobile && "text-sm mb-2"
-                                )}>
-                                  {children}
-                                </h2>
-                              ),
-                              h3: ({ children }) => (
-                                <h3 className={cn(
-                                  "text-base font-medium mb-2",
-                                  isMobile && "text-sm mb-2"
-                                )}>
-                                  {children}
-                                </h3>
-                              ),
-                              p: ({ children }) => (
-                                <p className={cn(
-                                  "mb-3",
-                                  isMobile && "mb-2 text-sm leading-relaxed"
-                                )}>
-                                  {children}
-                                </p>
-                              ),
-                              ul: ({ children }) => (
-                                <ul className={cn(
-                                  "list-disc pl-5 mb-3",
-                                  isMobile && "pl-4 mb-2 text-sm"
-                                )}>
-                                  {children}
-                                </ul>
-                              ),
-                            }}
-                          >
-                            {characterGuideContent}
-                          </ReactMarkdown>
+                          <div className={cn("prose prose-slate max-w-none", isMobile && "prose-sm")}>
+                            <ReactMarkdown>{characterGuideContent}</ReactMarkdown>
+                          </div>
                         </AccordionContent>
                       </AccordionItem>
                     </Accordion>
@@ -763,41 +616,9 @@ const MysteryPackageTabView = React.memo(({
             isMobile && "text-sm"
           )}>
             {evidenceCards ? (
-              <ReactMarkdown 
-                components={{
-                  table: ({ children }) => (
-                    <div className="overflow-x-auto">
-                      <table className={cn(isMobile && "text-xs")}>{children}</table>
-                    </div>
-                  ),
-                  h1: ({ children }) => (
-                    <h1 className={cn(
-                      "text-2xl font-bold mb-4",
-                      isMobile && "text-lg mb-3"
-                    )}>
-                      {children}
-                    </h1>
-                  ),
-                  h2: ({ children }) => (
-                    <h2 className={cn(
-                      "text-xl font-semibold mb-3",
-                      isMobile && "text-base mb-2"
-                    )}>
-                      {children}
-                    </h2>
-                  ),
-                  p: ({ children }) => (
-                    <p className={cn(
-                      "mb-4",
-                      isMobile && "mb-3 text-sm leading-relaxed"
-                    )}>
-                      {children}
-                    </p>
-                  ),
-                }}
-              >
-                {evidenceCards}
-              </ReactMarkdown>
+              <div className={cn("prose prose-slate max-w-none", isMobile && "prose-sm")}>
+                <ReactMarkdown>{evidenceCards}</ReactMarkdown>
+              </div>
             ) : isGenerating ? (
               <LoadingTabContent message={t('mysteryPackage.loading.clues')} />
             ) : (
@@ -822,57 +643,9 @@ const MysteryPackageTabView = React.memo(({
             isMobile && "text-sm"
           )}>
             {detectiveScript ? (
-              <ReactMarkdown 
-                components={{
-                  table: ({ children }) => (
-                    <div className="overflow-x-auto">
-                      <table className={cn(isMobile && "text-xs")}>{children}</table>
-                    </div>
-                  ),
-                  h1: ({ children }) => (
-                    <h1 className={cn(
-                      "text-2xl font-bold mb-4",
-                      isMobile && "text-lg mb-3"
-                    )}>
-                      {children}
-                    </h1>
-                  ),
-                  h2: ({ children }) => (
-                    <h2 className={cn(
-                      "text-xl font-semibold mb-3",
-                      isMobile && "text-base mb-2"
-                    )}>
-                      {children}
-                    </h2>
-                  ),
-                  p: ({ children }) => (
-                    <p className={cn(
-                      "mb-4",
-                      isMobile && "mb-3 text-sm leading-relaxed"
-                    )}>
-                      {children}
-                    </p>
-                  ),
-                  ul: ({ children }) => (
-                    <ul className={cn(
-                      "list-disc pl-6 mb-4",
-                      isMobile && "pl-4 mb-3 text-sm"
-                    )}>
-                      {children}
-                    </ul>
-                  ),
-                  ol: ({ children }) => (
-                    <ol className={cn(
-                      "list-decimal pl-6 mb-4",
-                      isMobile && "pl-4 mb-3 text-sm"
-                    )}>
-                      {children}
-                    </ol>
-                  ),
-                }}
-              >
-                {detectiveScript}
-              </ReactMarkdown>
+              <div className={cn("prose prose-slate max-w-none", isMobile && "prose-sm")}>
+                <ReactMarkdown>{detectiveScript}</ReactMarkdown>
+              </div>
             ) : isGenerating ? (
               <LoadingTabContent message={t('mysteryPackage.loading.inspector')} />
             ) : (
