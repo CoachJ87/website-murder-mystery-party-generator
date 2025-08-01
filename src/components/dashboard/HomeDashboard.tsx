@@ -307,7 +307,7 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
   };
 
   const handleViewMystery = (mysteryId: string) => {
-    const mystery = mysteries.find(m => m.id === mysteryId);
+    const mystery = displayedMysteries.find(m => m.id === mysteryId);
     
     if (mystery?.is_purchased || mystery?.status === "purchased" || mystery?.status === "generating") {
       navigate(`/mystery/${mysteryId}`);

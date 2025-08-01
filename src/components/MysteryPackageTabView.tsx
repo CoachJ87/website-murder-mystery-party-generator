@@ -60,40 +60,7 @@ const MysteryPackageTabView = React.memo(({
     }
   }, [generationStatus]);
 
-  // Clean table processing function
-  const processRelationshipMatrix = useCallback((rawMatrix: any): string => {
-    // Enhanced type checking and conversion
-    if (!rawMatrix) {
-      return "";
-    }
-    
-    // Convert to string if it's not already
-    let matrixString: string;
-    if (typeof rawMatrix === 'string') {
-      matrixString = rawMatrix;
-    } else if (typeof rawMatrix === 'object') {
-      // Handle case where it might be an object
-      matrixString = JSON.stringify(rawMatrix);
-    } else {
-      // Convert any other type to string
-      matrixString = String(rawMatrix);
-    }
-    
-    // Additional safety check
-    if (!matrixString || matrixString.length === 0) {
-      return "";
-    }
 
-    // Convert escaped newlines to actual newlines
-    const withLineBreaks = matrixString.replace(/\\n/g, '\n');
-    
-    // Extract just the table part (lines starting with |)
-    const lines = withLineBreaks.split('\n');
-    const tableLines = lines.filter(line => line.trim().startsWith('|'));
-    
-    // Join with proper line breaks and add spacing
-    return '\n\n' + tableLines.join('\n') + '\n\n';
-  }, []);
 
   // Helper function to safely get relationships as an array
   const getRelationshipsArray = useCallback((relationships: any): Array<{character: string, description: string}> => {
@@ -259,39 +226,7 @@ const MysteryPackageTabView = React.memo(({
     return match ? match[1].trim() : "";
   }, [packageContent]);
 
-  // Improved character matrix extraction
-  const extractCharacterMatrix = useCallback(() => {
-    if (!packageContent) return "";
-    
-    const matrixPattern = /# CHARACTER RELATIONSHIP MATRIX\n([\s\S]*?)(?=# |$)/i;
-    const match = packageContent.match(matrixPattern);
-    
-    if (!match) return "";
-    
-    const rawContent = match[1].trim();
-    
-    // Find the actual table content by looking for the first line with pipes
-    const lines = rawContent.split('\n');
-    const tableStartIndex = lines.findIndex(line => line.trim().includes('|'));
-    
-    if (tableStartIndex === -1) {
-      return ""; // No table found
-    }
-    
-    // Extract from table start to end of content or next section
-    const tableLines = lines.slice(tableStartIndex);
-    
-    // Find where table ends (empty line or non-table content)
-    const tableEndIndex = tableLines.findIndex((line, index) => {
-      if (index === 0) return false; // Don't end on first line
-      const trimmed = line.trim();
-      // End if we hit an empty line followed by non-table content, or a new section
-      return !trimmed || (trimmed.startsWith('#') && !trimmed.includes('|'));
-    });
-    
-    const finalTableLines = tableEndIndex > 0 ? tableLines.slice(0, tableEndIndex) : tableLines;
-    return finalTableLines.join('\n').trim();
-  }, [packageContent]);
+
 
   const extractCharacters = useCallback(() => {
     if (!packageContent) return [];
@@ -355,17 +290,7 @@ const MysteryPackageTabView = React.memo(({
     return packageData?.detectiveScript || extractInspectorScript();
   }, [packageData?.detectiveScript, extractInspectorScript]);
 
-  // Clean relationship matrix processing
-  const relationshipMatrix = useMemo(() => {
-    let rawMatrix = packageData?.relationshipMatrix || extractCharacterMatrix();
-    
-    if (!rawMatrix || typeof rawMatrix !== 'string') {
-      return "";
-    }
 
-    // Process the matrix using our clean function
-    return processRelationshipMatrix(rawMatrix);
-  }, [packageData?.relationshipMatrix, extractCharacterMatrix, processRelationshipMatrix]);
 
   const charactersList = useMemo(() => {
     if (characters && characters.length > 0) {
@@ -422,8 +347,6 @@ const MysteryPackageTabView = React.memo(({
     </div>
   ), [isMobile, t]);
 
-  // ...
-
   return (
     <div className="w-full">
       <div className={cn(
@@ -452,10 +375,10 @@ const MysteryPackageTabView = React.memo(({
         )}
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className={cn(
-          "w-full mb-4 bg-primary p-1 overflow-hidden",
-          isMobile ? "grid grid-cols-2 gap-1 h-auto" : "grid grid-cols-2 md:grid-cols-5"
+          "w-full mb-4 bg-primary/10 p-1 overflow-hidden",
+          isMobile ? "grid grid-cols-2 gap-1 h-auto" : "grid grid-cols-2 md:grid-cols-4"
         )}>
           <TabsTrigger 
             value="host-guide" 
@@ -492,15 +415,6 @@ const MysteryPackageTabView = React.memo(({
             )}
           >
             {t(isMobile ? 'mysteryPackage.mobileTabs.inspector' : 'mysteryPackage.tabs.inspector')}
-          </TabsTrigger>
-          <TabsTrigger 
-            value="matrix" 
-            className={cn(
-              "whitespace-nowrap text-primary-foreground data-[state=active]:bg-primary-hover data-[state=active]:text-primary-foreground hover:bg-primary/90",
-              isMobile && "text-xs px-2 py-2 h-auto"
-            )}
-          >
-            {t(isMobile ? 'mysteryPackage.mobileTabs.relations' : 'mysteryPackage.tabs.relationships')}
           </TabsTrigger>
         </TabsList>
 
@@ -663,70 +577,13 @@ const MysteryPackageTabView = React.memo(({
             )}
           </div>
         </TabsContent>
-
-        <TabsContent value="matrix" className={cn("overflow-hidden", isMobile && "px-2")}>
-          <div className={cn(
-            "mystery-content",
-            isMobile && "text-sm"
-          )}>
-            {relationshipMatrix ? (
-              <div>
-                <h2 className={cn(
-                  "text-xl font-semibold mb-4",
-                  isMobile && "text-lg mb-3"
-                )}>
-                  {t('mysteryPackage.matrix.title')}
-                </h2>
-                <div 
-                  className="overflow-x-auto mb-4"
-                  dangerouslySetInnerHTML={{
-                    __html: relationshipMatrix
-                      .split('\n')
-                      .filter(line => line.trim().startsWith('|'))
-                      .map((line, index) => {
-                        const cells = line.split('|').slice(1, -1).map(cell => {
-                          // Process **bold** markdown syntax
-                          return cell.trim().replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                        });
-                        if (index === 0) {
-                          return `<tr>${cells.map(cell => `<th class="border border-gray-300 px-3 py-2 text-left font-medium bg-gray-100">${cell}</th>`).join('')}</tr>`;
-                        } else if (index === 1) {
-                          return ''; // Skip separator row
-                        } else {
-                          return `<tr class="hover:bg-gray-50">${cells.map(cell => `<td class="border border-gray-300 px-3 py-2">${cell}</td>`).join('')}</tr>`;
-                        }
-                      })
-                      .filter(row => row)
-                      .join('')
-                      .replace(/^/, '<table class="w-full border-collapse border border-gray-300 bg-white">')
-                      .replace(/$/, '</table>')
-                  }}
-                />
-              </div>
-            ) : isGenerating ? (
-              <LoadingTabContent message={t('mysteryPackage.loading.matrix')} />
-            ) : (
-              <div className={cn(
-                "text-center py-6",
-                isMobile && "py-4 px-4"
-              )}>
-                <p className={cn(
-                  "text-muted-foreground",
-                  isMobile && "text-sm"
-                )}>
-                  {t('mysteryPackage.placeholder.matrix')}
-                </p>
-              </div>
-            )}
-          </div>
-        </TabsContent>
       </Tabs>
 
       {/* Mystery Guest Manager Dialog */}
       <MysteryGuestManager
         open={showGuestManager}
         onOpenChange={setShowGuestManager}
-        characters={charactersList}
+        characters={characters}
         mysteryId={conversationId || ""}
         mysteryTitle={mysteryTitle}
       />
