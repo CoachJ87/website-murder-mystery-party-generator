@@ -377,13 +377,13 @@ const MysteryPackageTabView = React.memo(({
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className={cn(
-          "w-full mb-4 bg-primary/10 p-1 overflow-hidden",
+          "w-full mb-4 bg-primary p-1 overflow-hidden border-0",
           isMobile ? "grid grid-cols-2 gap-1 h-auto" : "grid grid-cols-2 md:grid-cols-4"
         )}>
           <TabsTrigger 
             value="host-guide" 
             className={cn(
-              "whitespace-nowrap text-primary-foreground data-[state=active]:bg-primary-hover data-[state=active]:text-primary-foreground hover:bg-primary/90",
+              "whitespace-nowrap bg-primary text-primary-foreground data-[state=active]:bg-primary-hover data-[state=active]:text-primary-foreground hover:bg-primary/90",
               isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
@@ -392,7 +392,7 @@ const MysteryPackageTabView = React.memo(({
           <TabsTrigger 
             value="characters" 
             className={cn(
-              "whitespace-nowrap text-primary-foreground data-[state=active]:bg-primary-hover data-[state=active]:text-primary-foreground hover:bg-primary/90",
+              "whitespace-nowrap bg-primary text-primary-foreground data-[state=active]:bg-primary-hover data-[state=active]:text-primary-foreground hover:bg-primary/90",
               isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
@@ -401,7 +401,7 @@ const MysteryPackageTabView = React.memo(({
           <TabsTrigger 
             value="clues" 
             className={cn(
-              "whitespace-nowrap text-primary-foreground data-[state=active]:bg-primary-hover data-[state=active]:text-primary-foreground hover:bg-primary/90",
+              "whitespace-nowrap bg-primary text-primary-foreground data-[state=active]:bg-primary-hover data-[state=active]:text-primary-foreground hover:bg-primary/90",
               isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >
@@ -410,7 +410,7 @@ const MysteryPackageTabView = React.memo(({
           <TabsTrigger 
             value="inspector" 
             className={cn(
-              "whitespace-nowrap text-primary-foreground data-[state=active]:bg-primary-hover data-[state=active]:text-primary-foreground hover:bg-primary/90",
+              "whitespace-nowrap bg-primary text-primary-foreground data-[state=active]:bg-primary-hover data-[state=active]:text-primary-foreground hover:bg-primary/90",
               isMobile && "text-xs px-2 py-2 h-auto"
             )}
           >

@@ -78,12 +78,21 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
 
   // Update displayed mysteries with pagination
   const updateDisplayedMysteries = (mysteries: Mystery[], pageNum: number) => {
-    const start = (pageNum - 1) * pageSize;
-    const end = start + pageSize;
+    const end = pageNum * pageSize;
     const paginated = mysteries.slice(0, end);
     
     setDisplayedMysteries(paginated);
-    setHasMorePages(end < mysteries.length);
+    // Only set hasMorePages to false when we've loaded all available mysteries
+    setHasMorePages(mysteries.length > paginated.length);
+    
+    // Debug logging
+    console.log('updateDisplayedMysteries:', {
+      pageNum,
+      end,
+      totalMysteries: mysteries.length,
+      displayedCount: paginated.length,
+      hasMore: mysteries.length > paginated.length
+    });
   };
 
   const fetchMysteries = async (pageNumber: number, reset: boolean = false) => {
@@ -261,12 +270,15 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
       const updatedMysteries = reset ? validMysteries : [...allMysteries, ...validMysteries];
       setAllMysteries(updatedMysteries);
       
+      // Update hasMorePages based on whether we received a full page of results
+      setHasMorePages(validMysteries.length === pageSize);
+      
       if (isSearching) {
         // If searching, apply search filter to the updated list
         applySearchFilter(searchTerm.trim().toLowerCase());
       } else {
         // Otherwise, update displayed mysteries with pagination
-        updateDisplayedMysteries(updatedMysteries, pageNumber);
+        updateDisplayedMysteries(updatedMysteries, reset ? 1 : pageNumber);
       }
       
       setPage(pageNumber);
@@ -280,9 +292,18 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
 
   const handleLoadMore = () => {
     if (!loading) {
+      console.log('handleLoadMore called', { 
+        isSearching, 
+        page, 
+        hasMorePages, 
+        displayedCount: displayedMysteries.length,
+        allMysteriesCount: allMysteries.length
+      });
+      
+      const nextPage = page + 1;
+      
       if (isSearching) {
         // When searching and loading more, show more of the filtered results
-        const nextPage = page + 1;
         updateDisplayedMysteries(
           allMysteries.filter(mystery => {
             const searchLower = searchTerm.trim().toLowerCase();
@@ -298,11 +319,12 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
           }),
           nextPage
         );
-        setPage(nextPage);
-      } else if (hasMorePages) {
+      } else {
         // When not searching, fetch next page from server
-        fetchMysteries(page + 1, false);
+        fetchMysteries(nextPage, false);
       }
+      
+      setPage(nextPage);
     }
   };
 
@@ -368,12 +390,31 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
+    const searchLower = value.trim().toLowerCase();
     setSearchTerm(value);
     
-    // If clearing search, reset to show all mysteries with pagination
-    if (!value.trim()) {
+    if (searchLower) {
+      // When searching, filter the existing mysteries and update display
+      const filteredMysteries = allMysteries.filter(mystery => {
+        const searchableFields = [
+          mystery.title?.toLowerCase() || '',
+          mystery.ai_title?.toLowerCase() || '',
+          mystery.theme?.toLowerCase() || '',
+          mystery.mystery_data?.theme?.toLowerCase() || '',
+          mystery.mystery_data?.additionalDetails?.toLowerCase() || '',
+          mystery.mystery_data?.scriptType?.toLowerCase() || ''
+        ];
+        return searchableFields.some(field => field.includes(searchLower));
+      });
+      
+      setPage(1);
+      updateDisplayedMysteries(filteredMysteries, 1);
+      setIsSearching(true);
+    } else {
+      // If clearing search, reset to show all mysteries with pagination
       setPage(1);
       updateDisplayedMysteries(allMysteries, 1);
+      setIsSearching(false);
     }
   };
 
@@ -440,18 +481,28 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
               ))}
             </div>
             
-            {hasMorePages && (
+            {(hasMorePages || displayedMysteries.length >= pageSize) && (
               <div className="mt-8 text-center">
                 <Button 
                   onClick={handleLoadMore} 
                   variant="outline" 
                   disabled={loading}
+                  className="min-w-[120px]"
                 >
                   {loading 
                     ? t('homeDashboard.loading', { defaultValue: 'Loading...' }) 
                     : t('homeDashboard.loadMore', { defaultValue: 'Load More' })}
                   {!loading && <ArrowDown className="ml-2 h-4 w-4" />}
                 </Button>
+                <div className="mt-2 text-xs text-muted-foreground">
+                  Showing {displayedMysteries.length} of {allMysteries.length} mysteries
+                </div>
+                {/* Debug info - can be removed in production */}
+                <div className="hidden text-xs text-muted-foreground">
+                  <div>Page: {page}</div>
+                  <div>Has more: {hasMorePages ? 'true' : 'false'}</div>
+                  <div>Loading: {loading ? 'true' : 'false'}</div>
+                </div>
               </div>
             )}
           </>
