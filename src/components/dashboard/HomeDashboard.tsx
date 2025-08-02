@@ -495,7 +495,24 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
                   {!loading && <ArrowDown className="ml-2 h-4 w-4" />}
                 </Button>
                 <div className="mt-2 text-xs text-muted-foreground">
-                  Showing {displayedMysteries.length} of {allMysteries.length} mysteries
+                  {(() => {
+                    if (isSearching) {
+                      const filteredTotal = allMysteries.filter(mystery => {
+                        const searchLower = searchTerm.trim().toLowerCase();
+                        const searchableFields = [
+                          mystery.title?.toLowerCase() || '',
+                          mystery.ai_title?.toLowerCase() || '',
+                          mystery.theme?.toLowerCase() || '',
+                          mystery.mystery_data?.theme?.toLowerCase() || '',
+                          mystery.mystery_data?.additionalDetails?.toLowerCase() || '',
+                          mystery.mystery_data?.scriptType?.toLowerCase() || ''
+                        ];
+                        return searchableFields.some(field => field.includes(searchLower));
+                      }).length;
+                      return `Showing ${displayedMysteries.length} of ${filteredTotal} mysteries`;
+                    }
+                    return `Showing ${displayedMysteries.length} of ${allMysteries.length} mysteries`;
+                  })()}
                 </div>
                 {/* Debug info - can be removed in production */}
                 <div className="hidden text-xs text-muted-foreground">

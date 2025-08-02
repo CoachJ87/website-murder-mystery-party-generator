@@ -67,6 +67,14 @@ const MysteryView = () => {
     }
   }, []);
 
+  // Calculate estimated generation time based on player count
+  const getEstimatedTime = useCallback((playerCount: number) => {
+    if (playerCount <= 6) return "3-5 minutes";
+    if (playerCount <= 12) return "5-8 minutes";
+    if (playerCount <= 20) return "8-12 minutes";
+    return "10-15 minutes";
+  }, []);
+
   // Fetch structured package data with proper error handling
   const fetchStructuredPackageData = useCallback(async () => {
     if (!id) {
@@ -228,7 +236,8 @@ const MysteryView = () => {
     packageReadyNotified.current = false; // Reset notification flag
     
     try {
-      toast.info("Starting generation of your mystery package. This will take 3-5 minutes...");
+      const estimatedTime = getEstimatedTime(mystery?.player_count || 6);
+      toast.info(`Starting generation of your mystery package. This will take ${estimatedTime}...`);
       
       // Just call the webhook - don't wait for completion
       await generateCompletePackage(id);
@@ -783,7 +792,7 @@ const MysteryView = () => {
             </Button>
           </CardTitle>
           <CardDescription className={cn(isMobile && "text-sm")}>
-            This process takes 3-5 minutes to complete. This page automatically refreshes every 15 seconds.
+            This process takes {getEstimatedTime(mystery?.player_count || 6)} to complete. This page automatically refreshes every 15 seconds.
           </CardDescription>
         </CardHeader>
         <CardContent className={cn(
@@ -893,18 +902,22 @@ const MysteryView = () => {
     );
   }
 
-  // Updated logic to determine when to show tabs
+  // Only show tabs when generation is explicitly completed OR when we have complete data and not actively generating
   const shouldShowTabs = (
-    generationStatus?.status === 'completed' || 
-    packageContent || 
-    packageData ||
-    characters.length > 0 ||
-    (mystery && (mystery.is_paid || mystery.has_complete_package))
+    // Case 1: Generation status explicitly shows completed
+    generationStatus?.status === 'completed' ||
+    
+    // Case 2: Not currently generating AND we have complete package data AND characters
+    (!generating && 
+     !generationStatus && 
+     packageData && 
+     characters.length > 0 &&
+     (mystery?.is_paid || mystery?.has_complete_package))
   );
 
   console.log("🎭 [DEBUG] shouldShowTabs decision:", {
     generationStatus: generationStatus?.status,
-    hasPackageContent: !!packageContent,
+    generating,
     hasPackageData: !!packageData,
     charactersCount: characters.length,
     mysteryPaid: mystery?.is_paid,
@@ -974,7 +987,7 @@ const MysteryView = () => {
                     "text-sm text-muted-foreground mt-3",
                     isMobile && "text-xs mt-2"
                   )}>
-                    Generation takes 3-5 minutes. This page will auto-refresh to show progress.
+                    Generation takes {getEstimatedTime(mystery?.player_count || 6)}. This page will auto-refresh to show progress.
                   </p>
                 </CardContent>
               </Card>
