@@ -181,9 +181,18 @@ const MysteryPackageTabView = React.memo(({
       return text;
     }
     
+    // Normalize the text and header for comparison
+    const normalizedText = text.trim().toLowerCase();
+    const normalizedHeader = header.trim().toLowerCase();
+    let result = '';
+    
+    // Only add header if it doesn't already exist at the start of the text
+    if (!normalizedText.startsWith(normalizedHeader)) {
+      result = `${header}\n\n`;
+    }
+    
     // Split into lines and process each line
     const lines = text.split('\n');
-    let result = header + '\n\n';
     
     for (const line of lines) {
       const trimmed = line.trim();
