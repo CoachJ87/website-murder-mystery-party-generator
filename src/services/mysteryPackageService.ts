@@ -451,95 +451,144 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
     console.log("Request headers:", { 'Content-Type': 'application/json' });
     console.log("=== END WEBHOOK REQUEST DEBUG ===");
 
-    // Send to Make.com webhook as JSON
-    const response = await fetch("https://hook.eu2.make.com/lso1g2u34qe45p0pdyteaqkqw7o8shbp", {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(webhookPayload)
-    });
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("=== WEBHOOK ERROR DEBUG ===");
-      console.error("Status:", response.status);
-      console.error("Status Text:", response.statusText);
-      console.error("Error Response:", errorText);
-      console.error("Request URL:", response.url);
-      console.error("Response Headers:", Object.fromEntries(response.headers.entries()));
-      console.error("=== END WEBHOOK ERROR DEBUG ===");
+    // Helper function to send webhook with different content types
+    const sendWebhook = async (contentType: 'json' | 'form' | 'formData') => {
+      let headers: Record<string, string> = {};
+      let body: string | FormData;
       
-      // Update status to failed
-      await supabase
-        .from("mystery_packages")
-        .update({
-          generation_status: {
-            status: 'failed',
-            progress: 0,
-            currentStep: 'Failed to send to external service: ' + errorText,
-            resumable: true
-          },
-          updated_at: new Date().toISOString()
-        })
-        .eq("id", packageId);
-        
-      throw new Error(`Webhook failed: ${response.status} ${errorText}`);
-    }
-
-    // Check if we got structured JSON response (immediate completion)
-    let responseData;
-    try {
-      responseData = await response.json();
-      console.log("Make.com webhook response:", responseData);
-      
-      if (responseData && typeof responseData === 'object' && responseData.title) {
-        console.log("Received structured JSON response, saving data...");
-        await saveStructuredPackageData(mysteryId, responseData);
-        console.log("Structured data saved successfully");
-        return "Package generation completed successfully";
+      if (contentType === 'json') {
+        headers['Content-Type'] = 'application/json';
+        body = JSON.stringify(webhookPayload);
+      } else if (contentType === 'form') {
+        headers['Content-Type'] = 'application/x-www-form-urlencoded';
+        const formData = new URLSearchParams();
+        Object.entries(webhookPayload).forEach(([key, value]) => {
+          if (value !== null && value !== undefined) {
+            formData.append(key, String(value));
+          }
+        });
+        body = formData.toString();
+      } else {
+        // formData (multipart/form-data)
+        const formData = new FormData();
+        Object.entries(webhookPayload).forEach(([key, value]) => {
+          if (value !== null && value !== undefined) {
+            if (typeof value === 'object' && !(value instanceof File)) {
+              formData.append(key, JSON.stringify(value));
+            } else {
+              formData.append(key, value as any);
+            }
+          }
+        });
+        body = formData;
       }
-    } catch (e) {
-      console.log("Webhook responded with non-JSON (normal for async webhooks)");
-    }
 
-    // Update status to "processing" - the webhook will update when complete
+      console.log(`=== SENDING WEBHOOK (${contentType}) ===`);
+      console.log('Headers:', headers);
+      console.log('Body:', body);
+      
+      try {
+        const response = await fetch("https://hook.eu2.make.com/lso1g2u34qe45p0pdyteaqkqw7o8shbp", {
+          method: 'POST',
+          headers: headers,
+          body: body as BodyInit
+        });
+        
+        console.log(`=== WEBHOOK RESPONSE (${contentType}) ===`);
+        console.log('Status:', response.status, response.statusText);
+        console.log('Headers:', Object.fromEntries(response.headers.entries()));
+        
+        const responseText = await response.text();
+        console.log('Response:', responseText);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status} - ${responseText}`);
+        }
+        
+        return { success: true, response: responseText };
+      } catch (error) {
+        console.error(`Webhook error (${contentType}):`, error);
+        return { 
+          success: false, 
+          error: error instanceof Error ? error.message : String(error),
+          contentType
+        };
+      }
+    };
+    
+    // Try different content types in sequence
+    const contentTypes = ['json', 'form', 'formData'] as const;
+    let lastError: Error | string = '';
+    
+    for (const contentType of contentTypes) {
+      console.log(`\n=== TRYING CONTENT TYPE: ${contentType} ===`);
+      const result = await sendWebhook(contentType);
+      
+      if (result.success) {
+        console.log(`✓ Successfully sent with ${contentType}`);
+        // Update status to indicate webhook was sent successfully
+        await supabase
+          .from("mystery_packages")
+          .update({
+            generation_status: {
+              status: 'in_progress',
+              progress: 20,
+              currentStep: 'Processing by external service...'
+            },
+            updated_at: new Date().toISOString()
+          })
+          .eq("id", packageId);
+          
+        return "Package generation started successfully";
+      } else {
+        lastError = result.error || 'Unknown error';
+        console.warn(`✗ Failed with ${contentType}:`, lastError);
+      }
+    }
+    
+    // If we get here, all content types failed
+    console.error("=== ALL WEBHOOK ATTEMPTS FAILED ===");
+    console.error("Last error:", lastError);
+    
+    // Update status to failed
     await supabase
       .from("mystery_packages")
       .update({
         generation_status: {
-          status: 'in_progress',
-          progress: 20,
-          currentStep: 'Package generation in progress (3-5 minutes)...',
-          sections: {
-            hostGuide: false,
-            characters: false,
-            clues: false,
-            inspectorScript: false,
-            characterMatrix: false,
-            solution: false
-          }
+          status: 'failed',
+          progress: 0,
+          currentStep: 'Failed to send to external service',
+          error: String(lastError),
+          resumable: true
         },
         updated_at: new Date().toISOString()
       })
       .eq("id", packageId);
-
-    // Update conversation to mark that generation is in progress
+      
+    throw new Error(`All webhook attempts failed. Last error: ${lastError}`);
+  } catch (e) {
+    console.error("Unexpected error in generateCompletePackage:", e);
+    
+    // Update status to failed with error details
     await supabase
-      .from("conversations")
+      .from("mystery_packages")
       .update({
-        needs_package_generation: true,
+        generation_status: {
+          status: 'failed',
+          progress: 0,
+          currentStep: 'Unexpected error during generation',
+          error: e instanceof Error ? e.message : String(e),
+          resumable: true
+        },
         updated_at: new Date().toISOString()
       })
-      .eq("id", mysteryId);
-
-    console.log("Successfully sent enhanced data to Make.com webhook with callback URL");
-    return "Webhook sent - generation in progress";
-    
-  } catch (error) {
-    console.error("Error in generateCompletePackage:", error);
-    throw error;
+      .eq("id", packageId);
+      
+    throw new Error(`Package generation failed: ${e instanceof Error ? e.message : String(e)}`);
   }
+  
+  // If we get here, the webhook was sent successfully
+  return "Package generation started successfully";
 }
 
 // Simplified resume function - just calls generate again

@@ -174,6 +174,36 @@ const MysteryPackageTabView = React.memo(({
     return normalizedContent;
   }, [getRelationshipsArray, getSecretsArray]);
 
+  // Helper function to format content as a bulleted list if it's not already formatted
+  const formatAsBulletedList = (text: string, header: string): string => {
+    // If the text already contains list markers or is empty, return as is
+    if (!text || /^[\s\n]*(?:[-*•]|\d+\.|\[x?\]|\s*$)/m.test(text)) {
+      return text;
+    }
+    
+    // Split into lines and process each line
+    const lines = text.split('\n');
+    let result = header + '\n\n';
+    
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed) {
+        // Skip lines that are already headers or empty
+        if (!trimmed.startsWith('#') && trimmed.length > 0) {
+          result += `- ${trimmed}\n`;
+        } else if (trimmed.startsWith('##')) {
+          // Preserve subheaders
+          result += `\n${trimmed}\n`;
+        }
+      } else {
+        // Preserve empty lines
+        result += '\n';
+      }
+    }
+    
+    return result + '\n';
+  };
+
   // Function to build complete host guide content
   const buildCompleteHostGuide = useCallback((): string => {
     if (!packageData) return "";
@@ -187,11 +217,11 @@ const MysteryPackageTabView = React.memo(({
     }
     
     if (packageData.materials) {
-      content += `${packageData.materials}\n\n`;
+      content += formatAsBulletedList(packageData.materials, '## MATERIALS');
     }
     
     if (packageData.preparation) {
-      content += `${packageData.preparation}\n\n`;
+      content += formatAsBulletedList(packageData.preparation, '## PREPARATION');
     }
     
     if (packageData.timeline) {

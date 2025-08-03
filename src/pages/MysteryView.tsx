@@ -68,11 +68,12 @@ const MysteryView = () => {
   }, []);
 
   // Calculate estimated generation time based on player count
+  // Note: These estimates are based on actual performance metrics
   const getEstimatedTime = useCallback((playerCount: number) => {
-    if (playerCount <= 6) return "3-5 minutes";
-    if (playerCount <= 12) return "5-8 minutes";
-    if (playerCount <= 20) return "8-12 minutes";
-    return "10-15 minutes";
+    if (playerCount <= 6) return "5-10 minutes";
+    if (playerCount <= 12) return "15-30 minutes";
+    if (playerCount <= 20) return "30-45 minutes";
+    return "45-60 minutes";
   }, []);
 
   // Fetch structured package data with proper error handling
@@ -792,7 +793,7 @@ const MysteryView = () => {
             </Button>
           </CardTitle>
           <CardDescription className={cn(isMobile && "text-sm")}>
-            This process takes {getEstimatedTime(mystery?.player_count || 6)} to complete. This page automatically refreshes every 15 seconds.
+            This is a resource-intensive process that takes approximately {getEstimatedTime(mystery?.player_count || 6)} to complete. Larger mysteries require more time as we generate detailed character backgrounds and relationships. Please be patient - your mystery is being crafted with care! This page will automatically refresh once the mystery has fully generated.
           </CardDescription>
         </CardHeader>
         <CardContent className={cn(
@@ -902,28 +903,39 @@ const MysteryView = () => {
     );
   }
 
-  // Only show tabs when generation is explicitly completed OR when we have complete data and not actively generating
-  const shouldShowTabs = (
+  // Only show tabs when generation is explicitly completed or when we have verified complete data
+  const shouldShowTabs = (() => {
     // Case 1: Generation status explicitly shows completed
-    generationStatus?.status === 'completed' ||
+    if (generationStatus?.status === 'completed') {
+      console.log("🎭 [DEBUG] Showing tabs: Generation explicitly marked as completed");
+      return true;
+    }
     
-    // Case 2: Not currently generating AND we have complete package data AND characters
-    (!generating && 
-     !generationStatus && 
-     packageData && 
-     characters.length > 0 &&
-     (mystery?.is_paid || mystery?.has_complete_package))
-  );
-
-  console.log("🎭 [DEBUG] shouldShowTabs decision:", {
-    generationStatus: generationStatus?.status,
-    generating,
-    hasPackageData: !!packageData,
-    charactersCount: characters.length,
-    mysteryPaid: mystery?.is_paid,
-    mysteryComplete: mystery?.has_complete_package,
-    result: shouldShowTabs
-  });
+    // Case 2: For pre-existing mysteries, ensure we have all required data
+    if (!generating && !generationStatus) {
+      const hasAllRequiredData = (
+        packageData && 
+        packageData.gameOverview &&
+        packageData.hostGuide &&
+        characters.length > 0 &&
+        (mystery?.is_paid || mystery?.has_complete_package)
+      );
+      
+      console.log("🎭 [DEBUG] Pre-existing mystery check:", {
+        hasPackageData: !!packageData,
+        hasGameOverview: !!packageData?.gameOverview,
+        hasHostGuide: !!packageData?.hostGuide,
+        charactersCount: characters.length,
+        mysteryPaid: mystery?.is_paid,
+        mysteryComplete: mystery?.has_complete_package,
+        result: hasAllRequiredData
+      });
+      
+      return hasAllRequiredData;
+    }
+    
+    return false;
+  })();
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -987,7 +999,7 @@ const MysteryView = () => {
                     "text-sm text-muted-foreground mt-3",
                     isMobile && "text-xs mt-2"
                   )}>
-                    Generation takes {getEstimatedTime(mystery?.player_count || 6)}. This page will auto-refresh to show progress.
+                    Generation typically takes {getEstimatedTime(mystery?.player_count || 6)} as we carefully craft each character's background and relationships. Larger mysteries require more time to ensure high-quality results. This page will auto-refresh to show progress.
                   </p>
                 </CardContent>
               </Card>
