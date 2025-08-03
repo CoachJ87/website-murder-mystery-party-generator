@@ -28,6 +28,7 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
   const [page, setPage] = useState(1);
   const [hasMorePages, setHasMorePages] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
+  const [totalMysteriesCount, setTotalMysteriesCount] = useState(0);
   const pageSize = 6;
   const { t } = useTranslation();
 
@@ -99,6 +100,16 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
     try {
       setLoading(true);
       if (!user?.id) return;
+
+      // First, get the total count of all conversations
+      const { count: totalCount } = await supabase
+        .from("conversations")
+        .select("*", { count: 'exact', head: true })
+        .eq("user_id", user.id);
+
+      if (totalCount !== null) {
+        setTotalMysteriesCount(totalCount);
+      }
 
       // Build base query
       let query = supabase
@@ -365,6 +376,15 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
 
   const handleDeleteMystery = async (mysteryId: string) => {
     try {
+      const { count: totalCount } = await supabase
+        .from("conversations")
+        .select("*", { count: 'exact', head: true })
+        .eq("user_id", user.id);
+
+      if (totalCount !== null) {
+        setTotalMysteriesCount(totalCount);
+      }
+
       const { error } = await supabase
         .from("conversations")
         .delete()
@@ -511,7 +531,7 @@ export const HomeDashboard = ({ onCreateNew }: HomeDashboardProps) => {
                       }).length;
                       return `Showing ${displayedMysteries.length} of ${filteredTotal} mysteries`;
                     }
-                    return `Showing ${displayedMysteries.length} of ${allMysteries.length} mysteries`;
+                    return `Showing ${displayedMysteries.length} of ${totalMysteriesCount} mysteries`;
                   })()}
                 </div>
                 {/* Debug info - can be removed in production */}
