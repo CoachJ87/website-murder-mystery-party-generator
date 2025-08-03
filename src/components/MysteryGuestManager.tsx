@@ -229,14 +229,14 @@ const MysteryGuestManager: React.FC<MysteryGuestManagerProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl">
+      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>{t('character.guestManager.title')}</DialogTitle>
         </DialogHeader>
         <p className="text-muted-foreground mb-4">
           {t('character.guestManager.subtitle')}
         </p>
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto pr-2 -mr-2">
           <Table>
             <TableHeader>
               <TableRow>
