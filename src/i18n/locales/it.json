@@ -913,7 +913,7 @@
       },
       "loading": {
         "generating": "Generazione in corso...",
-        "generatingMessage": "Il tuo mistero completo è in fase di generazione. Ci vorranno 3-5 minuti.<br />Questa pagina si aggiornerà automaticamente una volta completato il mistero.",
+        "generatingMessage": "Il tuo mistero completo è in fase di generazione.<br />Questa pagina si aggiornerà automaticamente una volta completato il mistero.",
         "characters": "Sviluppo di profili di personaggi unici con background, motivazioni e segreti per il tuo mistero.",
         "clues": "Generazione di schede di prova, indizi e materiali investigativi che faranno progredire la risoluzione del mistero.",
         "inspector": "Creazione di uno script per l'investigatore e di una cronologia delle indagini per guidare la risoluzione del mistero.",

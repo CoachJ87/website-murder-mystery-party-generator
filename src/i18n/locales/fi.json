@@ -913,7 +913,7 @@
       },
       "loading": {
         "generating": "Generoidaan...",
-        "generatingMessage": "Täysi mysteerisi generoidaan parhaillaan. Tämä kestää 3-5 minuuttia.<br />Tämä sivu päivittyy automaattisesti, kun mysteeri on valmis.",
+        "generatingMessage": "Täysi mysteerisi generoidaan parhaillaan.<br />Tämä sivu päivittyy automaattisesti, kun mysteeri on valmis.",
         "characters": "Ainutlaatuisten hahmoprofiilien kehittäminen taustoilla, motiiveilla ja salaisuuksilla mysteeriisi.",
         "clues": "Todistekorttien, vihjeiden ja tutkintamateriaalien luominen, jotka edistävät mysteerin ratkaisua.",
         "inspector": "Tarkastajan käsikirjoituksen ja tutkinnan aikajanan laatiminen ohjaamaan mysteerin ratkaisua.",

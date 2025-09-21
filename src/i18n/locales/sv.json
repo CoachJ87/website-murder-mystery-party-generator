@@ -948,7 +948,7 @@
       },
       "loading": {
         "generating": "Genererar...",
-        "generatingMessage": "Vi genererar ditt kompletta mysteriumpaket. Denna process tar cirka 3-5 minuter.<br />Denna sida uppdateras automatiskt när mysteriet är klart.",
+        "generatingMessage": "Vi genererar ditt kompletta mysteriumpaket.<br />Denna sida uppdateras automatiskt när mysteriet är klart.",
         "characters": "Utvecklar unika karaktärsprofiler med bakgrundshistorier, motiv och hemligheter för ditt mysteriespel.",
         "clues": "Skapar beviskort, ledtrådar och utredningsmaterial som hjälper till att lösa ditt mysterium.",
         "inspector": "Skriver inspektörens manus och utredningstidslinjen för att vägleda mysterielösningen.",
