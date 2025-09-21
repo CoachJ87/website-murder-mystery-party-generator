@@ -147,7 +147,7 @@ const MysteryPackage = ({ mysteryId, title }: MysteryPackageProps) => {
       
       const toastMessage = testMode 
         ? "Generating test version of your murder mystery package..."
-        : "Generating your complete murder mystery package. This may take a few minutes...";
+        : "Generating your complete murder mystery package. This may take a few ...";
         
       toast.info(toastMessage);
       

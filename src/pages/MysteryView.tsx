@@ -918,7 +918,7 @@ const MysteryView = () => {
         packageData.gameOverview &&
         packageData.hostGuide &&
         characters.length > 0 &&
-        (mystery?.is_paid || mystery?.has_complete_package)
+        mystery?.is_paid
       );
       
       console.log("🎭 [DEBUG] Pre-existing mystery check:", {
