@@ -477,7 +477,7 @@
           },
           "creationProcess": {
             "question": "Miten luomis- ja ostoprosessi toimii?",
-            "answer": "Se on helppoa! Ensin kuvailet ihanteellisen murhamysteerisi, ja luomme mukautetun esikatselun ilmaiseksi. Kun olet tyytyväinen mysteeriisi, ostat koko paketin hintaan 11,99 $. Saat välittömästi kaiken isännöintiin tarvittavan: yksityiskohtaiset hahmoprofiilit, isännöintioppaan ja kaikki pelimateriaalit."
+            "answer": "Se on helppoa! Ensin kuvailet ihanteellisen murhamysteerisi, ja luomme mukautetun esikatselun ilmaiseksi. Kun olet tyytyväinen mysteeriisi, ostat koko paketin hintaan 24,99 $. Saat välittömästi kaiken isännöintiin tarvittavan: yksityiskohtaiset hahmoprofiilit, isännöintioppaan ja kaikki pelimateriaalit."
           },
           "saveWork": {
             "question": "Voinko tallentaa työni ja palata siihen myöhemmin?",
@@ -521,7 +521,7 @@
           },
           "purchaseIncludes": {
             "question": "Mitä saan, kun ostan mysteerin?",
-            "answer": "Hintaan 11,99 $ saat kaiken isännöintiin tarvittavan: kattavan isännöintioppaan, yksityiskohtaiset hahmoprofiilit jokaiselle pelaajalle, vihjeet, todisteet ja kaikki peliin valmiit materiaalit."
+            "answer": "Hintaan 24,99 $ saat kaiken isännöintiin tarvittavan: kattavan isännöintioppaan, yksityikohtaiset hahmoprofiilit jokaiselle pelaajalle, vihjeet, todisteet ja kaikki peliin valmiit materiaalit."
           },
           "refund": {
             "question": "Voinko saada hyvityksen, jos en ole tyytyväinen?",
@@ -817,7 +817,20 @@
         "loadFailed": "Hahmotietojen lataaminen epäonnistui"
       }
     },
-    "purchase": {
+    "blog": {
+    "title": "Murhamysteeri Blogi",
+    "subtitle": "Vinkkejä, oppaita ja inspiraatiota seuraavaan mystery-juhlaan",
+    "backToHome": "Takaisin Kotiin",
+    "readMore": "Lue lisää →",
+    "minRead": "min lukeminen",
+    "publishedOn": "Julkaistu",
+    "by": "Kirjoittaja",
+    "relatedPosts": "Aiheeseen liittyvät kirjoitukset",
+    "noPostsFound": "Blogikirjoituksia ei löytynyt.",
+    "loading": "Ladataan...",
+    "error": "Blogikirjoitusten lataaminen epäonnistui."
+  },
+  "purchase": {
       "toasts": {
         "success": "Osto valmis! Sinulla on nyt täysi pääsy tähän mysteeripakettiin.",
         "cancel": "Osto peruutettu. Voit yrittää uudelleen, kun olet valmis.",

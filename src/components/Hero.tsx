@@ -122,7 +122,8 @@ const Hero = () => {
         
         console.log("Navigating to create page with theme:", theme);
         
-        // Navigate to mystery creation with theme as URL parameter
+        // For now, navigate to mystery creation with theme as URL parameter
+        // The actual navigation after creation will be handled by the creation component
         navigate(`/mystery/create?input=${encodeURIComponent(value)}`);
         
       } catch (error) {

@@ -200,8 +200,8 @@ const MysteryCreation = () => {
             }
 
             toast.success(t("mysteryCreation.success.setupComplete"));
-            // Navigate immediately to chat with needsInitialAIResponse flag
-            navigate(`/mystery/chat/${conversationId}?initial=true`);
+            // Navigate to the tabbed view after creation
+            navigate(`/mystery/${conversationId}`);
 
         } catch (error) {
             console.error("Error saving mystery:", error);

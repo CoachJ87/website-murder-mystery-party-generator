@@ -477,7 +477,7 @@
         },
         "creationProcess": {
           "question": "How does the creation and purchase process work?",
-          "answer": "Simple! First, describe your ideal murder mystery and we'll create a custom preview for free. When you're happy with your mystery, purchase the complete package for $11.99. You'll instantly get everything needed to host: detailed character profiles, host guide, and all game materials."
+          "answer": "Simple! First, describe your ideal murder mystery and we'll create a custom preview for free. When you're happy with your mystery, purchase the complete package for $24.99. You'll instantly get everything needed to host: detailed character profiles, host guide, and all game materials."
         },
         "saveWork": {
           "question": "Can I save my work and come back to it later?",
@@ -521,7 +521,7 @@
         },
         "purchaseIncludes": {
           "question": "What do I get when I purchase a mystery?",
-          "answer": "For $11.99, you receive everything needed to host: comprehensive host guide, detailed character profiles for each player, clues, evidence, and all game materials ready to use."
+          "answer": "For $24.99, you receive everything needed to host: comprehensive host guide, detailed character profiles for each player, clues, evidence, and all game materials ready to use."
         },
         "refund": {
           "question": "Can I get a refund if I'm not satisfied?",
@@ -925,6 +925,22 @@
     "matrix": {
       "title": "Character Relationship Matrix"
 }
+  },
+  "blog": {
+    "title": "Murder Mystery Blog",
+    "subtitle": "Tips, guides, and inspiration for your next mystery party",
+    "backToHome": "Back to Home",
+    "readMore": "Read more →",
+    "minRead": "min read",
+    "publishedOn": "Published on",
+    "by": "By",
+    "relatedPosts": "Related posts",
+    "noPostsFound": "No blog posts found.",
+    "loading": "Loading...",
+    "error": "Failed to load blog posts.",
+    "errorTitle": "Error",
+    "tryAgain": "Try Again",
+    "checkBackLater": "Check back later for new articles!"
   },
   "chatbot": {
     "toasts": {

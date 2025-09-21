@@ -477,7 +477,7 @@
         },
         "creationProcess": {
           "question": "Comment fonctionne le processus de création et d'achat ?",
-          "answer": "C'est simple ! D'abord, vous décrivez votre mystère de meurtre idéal, et nous générons un aperçu personnalisé gratuitement. Une fois que vous êtes satisfait de votre mystère, vous achetez le package complet pour 11,99 $. Vous recevrez instantanément tout ce dont vous avez besoin pour l'hébergement : des profils de personnages détaillés, un guide de l'hôte et tous les matériaux de jeu."
+          "answer": "C'est simple ! D'abord, vous décrivez votre mystère de meurtre idéal, et nous générons un aperçu personnalisé gratuitement. Une fois que vous êtes satisfait de votre mystère, vous achetez le package complet pour 24,99 $. Vous recevrez instantanément tout ce dont vous avez besoin pour l'hébergement : des profils de personnages détaillés, un guide de l'hôte et tous les matériaux de jeu."
         },
         "saveWork": {
           "question": "Puis-je enregistrer mon travail et y revenir plus tard ?",
@@ -521,7 +521,7 @@
         },
         "purchaseIncludes": {
           "question": "Que reçois-je lorsque j'achète un mystère ?",
-          "answer": "Pour 11,99 $, vous recevez tout ce dont vous avez besoin pour l'hébergement : un guide complet de l'hôte, des profils de personnages détaillés pour chaque joueur, des indices, des preuves et tous les matériaux prêts à jouer."
+          "answer": "Pour 24,99 $, vous recevez tout ce dont vous avez besoin pour l'hébergement : un guide complet de l'hôte, des profils de personnages détaillés pour chaque joueur, des indices, des preuves et tous les matériaux prêts à jouer."
         },
         "refund": {
           "question": "Puis-je obtenir un remboursement si je ne suis pas satisfait ?",
@@ -816,6 +816,19 @@
       "saveFailed": "Échec de l'enregistrement des rôles de personnage",
       "loadFailed": "Échec du chargement des données de personnage"
     }
+  },
+  "blog": {
+    "title": "Blog Mystère et Meurtre",
+    "subtitle": "Conseils, guides et inspiration pour votre prochaine soirée mystère",
+    "backToHome": "Retour à l'Accueil",
+    "readMore": "Lire la suite →",
+    "minRead": "min de lecture",
+    "publishedOn": "Publié le",
+    "by": "Par",
+    "relatedPosts": "Articles connexes",
+    "noPostsFound": "Aucun article de blog trouvé.",
+    "loading": "Chargement...",
+    "error": "Échec du chargement des articles de blog."
   },
   "purchase": {
     "toasts": {

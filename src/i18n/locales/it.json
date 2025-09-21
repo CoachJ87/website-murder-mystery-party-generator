@@ -477,7 +477,7 @@
           },
           "creationProcess": {
             "question": "Come funziona il processo di creazione e acquisto?",
-            "answer": "È semplice! Per prima cosa, descrivi il tuo mistero con delitto ideale e noi generiamo un'anteprima personalizzata gratuitamente. Una volta che sei soddisfatto del tuo mistero, acquisti il pacchetto completo per $11.99. Riceverai istantaneamente tutto ciò di cui hai bisogno per l'hosting: profili dettagliati dei personaggi, una guida per l'organizzatore e tutti i materiali di gioco."
+            "answer": "È semplice! Per prima cosa, descrivi il tuo mistero con delitto ideale e noi generiamo un'anteprima personalizzata gratuitamente. Una volta che sei soddisfatto del tuo mistero, acquisti il pacchetto completo per $24.99. Riceverai istantaneamente tutto ciò di cui hai bisogno per l'hosting: profili dettagliati dei personaggi, una guida per l'organizzatore e tutti i materiali di gioco."
           },
           "saveWork": {
             "question": "Posso salvare il mio lavoro e tornarci in seguito?",
@@ -521,7 +521,7 @@
           },
           "purchaseIncludes": {
             "question": "Cosa ricevo quando acquisto un mistero?",
-            "answer": "Per $11.99 ricevi tutto ciò di cui hai bisogno per l'hosting: una guida completa per l'organizzatore, profili dettagliati dei personaggi per ogni giocatore, indizi, prove e tutti i materiali pronti per giocare."
+            "answer": "Per $24.99 ricevi tutto ciò di cui hai bisogno per l'hosting: una guida completa per l'organizzatore, profili dettagliati dei personaggi per ogni giocatore, indizi, prove e tutti i materiali pronti per giocare."
           },
           "refund": {
             "question": "Posso ottenere un rimborso se non sono soddisfatto?",
@@ -817,7 +817,20 @@
         "loadFailed": "Impossibile caricare i dati dei personaggi"
       }
     },
-    "purchase": {
+    "blog": {
+    "title": "Blog Giallo",
+    "subtitle": "Suggerimenti, guide e ispirazione per la tua prossima festa misteriosa",
+    "backToHome": "Torna alla Home",
+    "readMore": "Leggi di più →",
+    "minRead": "min di lettura",
+    "publishedOn": "Pubblicato il",
+    "by": "Di",
+    "relatedPosts": "Post correlati",
+    "noPostsFound": "Nessun post del blog trovato.",
+    "loading": "Caricamento...",
+    "error": "Impossibile caricare i post del blog."
+  },
+  "purchase": {
       "toasts": {
         "success": "Acquisto completato! Ora hai pieno accesso a questo pacchetto mistero.",
         "cancel": "Acquisto annullato. Puoi riprovare quando sei pronto.",

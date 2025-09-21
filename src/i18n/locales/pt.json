@@ -477,7 +477,7 @@
           },
           "creationProcess": {
             "question": "Como funciona o processo de criação e compra?",
-            "answer": "É fácil! Primeiro, descreva seu mistério de assassinato ideal, e criaremos uma prévia personalizada gratuitamente. Se você estiver satisfeito com seu mistério, compre o pacote completo por $11,99. Você receberá instantaneamente tudo o que precisa para hospedar: perfis detalhados de personagens, um guia do anfitrião e todos os materiais do jogo."
+            "answer": "É fácil! Primeiro, descreva seu mistério de assassinato ideal, e criaremos uma prévia personalizada gratuitamente. Se você estiver satisfeito com seu mistério, compre o pacote completo por $24,99. Você receberá instantaneamente tudo o que precisa para hospedar: perfis detalhados de personagens, um guia do anfitrião e todos os materiais do jogo."
           },
           "saveWork": {
             "question": "Posso salvar meu trabalho e voltar a ele mais tarde?",
@@ -521,7 +521,7 @@
           },
           "purchaseIncludes": {
             "question": "O que eu recebo quando compro um mistério?",
-            "answer": "Por $11,99, você receberá tudo o que é necessário para hospedar: um guia abrangente do anfitrião, perfis detalhados de personagens para cada jogador, pistas, evidências e todos os materiais do jogo, prontos para uso."
+            "answer": "Por $24,99, você receberá tudo o que é necessário para hospedar: um guia abrangente do anfitrião, perfis detalhados de personagens para cada jogador, pistas, evidências e todos os materiais do jogo, prontos para uso."
           },
           "refund": {
             "question": "Posso obter um reembolso se não estiver satisfeito?",
@@ -852,7 +852,20 @@
         "loadFailed": "Falha ao carregar dados de personagem"
       }
     },
-    "purchase": {
+    "blog": {
+    "title": "Blog de Mistério",
+    "subtitle": "Dicas, guias e inspiração para sua próxima festa misteriosa",
+    "backToHome": "Voltar ao Início",
+    "readMore": "Leia mais →",
+    "minRead": "min de leitura",
+    "publishedOn": "Publicado em",
+    "by": "Por",
+    "relatedPosts": "Posts relacionados",
+    "noPostsFound": "Nenhum post do blog encontrado.",
+    "loading": "Carregando...",
+    "error": "Falha ao carregar posts do blog."
+  },
+  "purchase": {
       "toasts": {
         "success": "Compra bem-sucedida! Agora você tem acesso total a este pacote de mistério.",
         "cancel": "Compra cancelada. Você pode tentar novamente quando estiver pronto.",

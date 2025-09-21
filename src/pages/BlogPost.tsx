@@ -7,15 +7,25 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 // Removed i18n for now to fix TypeScript errors
-import { ArrowRight, Clock, Users, BookOpen, ChevronRight, User } from 'lucide-react';
+import { ArrowRight, Clock, Users, BookOpen, ChevronRight } from 'lucide-react';
+// Import i18n directly to avoid type issues
+import i18n from 'i18next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+
+const calculateReadingTime = (content: string): number => {
+  const wordsPerMinute = 200;
+  const wordCount = content.trim().split(/\s+/).length;
+  return Math.max(1, Math.ceil(wordCount / wordsPerMinute));
+};
 
 interface RelatedPost {
   id: string;
   slug: string;
   title: string;
-  reading_time: number;
+  reading_time?: number;
+  language: string;
+  content?: string;
 }
 
 interface BlogPost {
@@ -29,11 +39,11 @@ interface BlogPost {
   updated_at: string;
   reading_time: number;
   featured_image?: string;
-  author_name: string;
-  author_bio?: string;
-  author_image?: string;
   related_posts?: RelatedPost[];
   status?: string;
+  language: string;
+  post_date: string;
+  theme?: string;
 }
 
 const CTA_SECTION = ({ theme = 'light' as 'light' | 'dark' } = {}) => {
@@ -60,13 +70,14 @@ const CTA_SECTION = ({ theme = 'light' as 'light' | 'dark' } = {}) => {
 
 export default function BlogPost() {
   const { slug } = useParams<{ slug: string }>();
-  // Using hardcoded strings for simplicity
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [viewingTime, setViewingTime] = useState(0);
   const [showStickyCTA, setShowStickyCTA] = useState(true);
   const ctaSectionRef = useRef<HTMLDivElement>(null);
+  // Get current language directly from i18n
+  const currentLanguage = i18n.language.split('-')[0];
 
   // Track time on page for conversion optimization
   useEffect(() => {
@@ -115,52 +126,78 @@ export default function BlogPost() {
       try {
         setLoading(true);
         
-        const { data, error: fetchError } = await supabase
+        // Get all posts with this slug to handle multiple languages
+        const { data: allPosts, error: fetchError } = await supabase
           .from('blog_posts')
           .select('*')
           .eq('slug', slug)
           .eq('status', 'published')
-          .single();
+          .eq('language', currentLanguage);
 
         if (fetchError) throw fetchError;
-        if (!data) throw new Error('Post not found');
+        if (!allPosts || allPosts.length === 0) throw new Error('Post not found');
 
-        // Step 1: Try to get related posts with the same theme
+        // Since we're already filtering by language, just use the first result
+        const selectedPost = allPosts[0];
+
+        // Get related posts with the same post_date but different slugs and same language
+        const { data: relatedPosts } = await supabase
+          .from('blog_posts')
+          .select('id, slug, title, reading_time, language, content')
+          .eq('post_date', selectedPost.post_date)
+          .neq('id', selectedPost.id)
+          .eq('status', 'published')
+          .eq('language', currentLanguage);
+
+        // Get theme-related posts (excluding the current post and same post_date) in current language
         const { data: themeRelated } = await supabase
           .from('blog_posts')
-          .select('id, slug, title, reading_time, theme')
-          .eq('theme', data.theme)
-          .neq('id', data.id)
+          .select('id, slug, title, reading_time, language, content')
+          .eq('theme', selectedPost.theme)
+          .eq('language', currentLanguage)
+          .neq('id', selectedPost.id)
+          .neq('post_date', selectedPost.post_date) // Exclude same date
           .eq('status', 'published')
           .order('published_at', { ascending: false })
           .limit(3);
 
-        let related = [...(themeRelated || [])];
+        // Get recent posts to fill in if needed
+        let related = [...(relatedPosts || [])];
+        
+        // If we don't have enough related posts, add theme-related ones
+        if (related.length < 3 && themeRelated) {
+          const uniqueThemeRelated = themeRelated.filter(
+            p => !related.some(rp => rp.id === p.id)
+          );
+          related = [...related, ...uniqueThemeRelated.slice(0, 3 - related.length)];
+        }
 
-        // Step 2: If we don't have enough theme-related posts, get recent posts to fill the gap
+        // If we still don't have enough, get recent posts in current language
         if (related.length < 3) {
           const { data: recentPosts } = await supabase
             .from('blog_posts')
-            .select('id, slug, title, reading_time, theme')
-            .neq('id', data.id)
+            .select('id, slug, title, reading_time, language, content')
+            .eq('language', currentLanguage)
+            .neq('id', selectedPost.id)
+            .neq('post_date', selectedPost.post_date) // Exclude same date
             .eq('status', 'published')
             .order('published_at', { ascending: false })
             .limit(3 - related.length);
           
-          // Combine theme-related and recent posts, removing any duplicates
-          const recentUnique = (recentPosts || []).filter(
-            (post) => !related.some(rp => rp.id === post.id)
-          );
-          related = [...related, ...recentUnique];
+          if (recentPosts) {
+            const uniqueRecent = recentPosts.filter(
+              p => !related.some(rp => rp.id === p.id)
+            );
+            related = [...related, ...uniqueRecent];
+          }
         }
 
-        const postData = { ...data, related_posts: related || [] };
+        const postData = { ...selectedPost, related_posts: related || [] };
         setPost(postData);
         
         // Debug logging
         console.log('Blog post data:', postData);
-        console.log('Content word count:', postData.content?.trim().split(/\s+/).length);
-        console.log('Stored reading_time:', postData.reading_time);
+        console.log('Selected language:', currentLanguage);
       } catch (err) {
         console.error('Error fetching blog post:', err);
         setError('Post not found');
@@ -170,7 +207,7 @@ export default function BlogPost() {
     };
 
     fetchPost();
-  }, [slug]);
+  }, [slug, currentLanguage]); // Add currentLanguage to dependencies
 
   if (error) {
     return (
@@ -213,11 +250,6 @@ export default function BlogPost() {
     "description": post.meta_description,
     "datePublished": post.published_at,
     "dateModified": post.updated_at || post.published_at,
-    "author": {
-      "@type": "Person",
-      "name": post.author_name,
-      ...(post.author_bio && { "description": post.author_bio })
-    },
     "publisher": {
       "@type": "Organization",
       "name": "Murder Mystery Party Generator",
@@ -230,7 +262,7 @@ export default function BlogPost() {
       "@type": "WebPage",
       "@id": `https://yourdomain.com/blog/${post.slug}`
     },
-    "timeRequired": `PT${post.reading_time}M`,
+    "timeRequired": `PT${post.reading_time || calculateReadingTime(post.content || '')}M`,
     "wordCount": post.content.split(' ').length
   };
 
@@ -269,12 +301,8 @@ export default function BlogPost() {
             
             <div className="flex flex-wrap items-center text-gray-600 text-sm gap-4 mb-6">
               <div className="flex items-center">
-                <User className="h-4 w-4 mr-1 text-[#8B1538]" />
-                {post.author_name}
-              </div>
-              <div className="flex items-center">
                 <Clock className="h-4 w-4 mr-1 text-[#8B1538]" />
-                {post.reading_time} min read
+                {post.reading_time || calculateReadingTime(post.content || '')} min read
               </div>
             </div>
             
@@ -313,7 +341,7 @@ export default function BlogPost() {
                       </h3>
                       <div className="flex items-center text-sm text-gray-500 mt-2">
                         <Clock className="h-3 w-3 mr-1" />
-                        {related.reading_time} min read
+                        {related.reading_time || calculateReadingTime(related.content || '')} min read
                       </div>
                     </CardContent>
                   </Card>
@@ -322,23 +350,6 @@ export default function BlogPost() {
             </section>
           )}
 
-          <div className="mt-16 pt-8 border-t border-gray-200">
-            <div className="flex items-center">
-              {post.author_image && (
-                <img 
-                  src={post.author_image} 
-                  alt={post.author_name} 
-                  className="h-16 w-16 rounded-full mr-4"
-                />
-              )}
-              <div>
-                <h3 className="font-bold text-lg">{post.author_name}</h3>
-                {post.author_bio && (
-                  <p className="text-gray-600">{post.author_bio}</p>
-                )}
-              </div>
-            </div>
-          </div>
         </article>
       </main>
       

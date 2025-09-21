@@ -42,8 +42,14 @@ const LanguageSwitcher = () => {
   }, [i18n]);
 
   const handleLanguageChange = async (languageCode: string) => {
+    console.log('=== LANGUAGE CHANGE ATTEMPT ===');
+    console.log('Trying to change language to:', languageCode);
+    console.log('Current i18n language before change:', i18n.language);
+    
     try {
       await i18n.changeLanguage(languageCode);
+      console.log('i18n.changeLanguage completed');
+      console.log('Current i18n language after change:', i18n.language);
       setCurrentLang(i18n.language);
     } catch (error) {
       console.error('Error changing language:', error);

@@ -477,7 +477,7 @@
           },
           "creationProcess": {
             "question": "Hur fungerar skapande- och köpprocessen?",
-            "answer": "Det är enkelt! Först beskriver du ditt perfekta mordmysterium, och vi skapar en anpassad förhandsgranskning gratis. Om du är nöjd med ditt mysterium, köp det kompletta paketet för 11,99 $. Du får omedelbart allt du behöver för att arrangera: detaljerade karaktärsprofiler, en värdguide och allt spelmaterial."
+            "answer": "Det är enkelt! Först beskriver du ditt perfekta mordmysterium, och vi skapar en anpassad förhandsgranskning gratis. Om du är nöjd med ditt mysterium, köp det kompletta paketet för 24,99 $. Du får omedelbart allt du behöver för att arrangera: detaljerade karaktärsprofiler, en värdguide och allt spelmaterial."
           },
           "saveWork": {
             "question": "Kan jag spara mitt arbete och återgå till det senare?",
@@ -521,7 +521,7 @@
           },
           "purchaseIncludes": {
             "question": "Vad får jag när jag köper ett mysterium?",
-            "answer": "För 11,99 $ får du allt som behövs för att arrangera: en omfattande värdguide, detaljerade karaktärsprofiler för varje spelare, ledtrådar, bevis och allt spelmaterial, redo att användas."
+            "answer": "För 24,99 $ får du allt som behövs för att arrangera: en omfattande värdguide, detaljerade karaktärsprofiler för varje spelare, ledtrådar, bevis och allt spelmaterial, redo att användas."
           },
           "refund": {
             "question": "Kan jag få pengarna tillbaka om jag inte är nöjd?",
@@ -852,7 +852,20 @@
         "loadFailed": "Misslyckades med att ladda karaktärsdata"
       }
     },
-    "purchase": {
+    "blog": {
+    "title": "Mordmysterie-blog",
+    "subtitle": "Tips, guider och inspiration för din nästa mystery-fest",
+    "backToHome": "Tillbaka till Hem",
+    "readMore": "Läs mer →",
+    "minRead": "min läsning",
+    "publishedOn": "Publicerad",
+    "by": "Av",
+    "relatedPosts": "Relaterade inlägg",
+    "noPostsFound": "Inga blogginlägg hittades.",
+    "loading": "Laddar...",
+    "error": "Kunde inte ladda blogginlägg."
+  },
+  "purchase": {
       "toasts": {
         "success": "Köpet lyckades! Du har nu full tillgång till detta mysteriumpaket.",
         "cancel": "Köpet avbrutet. Du kan försöka igen när du är redo.",

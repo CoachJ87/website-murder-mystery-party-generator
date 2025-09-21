@@ -477,7 +477,7 @@
           },
           "creationProcess": {
             "question": "Hvordan fungerer oprettelses- og købsprocessen?",
-            "answer": "Det er nemt! Først beskriver du dit ideelle mordmysterie, og vi skaber en tilpasset forhåndsvisning gratis. Når du er tilfreds med dit mysterium, køber du den fulde pakke for 11,99 $. Du får øjeblikkeligt alt det nødvendige for at hoste: detaljerede karakterprofiler, en værtsguide og alle spilmaterialer."
+            "answer": "Det er nemt! Først beskriver du dit ideelle mordmysterie, og vi skaber en tilpasset forhåndsvisning gratis. Når du er tilfreds med dit mysterium, køber du den fulde pakke for 24,99 $. Du får øjeblikkeligt alt det nødvendige for at hoste: detaljerede karakterprofiler, en værtsguide og alle spilmaterialer."
           },
           "saveWork": {
             "question": "Kan jeg gemme mit arbejde og vende tilbage til det senere?",
@@ -521,7 +521,7 @@
           },
           "purchaseIncludes": {
             "question": "Hvad får jeg, når jeg køber et mysterium?",
-            "answer": "For 11,99 $ får du alt, hvad du behøver for at hoste: en omfattende værtsguide, detaljerede karakterprofiler for hver spiller, spor, beviser og alle spilklar materialer."
+            "answer": "For 24,99 $ får du alt, hvad du behøver for at hoste: en omfattende værtsguide, detaljerede karakterprofiler for hver spiller, spor, beviser og alle spilklar materialer."
           },
           "refund": {
             "question": "Kan jeg få refusion, hvis jeg ikke er tilfreds?",
@@ -817,7 +817,20 @@
         "loadFailed": "Kunne ikke indlæse karakterdata"
       }
     },
-    "purchase": {
+    "blog": {
+    "title": "Mordmysterie Blog",
+    "subtitle": "Tips, guides og inspiration til din næste mystery-fest",
+    "backToHome": "Tilbage til Hjem",
+    "readMore": "Læs mere →",
+    "minRead": "min læsning",
+    "publishedOn": "Udgivet den",
+    "by": "Af",
+    "relatedPosts": "Relaterede indlæg",
+    "noPostsFound": "Ingen blogindlæg fundet.",
+    "loading": "Indlæser...",
+    "error": "Kunne ikke indlæse blogindlæg."
+  },
+  "purchase": {
       "toasts": {
         "success": "Køb gennemført! Du har nu fuld adgang til denne mysteriepakke.",
         "cancel": "Køb annulleret. Du kan prøve igen, når du er klar.",

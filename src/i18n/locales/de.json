@@ -477,7 +477,7 @@
         },
         "creationProcess": {
           "question": "Wie funktioniert der Erstellungs- und Kaufprozess?",
-          "answer": "Ganz einfach! Zuerst beschreiben Sie Ihr ideales Krimi-Mysterium und wir erstellen eine individuelle Vorschau kostenlos. Wenn Sie mit Ihrem Mysterium zufrieden sind, kaufen Sie das Komplettpaket für 11,99 $. Sie erhalten sofort alles Notwendige zum Hosten: detaillierte Charakterprofile, eine Host-Anleitung und alle Spielmaterialien."
+          "answer": "Ganz einfach! Zuerst beschreiben Sie Ihr ideales Krimi-Mysterium und wir erstellen eine individuelle Vorschau kostenlos. Wenn Sie mit Ihrem Mysterium zufrieden sind, kaufen Sie das Komplettpaket für 24,99 $. Sie erhalten sofort alles Notwendige zum Hosten: detaillierte Charakterprofile, eine Host-Anleitung und alle Spielmaterialien."
         },
         "saveWork": {
           "question": "Kann ich meine Arbeit speichern und später darauf zurückgreifen?",
@@ -521,7 +521,7 @@
         },
         "purchaseIncludes": {
           "question": "Was erhalte ich, wenn ich ein Mysterium kaufe?",
-          "answer": "Für 11,99 $ erhalten Sie alles, was Sie zum Hosten benötigen: eine umfassende Gastgeberanleitung, detaillierte Charakterprofile für jeden Spieler, Hinweise, Beweise und alle spielfertigen Materialien."
+          "answer": "Für 24,99 $ erhalten Sie alles, was Sie zum Hosten benötigen: eine umfassende Gastgeberanleitung, detaillierte Charakterprofile für jeden Spieler, Hinweise, Beweise und alle spielfertigen Materialien."
         },
         "refund": {
           "question": "Kann ich eine Rückerstattung erhalten, wenn ich nicht zufrieden bin?",
@@ -816,6 +816,19 @@
       "saveFailed": "Fehler beim Speichern der Charakterrollen",
       "loadFailed": "Fehler beim Laden der Charakterdaten"
     }
+  },
+  "blog": {
+    "title": "Krimi-Blog",
+    "subtitle": "Tipps, Anleitungen und Inspiration für Ihre nächste Mystery-Party",
+    "backToHome": "Zurück zur Startseite",
+    "readMore": "Weiterlesen →",
+    "minRead": "Min. Lesezeit",
+    "publishedOn": "Veröffentlicht am",
+    "by": "Von",
+    "relatedPosts": "Verwandte Beiträge",
+    "noPostsFound": "Keine Blog-Beiträge gefunden.",
+    "loading": "Wird geladen...",
+    "error": "Fehler beim Laden der Blog-Beiträge."
   },
   "purchase": {
     "toasts": {

@@ -477,7 +477,7 @@
           },
           "creationProcess": {
             "question": "Hoe werkt het aanmaak- en aankoopproces?",
-            "answer": "Eenvoudig! Beschrijf eerst uw ideale moordmysterie en we maken gratis een aangepaste preview. Als u tevreden bent met uw mysterie, koopt u het complete pakket voor $11,99. U krijgt direct alles wat u nodig heeft om te hosten: gedetailleerde personageprofielen, een hostgids en alle spelmaterialen."
+            "answer": "Eenvoudig! Beschrijf eerst uw ideale moordmysterie en we maken gratis een aangepaste preview. Als u tevreden bent met uw mysterie, koopt u het complete pakket voor $24,99. U krijgt direct alles wat u nodig heeft om te hosten: gedetailleerde personageprofielen, een hostgids en alle spelmaterialen."
           },
           "saveWork": {
             "question": "Kan ik mijn werk opslaan en er later op terugkomen?",
@@ -521,7 +521,7 @@
           },
           "purchaseIncludes": {
             "question": "Wat krijg ik als ik een mysterie koop?",
-            "answer": "Voor $11,99 ontvangt u alles wat nodig is om te hosten: een uitgebreide hostgids, gedetailleerde personageprofielen voor elke speler, aanwijzingen, bewijsmateriaal en alle spelmaterialen, klaar voor gebruik."
+            "answer": "Voor $24,99 ontvangt u alles wat nodig is om te hosten: een uitgebreide hostgids, gedetailleerde personageprofielen voor elke speler, aanwijzingen, bewijsmateriaal en alle spelmaterialen, klaar voor gebruik."
           },
           "refund": {
             "question": "Kan ik een terugbetaling krijgen als ik niet tevreden ben?",
@@ -817,7 +817,20 @@
         "loadFailed": "Laden van personagegegevens mislukt"
       }
     },
-    "purchase": {
+    "blog": {
+    "title": "Moordmysterie Blog",
+    "subtitle": "Tips, gidsen en inspiratie voor uw volgende mystery-feest",
+    "backToHome": "Terug naar Home",
+    "readMore": "Lees meer →",
+    "minRead": "min lezen",
+    "publishedOn": "Gepubliceerd op",
+    "by": "Door",
+    "relatedPosts": "Gerelateerde berichten",
+    "noPostsFound": "Geen blogberichten gevonden.",
+    "loading": "Laden...",
+    "error": "Kan blogberichten niet laden."
+  },
+  "purchase": {
       "toasts": {
         "success": "Aankoop succesvol! U heeft nu volledige toegang tot dit mysteriepakket.",
         "cancel": "Aankoop geannuleerd. U kunt het opnieuw proberen wanneer u er klaar voor bent.",

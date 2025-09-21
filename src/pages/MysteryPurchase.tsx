@@ -467,7 +467,7 @@ const MysteryPurchase = () => {
                         "font-bold mb-1",
                         isMobile ? "text-xl" : "text-2xl"
                       )}>
-                        $11.99
+                        $24.99
                       </div>
                       <p className={cn(
                         "text-muted-foreground",

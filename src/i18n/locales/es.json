@@ -477,7 +477,7 @@
         },
         "creationProcess": {
           "question": "¿Cómo funciona el proceso de creación y compra?",
-          "answer": "¡Simple! Primero, describe tu misterio de asesinato ideal y crearemos una vista previa personalizada de forma gratuita. Cuando estés satisfecho con tu misterio, compra el paquete completo por $11.99. Obtendrás al instante todo lo necesario para organizar: perfiles detallados de los personajes, guía del anfitrión y todos los materiales del juego."
+          "answer": "¡Simple! Primero, describe tu misterio de asesinato ideal y crearemos una vista previa personalizada de forma gratuita. Cuando estés satisfecho con tu misterio, compra el paquete completo por $24.99. Obtendrás al instante todo lo necesario para organizar: perfiles detallados de los personajes, guía del anfitrión y todos los materiales del juego."
         },
         "saveWork": {
           "question": "¿Puedo guardar mi trabajo y volver a él más tarde?",
@@ -521,7 +521,7 @@
         },
         "purchaseIncludes": {
           "question": "¿Qué obtengo al comprar un misterio?",
-          "answer": "Por $11.99, recibes todo lo necesario para organizar: una guía completa del anfitrión, perfiles detallados de los personajes para cada jugador, pistas, pruebas y todos los materiales del juego listos para usar."
+          "answer": "Por $24.99, recibes todo lo necesario para organizar: una guía completa del anfitrión, perfiles detallados de los personajes para cada jugador, pistas, pruebas y todos los materiales del juego listos para usar."
         },
         "refund": {
           "question": "¿Puedo obtener un reembolso si no estoy satisfecho?",
@@ -816,6 +816,19 @@
       "saveFailed": "Error al guardar roles de personajes",
       "loadFailed": "Error al cargar datos de personajes"
     }
+  },
+  "blog": {
+    "title": "Blog de Misterio y Asesinato",
+    "subtitle": "Consejos, guías e inspiración para tu próxima fiesta de misterio",
+    "backToHome": "Volver al Inicio",
+    "readMore": "Leer más →",
+    "minRead": "min de lectura",
+    "publishedOn": "Publicado el",
+    "by": "Por",
+    "relatedPosts": "Publicaciones relacionadas",
+    "noPostsFound": "No se encontraron publicaciones del blog.",
+    "loading": "Cargando...",
+    "error": "Error al cargar las publicaciones del blog."
   },
   "purchase": {
     "toasts": {
