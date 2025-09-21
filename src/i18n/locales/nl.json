@@ -983,5 +983,13 @@
         "purchased": "Gekocht",
         "archived": "Gearchiveerd"
       }
+    },
+    "mysteryView": {
+      "timing": {
+        "small": "5-10 minuten",
+        "medium": "15-30 minuten",
+        "large": "30-45 minuten",
+        "xlarge": "45-60 minuten"
+      }
     }
   }
