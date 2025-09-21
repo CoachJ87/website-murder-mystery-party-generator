@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -903,40 +903,6 @@ const MysteryView = () => {
     );
   }
 
-  // Only show tabs when generation is explicitly completed or when we have verified complete data
-  const shouldShowTabs = (() => {
-    // Case 1: Generation status explicitly shows completed
-    if (generationStatus?.status === 'completed') {
-      console.log("🎭 [DEBUG] Showing tabs: Generation explicitly marked as completed");
-      return true;
-    }
-    
-    // Case 2: For pre-existing mysteries, ensure we have all required data
-    if (!generating && !generationStatus) {
-      const hasAllRequiredData = (
-        mystery?.is_paid || (
-          packageData && 
-          packageData.gameOverview &&
-          packageData.hostGuide &&
-          characters.length > 0
-        )
-      );
-      
-      console.log(" [DEBUG] Pre-existing mystery check:", {
-        hasPackageData: !!packageData,
-        hasGameOverview: !!packageData?.gameOverview,
-        hasHostGuide: !!packageData?.hostGuide,
-        charactersCount: characters.length,
-        mysteryPaid: mystery?.is_paid,
-        mysteryComplete: mystery?.has_complete_package,
-        result: hasAllRequiredData
-      });
-      
-      return hasAllRequiredData;
-    }
-    
-    return false;
-  })();
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -949,7 +915,39 @@ const MysteryView = () => {
           "container mx-auto max-w-4xl",
           isMobile && "max-w-full"
         )}>
-          {shouldShowTabs ? (
+          {useMemo(() => {
+            // Case 1: Generation status explicitly shows completed
+            if (generationStatus?.status === 'completed') {
+              console.log("🎭 [DEBUG] Showing tabs: Generation explicitly marked as completed");
+              return true;
+            }
+            
+            // Case 2: For pre-existing mysteries, ensure we have all required data
+            if (!generating && !generationStatus) {
+              const hasAllRequiredData = (
+                mystery?.is_paid || (
+                  packageData && 
+                  packageData.gameOverview &&
+                  packageData.hostGuide &&
+                  characters.length > 0
+                )
+              );
+              
+              console.log("🎭 [DEBUG] Pre-existing mystery check:", {
+                hasPackageData: !!packageData,
+                hasGameOverview: !!packageData?.gameOverview,
+                hasHostGuide: !!packageData?.hostGuide,
+                charactersCount: characters.length,
+                mysteryPaid: mystery?.is_paid,
+                mysteryComplete: mystery?.has_complete_package,
+                result: hasAllRequiredData
+              });
+              
+              return hasAllRequiredData;
+            }
+            
+            return false;
+          }, [mystery, generationStatus, generating, packageData, characters]) ? (
             <MysteryPackageTabView 
               packageContent={packageContent || ""} 
               mysteryTitle={getMysteryTitle()}
