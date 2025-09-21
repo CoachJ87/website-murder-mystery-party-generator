@@ -966,5 +966,13 @@
       "matrix": {
         "title": "Matriz de Relacionamento de Personagens"
       }
+    },
+    "mysteryView": {
+      "timing": {
+        "small": "5-10 minutos",
+        "medium": "15-30 minutos",
+        "large": "30-45 minutos",
+        "xlarge": "45-60 minutos"
+      }
     }
   }
