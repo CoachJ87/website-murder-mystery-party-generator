@@ -913,7 +913,7 @@
       },
       "loading": {
         "generating": "Genererer...",
-        "generatingMessage": "Dit fulde mysterium genereres i øjeblikket.<br />Denne side opdateres automatisk, når mysteriet er færdigt.",
+        "generatingMessage": "Dit fulde mysterium genereres i øjeblikket. Dette tager 3-5 minutter.<br />Denne side opdateres automatisk, når mysteriet er færdigt.",
         "characters": "Udvikling af unikke karakterprofiler med baggrunde, motiver og hemmeligheder til dit mysterium.",
         "clues": "Oprettelse af beviskort, spor og efterforskningsmaterialer, der bidrager til løsningen af dit mysterium.",
         "inspector": "Udarbejdelse af detektivens script og efterforskningstidslinje for at vejlede mysteriets løsning.",
@@ -983,13 +983,5 @@
         "purchased": "Købt",
         "archived": "Arkiveret"
       }
-    }
-  },
-  "mysteryView": {
-    "timing": {
-      "small": "5-10 minutter",
-      "medium": "15-30 minutter",
-      "large": "30-45 minutter",
-      "xlarge": "45-60 minutter"
     }
   }

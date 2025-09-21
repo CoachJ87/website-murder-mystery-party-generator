@@ -913,7 +913,7 @@
     },
     "loading": {
       "generating": "Génération en cours...",
-      "generatingMessage": "Votre mystère complet est en cours de génération.<br />Cette page se rafraîchira automatiquement une fois le mystère terminé.",
+      "generatingMessage": "Votre mystère complet est en cours de génération. Cela prendra 3 à 5 minutes.<br />Cette page se rafraîchira automatiquement une fois le mystère terminé.",
       "characters": "Développement de profils de personnages uniques avec des historiques, des motivations et des secrets pour votre mystère.",
       "clues": "Génération de cartes de preuves, d'indices et de matériaux d'enquête qui feront avancer la résolution du mystère.",
       "inspector": "Élaboration d'un script d'inspecteur et d'une chronologie d'enquête pour guider la résolution du mystère.",
@@ -982,14 +982,6 @@
       "drafts": "Brouillons",
       "purchased": "Achetés",
       "archived": "Archivés"
-    }
-  },
-  "mysteryView": {
-    "timing": {
-      "small": "5-10 minutes",
-      "medium": "15-30 minutes",
-      "large": "30-45 minutes",
-      "xlarge": "45-60 minutes"
     }
   }
 }
