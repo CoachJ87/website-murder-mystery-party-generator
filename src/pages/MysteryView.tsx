@@ -914,14 +914,15 @@ const MysteryView = () => {
     // Case 2: For pre-existing mysteries, ensure we have all required data
     if (!generating && !generationStatus) {
       const hasAllRequiredData = (
-        packageData && 
-        packageData.gameOverview &&
-        packageData.hostGuide &&
-        characters.length > 0 &&
-        mystery?.is_paid
+        mystery?.is_paid || (
+          packageData && 
+          packageData.gameOverview &&
+          packageData.hostGuide &&
+          characters.length > 0
+        )
       );
       
-      console.log("🎭 [DEBUG] Pre-existing mystery check:", {
+      console.log(" [DEBUG] Pre-existing mystery check:", {
         hasPackageData: !!packageData,
         hasGameOverview: !!packageData?.gameOverview,
         hasHostGuide: !!packageData?.hostGuide,
