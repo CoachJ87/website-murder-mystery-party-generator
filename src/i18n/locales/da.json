@@ -915,7 +915,7 @@
     },
     "loading": {
       "generating": "Generating...",
-      "generatingMessage": "Currently generating your complete mystery. This process will take around 3-5 minutes.<br />This page will automatically refresh once the mystery is complete.",
+      "generatingMessage": "Currently generating your complete mystery. This process is now in progress.<br />This page will automatically refresh once the mystery is complete.",
       "characters": "Developing unique character profiles with backgrounds, motivations, and secrets for your mystery game.",
       "clues": "Crafting evidence cards, clues, and investigative materials that will help solve your mystery.",
       "inspector": "Writing the detective's script and investigation timeline to guide the mystery solving process.",

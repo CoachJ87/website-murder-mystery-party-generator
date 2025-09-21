@@ -913,7 +913,7 @@
       },
       "loading": {
         "generating": "Genereren...",
-        "generatingMessage": "Momenteel wordt uw complete mysterie gegenereerd. Dit proces duurt ongeveer 3-5 minuten.<br />Deze pagina wordt automatisch vernieuwd zodra het mysterie is voltooid.",
+        "generatingMessage": "Momenteel wordt uw complete mysterie gegenereerd. Dit proces is nu aan de gang.<br />Deze pagina wordt automatisch vernieuwd zodra het mysterie is voltooid.",
         "characters": "Unieke personageprofielen ontwikkelen met achtergronden, motivaties en geheimen voor uw mysteriespel.",
         "clues": "Bewijskaarten, aanwijzingen en onderzoeksmaterialen creëren die zullen helpen bij het oplossen van uw mysterie.",
         "inspector": "Het script van de detective en de onderzoekstijdlijn schrijven om het oplossen van het mysterie te begeleiden.",
