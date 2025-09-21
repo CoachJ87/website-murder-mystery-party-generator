@@ -966,5 +966,13 @@
       "matrix": {
         "title": "角色关系矩阵"
       }
+    },
+    "mysteryView": {
+      "timing": {
+        "small": "5-10分钟",
+        "medium": "15-30分钟",
+        "large": "30-45分钟",
+        "xlarge": "45-60分钟"
+      }
     }
   }
