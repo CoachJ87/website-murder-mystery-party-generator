@@ -983,5 +983,13 @@
         "purchased": "Ostetut",
         "archived": "Arkistoidut"
       }
+    },
+    "mysteryView": {
+      "timing": {
+        "small": "5-10 minuuttia",
+        "medium": "15-30 minuuttia",
+        "large": "30-45 minuuttia",
+        "xlarge": "45-60 minuuttia"
+      }
     }
   }
