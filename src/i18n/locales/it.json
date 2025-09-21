@@ -984,4 +984,12 @@
         "archived": "Archiviati"
       }
     }
+  },
+  "mysteryView": {
+    "timing": {
+      "small": "5-10 minuti",
+      "medium": "15-30 minuti",
+      "large": "30-45 minuti",
+      "xlarge": "45-60 minuti"
+    }
   }

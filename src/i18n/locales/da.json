@@ -984,4 +984,12 @@
         "archived": "Arkiveret"
       }
     }
+  },
+  "mysteryView": {
+    "timing": {
+      "small": "5-10 minutter",
+      "medium": "15-30 minutter",
+      "large": "30-45 minutter",
+      "xlarge": "45-60 minutter"
+    }
   }

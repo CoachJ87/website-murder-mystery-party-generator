@@ -983,5 +983,12 @@
       "purchased": "Gekauft",
       "archived": "Archiviert"
     }
+  },
+  "mysteryView": {
+    "timing": {
+      "small": "5-10 Minuten",
+      "medium": "15-30 Minuten",
+      "large": "30-45 Minuten",
+      "xlarge": "45-60 Minuten"
+    }
   }
-}
