@@ -1,987 +1,1005 @@
 {
-    "navigation": {
-      "home": "Hjem",
-      "dashboard": "Dashboard",
-      "signIn": "Log ind",
-      "signUp": "Tilmeld",
-      "signOut": "Log ud",
-      "account": "Kontoindstillinger"
-    },
-    "hero": {
-      "title": "Skab mordmysterie-fester på få minutter",
-      "subtitle": "Design tilpassede mysterier præcis som du ønsker dem - ethvert tema, enhver karakter, enhver setting.",
-      "subtitleAuth": "Design tilpassede mysterier præcis som du ønsker dem - ethvert tema, enhver karakter, enhver setting.",
-      "placeholder": "Et 1920'er speakeasy mordmysterie med jazzmusikere...",
-      "placeholderAuth": "Et 1920'er speakeasy mordmysterie med jazzmusikere...",
-      "themes": {
-        "1920sSpeakeasy": "1920'er Speakeasy",
-        "hollywoodMurder": "Hollywood-mord",
-        "castleMystery": "Slotsmysterie",
-        "sciFiMystery": "Sci-Fi Mysterie",
-        "artGalleryOpening": "Kunstgalleri-åbning",
-        "bakeryCompetition": "Bagekonkurrence",
-        "mountainSkiResort": "Bjergrigt Skisportssted",
-        "luxuryTrainJourney": "Luksustogrejse",
-        "historicUniversity": "Historisk Universitet",
-        "pokerTournament": "Pokerturnering",
-        "barbieDreamworld": "Barbies Drømmeverden",
-        "dystopianWaterworld": "Dystopisk Vandverden",
-        "jungleSteampunk": "Jungle Steampunk",
-        "magicalBakery": "Magisk Bageri",
-        "gamingTournament": "Spilturnering",
-        "synthwave80s": "Synthwave 80'erne",
-        "beachResort": "Strandresort",
-        "operaHouse": "Operahus",
-        "wineCountry": "Vinland",
-        "safariAdventure": "Safari-eventyr",
-        "fashionShow": "Modeshow",
-        "casinoNight": "Casinoaften",
-        "fairyTaleKingdom": "Eventyrrige",
-        "spaceColony": "Rumkoloni",
-        "superheroAcademy": "Superhelteakademi",
-        "underwaterCity": "Undervandsby",
-        "wildWestSaloon": "Vilde Vestens Saloon",
-        "vikingFeast": "Vikingefest",
-        "candyKingdom": "Slikrige",
-        "dragonsLair": "Dragens Hule",
-        "timeTravelersBall": "Tidsrejsendes Bal",
-        "atlantisRising": "Atlantis' Fremkomst",
-        "toyBoxAdventure": "Legetøjskasse-eventyr",
-        "vampireMasquerade": "Vampyrmaskebal",
-        "dimensionHopping": "Dimensionshop",
-        "cyberpunkNightclub": "Cyberpunk Natklub",
-        "ghostShip": "Spøgelsesskib",
-        "sentientPlantColony": "Koloni af Følende Planter"
-      },
-      "prompts": {
-        "1920sSpeakeasy": "Jeg vil gerne lave et mordmysterie-spil med 1920'er speakeasy-tema, der foregår i forbudstiden.",
-        "hollywoodMurder": "Design et mordmysterie, der foregår på et Hollywood-filmset i filmens gyldne æra.",
-        "castleMystery": "Udvikl et mordmysterie, der foregår på et afsides middelalderligt slot omdannet til et luksushotel.",
-        "sciFiMystery": "Design et mordmysterie om bord på en rumforskningsstation i kredsløb om en nyopdaget exoplanet.",
-        "artGalleryOpening": "Skab et mordmysterie, der foregår i et prestigefyldt kunstgalleri under en højt profileret udstillingsåbning.",
-        "bakeryCompetition": "Design et mordmysterie, der drejer sig om en bagekonkurrence i en lille by.",
-        "mountainSkiResort": "Udvikl et mordmysterie på et afsidesliggende skisportssted i bjergene under en snestorm.",
-        "luxuryTrainJourney": "Skab et mysterium, der foregår på en luksuriøs togrejse gennem de schweiziske alper.",
-        "historicUniversity": "Skab et mordmysterie, der foregår på et historisk universitet med en hjemsøgt fortid.",
-        "pokerTournament": "Skab et mysterium, der foregår ved en pokerturnering med høj indsats.",
-        "barbieDreamworld": "Design et mordmysterie i en Barbie-inspireret drømmeverden, hvor alt er lyserødt og perfekt.",
-        "dystopianWaterworld": "Skab et dystopisk fremtidsmysterie, hvor vand er den mest dyrebare ressource.",
-        "jungleSteampunk": "Udvikl et mordmysterie, der foregår i junglen med steampunk-teknologi og -stemning.",
-        "magicalBakery": "Skab et mordmysterie, der foregår i et magisk bageri, hvor fortryllede desserter er specialiteten.",
-        "gamingTournament": "Design et videospilsmysterium, hvor spillere deltager i en spilturnering.",
-        "synthwave80s": "Skab et mysterium, der foregår i en alternativ 80'er-setting, hvor synthwave-musik styrer følelserne.",
-        "beachResort": "Udvikl et mordmysterie, der foregår på et tropisk strandresort.",
-        "operaHouse": "Skab et mysterium, der foregår under en premiere i et historisk operahus.",
-        "wineCountry": "Design et mysterium, der foregår på en prestigefyldt vingård under høstsæsonen.",
-        "safariAdventure": "Skab et mordmysterie, der foregår under en afrikansk safari-ekspedition.",
-        "fashionShow": "Skab et mysterium bag kulisserne på et high-fashion modeshow.",
-        "casinoNight": "Skab et mysterium under en velgørenhedscasinoaften.",
-        "fairyTaleKingdom": "Design et mordmysterie i et fortryllet eventyrrige.",
-        "spaceColony": "Skab et mysterium, der foregår i den første menneskelige koloni på Mars.",
-        "superheroAcademy": "Udvikl et mysterium, der foregår på en skole for unge superhelte under uddannelse.",
-        "underwaterCity": "Skab et mordmysterie i en futuristisk undervandsby.",
-        "wildWestSaloon": "Design et mysterium, der foregår i en grænseby under guldfeberen.",
-        "vikingFeast": "Skab et mordmysterie, der foregår under en traditionel vikingefest.",
-        "candyKingdom": "Skab et mordmysterie, der foregår i en verden, hvor alt er lavet af slik og sukker.",
-        "dragonsLair": "Design et mysterium i en middelalderlig fantasiverden, hvor mennesker og drager sameksisterer.",
-        "timeTravelersBall": "Skab et mordmysterie, der foregår ved et sammenkomst, hvor de fremmødte er fra forskellige tidsperioder.",
-        "atlantisRising": "Udvikl et mysterium, der foregår i den gamle, nyligt genopdukkede by Atlantis.",
-        "toyBoxAdventure": "Skab et mysterium, hvor legetøj bliver levende, når mennesker ikke kigger.",
-        "vampireMasquerade": "Design et mysterium, der foregår ved den årlige blodbal for et eksklusivt vampyrsamfund.",
-        "dimensionHopping": "Skab et mysterium, der strækker sig over flere parallelle universer.",
-        "cyberpunkNightclub": "Skab et mordmysterie, der foregår i en neonfyldt cyberpunk-natklub.",
-        "ghostShip": "Design et mysterium om bord på et legendarisk skib, der forsvandt århundreder tidligere og mystisk er genopstået.",
-        "sentientPlantColony": "Skab et mordmysterie, der foregår i et samfund af intelligente, mobile planter med et komplekst socialt hierarki."
-      }
-    },
-    "howItWorks": {
-      "step1": {
-        "title": "Beskriv dit ideelle mordmysterie.",
-        "description": "Del din unikke vision: ethvert tema, enhver karakter eller enhver setting, du ønsker."
-      },
-      "step2": {
-        "title": "Vi skaber øjeblikkeligt dit tilpassede mysterium.",
-        "description": "Vores AI genererer alt præcis efter dine specifikationer: karakterer, spor og plot."
-      },
-      "step3": {
-        "title": "Perfektioner dit mysterium med vores redigeringsværktøj.",
-        "description": "Finpuds og optimer, indtil dit mysterium er perfekt til din gruppe."
-      },
-      "step4": {
-        "title": "Modtag alt, hvad du behøver for at hoste og dele.",
-        "description": "Du kan nemt downloade og dele alle materialer med dine spillere."
-      }
-    },
-    "features": {
-      "title": "Alt det nødvendige inkluderet",
-      "step1": {
-        "step": "Trin 1",
-        "title": "Ubegrænset Tilpasning",
-        "content": "Ethvert tema, enhver karakter, enhver setting – skab mysterier præcis som du forestiller dig dem."
-      },
-      "step2": {
-        "step": "Trin 2",
-        "title": "Fuldstændige Karakterprofiler",
-        "content": "Dybdegående baggrunde, motiver og hemmeligheder, der er unikt skræddersyet til dit mysterium."
-      },
-      "step3": {
-        "step": "Trin 3",
-        "title": "Nem Værtsguide",
-        "content": "Trin-for-trin-vejledning, så du trygt kan lede dit skræddersyede mysterium."
-      }
-    },
-    "testimonials": {
-      "title": "Hvad andre siger",
-      "testimonial1": {
-        "text": "Mine venner snakker stadig om vores mordmysterieaften. Karaktererne var så detaljerede, og plottwistene var perfekte!",
-        "author": "Jed"
-      },
-      "testimonial2": {
-        "text": "Så nemt at sætte op! Jeg var bekymret for at være vært for en fest for 12 personer, men materialerne gjorde det nemt, og alle havde en fantastisk tid.",
-        "author": "Laura"
-      },
-      "testimonial3": {
-        "text": "Tredje mordmysterie-fest med denne service, og de bliver bare bedre og bedre. Tilpasningsmulighederne er utrolige.",
-        "author": "Alex"
-      }
-    },
-    "support": {
-      "title": "Har du brug for mere hjælp?",
-      "description": "Besøg vores omfattende supportcenter for ofte stillede spørgsmål, hosting-tips og mere information om brugen af vores Mystery Creator.",
-      "button": "Besøg Supportcenter",
-      "email": "support@mysterymaker.party"
-    },
-    "footer": {
-      "tagline": "Skab fængslende mordmysterier med din forestillingshastighed.",
-      "quickLinks": "Hurtige Links",
-      "company": "Virksomhed",
-      "links": {
-        "home": "Hjem",
-        "support": "Support",
-        "contact": "Kontakt",
-        "privacy": "Privatlivspolitik"
-      },
-      "copyright": "Mystery Maker, Inc. Alle rettigheder forbeholdes."
-    },
-    "auth": {
-      "signIn": {
-        "title": "Velkommen tilbage",
-        "subtitle": "Log ind på din konto for at fortsætte med at skabe fantastiske mysterier",
-        "email": "E-mail",
-        "password": "Adgangskode",
-        "rememberMe": "Husk mig",
-        "forgotPassword": "Glemt adgangskode?",
-        "noAccount": "Har du ikke en konto?",
-        "signUpLink": "Tilmeld dig her",
-        "submitButton": "Log ind",
-        "signingIn": "Logger ind...",
-        "orDivider": "eller fortsæt med",
-        "googleButton": "Fortsæt med Google"
-      },
-      "signUp": {
-        "title": "Opret din konto",
-        "subtitle": "Slut dig til tusindvis af mysterieskabere og begynd at skabe i dag",
-        "name": "Fulde navn",
-        "email": "E-mail",
-        "password": "Adgangskode",
-        "confirmPassword": "Bekræft adgangskode",
-        "terms": "Jeg accepterer",
-        "termsLink": "vilkår og betingelser",
-        "privacy": "privatlivspolitik",
-        "and": "og",
-        "hasAccount": "Har du allerede en konto?",
-        "signInLink": "Log ind her",
-        "submitButton": "Opret konto",
-        "creatingAccount": "Opretter konto...",
-        "orDivider": "eller fortsæt med",
-        "googleButton": "Fortsæt med Google"
-      },
-      "forgotPassword": {
-        "title": "Nulstil adgangskode",
-        "subtitle": "Indtast din e-mailadresse, så sender vi dig et link til nulstilling af adgangskode",
-        "email": "E-mail",
-        "submitButton": "Send nulstillingslink",
-        "sending": "Sender...",
-        "backToSignIn": "Tilbage til login",
-        "checkEmail": {
-          "title": "Tjek din e-mail",
-          "message": "Vi har sendt et nulstillingslink til adgangskode til",
-          "noEmail": "Har du ikke modtaget e-mailen?",
-          "tryAgain": "Prøv igen",
-          "returnToSignIn": "Tilbage til login"
-        }
-      },
-      "resetPassword": {
-        "title": "Angiv ny adgangskode",
-        "subtitle": "Opret en ny adgangskode til din konto",
-        "password": "Ny adgangskode",
-        "confirmPassword": "Bekræft ny adgangskode",
-        "submitButton": "Opdater adgangskode",
-        "updating": "Opdaterer...",
-        "success": "Adgangskode er opdateret"
-      },
-      "errors": {
-        "invalidCredentials": "Ugyldig e-mail eller adgangskode",
-        "emailAlreadyExists": "En konto med denne e-mail eksisterer allerede",
-        "weakPassword": "Adgangskoden skal være mindst 6 tegn lang",
-        "passwordMismatch": "Adgangskoder stemmer ikke overens",
-        "invalidEmail": "Indtast venligst en gyldig e-mailadresse",
-        "requiredField": "Dette felt er påkrævet",
-        "termsRequired": "Du skal acceptere vilkår og betingelser",
-        "networkError": "Netværksfejl. Prøv venligst igen.",
-        "unknownError": "Der opstod en fejl. Prøv venligst igen."
-      },
-      "success": {
-        "accountCreated": "Konto oprettet! Tjek venligst din e-mail for at bekræfte din konto.",
-        "passwordReset": "E-mail til nulstilling af adgangskode er sendt",
-        "passwordUpdated": "Adgangskode er opdateret",
-        "signedOut": "Logget ud"
-      }
-    },
-    "dashboard": {
-      "title": "Dine mordmysterier",
-      "subtitle": "Se, rediger og administrer alle dine oprettede mysterier",
-      "welcome": {
-        "title": "Velkommen tilbage",
-        "subtitle": "Klar til at skabe dit næste mysterium?",
-        "noMysteries": "Du har ikke oprettet nogen mysterier endnu",
-        "getStarted": "Kom i gang ved at oprette dit første mysterium"
-      },
-      "mysteries": {
-        "title": "Dine mysterier",
-        "searchPlaceholder": "Søg mysterier...",
-        "deleteSuccess": "Mysteriet er arkiveret",
-        "deleteFailed": "Kunne ikke arkivere mysteriet",
-        "filter": {
-          "all": "Alle mysterier",
-          "drafts": "Kladder",
-          "completed": "Fuldført",
-          "purchased": "Købt",
-          "archived": "Arkiveret"
-        },
-        "empty": {
-          "title": "Ingen mysterier fundet",
-          "description": "Opret dit første mysterium for at komme i gang",
-          "searchResult": "Ingen mysterier matcher din søgning"
-        },
-        "card": {
-          "players": "{{count}} spillere",
-          "created": "Oprettet",
-          "lastEdited": "Sidst redigeret",
-          "theme": "Tema: {{theme}}",
-          "actions": {
-            "view": "Vis",
-            "chat": "Chat",
-            "delete": "Slet",
-            "viewProgress": "Se fremskridt",
-            "progress": "Fremskridt",
-            "editMystery": "Rediger mysterium",
-            "edit": "Rediger",
-            "archive": "Arkivér",
-            "deleteTitle": "Slet"
-          },
-          "deleteDialog": {
-            "title": "Slet mysterium",
-            "description": "Er du sikker på, at du vil slette dette mysterium? Denne handling kan ikke fortrydes."
-          },
-          "generationInProgress": "Generering i gang...",
-          "editedDate": "Redigeret den {{date}}"
-        },
-        "status": {
-          "completed": "Fuldført",
-          "draft": "Kladde",
-          "purchased": "Købt",
-          "unknown": "Ukendt",
-          "done": "Færdig",
-          "bought": "Købt",
-          "generating": "Genererer...",
-          "generatingShort": "Gen..."
-        },
-        "showingCount": "Viser {{count}} af {{total}} mysterier"
-      },
-      "stats": {
-        "totalMysteries": "Total mysterier",
-        "completedMysteries": "Fuldførte",
-        "purchasedMysteries": "Købte",
-        "totalPlayers": "Total antal spillere hostet"
-      },
-      "backToDashboard": "Tilbage til Dashboard",
-      "buttons": {
-        "createFirstMystery": "Opret dit første mysterium"
-      },
-      "errors": {
-        "loadFailed": "Kunne ikke indlæse dine mysterier"
-      }
-    },
-    "account": {
-      "title": "Kontoindstillinger",
-      "tabs": {
-        "profile": "Profil",
-        "security": "Sikkerhed"
-      },
-      "profile": {
-        "title": "Profiloplysninger",
-        "description": "Opdater din kontoprofiloplysninger",
-        "name": "Fulde navn",
-        "email": "E-mail",
-        "emailNote": "E-mail kan ikke ændres",
-        "saveButton": "Gem ændringer",
-        "saving": "Gemmer...",
-        "success": "Profil er opdateret"
-      },
-      "security": {
-        "password": {
-          "title": "Skift adgangskode",
-          "description": "Opdater din adgangskode for at holde din konto sikker",
-          "currentPassword": "Nuværende adgangskode",
-          "newPassword": "Ny adgangskode",
-          "confirmPassword": "Bekræft ny adgangskode",
-          "updateButton": "Opdater adgangskode",
-          "updating": "Opdaterer...",
-          "success": "Adgangskode er opdateret"
-        },
-        "deleteAccount": {
-          "title": "Slet konto",
-          "description": "Slet din konto og alle tilknyttede data permanent",
-          "warning": "Denne handling kan ikke fortrydes. Alle dine mysterier og data slettes permanent.",
-          "confirmText": "Skriv SLET for at bekræfte",
-          "deleteButton": "Slet konto",
-          "deleting": "Sletter...",
-          "success": "Konto er slettet"
-        }
-      }
-    },
-    "mysteryCreation": {
-      "scriptType": {
-        "full": "fuld",
-        "pointForm": "punktform",
-        "both": "begge (fuld og punktform)"
-      },
-      "sections": {
-        "premise": "Præmis",
-        "victim": "Offer",
-        "characterList": "Karakterliste",
-        "players": "Spillere",
-        "murderMethod": "Mordmetode"
-      },
-      "wizard": {
-        "title": "Skab dit mysterium",
-        "step1": {
-          "title": "Fortæl os din vision",
-          "description": "Beskriv din ideelle mordmysteriefest"
-        },
-        "step2": {
-          "title": "Gennemgå og Finpuds",
-          "description": "Perfektioner dit mysterium med vores AI-assistent"
-        },
-        "step3": {
-          "title": "Komplet Pakke",
-          "description": "Modtag alt, hvad du behøver for at hoste"
-        },
-        "prompt": {
-          "defaultStart": "Jeg vil gerne skabe et mordmysterie",
-          "withTheme": "Temaet/settingen skal være {{theme}} for {{playerCount}} spillere med scripts i {{scriptType}}-format",
-          "withoutTheme": "Dette er for {{playerCount}} spillere med scripts i {{scriptType}}-format",
-          "withAccomplice": "Inkluder en medskyldig-mekanisme i mysteriet",
-          "withoutAccomplice": "Inkluder ikke en medskyldig-mekanisme i mysteriet",
-          "additionalDetails": "Yderligere detaljer er: {{details}}"
-        }
-      },
-      "editor": {
-        "title": "Mysterie Editor",
-        "characters": "Karakterer",
-        "story": "Historie",
-        "clues": "Spor",
-        "hostGuide": "Værtsguide",
-        "save": "Gem kladde",
-        "publish": "Afslut mysterium",
-        "saving": "Gemmer...",
-        "publishing": "Publicerer...",
-        "saved": "Kladde gemt",
-        "published": "Mysterium afsluttet"
-      },
-      "guidance": {
-        "describe": "Beskriv dit mysterium i detaljer; jo mere specifik du er, jo bedre kan vi skabe det for dig",
-        "examples": "Eksempel: 'Et 1920'er speakeasy mordmysterie med 8 karakterer, herunder en jazzsanger, en bartender og en gangsterboss'",
-        "playerCount": "Hvor mange spillere vil deltage?",
-        "theme": "Hvad er settingen eller temaet?",
-        "special": "Er der nogle særlige krav eller begrænsninger?",
-        "initialPrompt": {
-          "withTheme": "Lad os skabe et mordmysterie med temaet {{theme}}. Før mig venligst trin for trin gennem oprettelsen af dette mysterium.",
-          "withoutTheme": "Lad os skabe et mordmysterie. Før mig venligst trin for trin gennem oprettelsen af dette mysterium."
-        }
-      },
-      "editTitle": "Rediger mysterium",
-      "createTitle": "Opret nyt mysterium",
-      "form": {
-        "description": "Udfyld formularen herunder for at generere dit tilpassede mordmysterie"
-      },
-      "buttons": {
-        "generateFullMystery": "Generer fuldt mysterium"
-      },
-      "errors": {
-        "signInToSave": "Log venligst ind for at gemme dit mysterium",
-        "saveFailed": "Kunne ikke gemme mysteriet",
-        "loadFailed": "Kunne ikke indlæse mysteriet",
-        "loadMessagesFailed": "Kunne ikke indlæse chatbeskeder",
-        "loadConversationFailed": "Kunne ikke indlæse samtale",
-        "initialPrompt": "Angiv venligst en prompt for dit mysterium",
-        "saveMessageFailed": "Kunne ikke gemme besked"
-      },
-      "success": {
-        "setupComplete": "Mysteriumsopsætning færdig! Starter chat..."
-      }
-    },
-    "mysteryForm": {
-      "userRequestLabel": "Hvad du vil skabe",
-      "userRequestDescription": "Din oprindelige anmodning fra startsiden",
-      "themeLabel": "Tema/miljødetaljer (valgfrit)",
-      "themePlaceholder": "F.eks. tidsperiode, specifikke miljødetaljer, must-haves osv.",
-      "themeDescription": "Vælg et specifikt tema eller miljø for dit mordmysterie",
-      "playerCountLabel": "Hvor mange spillere vil deltage?",
-      "playerCountPlaceholder": "Vælg antal spillere",
-      "playerCountItem": "{{count}} spillere",
-      "playerCountDescription": "Vælg mellem 4 og 32 spillere til dit mordmysterie.",
-      "accompliceLabel": "Inkluder medskyldig-mekanisme",
-      "accompliceDescription": "Ideel til spil med 10 eller flere spillere",
-      "scriptTypeLabel": "Detaljeringsniveau for script",
-      "scriptTypeFullLabel": "Fuld scripts – Komplet dialog og detaljerede instruktioner",
-      "scriptTypePointFormLabel": "Punktform – Nøglepunkter og opsummerende punkter",
-      "scriptTypeBothLabel": "Begge formater – Fuld scripts OG punktformede noter",
-      "additionalDetailsLabel": "Yderligere detaljer (valgfrit)",
-      "additionalDetailsPlaceholder": "Eventuelle specifikke krav, særlige regler eller yderligere kontekst for dit mysterium...",
-      "additionalDetailsDescription": "Angiv eventuelle yderligere detaljer eller særlige anmodninger til dit mysterium",
-      "startChat": "Start chat med AI",
-      "startingChat": "Starter chat..."
-    },
-    "supportPage": {
-      "title": "Supportcenter",
-      "subtitle": "Find svar på ofte stillede spørgsmål, kontakt vores supportteam, og få alt, hvad du behøver for at skabe utrolige mysterie-fester.",
-      "tabs": {
-        "faqs": "Ofte stillede spørgsmål",
-        "contact": "Kontakt"
-      },
-      "faqs": {
-        "title": "Ofte stillede spørgsmål",
-        "description": "Find svar på almindelige spørgsmål om Mystery Maker",
-        "categories": {
-          "aboutMysteryMaker": "Om Mystery Maker",
-          "gameMechanics": "Spilmekanik",
-          "hostingPlanning": "Hosting og Planlægning",
-          "accountBilling": "Konto og Fakturering"
-        },
-        "questions": {
-          "whatIsMysteryMaker": {
-            "question": "Hvad er Mystery Maker, og hvordan fungerer det?",
-            "answer": "Mystery Maker er en AI-drevet platform, der skaber tilpassede mordmysterie-fester præcis efter dine specifikationer. Du deler din unikke vision – ethvert tema, enhver karakter eller enhver setting, du ønsker – og vores AI genererer alt det, du behøver: karakterprofiler, spor og værtsmaterialer, der er unikt skræddersyet til din fest."
-          },
-          "creationProcess": {
-            "question": "Hvordan fungerer oprettelses- og købsprocessen?",
-            "answer": "Det er nemt! Først beskriver du dit ideelle mordmysterie, og vi skaber en tilpasset forhåndsvisning gratis. Når du er tilfreds med dit mysterium, køber du den fulde pakke for 24,99 $. Du får øjeblikkeligt alt det nødvendige for at hoste: detaljerede karakterprofiler, en værtsguide og alle spilmaterialer."
-          },
-          "saveWork": {
-            "question": "Kan jeg gemme mit arbejde og vende tilbage til det senere?",
-            "answer": "Ja! Alle dine tilpassede mysterier gemmes på din konto, så du kan vende tilbage og redigere dem når som helst."
-          },
-          "replayable": {
-            "question": "Kan disse mordmysterier genspilles?",
-            "answer": "Absolut! Vores mysterier indeholder variable elementer, så hvert spil føles friskt, selv med den samme gruppe. Du kan være vært for dit tilpassede mysterium så mange gange, du vil."
-          },
-          "playerCount": {
-            "question": "Hvor mange spillere har jeg brug for?",
-            "answer": "Vores system skaber mysterier til enhver gruppestørrelse, du angiver, fra intime sammenkomster med 4-6 spillere til større fester med over 15 spillere. Bare fortæl os, hvor mange spillere, så designer vi derefter."
-          },
-          "modifyMystery": {
-            "question": "Kan jeg ændre mit mysterium, når det er oprettet?",
-            "answer": "Ja, selvfølgelig! Brug vores redigeringsværktøj til at finpudse og tilpasse dit mysterium, indtil det er perfekt til din gruppe. Rediger karakterer, temaer eller kompleksitet når som helst."
-          },
-          "lastMinuteChanges": {
-            "question": "Hvad hvis jeg har brug for at tilføje eller fjerne spillere i sidste øjeblik?",
-            "answer": "Intet problem! Vores fleksible system giver dig mulighed for at justere antallet af spillere selv efter dit mysterium er oprettet. AI'en vil tilpasse historien og karaktererne, så de passer til disse ændringer."
-          },
-          "whatIncluded": {
-            "question": "Hvad er inkluderet i min brugerdefinerede mysteriepakke?",
-            "answer": "Alt hvad du behøver: en omfattende værtsguide med trin-for-trin-instruktioner, detaljerede karakterprofiler til hver spiller, spor, beviser og alle spilmaterialer. Ingen ekstra forberedelse nødvendig."
-          },
-          "gameDuration": {
-            "question": "Hvor lang tid tager et typisk spil?",
-            "answer": "De fleste mysterier tager 2-3 timer at spille, men du sætter tempoet. Vores værtsguide indeholder tidsforslag, som du kan tilpasse din tidsplan."
-          },
-          "themedMysteries": {
-            "question": "Tilbyder I tematiske mysterier til særlige lejligheder?",
-            "answer": "Vi skaber ethvert tema, du kan forestille dig! Fra klassiske 1920'er speakeasies til rumstationer eller eventyrriger – del din vision, så bringer vi den til live."
-          },
-          "ageRecommendation": {
-            "question": "Er der en aldersanbefaling for jeres mysterier?",
-            "answer": "Vores standardmysterier er ideelle for voksne og teenagere (13+ år). Du kan også anmode om familievenlige temaer, når du opretter dit mysterium til yngre spillere."
-          },
-          "freePreview": {
-            "question": "Hvad indeholder den gratis forhåndsvisning?",
-            "answer": "Du kan oprette ubegrænsede gratis mysterieforhåndsvisninger, herunder det grundlæggende plot og karakterkoncepter. Dette giver dig mulighed for at udforske forskellige ideer, før du køber."
-          },
-          "purchaseIncludes": {
-            "question": "Hvad får jeg, når jeg køber et mysterium?",
-            "answer": "For 24,99 $ får du alt, hvad du behøver for at hoste: en omfattende værtsguide, detaljerede karakterprofiler for hver spiller, spor, beviser og alle spilklar materialer."
-          },
-          "refund": {
-            "question": "Kan jeg få refusion, hvis jeg ikke er tilfreds?",
-            "answer": "Absolut! Hvis du ikke er helt tilfreds med dit køb, skal du kontakte os inden for 7 dage, og vi giver dig fuld refusion, uden spørgsmål."
-          }
-        }
-      },
-      "contact": {
-        "title": "Kontakt os",
-        "description": "Har du brug for mere hjælp? Vi er her for at hjælpe",
-        "intro": "Vores supportteam er klar til at hjælpe dig med eventuelle spørgsmål, du måtte have om at skabe din perfekte mysterie-fest med Mystery Maker.",
-        "form": {
-          "name": "Navn",
-          "email": "E-mail",
-          "subject": "Emne",
-          "message": "Besked",
-          "namePlaceholder": "Dit navn",
-          "emailPlaceholder": "din.email@example.com",
-          "subjectPlaceholder": "Hvad handler din besked om?",
-          "messagePlaceholder": "Hvordan kan vi hjælpe dig?",
-          "sendButton": "Send besked",
-          "sending": "Sender...",
-          "success": "Tak for din henvendelse! Vi vender tilbage inden for 24 timer.",
-          "error": "Kunne ikke sende besked. Prøv venligst igen senere."
-        }
-      }
-    },
-    "chat": {
-      "title": "Mordmysterie-skaber",
-      "public": "Offentlig",
-      "private": "Privat",
-      "initialGreeting": "Hej! Jeg er din AI-udviklingsassistent. Lad mig hjælpe dig med at skabe et mordmysterie. Hvor mange spillere vil du gerne have til dit mordmysterie?",
-      "inputPlaceholder": "Skriv din besked...",
-      "signInPrompt": "Log venligst <1>ind</1> for at bruge privat tilstand",
-      "errorResponse": "Jeg har problemer med at svare i øjeblikket. Prøv venligst igen.",
-      "errorResponseWithFallback": "Jeg oplever tekniske vanskeligheder. Hvor mange spillere vil du have til dit mordmysterie?",
-      "connectionErrorResponse": "Jeg oplever i øjeblikket forbindelsesproblemer. Hvor mange spillere vil du have til dit mordmysterie?",
-      "placeholder": "Del dine mysterieidéer...",
-      "loadingMessages": "Indlæser gamle beskeder...",
-      "errors": {
-        "responseFailed": "Kunne ikke hente AI-svar. Prøv venligst igen.",
-        "aiUnavailable": "Jeg beklager, men jeg har i øjeblikket problemer med at svare. Prøv venligst igen om et øjeblik."
-      }
-    },
-    "sendToGuests": {
-      "title": "Send karaktervejledninger til dine gæster",
-      "description": "Indtast e-mailadresserne for hver karakter for at sende personlige vejledninger direkte til dine gæster. Hver gæst modtager kun deres egen karakters information.",
-      "status": {
-        "sent": "Sendt"
-      },
-      "emailPlaceholder": "gæst@eksempel.com",
-      "buttons": {
-        "sending": "Sender...",
-        "send": "Send karaktervejledninger"
-      },
-      "errors": {
-        "noValidEmails": "Tilføj venligst mindst én gyldig e-mailadresse",
-        "sendFailed": "Kunne ikke sende nogle e-mails. Prøv venligst igen."
-      },
-      "success": {
-        "sentCount": "Karaktervejledninger sendt til {{count}} gæster"
-      }
-    },
-    "common": {
-      "buttons": {
-        "createNew": "Opret nyt mysterium",
-        "getStarted": "Kom i gang",
-        "learnMore": "Lær mere",
-        "tryNow": "Prøv nu",
-        "continue": "Fortsæt",
-        "cancel": "Annuller",
-        "save": "Gem",
-        "delete": "Slet",
-        "edit": "Rediger",
-        "close": "Luk",
-        "back": "Tilbage",
-        "next": "Næste",
-        "previous": "Forrige",
-        "finish": "Afslut",
-        "submit": "Indsend",
-        "confirm": "Bekræft",
-        "yes": "Ja",
-        "no": "Nej"
-      },
-      "labels": {
-        "loading": "Indlæser...",
-        "pleaseWait": "Vent venligst...",
-        "error": "Fejl",
-        "success": "Succes",
-        "warning": "Advarsel",
-        "info": "Info",
-        "required": "Påkrævet",
-        "optional": "Valgfri"
-      },
-      "messages": {
-        "welcome": "Velkommen!",
-        "thankYou": "Tak!",
-        "comingSoon": "Kommer snart",
-        "notFound": "Ikke fundet",
-        "somethingWentWrong": "Der gik noget galt",
-        "tryAgain": "Prøv venligst igen",
-        "noResultsFound": "Ingen resultater fundet",
-        "loadingContent": "Indlæser indhold...",
-        "savingChanges": "Gemmer ændringer...",
-        "changesSuccess": "Ændringer gemt",
-        "changesCanceled": "Ændringer annulleret",
-        "aiThinking": "AI tænker..."
-      },
-      "validation": {
-        "required": "Dette felt er påkrævet",
-        "invalidEmail": "Indtast venligst en gyldig e-mailadresse",
-        "passwordTooShort": "Adgangskoden skal være mindst 6 tegn lang",
-        "passwordMismatch": "Adgangskoder stemmer ikke overens",
-        "invalidFormat": "Ugyldigt format",
-        "tooShort": "For kort",
-        "tooLong": "For lang",
-        "invalidCharacters": "Indeholder ugyldige tegn"
-      },
-      "states": {
-        "draft": "Kladde",
-        "inProgress": "I gang",
-        "completed": "Fuldført",
-        "published": "Udgivet",
-        "archived": "Arkiveret",
-        "deleted": "Slettet"
-      },
-      "modals": {
-        "confirmDelete": {
-          "title": "Bekræft sletning",
-          "message": "Er du sikker på, at du vil slette dette element? Denne handling kan ikke fortrydes.",
-          "confirmButton": "Slet",
-          "cancelButton": "Annuller"
-        },
-        "unsavedChanges": {
-          "title": "Ugemte ændringer",
-          "message": "Du har ugemte ændringer. Vil du gemme dem, før du forlader siden?",
-          "saveButton": "Gem ændringer",
-          "discardButton": "Forkast ændringer",
-          "cancelButton": "Annuller"
-        }
-      },
-      "notifications": {
-        "welcomeBack": "Velkommen tilbage!",
-        "signedOut": "Du er blevet logget ud",
-        "sessionExpired": "Din session er udløbet. Log venligst ind igen.",
-        "connectionLost": "Forbindelse tabt. Forsøger at genoprette forbindelse...",
-        "connectionRestored": "Forbindelse genoprettet",
-        "updateAvailable": "En opdatering er tilgængelig. Opdater venligst for at se den.",
-        "offlineMode": "Du er i øjeblikket offline",
-        "deleteSuccess": "{{item}} slettet",
-        "deleteFailed": "Kunne ikke slette {{item}}",
-        "archiveSuccess": "{{item}} arkiveret",
-        "archiveFailed": "Kunne ikke arkivere {{item}}",
-        "updatedSuccess": "{{item}} opdateret",
-        "updateFailed": "Kunne ikke opdatere {{item}}"
-      }
-    },
-    "character": {
-      "detail": {
-        "description": "Karakterbeskrivelse",
-        "background": "Baggrund",
-        "relationships": "Relationer",
-        "secrets": "Hemmeligheder",
-        "whereabouts": "Hvor var du under mordet",
-        "introduction": "Introduktion",
-        "round1": "Runde 1: Indledende Undersøgelse",
-        "round2": "Runde 2: Dybere Afsløringer",
-        "round3": "Runde 3: Sidste Spor",
-        "finalStatement": "Afsluttende Erklæring",
-        "questioningOptions": "Afhøringsmuligheder",
-        "askTarget": "Spørg {{target}}: \"{{question}}\""
-      },
-      "import": {
-        "title": "Mysteriekarakterer",
-        "description": "Administrer dit mordmysteriums karakterer",
-        "importButton": "Importer karakterer",
-        "loading": "Indlæser karakterer...",
-        "noCharacters": "Ingen karakterer endnu",
-        "importPrompt": "Importer karakterdata for at udfylde dit mordmysterie.",
-        "foundCount": "{{count}} karakterer fundet i databasen",
-        "deleteConfirm": "Er du sikker på, at du vil slette {{name}}?",
-        "deleteSuccess": "Karakter slettet: {{name}}",
-        "deleteFailed": "Kunne ikke slette karakter",
-        "refreshSuccess": "Karakterliste opdateret",
-        "refreshFailed": "Kunne ikke opdatere karakterdata",
-        "loadFailed": "Kunne ikke indlæse karakterdata",
-        "table": {
-          "name": "Karakternavn",
-          "details": "Detaljer",
-          "scripts": "Scripts",
-          "actions": "Handlinger",
-          "badges": {
-            "description": "Beskrivelse",
-            "background": "Baggrund",
-            "relationships": "Relationer",
-            "secrets": "Hemmeligheder",
-            "intro": "Intro",
-            "round1": "Runde 1",
-            "round2": "Runde 2",
-            "round3": "Runde 3"
-          }
-        }
-      },
-      "access": {
-        "welcome": "Velkommen, {{name}}!",
-        "subtitle": "Her er din karakterguide til mysteriet",
-        "loading": "Indlæser din karakter...",
-        "accessDenied": "Adgang nægtet",
-        "notFound": "Karaktertildeling ikke fundet.",
-        "guide": {
-          "yourCharacter": "{{name}} – Din Karakter",
-          "yourBackground": "Din Baggrund",
-          "yourSecret": "Din Hemmelighed",
-          "introduction": "Introduktion",
-          "rumorsYouKnow": "Rygter du kender",
-          "round1": "Runde 1: Indledende Udtalelse",
-          "round2": "Runde 2: Motiver",
-          "round3": "Runde 3: Metode",
-          "questionsToAsk": "Spørgsmål at stille",
-          "ifInnocent": "Hvis du er uskyldig:",
-          "ifGuilty": "Hvis du er skyldig:",
-          "ifAccomplice": "Hvis du er medskyldig:"
-        }
-      },
-      "dialog": {
-        "title": "Importer karakterdata",
-        "subtitle": "Indsæt dine karakterdata nedenfor:",
-        "pasteButton": "Indsæt fra udklipsholder",
-        "pasteSuccess": "Tekst indsat fra udklipsholder",
-        "pasteError": "Kunne ikke få adgang til udklipsholder. Indsæt venligst manuelt.",
-        "placeholder": "Indsæt indholdet af CHARACTER GUIDE her...",
-        "instructions": "Karakterdata skal inkludere sektioner for:",
-        "sections": [
-          "KARAKTERBESKRIVELSE",
-          "BAGGRUND",
-          "RELATIONER",
-          "HEMMELIGHEDER",
-          "HVOR VAR DU",
-          "Rundeudtalelser (RUNDE 1, RUNDE 2 osv.)"
-        ],
-        "importButton": "Importer karakterer",
-        "importing": "Importerer...",
-        "cancel": "Annuller",
-        "enterData": "Indtast eller indsæt venligst karakterdata",
-        "importSuccess": "Karakterer importeret",
-        "importFailed": "Kunne ikke importere karakterdata",
-        "importError": "En uventet fejl opstod under import"
-      },
-      "guestManager": {
-        "title": "Del karakterer med gæster",
-        "subtitle": "Tildel en gæst til hver karakter og send via e-mail",
-        "table": {
-          "character": "Karakter",
-          "guestName": "Gæstenavn",
-          "email": "E-mail",
-          "action": "Handling"
-        },
-        "placeholders": {
-          "guestName": "Gæstenavn",
-          "email": "gæst@eksempel.com"
-        },
-        "buttons": {
-          "edit": "Rediger",
-          "send": "Send",
-          "sendAll": "Send alle",
-          "close": "Luk"
-        },
-        "status": {
-          "sent": "Sendt"
-        },
-        "assignedCount": "{{count}} karakterer tildelt",
-        "toasts": {
-          "characterSent": "Karakter sendt til {{name}}!",
-          "sendFailed": "Kunne ikke sende karaktertildeling",
-          "loadFailed": "Kunne ikke indlæse eksisterende tildelinger",
-          "updateFailed": "Kunne ikke opdatere tildeling",
-          "noValidAssignments": "Ingen gyldige tildelinger at sende",
-          "allSent": "{{count}} karaktertildelinger sendt!",
-          "sendSomeFailed": "Kunne ikke sende nogle tildelinger"
-        }
-      },
-      "roles": {
-        "title": "Karakterroller",
-        "description": "Tildel morderrollen til dit mysterium",
-        "murderer": "Morder",
-        "required": "Påkrævet",
-        "noneSelected": "Ingen valgt",
-        "murdererDescription": "Karakteren der begik mordet",
-        "saveRoles": "Gem roller",
-        "saving": "Gemmer...",
-        "saveSuccess": "Karakterroller gemt",
-        "saveFailed": "Kunne ikke gemme karakterroller",
-        "loadFailed": "Kunne ikke indlæse karakterdata"
-      }
-    },
-    "blog": {
-    "title": "Mordmysterie Blog",
-    "subtitle": "Tips, guides og inspiration til din næste mystery-fest",
-    "backToHome": "Tilbage til Hjem",
-    "readMore": "Læs mere →",
-    "minRead": "min læsning",
-    "publishedOn": "Udgivet den",
-    "by": "Af",
-    "relatedPosts": "Relaterede indlæg",
-    "noPostsFound": "Ingen blogindlæg fundet.",
-    "loading": "Indlæser...",
-    "error": "Kunne ikke indlæse blogindlæg."
+  "navigation": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out",
+    "account": "Account Settings"
   },
-  "purchase": {
-      "toasts": {
-        "success": "Køb gennemført! Du har nu fuld adgang til denne mysteriepakke.",
-        "cancel": "Køb annulleret. Du kan prøve igen, når du er klar.",
-        "loadFailed": "Kunne ikke indlæse mysteriedetaljer.",
-        "notFound": "Mysterium ikke fundet.",
-        "devPurchaseSim": "Simulerer køb i udviklingstilstand...",
-        "devPurchaseSuccess": "Køb simuleret! Omdirigerer til pakkeoprettelse...",
-        "devPurchaseFailed": "Kunne ikke simulere køb.",
-        "signInRequired": "Log venligst ind for at købe dette mysterium.",
-        "checkoutRedirect": "Omdirigerer til sikker betaling...",
-        "checkoutFailed": "Kunne ikke omdirigere til betaling. Prøv venligst igen.",
-        "genericError": "Der opstod en fejl under indlæsning af mysteriedetaljer."
-      },
-      "title": "Afslut dit køb",
-      "subtitle": "Få fuld adgang til din mordmysteriepakke",
-      "package": {
-        "title": "Mordmysteriepakke",
-        "description": "Engangskøb, øjeblikkelig adgang",
-        "priceDescription": "Fuld mordmysteriepakke med alle karaktermaterialer, spor og værtsinstruktioner.",
-        "whatsIncluded": "Hvad er inkluderet:",
-        "includes": [
-          "Fuldstændige karakterprofiler for alle mistænkte",
-          "Værtsguide med trin-for-trin-instruktioner",
-          "Printbare karakterark",
-          "Bevis- og sporkort",
-          "Tidslinje for begivenheder",
-          "Opløsning af afsløringsscript",
-          "PDF-downloads af alle materialer"
-        ]
-      },
-      "buttons": {
-        "processing": "Behandler...",
-        "complete": "Gennemfør køb",
-        "backToDesign": "Tilbage til mysteriedesign"
-      },
-      "notes": {
-        "title": "Vigtige bemærkninger",
-        "items": [
-          "Dette er et engangskøb for denne specifikke mysteriepakke",
-          "Du vil have permanent adgang til at downloade alle materialer",
-          "Indholdet er kun til personlig brug, ikke til kommerciel videredeling",
-          "Har du brug for hjælp? Kontakt vores support på {{email}}"
-        ]
-      },
-      "preview": {
-        "defaultTitle": "Tilpasset mordmysterie",
-        "characterPlaceholder": "Karakterdetaljer afsløres i den fulde pakke.",
-        "characterPlaceholderFull": "Fuld karakterbeskrivelse tilgængelig i den købte pakke.",
-        "evidencePlaceholder": "Bevisdetaljer tilgængelige i den fulde pakke.",
-        "title": "Mordmysterie forhåndsvisning",
-        "playersLabel": "Spillere",
-        "playersCount": "{{count}} spillere",
-        "unknownPlayers": "Ukendt antal spillere",
-        "storyTitle": "Historie forhåndsvisning",
-        "unlockMessage": "Køb for at låse op for den fulde mysteriepakke, komplet med alle karakterdetaljer, spor og materialer.",
-        "whatsIncluded": "Hvad den fulde pakke inkluderer:",
-        "packageIncludes": [
-          "Detaljeret værtsguide med komplette opsætningsinstruktioner",
-          "Karaktervejledninger til hver spiller",
-          "Beviskort og printbare materialer",
-          "Fuldt spilscript og tidslinje"
-        ]
+  "hero": {
+    "title": "Create Murder Mystery Parties in Minutes",
+    "subtitle": "Design custom mysteries exactly how you want them - any theme, any characters, any setting.",
+    "subtitleAuth": "Design custom mysteries exactly how you want them - any theme, any characters, any setting.",
+    "placeholder": "A 1920s speakeasy murder mystery with jazz musicians...",
+    "placeholderAuth": "A 1920s speakeasy murder mystery with jazz musicians...",
+    "themes": {
+      "1920sSpeakeasy": "1920s Speakeasy",
+      "hollywoodMurder": "Hollywood Murder",
+      "castleMystery": "Castle Mystery",
+      "sciFiMystery": "Sci-Fi Mystery",
+      "artGalleryOpening": "Art Gallery Opening",
+      "bakeryCompetition": "Bakery Competition",
+      "mountainSkiResort": "Mountain Ski Resort",
+      "luxuryTrainJourney": "Luxury Train Journey",
+      "historicUniversity": "Historic University",
+      "pokerTournament": "Poker Tournament",
+      "barbieDreamworld": "Barbie Dreamworld",
+      "dystopianWaterworld": "Dystopian Waterworld",
+      "jungleSteampunk": "Jungle Steampunk",
+      "magicalBakery": "Magical Bakery",
+      "gamingTournament": "Gaming Tournament",
+      "synthwave80s": "Synthwave 80s",
+      "beachResort": "Beach Resort",
+      "operaHouse": "Opera House",
+      "wineCountry": "Wine Country",
+      "safariAdventure": "Safari Adventure",
+      "fashionShow": "Fashion Show",
+      "casinoNight": "Casino Night",
+      "fairyTaleKingdom": "Fairy Tale Kingdom",
+      "spaceColony": "Space Colony",
+      "superheroAcademy": "Superhero Academy",
+      "underwaterCity": "Underwater City",
+      "wildWestSaloon": "Wild West Saloon",
+      "vikingFeast": "Viking Feast",
+      "candyKingdom": "Candy Kingdom",
+      "dragonsLair": "Dragon's Lair",
+      "timeTravelersBall": "Time Traveler's Ball",
+      "atlantisRising": "Atlantis Rising",
+      "toyBoxAdventure": "Toy Box Adventure",
+      "vampireMasquerade": "Vampire Masquerade",
+      "dimensionHopping": "Dimension Hopping",
+      "cyberpunkNightclub": "Cyberpunk Nightclub",
+      "ghostShip": "Ghost Ship",
+      "sentientPlantColony": "Sentient Plant Colony"
+    },
+    "prompts": {
+      "1920sSpeakeasy": "I want to host a 1920s Speakeasy themed murder mystery set during the prohibition era.",
+      "hollywoodMurder": "Design a murder mystery that takes place on a Hollywood film set in the golden age of cinema.",
+      "castleMystery": "Develop a murder mystery set in a remote medieval castle that's been converted into a luxury hotel.",
+      "sciFiMystery": "Design a murder mystery set aboard a research space station orbiting a newly discovered exoplanet.",
+      "artGalleryOpening": "Create a murder mystery set in a prestigious art gallery during a high-profile exhibition opening.",
+      "bakeryCompetition": "Design a murder mystery centered around a small-town bakery competition.",
+      "mountainSkiResort": "Develop a murder mystery at an isolated mountain ski resort during a blizzard.",
+      "luxuryTrainJourney": "Craft a mystery set on a luxury train journey through the Swiss Alps.",
+      "historicUniversity": "Build a murder mystery set at a historic university with a haunted past.",
+      "pokerTournament": "Create a mystery at a high-stakes poker tournament .",
+      "barbieDreamworld": "Design a murder mystery in a Barbie-inspired dreamworld where everything is pink and perfect.",
+      "dystopianWaterworld": "Craft a dystopian future mystery where water is the most precious resource.",
+      "jungleSteampunk": "Develop a murder mystery set in the jungle with steampunk technology and vibes.",
+      "magicalBakery": "Create a murder mystery in a magical bakery where enchanted desserts are the specialty.",
+      "gamingTournament": "Design a video game-themed mystery where players at a gaming tournament.",
+      "synthwave80s": "Craft a mystery set in an alternate 1980s where synthwave music controls emotions.",
+      "beachResort": "Develop a murder mystery at a tropical beach resort.",
+      "operaHouse": "Create a mystery set during a premiere at a historic opera house.",
+      "wineCountry": "Design a whodunit at a prestigious vineyard during harvest season.",
+      "safariAdventure": "Craft a murder mystery during an African safari expedition.",
+      "fashionShow": "Build a mystery backstage at a high-profile fashion show.",
+      "casinoNight": "Create a mystery during a charity casino night fundraiser.",
+      "fairyTaleKingdom": "Design a murder mystery in an enchanted fairy tale kingdom.",
+      "spaceColony": "Craft a mystery on humanity's first Mars colony.",
+      "superheroAcademy": "Develop a mystery at a school for young superheroes in training.",
+      "underwaterCity": "Create a murder mystery in a futuristic underwater city.",
+      "wildWestSaloon": "Design a mystery in a frontier town during the gold rush.",
+      "vikingFeast": "Craft a murder mystery during a traditional Viking celebration.",
+      "candyKingdom": "Create a murder mystery in a world where everything is made of sweets and sugar.",
+      "dragonsLair": "Design a mystery in a medieval fantasy world where humans and dragons coexist.",
+      "timeTravelersBall": "Craft a murder mystery at a gathering where attendees come from different time periods.",
+      "atlantisRising": "Develop a mystery in the recently emerged ancient city of Atlantis.",
+      "toyBoxAdventure": "Create a mystery where toys come to life when humans aren't looking.",
+      "vampireMasquerade": "Design a mystery at an exclusive vampire society's annual blood ball.",
+      "dimensionHopping": "Craft a mystery that spans multiple parallel universes.",
+      "cyberpunkNightclub": "Create a murder mystery in a neon-soaked cyberpunk nightclub.",
+      "ghostShip": "Design a mystery aboard a legendary vessel that vanished centuries ago and has mysteriously reappeared.",
+      "sentientPlantColony": "Create a murder mystery in a society of intelligent, mobile plants with a complex social hierarchy."
+    }
+  },
+  "howItWorks": {
+    "step1": {
+      "title": "Describe your ideal murder mystery.",
+      "description": "Tell us your unique vision - any theme, characters, or setting you want."
+    },
+    "step2": {
+      "title": "We create your custom mystery instantly.",
+      "description": "Our AI generates everything exactly how you want it - characters, clues, and story."
+    },
+    "step3": {
+      "title": "Perfect your mystery with our editor.",
+      "description": "Refine and adjust until your mystery is exactly right for your group."
+    },
+    "step4": {
+      "title": "Get everything you need to host and share.",
+      "description": "Download and easily share all materials with your players."
+    }
+  },
+  "features": {
+    "title": "Everything You Need Included",
+    "step1": {
+      "step": "Step 1",
+      "title": "Unlimited Customization",
+      "content": "Any theme, any characters, any setting - create mysteries exactly how you envision them."
+    },
+    "step2": {
+      "step": "Step 2",
+      "title": "Complete Character Profiles",
+      "content": "Detailed backgrounds, motivations, and secrets tailored specifically for your mystery."
+    },
+    "step3": {
+      "step": "Step 3",
+      "title": "Easy Host Guide",
+      "content": "Step-by-step instructions to run your custom mystery with confidence."
+    }
+  },
+  "testimonials": {
+    "title": "What Others Are Saying",
+    "testimonial1": {
+      "text": "My friends and I still talk about our murder mystery night. The characters were so detailed and the plot twists were perfect!",
+      "author": "Jed"
+    },
+    "testimonial2": {
+      "text": "So easy to set up! I was worried about hosting for 12 people, but the materials made it simple and everyone had a blast.",
+      "author": "Laura"
+    },
+    "testimonial3": {
+      "text": "Third murder mystery party using this service and they keep getting better. The customization options are amazing.",
+      "author": "Alex"
+    }
+  },
+  "support": {
+    "title": "Need More Help?",
+    "description": "Visit our comprehensive support center for FAQs, hosting tips, and more information about using our Mystery Maker.",
+    "button": "Visit Support Center",
+    "email": "support@mysterymaker.party"
+  },
+  "footer": {
+    "tagline": "Craft captivating murder mysteries at the speed of imagination.",
+    "quickLinks": "Quick Links",
+    "company": "Company",
+    "links": {
+      "home": "Home",
+      "support": "Support",
+      "contact": "Contact",
+      "privacy": "Privacy Policy"
+    },
+    "copyright": "Mystery Maker, Inc. All rights reserved."
+  },
+  "auth": {
+    "signIn": {
+      "title": "Welcome Back",
+      "subtitle": "Sign in to your account to continue creating amazing mysteries",
+      "email": "Email Address",
+      "password": "Password",
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot your password?",
+      "noAccount": "Don't have an account?",
+      "signUpLink": "Sign up here",
+      "submitButton": "Sign In",
+      "signingIn": "Signing in...",
+      "orDivider": "or continue with",
+      "googleButton": "Continue with Google"
+    },
+    "signUp": {
+      "title": "Create Your Account",
+      "subtitle": "Join thousands of mystery makers and start creating today",
+      "name": "Full Name",
+      "email": "Email Address",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "terms": "I agree to the",
+      "termsLink": "Terms of Service",
+      "privacy": "Privacy Policy",
+      "and": "and",
+      "hasAccount": "Already have an account?",
+      "signInLink": "Sign in here",
+      "submitButton": "Create Account",
+      "creatingAccount": "Creating account...",
+      "orDivider": "or continue with",
+      "googleButton": "Continue with Google"
+    },
+    "forgotPassword": {
+      "title": "Reset Your Password",
+      "subtitle": "Enter your email address and we'll send you a link to reset your password",
+      "email": "Email Address",
+      "submitButton": "Send Reset Link",
+      "sending": "Sending...",
+      "backToSignIn": "Back to sign in",
+      "checkEmail": {
+        "title": "Check Your Email",
+        "message": "We've sent a password reset link to",
+        "noEmail": "Didn't receive an email?",
+        "tryAgain": "Try again",
+        "returnToSignIn": "Return to Sign In"
       }
     },
-    "mysteryPackage": {
-      "shareWithGuests": "Del med gæster",
-      "tabs": {
-        "hostGuide": "Værtsguide",
-        "characters": "Karakterer ({{count}})",
-        "clues": "Beviser",
-        "inspector": "Detektivguide",
-        "relationships": "Relationer"
-      },
-      "mobileTabs": {
-        "host": "Vært",
-        "characters": "Karakterer ({{count}})",
-        "clues": "Beviser",
-        "inspector": "Detektiv",
-        "relations": "Relationer"
-      },
-      "loading": {
-        "generating": "Genererer...",
-        "generatingMessage": "Dit fulde mysterium genereres i øjeblikket. Dette tager 3-5 minutter.<br />Denne side opdateres automatisk, når mysteriet er færdigt.",
-        "characters": "Udvikling af unikke karakterprofiler med baggrunde, motiver og hemmeligheder til dit mysterium.",
-        "clues": "Oprettelse af beviskort, spor og efterforskningsmaterialer, der bidrager til løsningen af dit mysterium.",
-        "inspector": "Udarbejdelse af detektivens script og efterforskningstidslinje for at vejlede mysteriets løsning.",
-        "matrix": "Oprettelse af karakterrelationsmatrixen, der viser forbindelser, konflikter og skjulte forhold."
-      },
-      "placeholder": {
-        "title": "Klar til at generere dit mysterium",
-        "description": "Klik på knappen herunder for at starte genereringen af din fulde mysteriepakke med alt inkluderet materiale.",
-        "button": "Generer pakke",
-        "characters": "Karaktervejledninger vil være tilgængelige, når genereringen er startet.",
-        "clues": "Beviskort vil være tilgængelige, når genereringen er startet.",
-        "inspector": "Detektivguiden vil være tilgængelig, når genereringen er startet.",
-        "matrix": "Relationsmatricen vil være tilgængelig, når genereringen er startet."
-      },
-      "matrix": {
-        "title": "Karakterrelationsmatrix"
-      }
+    "resetPassword": {
+      "title": "Set New Password",
+      "subtitle": "Create a new password for your account",
+      "password": "New Password",
+      "confirmPassword": "Confirm New Password",
+      "submitButton": "Update Password",
+      "updating": "Updating...",
+      "success": "Password updated successfully"
     },
-    "chatbot": {
-      "toasts": {
-        "invalidId": "Ugyldigt samtale-ID",
-        "loadFailed": "Kunne ikke indlæse din tidligere samtale",
-        "offlineMode": "Bruger offline-tilstand – nogle funktioner kan være begrænsede",
-        "requestError": "Kunne ikke behandle din anmodning",
-        "generationSuccess": "Mysterium genereret!",
-        "urlUnavailable": "Chatbot-URL er endnu ikke tilgængelig"
-      },
-      "welcomeMessage": "Velkommen til Murder Mystery Creator! Beskriv den type mysterium, du gerne vil skabe, eller bed mig om forslag.",
-      "newConversationTitle": "Nyt mordmysterie",
-      "fallbackResponses": [
-        "Jeg vil med glæde hjælpe dig med at skabe et mordmysterie. Hvilket tema eller setting vil du gerne have til dit mysterium?",
-        "Det er et godt valg! Lad os nu tænke over offeret. Hvem skal være offeret?",
-        "Interessant! Nu har vi brug for nogle mistænkte. Kan du beskrive 2-3 karakterer, der kunne have motiver til at begå denne forbrydelse?",
-        "Det er overbevisende mistænkte. Lad os tilføje nogle spor. Hvilken slags beviser kan findes på gerningsstedet?",
-        "Dit mysterium tager form! For at fortsætte med at udvikle detaljerne i din historie, lad os tænke over, hvilke andre elementer vi kunne inkludere."
-      ],
-      "title": "Skab dit mordmysterie",
-      "buttons": {
-        "external": "Ekstern",
-        "openFull": "Åbn fuld chatbot",
-        "finalize": "Færdiggør",
-        "finalizeMystery": "Færdiggør mysterium"
-      },
-      "creatorTitle": "Mordmysterie-skaber",
-      "placeholder": "Skriv dine idéer til mordmysteriet...",
-      "finalizePrompt": "Når du er tilfreds med dit mysterium, skal du færdiggøre det for at fortsætte."
+    "errors": {
+      "invalidCredentials": "Invalid email or password",
+      "emailAlreadyExists": "An account with this email already exists",
+      "weakPassword": "Password must be at least 6 characters",
+      "passwordMismatch": "Passwords do not match",
+      "invalidEmail": "Please enter a valid email address",
+      "requiredField": "This field is required",
+      "termsRequired": "You must accept the terms of service",
+      "networkError": "Network error. Please try again.",
+      "unknownError": "Something went wrong. Please try again."
     },
-    "homeDashboard": {
-      "title": "Dine mysterier",
-      "searchPlaceholder": "Søg mysterier...",
-      "loadMore": "Indlæs mere",
-      "loading": "Indlæser...",
+    "success": {
+      "accountCreated": "Account created successfully! Please check your email to verify your account.",
+      "passwordReset": "Password reset email sent successfully",
+      "passwordUpdated": "Password updated successfully",
+      "signedOut": "Signed out successfully"
+    }
+  },
+  "dashboard": {
+    "title": "Your Murder Mysteries",
+    "subtitle": "View, edit and manage all your created mysteries",
+    "welcome": {
+      "title": "Welcome back",
+      "subtitle": "Ready to create your next mystery masterpiece?",
+      "noMysteries": "You haven't created any mysteries yet",
+      "getStarted": "Get started by creating your first mystery"
+    },
+    "mysteries": {
+      "title": "Your Mysteries",
+      "searchPlaceholder": "Search mysteries...",
+      "deleteSuccess": "Mystery moved to archive",
+      "deleteFailed": "Failed to archive mystery",
+      "filter": {
+        "all": "All Mysteries",
+        "drafts": "Drafts",
+        "completed": "Completed",
+        "purchased": "Purchased",
+        "archived": "Archived"
+      },
       "empty": {
-        "title": "Du har ikke oprettet nogen mysterier endnu",
-        "description": "Brug inputboksen ovenfor til at begynde at oprette dit første mordmysterie!"
+        "title": "No mysteries found",
+        "description": "Create your first mystery to get started",
+        "searchResult": "No mysteries match your search"
       },
-      "errors": {
-        "loadFailed": "Kunne ikke indlæse nogle mysterier. Opdater venligst siden."
-      }
+      "card": {
+        "players": "{{count}} players",
+        "created": "Created",
+        "lastEdited": "Last edited",
+        "theme": "Theme: {{theme}}",
+        "actions": {
+          "view": "View",
+          "chat": "Chat",
+          "delete": "Delete",
+          "viewProgress": "View Progress",
+          "progress": "Progress",
+          "editMystery": "Edit Mystery",
+          "edit": "Edit",
+          "archive": "Archive",
+          "deleteTitle": "Delete"
+        },
+        "deleteDialog": {
+          "title": "Delete Mystery",
+          "description": "Are you sure you want to delete this mystery? This action cannot be undone."
+        },
+        "generationInProgress": "Generation in progress...",
+        "editedDate": "Edited {{date}}"
+      },
+      "status": {
+        "completed": "Completed",
+        "draft": "Draft",
+        "purchased": "Purchased",
+        "unknown": "Unknown",
+        "done": "Done",
+        "bought": "Bought",
+        "generating": "Generating...",
+        "generatingShort": "Gen..."
+      },
+      "showingCount": "Showing {{count}} of {{total}} mysteries"
     },
-    "mysteryDashboard": {
-      "title": "Mysterie Dashboard",
-      "description": "Administrer dine oprettede mysterier, start nye, eller udforsk eksempelindhold.",
-      "tabs": {
-        "all": "Alle",
-        "drafts": "Kladder",
-        "purchased": "Købt",
-        "archived": "Arkiveret"
+    "stats": {
+      "totalMysteries": "Total Mysteries",
+      "completedMysteries": "Completed",
+      "purchasedMysteries": "Purchased",
+      "totalPlayers": "Total Players Hosted"
+    },
+    "backToDashboard": "Back to Dashboard",
+    "buttons": {
+      "createFirstMystery": "Create Your First Mystery"
+    },
+    "errors": {
+      "loadFailed": "Failed to load your mysteries"
+    }
+  },
+  "account": {
+    "title": "Account Settings",
+    "tabs": {
+      "profile": "Profile",
+      "security": "Security"
+    },
+    "profile": {
+      "title": "Profile Information",
+      "description": "Update your account profile information",
+      "name": "Full Name",
+      "email": "Email Address",
+      "emailNote": "Email cannot be changed",
+      "saveButton": "Save Changes",
+      "saving": "Saving...",
+      "success": "Profile updated successfully"
+    },
+    "security": {
+      "password": {
+        "title": "Change Password",
+        "description": "Update your password to keep your account secure",
+        "currentPassword": "Current Password",
+        "newPassword": "New Password",
+        "confirmPassword": "Confirm New Password",
+        "updateButton": "Update Password",
+        "updating": "Updating...",
+        "success": "Password updated successfully"
+      },
+      "deleteAccount": {
+        "title": "Delete Account",
+        "description": "Permanently delete your account and all associated data",
+        "warning": "This action cannot be undone. All your mysteries and data will be permanently deleted.",
+        "confirmText": "Type DELETE to confirm",
+        "deleteButton": "Delete Account",
+        "deleting": "Deleting...",
+        "success": "Account deleted successfully"
       }
     }
+  },
+  "mysteryCreation": {
+    "scriptType": {
+      "full": "full",
+      "pointForm": "point form",
+      "both": "both full and point form"
+    },
+    "sections": {
+      "premise": "Premise",
+      "victim": "Victim",
+      "characterList": "Character List",
+      "players": "players",
+      "murderMethod": "Murder Method"
+    },
+    "wizard": {
+      "title": "Create Your Mystery",
+      "step1": {
+        "title": "Tell Us Your Vision",
+        "description": "Describe your ideal murder mystery party"
+      },
+      "step2": {
+        "title": "Review & Refine",
+        "description": "Perfect your mystery with our AI assistant"
+      },
+      "step3": {
+        "title": "Complete Package",
+        "description": "Get everything you need to host"
+      },
+      "prompt": {
+        "defaultStart": "I want to create a murder mystery",
+        "withTheme": "The theme/setting should be {{theme}} for {{playerCount}} players with {{scriptType}} scripts",
+        "withoutTheme": "This is for {{playerCount}} players with {{scriptType}} scripts",
+        "withAccomplice": "Include an accomplice mechanism in the mystery",
+        "withoutAccomplice": "Do not include an accomplice mechanism in the mystery",
+        "additionalDetails": "Additional details include: {{details}}"
+      }
+    },
+    "editor": {
+      "title": "Mystery Editor",
+      "characters": "Characters",
+      "story": "Story",
+      "clues": "Clues",
+      "hostGuide": "Host Guide",
+      "save": "Save Draft",
+      "publish": "Complete Mystery",
+      "saving": "Saving...",
+      "publishing": "Publishing...",
+      "saved": "Draft saved",
+      "published": "Mystery completed"
+    },
+    "guidance": {
+      "describe": "Describe your mystery in detail - the more specific you are, the better we can create it for you",
+      "examples": "Try: 'A 1920s speakeasy murder mystery with 8 characters including a jazz singer, bartender, and mob boss'",
+      "playerCount": "How many players will participate?",
+      "theme": "What's the setting or theme?",
+      "special": "Any special requirements or constraints?",
+      "initialPrompt": {
+        "withTheme": "Let's create a murder mystery with a {{theme}} theme. Please guide me through creating this mystery step by step.",
+        "withoutTheme": "Let's create a murder mystery. Please guide me through creating this mystery step by step."
+      }
+    },
+    "editTitle": "Edit Mystery",
+    "createTitle": "Create New Mystery",
+    "form": {
+      "description": "Fill out the form below to generate your custom murder mystery"
+    },
+    "buttons": {
+      "generateFullMystery": "Generate Full Mystery"
+    },
+    "errors": {
+      "signInToSave": "Please sign in to save your mystery",
+      "saveFailed": "Failed to save mystery",
+      "loadFailed": "Failed to load mystery",
+      "loadMessagesFailed": "Failed to load conversation messages",
+      "loadConversationFailed": "Failed to load conversation",
+      "initialPrompt": "Please provide a prompt for your mystery",
+      "saveMessageFailed": "Failed to save message"
+    },
+    "success": {
+      "setupComplete": "Mystery setup complete! Starting chat..."
+    }
+  },
+  "mysteryForm": {
+    "userRequestLabel": "What you want to create",
+    "userRequestDescription": "Your original request from the homepage",
+    "themeLabel": "Theme/Setting Details (Optional)",
+    "themePlaceholder": "e.g., time period, setting specifics, must-have's, etc.",
+    "themeDescription": "Choose a specific theme or setting for your murder mystery",
+    "playerCountLabel": "How many players will participate?",
+    "playerCountPlaceholder": "Select number of players",
+    "playerCountItem": "{{count}} players",
+    "playerCountDescription": "Choose between 4 and 32 players for your murder mystery.",
+    "accompliceLabel": "Include Accomplice Mechanism",
+    "accompliceDescription": "Best for games with 10 or more players",
+    "scriptTypeLabel": "Script Detail Level",
+    "scriptTypeFullLabel": "Full Scripts - Complete dialogue and detailed instructions",
+    "scriptTypePointFormLabel": "Point Form - Key points and bullet summaries",
+    "scriptTypeBothLabel": "Both Formats - Full scripts AND point form notes",
+    "additionalDetailsLabel": "Additional Details (Optional)",
+    "additionalDetailsPlaceholder": "Any specific requirements, special rules, or additional context for your mystery...",
+    "additionalDetailsDescription": "Provide any extra details or special requests for your mystery",
+    "startChat": "Start AI Chat",
+    "startingChat": "Starting Chat..."
+  },
+  "supportPage": {
+    "title": "Support Center",
+    "subtitle": "Find answers to common questions, contact our support team, and get everything you need to create amazing mystery parties.",
+    "tabs": {
+      "faqs": "FAQs",
+      "contact": "Contact Us"
+    },
+    "faqs": {
+      "title": "Frequently Asked Questions",
+      "description": "Find answers to common questions about Mystery Maker",
+      "categories": {
+        "aboutMysteryMaker": "About Mystery Maker",
+        "gameMechanics": "Game Mechanics",
+        "hostingPlanning": "Hosting & Planning",
+        "accountBilling": "Account & Billing"
+      },
+      "questions": {
+        "whatIsMysteryMaker": {
+          "question": "What is Mystery Maker and how does it work?",
+          "answer": "Mystery Maker is an AI-powered platform that creates custom murder mystery parties exactly how you want them. Tell us your unique vision - any theme, characters, or setting - and our AI generates everything you need: character profiles, clues, and host materials tailored specifically for your party."
+        },
+        "creationProcess": {
+          "question": "How does the creation and purchase process work?",
+          "answer": "Simple! First, describe your ideal murder mystery and we'll create a custom preview for free. When you're happy with your mystery, purchase the complete package for $24.99. You'll instantly get everything needed to host: detailed character profiles, host guide, and all game materials."
+        },
+        "saveWork": {
+          "question": "Can I save my work and come back to it later?",
+          "answer": "Yes! All your custom mysteries are saved to your account so you can return and edit them anytime."
+        },
+        "replayable": {
+          "question": "Are these murder mysteries replayable?",
+          "answer": "Absolutely! Our mysteries include variable elements so each playthrough feels fresh, even with the same group. You can host your custom mystery as many times as you want."
+        },
+        "playerCount": {
+          "question": "How many players do I need?",
+          "answer": "Our system creates mysteries for any group size you specify - from intimate gatherings of 4-6 players to larger parties of 15+ players. Just tell us your player count and we'll design accordingly."
+        },
+        "modifyMystery": {
+          "question": "Can I modify my mystery after creating it?",
+          "answer": "Of course! Use our editor to refine and adjust your mystery until it's exactly right for your group. Change characters, themes, or complexity anytime."
+        },
+        "lastMinuteChanges": {
+          "question": "What if I need to add or remove players at the last minute?",
+          "answer": "No problem! Our flexible system allows you to adjust your player count even after creating your mystery. The AI will adapt the story and characters to accommodate these changes."
+        },
+        "whatIncluded": {
+          "question": "What's included in my custom mystery package?",
+          "answer": "Everything you need: a comprehensive host guide with step-by-step instructions, detailed character profiles for each player, clues, evidence, and all game materials. No additional preparation required."
+        },
+        "gameDuration": {
+          "question": "How long does a typical game last?",
+          "answer": "Most mysteries run 2-3 hours, but you control the pacing. Our host guide includes timing suggestions that you can adjust to fit your schedule."
+        },
+        "themedMysteries": {
+          "question": "Do you offer themed mysteries for special occasions?",
+          "answer": "We create any theme you can imagine! From classic 1920s speakeasies to space stations to fairy tale kingdoms - tell us your vision and we'll make it happen."
+        },
+        "ageRecommendation": {
+          "question": "Is there an age recommendation for your mysteries?",
+          "answer": "Our standard mysteries work great for adults and teens (13+). You can also request family-friendly themes when creating your mystery for younger players."
+        },
+        "freePreview": {
+          "question": "What's included in the free preview?",
+          "answer": "You can create unlimited mystery previews for free, including the basic story premise and character concepts. This lets you explore different ideas before purchasing."
+        },
+        "purchaseIncludes": {
+          "question": "What do I get when I purchase a mystery?",
+          "answer": "For $24.99, you receive everything needed to host: comprehensive host guide, detailed character profiles for each player, clues, evidence, and all game materials ready to use."
+        },
+        "refund": {
+          "question": "Can I get a refund if I'm not satisfied?",
+          "answer": "Absolutely! If you're not completely satisfied with your purchase, contact us within 7 days and we'll issue a full refund, no questions asked."
+        }
+      }
+    },
+    "contact": {
+      "title": "Contact Us",
+      "description": "Need more help? We're here for you",
+      "intro": "Our support team is ready to help with any questions about creating your perfect mystery party with Mystery Maker.",
+      "form": {
+        "name": "Name",
+        "email": "Email Address",
+        "subject": "Subject",
+        "message": "Message",
+        "namePlaceholder": "Your name",
+        "emailPlaceholder": "your.email@example.com",
+        "subjectPlaceholder": "What is your message about?",
+        "messagePlaceholder": "How can we help you?",
+        "sendButton": "Send Message",
+        "sending": "Sending...",
+        "success": "Thank you for contacting us! We'll get back to you within 24 hours.",
+        "error": "Failed to send message. Please try again later."
+      }
+    }
+  },
+  "chat": {
+    "title": "Murder Mystery Creator",
+    "public": "Public",
+    "private": "Private",
+    "initialGreeting": "Hello! I'm your AI development assistant. Let me help you create a murder mystery. How many players do you want for your murder mystery?",
+    "inputPlaceholder": "Type your message...",
+    "signInPrompt": "Please <1>sign in</1> to use private mode",
+    "errorResponse": "I'm having trouble responding right now. Please try again.",
+    "errorResponseWithFallback": "I'm experiencing some technical difficulties. How many players do you want for your murder mystery?",
+    "connectionErrorResponse": "I'm having trouble connecting right now. How many players do you want for your murder mystery?",
+    "placeholder": "Share your ideas for the mystery...",
+    "loadingMessages": "Loading previous messages...",
+    "errors": {
+      "responseFailed": "Failed to get AI response. Please try again.",
+      "aiUnavailable": "I apologize, but I'm having trouble responding right now. Please try again in a moment."
+    }
+  },
+  "sendToGuests": {
+    "title": "Send Character Guides to Your Guests",
+    "description": "Enter email addresses for each character to send personalized guides directly to your guests. Each guest will only receive their own character information.",
+    "status": {
+      "sent": "Sent"
+    },
+    "emailPlaceholder": "guest@example.com",
+    "buttons": {
+      "sending": "Sending...",
+      "send": "Send Character Guides"
+    },
+    "errors": {
+      "noValidEmails": "Please add at least one valid email address",
+      "sendFailed": "Failed to send some emails. Please try again."
+    },
+    "success": {
+      "sentCount": "Sent character guides to {{count}} guests"
+    }
+  },
+  "common": {
+    "buttons": {
+      "createNew": "Create New Mystery",
+      "getStarted": "Get Started",
+      "learnMore": "Learn More",
+      "tryNow": "Try Now",
+      "continue": "Continue",
+      "cancel": "Cancel",
+      "save": "Save",
+      "delete": "Delete",
+      "edit": "Edit",
+      "close": "Close",
+      "back": "Back",
+      "next": "Next",
+      "previous": "Previous",
+      "finish": "Finish",
+      "submit": "Submit",
+      "confirm": "Confirm",
+      "yes": "Yes",
+      "no": "No"
+    },
+    "labels": {
+      "loading": "Loading...",
+      "pleaseWait": "Please wait...",
+      "error": "Error",
+      "success": "Success",
+      "warning": "Warning",
+      "info": "Information",
+      "required": "Required",
+      "optional": "Optional"
+    },
+    "messages": {
+      "welcome": "Welcome!",
+      "thankYou": "Thank you!",
+      "comingSoon": "Coming Soon",
+      "notFound": "Not Found",
+      "somethingWentWrong": "Something went wrong",
+      "tryAgain": "Please try again",
+      "noResultsFound": "No results found",
+      "loadingContent": "Loading content...",
+      "savingChanges": "Saving changes...",
+      "changesSuccess": "Changes saved successfully",
+      "changesCanceled": "Changes canceled",
+      "aiThinking": "AI is thinking..."
+    },
+    "validation": {
+      "required": "This field is required",
+      "invalidEmail": "Please enter a valid email address",
+      "passwordTooShort": "Password must be at least 6 characters",
+      "passwordMismatch": "Passwords do not match",
+      "invalidFormat": "Invalid format",
+      "tooShort": "Too short",
+      "tooLong": "Too long",
+      "invalidCharacters": "Contains invalid characters"
+    },
+    "states": {
+      "draft": "Draft",
+      "inProgress": "In Progress",
+      "completed": "Completed",
+      "published": "Published",
+      "archived": "Archived",
+      "deleted": "Deleted"
+    },
+    "modals": {
+      "confirmDelete": {
+        "title": "Confirm Deletion",
+        "message": "Are you sure you want to delete this item? This action cannot be undone.",
+        "confirmButton": "Delete",
+        "cancelButton": "Cancel"
+      },
+      "unsavedChanges": {
+        "title": "Unsaved Changes",
+        "message": "You have unsaved changes. Do you want to save them before leaving?",
+        "saveButton": "Save Changes",
+        "discardButton": "Discard Changes",
+        "cancelButton": "Cancel"
+      }
+    },
+    "notifications": {
+      "welcomeBack": "Welcome back!",
+      "signedOut": "You have been signed out",
+      "sessionExpired": "Your session has expired. Please sign in again.",
+      "connectionLost": "Connection lost. Trying to reconnect...",
+      "connectionRestored": "Connection restored",
+      "updateAvailable": "A new version is available. Refresh to update.",
+      "offlineMode": "You are currently offline",
+      "deleteSuccess": "{{item}} deleted successfully",
+      "deleteFailed": "Failed to delete {{item}}",
+      "archiveSuccess": "{{item}} archived successfully",
+      "archiveFailed": "Failed to archive {{item}}",
+      "updatedSuccess": "{{item}} updated successfully",
+      "updateFailed": "Failed to update {{item}}"
+    }
+  },
+  "character": {
+    "detail": {
+      "description": "Character Description",
+      "background": "Background", 
+      "relationships": "Relationships",
+      "secrets": "Secrets",
+      "whereabouts": "Whereabouts During the Murder",
+      "introduction": "Introduction",
+      "round1": "Round 1: Initial Investigation",
+      "round2": "Round 2: Deeper Revelations", 
+      "round3": "Round 3: Final Clues",
+      "finalStatement": "Final Statement",
+      "questioningOptions": "Questioning Options",
+      "askTarget": "Ask {{target}}: \"{{question}}\""
+    },
+    "import": {
+      "title": "Mystery Characters",
+      "description": "Manage the characters in your murder mystery",
+      "importButton": "Import Characters",
+      "loading": "Loading characters...",
+      "noCharacters": "No characters yet",
+      "importPrompt": "Import character data to populate your murder mystery.",
+      "foundCount": "{{count}} characters found in database",
+      "deleteConfirm": "Are you sure you want to delete {{name}}?",
+      "deleteSuccess": "Deleted character: {{name}}",
+      "deleteFailed": "Failed to delete character",
+      "refreshSuccess": "Character list refreshed",
+      "refreshFailed": "Failed to refresh character data",
+      "loadFailed": "Failed to load character data",
+      "table": {
+        "name": "Character Name",
+        "details": "Details", 
+        "scripts": "Scripts",
+        "actions": "Actions",
+        "badges": {
+          "description": "Description",
+          "background": "Background",
+          "relationships": "Relationships",
+          "secrets": "Secrets",
+          "intro": "Intro",
+          "round1": "Round 1",
+          "round2": "Round 2", 
+          "round3": "Round 3"
+        }
+      }
+    },
+    "access": {
+      "welcome": "Welcome, {{name}}!",
+      "subtitle": "Here's your character guide for the mystery game",
+      "loading": "Loading your character...",
+      "accessDenied": "Access Denied",
+      "notFound": "Character assignment not found.",
+      "guide": {
+        "yourCharacter": "{{name}} - Your Character",
+        "yourBackground": "Your Background",
+        "yourSecret": "Your Secret", 
+        "introduction": "Introduction",
+        "rumorsYouKnow": "Rumors You Know",
+        "round1": "Round 1: Initial Statement",
+        "round2": "Round 2: Motives",
+        "round3": "Round 3: Method",
+        "questionsToAsk": "Questions to Ask",
+        "ifInnocent": "If You're Innocent:",
+        "ifGuilty": "If You're Guilty:",
+        "ifAccomplice": "If You're an Accomplice:"
+      }
+    },
+    "dialog": {
+      "title": "Import Character Data",
+      "subtitle": "Paste your character data below:",
+      "pasteButton": "Paste from Clipboard",
+      "pasteSuccess": "Text pasted from clipboard",
+      "pasteError": "Could not access clipboard. Please paste manually.",
+      "placeholder": "Paste CHARACTER GUIDE content here...",
+      "instructions": "Character data should include sections for:",
+      "sections": [
+        "CHARACTER DESCRIPTION",
+        "BACKGROUND", 
+        "RELATIONSHIPS",
+        "SECRETS",
+        "WHEREABOUTS",
+        "Round statements (ROUND 1, ROUND 2, etc.)"
+      ],
+      "importButton": "Import Characters",
+      "importing": "Importing...",
+      "cancel": "Cancel",
+      "enterData": "Please enter or paste character data",
+      "importSuccess": "Characters imported successfully",
+      "importFailed": "Failed to import character data",
+      "importError": "An unexpected error occurred during import"
+    },
+    "guestManager": {
+      "title": "Share Characters with Guests",
+      "subtitle": "Assign each character to a guest and send via email",
+      "table": {
+        "character": "Character",
+        "guestName": "Guest Name", 
+        "email": "Email",
+        "action": "Action"
+      },
+      "placeholders": {
+        "guestName": "Guest's name",
+        "email": "guest@example.com"
+      },
+      "buttons": {
+        "edit": "Edit",
+        "send": "Send",
+        "sendAll": "Send All",
+        "close": "Close"
+      },
+      "status": {
+        "sent": "Sent"
+      },
+      "assignedCount": "{{count}} characters assigned",
+      "toasts": {
+        "characterSent": "Character sent to {{name}}!",
+        "sendFailed": "Failed to send character assignment",
+        "loadFailed": "Failed to load existing assignments",
+        "updateFailed": "Failed to update assignment",
+        "noValidAssignments": "No valid assignments to send",
+        "allSent": "Sent {{count}} character assignments!",
+        "sendSomeFailed": "Failed to send some assignments"
+      }
+    },
+    "roles": {
+      "title": "Character Roles",
+      "description": "Assign the murderer role for your mystery",
+      "murderer": "Murderer",
+      "required": "Required",
+      "noneSelected": "None selected",
+      "murdererDescription": "The character who committed the murder",
+      "saveRoles": "Save Roles",
+      "saving": "Saving...",
+      "saveSuccess": "Character roles saved successfully",
+      "saveFailed": "Failed to save character roles",
+      "loadFailed": "Failed to load character data"
+    }
+  },
+  "payment": {
+    "success": {
+      "message": "Payment successful! Your purchase is complete.",
+      "verifying": "Verifying your payment...",
+      "redirecting": "Redirecting you to your mystery..."
+    }
+  },
+  "purchase": {
+    "toasts": {
+      "success": "Purchase successful! You now have full access to this mystery package.",
+      "cancel": "Purchase cancelled. You can try again when you're ready.",
+      "loadFailed": "Failed to load mystery details.",
+      "notFound": "Mystery not found.",
+      "devPurchaseSim": "Simulating purchase in dev mode...",
+      "devPurchaseSuccess": "Purchase simulated! Redirecting to generate package...",
+      "devPurchaseFailed": "Failed to simulate purchase.",
+      "signInRequired": "Please sign in to purchase this mystery.",
+      "checkoutRedirect": "Redirecting to secure checkout...",
+      "checkoutFailed": "Failed to redirect to checkout. Please try again.",
+      "genericError": "An error occurred while loading mystery details."
+    },
+    "title": "Complete Your Purchase",
+    "subtitle": "Get full access to your murder mystery package",
+    "package": {
+      "title": "Murder Mystery Package",
+      "description": "One-time purchase, instant access",
+      "priceDescription": "Complete murder mystery package with all character materials, clues, and hosting instructions.",
+      "whatsIncluded": "What's included:",
+      "includes": [
+        "Full character profiles for all suspects",
+        "Host guide with step-by-step instructions",
+        "Printable character sheets",
+        "Evidence and clue cards",
+        "Timeline of events",
+        "Solution reveal script",
+        "PDF downloads of all materials"
+      ]
+    },
+    "buttons": {
+      "processing": "Processing...",
+      "complete": "Complete Purchase",
+      "backToDesign": "Back to Mystery Design"
+    },
+    "notes": {
+      "title": "Important Notes",
+      "items": [
+        "This is a one-time purchase for this specific mystery package",
+        "You'll have permanent access to download all materials",
+        "Content is for personal use only, not for commercial redistribution",
+        "Need help? Contact our support at {{email}}"
+      ]
+    },
+    "preview": {
+      "defaultTitle": "Custom Murder Mystery",
+      "characterPlaceholder": "Character details will be revealed in the full package.",
+      "characterPlaceholderFull": "Full character description available in the purchased package.",
+      "evidencePlaceholder": "Evidence details available in the full package.",
+      "title": "Murder Mystery Preview",
+      "playersLabel": "Players",
+      "playersCount": "{{count}} Players",
+      "unknownPlayers": "Unknown # of Players",
+      "storyTitle": "Story Preview",
+      "unlockMessage": "Purchase to unlock the complete mystery package with all character details, clues, and materials.",
+      "whatsIncluded": "What's included in the full package:",
+      "packageIncludes": [
+        "Detailed host guide with complete setup instructions",
+        "Character guides for each player", 
+        "Evidence cards and printable materials",
+        "Full gameplay script and timeline"
+      ]
+    }
+  },
+  "mysteryView": {
+    "timing": {
+      "small": "5-10 minutter",
+      "medium": "15-30 minutter",
+      "large": "30-45 minutter",
+      "xlarge": "45-60 minutter"
+    }
+  },
+  "mysteryPackage": {
+    "shareWithGuests": "Share With Guests",
+    "tabs": {
+      "hostGuide": "Host Guide",
+      "characters": "Characters ({{count}})",
+      "clues": "Evidence",
+      "inspector": "Detective Guide",
+      "relationships": "Relationships"
+    },
+    "mobileTabs": {
+      "host": "Host",
+      "characters": "Characters ({{count}})",
+      "clues": "Evidence",
+      "inspector": "Detective",
+      "relations": "Relations"
+    },
+    "loading": {
+      "generating": "Generating...",
+      "generatingMessage": "Currently generating your complete mystery. This process will take around 3-5 minutes.<br />This page will automatically refresh once the mystery is complete.",
+      "characters": "Developing unique character profiles with backgrounds, motivations, and secrets for your mystery game.",
+      "clues": "Crafting evidence cards, clues, and investigative materials that will help solve your mystery.",
+      "inspector": "Writing the detective's script and investigation timeline to guide the mystery solving process.",
+      "matrix": "Building the character relationship matrix showing connections, conflicts, and hidden relationships."
+    },
+    "placeholder": {
+      "title": "Ready to Generate Your Mystery",
+      "description": "Click the button below to start generating your complete mystery package with all materials included.",
+      "button": "Generate Package",
+      "characters": "Character guides will be available after generation starts.",
+      "clues": "Evidence cards will be available after generation starts.",
+      "inspector": "Detective guide will be available after generation starts.",
+      "matrix": "Relationship matrix will be available after generation starts."
+    },
+    "matrix": {
+      "title": "Character Relationship Matrix"
+}
+  },
+  "blog": {
+    "title": "Murder Mystery Blog",
+    "subtitle": "Tips, guides, and inspiration for your next mystery party",
+    "backToHome": "Back to Home",
+    "readMore": "Read more →",
+    "minRead": "min read",
+    "publishedOn": "Published on",
+    "by": "By",
+    "relatedPosts": "Related posts",
+    "noPostsFound": "No blog posts found.",
+    "loading": "Loading...",
+    "error": "Failed to load blog posts.",
+    "errorTitle": "Error",
+    "tryAgain": "Try Again",
+    "checkBackLater": "Check back later for new articles!"
+  },
+  "chatbot": {
+    "toasts": {
+      "invalidId": "Invalid conversation ID",
+      "loadFailed": "Could not load your previous conversation",
+      "offlineMode": "Using offline mode - some features may be limited",
+      "requestError": "Error processing your request",
+      "generationSuccess": "Mystery generated successfully!",
+      "urlUnavailable": "Chatbot URL not available yet"
+    },
+    "welcomeMessage": "Welcome to the Murder Mystery Creator! Describe the type of mystery you'd like to create, or ask me for suggestions.",
+    "newConversationTitle": "New Murder Mystery",
+    "fallbackResponses": [
+      "I'd love to help you create a murder mystery. What theme or setting would you like for your mystery?",
+      "That's a great choice! Now, let's think about the victim. Who would you like the victim to be?",
+      "Interesting! Now we need some suspects. Could you describe 2-3 characters who might have motives to commit this crime?",
+      "Those are compelling suspects. Let's add some clues. What kind of evidence might be found at the scene?",
+      "Your mystery is taking shape! To continue developing the details of your story, let's think about what other elements we might include."
+    ],
+    "title": "Create Your Murder Mystery",
+    "buttons": {
+      "external": "External",
+      "openFull": "Open Full Chatbot",
+      "finalize": "Finalize",
+      "finalizeMystery": "Finalize Mystery"
+    },
+    "creatorTitle": "Murder Mystery Creator",
+    "placeholder": "Type your ideas for the murder mystery...",
+    "finalizePrompt": "When you're satisfied with your mystery, finalize it to continue."
+  },
+  "homeDashboard": {
+    "title": "Your Mysteries",
+    "searchPlaceholder": "Search mysteries...",
+    "loadMore": "Load More",
+    "loading": "Loading...",
+    "empty": {
+      "title": "You haven't created any mysteries yet",
+      "description": "Use the input box above to start creating your first murder mystery!"
+    },
+    "errors": {
+      "loadFailed": "Failed to load some mysteries. Please refresh the page."
+    }
+  },
+  "mysteryDashboard": {
+    "title": "Mystery Dashboard",
+    "description": "Manage your created mysteries, start new ones, or explore sample content.",
+    "tabs": {
+      "all": "All",
+      "drafts": "Drafts",
+      "purchased": "Purchased",
+      "archived": "Archived"
+    }
   }
+}
