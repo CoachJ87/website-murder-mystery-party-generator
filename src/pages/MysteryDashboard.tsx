@@ -256,19 +256,6 @@ const MysteryDashboard = () => {
   };
 
   const handleNavigateToCreate = () => {
-    // If user has existing mysteries, redirect to the most recent one
-    if (mysteries && mysteries.length > 0) {
-      // Find the most recently updated mystery
-      const mostRecentMystery = [...mysteries].sort((a, b) => 
-        new Date(b.updated_at || b.created_at).getTime() - new Date(a.updated_at || a.created_at).getTime()
-      )[0];
-      
-      if (mostRecentMystery && mostRecentMystery.id) {
-        navigate(`/mystery/${mostRecentMystery.id}`);
-        return;
-      }
-    }
-    // If no mysteries exist, go to create page
     navigate("/mystery/create");
   };
 
