@@ -903,39 +903,19 @@ const MysteryView = () => {
     );
   }
 
-  const shouldShowTabs = useMemo(() => {
-    // Case 1: Generation status explicitly shows completed
-    if (generationStatus?.status === 'completed') {
-      console.log("🎭 [DEBUG] Showing tabs: Generation explicitly marked as completed");
-      return true;
-    }
-    
-    // Case 2: For pre-existing mysteries, ensure we have all required data
-    if (!generating && !generationStatus) {
-      const hasAllRequiredData = (
-        mystery?.is_paid || (
-          packageData && 
-          packageData.gameOverview &&
-          packageData.hostGuide &&
-          characters.length > 0
-        )
-      );
-      
-      console.log("🎭 [DEBUG] Pre-existing mystery check:", {
-        hasPackageData: !!packageData,
-        hasGameOverview: !!packageData?.gameOverview,
-        hasHostGuide: !!packageData?.hostGuide,
-        charactersCount: characters.length,
-        mysteryPaid: mystery?.is_paid,
-        mysteryComplete: mystery?.has_complete_package,
-        result: hasAllRequiredData
-      });
-      
-      return hasAllRequiredData;
-    }
-    
-    return false;
-  }, [mystery, generationStatus, generating, packageData, characters]);
+  // Log debug info for tab visibility
+  if (mystery?.is_paid || generationStatus?.status === 'completed' || 
+      (!generating && !generationStatus && packageData && packageData.gameOverview && 
+       packageData.hostGuide && characters.length > 0)) {
+    console.log("🎭 [DEBUG] Showing tabs because:", {
+      isPaid: mystery?.is_paid,
+      generationComplete: generationStatus?.status === 'completed',
+      hasPackageData: !!packageData,
+      hasGameOverview: !!packageData?.gameOverview,
+      hasHostGuide: !!packageData?.hostGuide,
+      charactersCount: characters.length
+    });
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -948,7 +928,9 @@ const MysteryView = () => {
           "container mx-auto max-w-4xl",
           isMobile && "max-w-full"
         )}>
-          {shouldShowTabs ? (
+          {(mystery?.is_paid || generationStatus?.status === 'completed' || 
+            (!generating && !generationStatus && packageData && packageData.gameOverview && 
+             packageData.hostGuide && characters.length > 0)) ? (
             <MysteryPackageTabView 
               packageContent={packageContent || ""} 
               mysteryTitle={getMysteryTitle()}
