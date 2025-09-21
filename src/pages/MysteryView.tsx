@@ -20,6 +20,7 @@ import { MysteryCharacter } from "@/interfaces/mystery";
 import { extractTitleFromMessages } from "@/utils/titleExtraction";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface MysteryPackageData {
   title?: string;
@@ -48,6 +49,7 @@ const MysteryView = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const isMobile = useIsMobile();
+  const { t } = useTranslation();
   
   // Controlled logging and polling
   const DEBUG_MODE = process.env.NODE_ENV === 'development';
@@ -70,11 +72,11 @@ const MysteryView = () => {
   // Calculate estimated generation time based on player count
   // Note: These estimates are based on actual performance metrics
   const getEstimatedTime = useCallback((playerCount: number) => {
-    if (playerCount <= 6) return "5-10 minutes";
-    if (playerCount <= 12) return "15-30 minutes";
-    if (playerCount <= 20) return "30-45 minutes";
-    return "45-60 minutes";
-  }, []);
+    if (playerCount <= 6) return t('mysteryView.timing.small');
+    if (playerCount <= 12) return t('mysteryView.timing.medium');
+    if (playerCount <= 20) return t('mysteryView.timing.large');
+    return t('mysteryView.timing.xlarge');
+  }, [t]);
 
   // Fetch structured package data with proper error handling
   const fetchStructuredPackageData = useCallback(async () => {
@@ -940,6 +942,7 @@ const MysteryView = () => {
               isGenerating={generating}
               packageData={packageData || undefined}
               characters={characters}
+              estimatedTime={getEstimatedTime(mystery?.player_count || 6)}
             />
           ) : (
             // Show generation progress or start button

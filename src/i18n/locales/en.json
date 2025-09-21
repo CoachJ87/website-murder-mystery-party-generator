@@ -889,6 +889,14 @@
       ]
     }
   },
+  "mysteryView": {
+    "timing": {
+      "small": "5-10 minutes",
+      "medium": "15-30 minutes",
+      "large": "30-45 minutes",
+      "xlarge": "45-60 minutes"
+    }
+  },
   "mysteryPackage": {
     "shareWithGuests": "Share With Guests",
     "tabs": {

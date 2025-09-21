@@ -35,6 +35,7 @@ interface MysteryPackageTabViewProps {
   onGenerateClick?: () => void;
   packageData?: MysteryPackageData;
   characters?: MysteryCharacter[];
+  estimatedTime: string;
 }
 
 const MysteryPackageTabView = React.memo(({
@@ -45,7 +46,8 @@ const MysteryPackageTabView = React.memo(({
   conversationId,
   onGenerateClick,
   packageData,
-  characters = []
+  characters = [],
+  estimatedTime
 }: MysteryPackageTabViewProps) => {
   const [activeTab, setActiveTab] = useState("host-guide");
   const [statusMessage, setStatusMessage] = useState("Starting generation...");
@@ -359,7 +361,7 @@ const MysteryPackageTabView = React.memo(({
   }, [packageData, hostGuide, detectiveScript, evidenceCards, characters]);
 
   // Simplified loading component for individual tabs with mobile optimization
-  const LoadingTabContent = useCallback(({ message }: { message: string }) => (
+  const LoadingTabContent = useCallback(({ message, estimatedTime: loadingTime }: { message: string; estimatedTime: string }) => (
     <div className={cn(
       "loading-section",
       isMobile && "py-8"
@@ -369,22 +371,18 @@ const MysteryPackageTabView = React.memo(({
           "animate-spin text-primary",
           isMobile ? "h-6 w-6" : "h-8 w-8"
         )} />
-        <h3 className={cn(
-          "font-semibold",
-          isMobile ? "text-base" : "text-lg"
+        <div className={cn(
+          "text-muted-foreground text-center max-w-md",
+          isMobile && "text-sm px-4"
         )}>
-          {t('mysteryPackage.loading.generating')}
-        </h3>
-        <p 
-          className={cn(
-            "text-muted-foreground text-center max-w-md",
-            isMobile && "text-sm px-4"
-          )}
-          dangerouslySetInnerHTML={{ __html: message }}
-        />
+          <div dangerouslySetInnerHTML={{ __html: message }} />
+          <p className="mt-2 text-sm">
+            This typically takes {loadingTime} to complete.
+          </p>
+        </div>
       </div>
     </div>
-  ), [isMobile, t]);
+  ), [isMobile]);
 
   return (
     <div className="w-full">
@@ -467,7 +465,10 @@ const MysteryPackageTabView = React.memo(({
                 <ReactMarkdown>{hostGuide}</ReactMarkdown>
               </div>
             ) : isGenerating ? (
-              <LoadingTabContent message={t('mysteryPackage.loading.generatingMessage')} />            
+              <LoadingTabContent 
+                message={t('mysteryPackage.loading.generatingMessage')} 
+                estimatedTime={estimatedTime} 
+              />            
             ) : (
               <div className={cn(
                 "text-center py-12 space-y-4",
@@ -546,7 +547,10 @@ const MysteryPackageTabView = React.memo(({
                 })}
               </div>
             ) : isGenerating ? (
-              <LoadingTabContent message={t('mysteryPackage.loading.characters')} />
+              <LoadingTabContent 
+                message={t('mysteryPackage.loading.characters')} 
+                estimatedTime={estimatedTime} 
+              />
             ) : (
               <div className={cn(
                 "text-center py-6",
@@ -573,7 +577,10 @@ const MysteryPackageTabView = React.memo(({
                 <ReactMarkdown>{evidenceCards}</ReactMarkdown>
               </div>
             ) : isGenerating ? (
-              <LoadingTabContent message={t('mysteryPackage.loading.clues')} />
+              <LoadingTabContent 
+                message={t('mysteryPackage.loading.clues')} 
+                estimatedTime={estimatedTime} 
+              />
             ) : (
               <div className={cn(
                 "text-center py-6",
@@ -600,7 +607,10 @@ const MysteryPackageTabView = React.memo(({
                 <ReactMarkdown>{detectiveScript}</ReactMarkdown>
               </div>
             ) : isGenerating ? (
-              <LoadingTabContent message={t('mysteryPackage.loading.inspector')} />
+              <LoadingTabContent 
+                message={t('mysteryPackage.loading.inspector')} 
+                estimatedTime={estimatedTime} 
+              />
             ) : (
               <div className={cn(
                 "text-center py-6",
