@@ -446,7 +446,7 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
 
     // Log request details before making the call
     console.log("=== WEBHOOK REQUEST DEBUG ===");
-    console.log("Making request to:", "https://hook.eu2.make.com/lso1g2u34qe45p0pdyteaqkqw7o8shbp");
+    console.log("Making request to:", "https://hook.eu2.make.com/rvbxk8barcrchw5vops26fp8zqv14kxp");
     console.log("Payload size:", JSON.stringify(webhookPayload).length, "characters");
     console.log("Request headers:", { 'Content-Type': 'application/json' });
     console.log("=== END WEBHOOK REQUEST DEBUG ===");
@@ -488,7 +488,7 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
       console.log('Body:', body);
       
       try {
-        const response = await fetch("https://hook.eu2.make.com/lso1g2u34qe45p0pdyteaqkqw7o8shbp", {
+        const response = await fetch("https://hook.eu2.make.com/rvbxk8barcrchw5vops26fp8zqv14kxp", {
           method: 'POST',
           headers: headers,
           body: body as BodyInit
