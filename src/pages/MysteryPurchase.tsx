@@ -355,7 +355,7 @@ const MysteryPurchase = () => {
       const cancelUrl = `${baseUrl}/mystery/purchase/${id}?purchase=cancel`;
       
       // Add client_reference_id to pass conversation ID to Stripe
-      const stripeUrl = `https://buy.stripe.com/dRmdRa2uC2ZS3DW1gd2Nq02?prefilled_email=${encodeURIComponent(user?.email || '')}&client_reference_id=${id}&success_url=${encodeURIComponent(successUrl)}&cancel_url=${encodeURIComponent(cancelUrl)}`;
+      const stripeUrl = `https://buy.stripe.com/dRm4gAgls6c47UccYV2Nq03?prefilled_email=${encodeURIComponent(user?.email || '')}&client_reference_id=${id}&success_url=${encodeURIComponent(successUrl)}&cancel_url=${encodeURIComponent(cancelUrl)}`;
       
       // Store conversation ID in localStorage as fallback in case URL params are lost
       if (id) {

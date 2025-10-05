@@ -44,7 +44,7 @@ export default async function handler(req) {
       }
 
       // This is your Stripe Price ID
-      const price = 'price_1RAvakKgSd73ikMWLbbjRicc';
+      const price = 'price_1SD68WKgSd73ikMWtUjQBZZg';
       const productName = 'Murder Mystery Game Package';
       
       // Build proper URLs
