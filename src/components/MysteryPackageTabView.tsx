@@ -228,11 +228,11 @@ const MysteryPackageTabView = React.memo(({
     }
     
     if (packageData.materials) {
-      content += formatAsBulletedList(packageData.materials, '## MATERIALS');
+      content += `${packageData.materials}\n\n`;
     }
     
     if (packageData.preparation) {
-      content += formatAsBulletedList(packageData.preparation, '## PREPARATION');
+      content += `${packageData.preparation}\n\n`;
     }
     
     if (packageData.timeline) {
