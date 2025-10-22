@@ -30,7 +30,6 @@ import BlogIndex from "./pages/BlogIndex";
 import BlogPost from "./pages/BlogPost";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import React from "react";
-import GlobalWarningRibbon from "@/components/GlobalWarningRibbon";
 
 const queryClient = new QueryClient();
 
@@ -71,7 +70,6 @@ const App = () => (
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <GlobalWarningRibbon />
         <RouteTracker />
         <AuthProvider>
           <TooltipProvider>
