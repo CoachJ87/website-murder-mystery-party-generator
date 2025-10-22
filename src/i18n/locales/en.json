@@ -94,6 +94,9 @@
       "sentientPlantColony": "Create a murder mystery in a society of intelligent, mobile plants with a complex social hierarchy."
     }
   },
+  "videoDemo": {
+    "title": "Watch a Demo"
+  },
   "howItWorks": {
     "step1": {
       "title": "Describe your ideal murder mystery.",

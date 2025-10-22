@@ -81,7 +81,30 @@ const Index = () => {
         <div className="bg-card">
           <Hero />
         </div>
-        
+
+        {/* Video Demo Section - Only for non-authenticated users */}
+        {!isAuthenticated && (
+          <section className="py-6 sm:py-8 px-2 sm:px-4 md:px-6 lg:px-8">
+            <div className="w-full max-w-7xl mx-auto">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 sm:mb-12 text-black font-playfair">
+                {t('videoDemo.title')}
+              </h2>
+              <div className="max-w-4xl mx-auto">
+                <div className="relative pb-[56.25%] h-0">
+                  <iframe
+                    className="absolute top-0 left-0 w-full h-full rounded-lg"
+                    src="https://www.youtube.com/embed/8WInnaFHMY0"
+                    title="Watch a Demo"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
         {isAuthenticated ? (
           // Content for logged-in users
           <div className="w-full px-2 sm:px-4 md:px-6 lg:px-8">
