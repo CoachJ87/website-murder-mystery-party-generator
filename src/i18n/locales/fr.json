@@ -145,6 +145,9 @@
       "author": "Alex"
     }
   },
+  "videoDemo": {
+    "title": "Voir une démo"
+  },
   "support": {
     "title": "Besoin de plus d'aide ?",
     "description": "Visitez notre centre d'aide complet pour les questions fréquemment posées, des conseils d'hébergement et plus d'informations sur l'utilisation de Mystery Creator.",

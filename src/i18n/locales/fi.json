@@ -145,7 +145,10 @@
         "author": "Alex"
       }
     },
-    "support": {
+    "videoDemo": {
+    "title": "Katso demo"
+  },
+  "support": {
       "title": "Tarvitsetko lisää apua?",
       "description": "Vieraile kattavassa tukikeskuksessamme usein kysyttyjen kysymysten, isännöintivinkkien ja lisätietojen saamiseksi Mystery Creatorin käytöstä.",
       "button": "Vieraile tukikeskuksessa",

@@ -145,7 +145,10 @@
         "author": "Alex"
       }
     },
-    "support": {
+    "videoDemo": {
+    "title": "Assistir a uma demonstração"
+  },
+  "support": {
       "title": "Precisa de Mais Ajuda?",
       "description": "Visite nosso centro de suporte abrangente para perguntas frequentes, dicas de hospedagem e mais informações sobre como usar nosso Criador de Mistérios.",
       "button": "Visitar Centro de Suporte",

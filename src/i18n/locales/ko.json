@@ -145,6 +145,9 @@
       "author": "Alex"
     }
   },
+  "videoDemo": {
+    "title": "데모 보기"
+  },
   "support": {
     "title": "Need More Help?",
     "description": "Visit our comprehensive support center for FAQs, hosting tips, and more information about using our Mystery Maker.",

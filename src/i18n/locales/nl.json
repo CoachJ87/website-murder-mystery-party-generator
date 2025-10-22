@@ -145,7 +145,10 @@
         "author": "Alex"
       }
     },
-    "support": {
+    "videoDemo": {
+    "title": "Bekijk een demo"
+  },
+  "support": {
       "title": "Meer Hulp Nodig?",
       "description": "Bezoek ons uitgebreide supportcentrum voor veelgestelde vragen, hostingtips en meer informatie over het gebruik van onze Mystery Maker.",
       "button": "Bezoek Supportcentrum",
