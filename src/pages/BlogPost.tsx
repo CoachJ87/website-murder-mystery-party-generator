@@ -6,12 +6,11 @@ import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-// Removed i18n for now to fix TypeScript errors
+import ReactMarkdown from 'react-markdown';
 import { ArrowRight, Clock, Users, BookOpen, ChevronRight } from 'lucide-react';
-// Import i18n directly to avoid type issues
-import i18n from 'i18next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import i18n from 'i18next'; // Import i18n directly to avoid type issues
 
 const calculateReadingTime = (content: string): number => {
   const wordsPerMinute = 200;
@@ -318,7 +317,18 @@ export default function BlogPost() {
           </header>
 
           <div className="prose prose-lg max-w-none mb-12">
-            <div dangerouslySetInnerHTML={{ __html: post.content }} />
+            <ReactMarkdown
+              components={{
+                h2: ({node, ...props}) => <h2 className="text-2xl font-bold text-[#8B1538] mt-8 mb-4" {...props} />,
+                h3: ({node, ...props}) => <h3 className="text-xl font-semibold text-[#8B1538] mt-6 mb-3" {...props} />,
+                ul: ({node, ...props}) => <ul className="list-disc ml-6 mb-4 space-y-2" {...props} />,
+                li: ({node, ...props}) => <li className="text-gray-700" {...props} />,
+                strong: ({node, ...props}) => <strong className="font-semibold text-[#8B1538]" {...props} />,
+                p: ({node, ...props}) => <p className="mb-4 text-gray-700 leading-relaxed" {...props} />,
+              }}
+            >
+              {post.content}
+            </ReactMarkdown>
           </div>
 
           <div ref={ctaSectionRef}>
