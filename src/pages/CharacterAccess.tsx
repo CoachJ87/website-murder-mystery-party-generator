@@ -106,8 +106,7 @@ const CharacterAccess: React.FC = () => {
 
   const cleanMarkdownHeaders = (text: string): string => {
     return text
-      .replace(/^(#{1,6} )?(YOUR BACKGROUND|YOUR SECRET|YOUR RELATIONSHIPS|RUMORS TO SPREAD|ROUND \d+:.*|QUESTIONS TO ASK|INNOCENT RESPONSES|GUILTY RESPONSES|FINAL STATEMENT.*|ACCUSATIONS|YOUR ACCUSATION)/gm, '')
-      .replace(/^(If You're Innocent:|If You're Guilty:|If You're an Accomplice:)/gm, '')
+      .replace(/^If You're (Innocent|Guilty)( \(Final\))?:/gm, '')
       .replace(/Point form script: (•[^•]+)/g, (match, content) => {
         const items = content.split('•').filter(i => i.trim());
         return '\n' + items.map(item => `- ${item.trim()}`).join('\n');
