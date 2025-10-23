@@ -104,94 +104,105 @@ const CharacterAccess: React.FC = () => {
     }
   };
 
+  const cleanMarkdownHeaders = (text: string): string => {
+    return text
+      .replace(/^## (YOUR BACKGROUND|YOUR SECRET|YOUR RELATIONSHIPS|ROUND \d+:.*|QUESTIONS TO ASK|.*RESPONSES|FINAL STATEMENT.*|ACCUSATIONS|YOUR ACCUSATION)/gm, '')
+      .replace(/Point form script: (•[^•]+)/g, (match, content) => {
+        const items = content.split('•').filter(i => i.trim());
+        return '\n' + items.map(item => `- ${item.trim()}`).join('\n');
+      })
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+  };
+
   const buildCharacterGuideContent = (character: any): string => {
     let content = `# ${character.character_name} - Your Character\n\n`;
-    
+
     if (character.description) {
-      content += `${character.description}\n\n`;
+      content += `${cleanMarkdownHeaders(character.description)}\n\n`;
     }
-    
+
     if (character.background) {
-      content += `## Your Background\n\n${character.background}\n\n`;
+      content += `### Your Background\n\n${cleanMarkdownHeaders(character.background)}\n\n`;
     }
-    
+
     if (character.secret) {
-      content += `## Your Secret\n\n${character.secret}\n\n`;
+      content += `### Your Secret\n\n${cleanMarkdownHeaders(character.secret)}\n\n`;
     }
-    
+
     if (character.introduction) {
-      content += `## Introduction\n\n${character.introduction}\n\n`;
+      content += `### Introduction\n\n${cleanMarkdownHeaders(character.introduction)}\n\n`;
     }
-    
+
     if (character.rumors) {
-      content += `## Rumors You Know\n\n${character.rumors}\n\n`;
+      content += `### Rumors You Know\n\n${cleanMarkdownHeaders(character.rumors)}\n\n`;
     }
-    
+
     // Add round responses
     if (character.round2_questions) {
-      content += `## Round 2 Questions\n\n${character.round2_questions}\n\n`;
+      content += `### Round 2 Questions\n\n${cleanMarkdownHeaders(character.round2_questions)}\n\n`;
 
       if (character.round2_innocent) {
-        content += `**If You're Innocent:**\n${character.round2_innocent}\n\n`;
+        content += `**If You're Innocent:**\n${cleanMarkdownHeaders(character.round2_innocent)}\n\n`;
       }
 
       if (character.round2_guilty) {
-        content += `**If You're Guilty:**\n${character.round2_guilty}\n\n`;
+        content += `**If You're Guilty:**\n${cleanMarkdownHeaders(character.round2_guilty)}\n\n`;
       }
 
       if (character.round2_accomplice) {
-        content += `**If You're an Accomplice:**\n${character.round2_accomplice}\n\n`;
+        content += `**If You're an Accomplice:**\n${cleanMarkdownHeaders(character.round2_accomplice)}\n\n`;
       }
     }
 
     if (character.round3_questions) {
-      content += `## Round 3 Questions\n\n${character.round3_questions}\n\n`;
+      content += `### Round 3 Questions\n\n${cleanMarkdownHeaders(character.round3_questions)}\n\n`;
 
       if (character.round3_innocent) {
-        content += `**If You're Innocent:**\n${character.round3_innocent}\n\n`;
+        content += `**If You're Innocent:**\n${cleanMarkdownHeaders(character.round3_innocent)}\n\n`;
       }
 
       if (character.round3_guilty) {
-        content += `**If You're Guilty:**\n${character.round3_guilty}\n\n`;
+        content += `**If You're Guilty:**\n${cleanMarkdownHeaders(character.round3_guilty)}\n\n`;
       }
 
       if (character.round3_accomplice) {
-        content += `**If You're an Accomplice:**\n${character.round3_accomplice}\n\n`;
+        content += `**If You're an Accomplice:**\n${cleanMarkdownHeaders(character.round3_accomplice)}\n\n`;
       }
     }
 
     if (character.round4_questions) {
-      content += `## Round 4 Questions\n\n${character.round4_questions}\n\n`;
+      content += `### Round 4 Questions\n\n${cleanMarkdownHeaders(character.round4_questions)}\n\n`;
 
       if (character.round4_innocent) {
-        content += `**If You're Innocent:**\n${character.round4_innocent}\n\n`;
+        content += `**If You're Innocent:**\n${cleanMarkdownHeaders(character.round4_innocent)}\n\n`;
       }
 
       if (character.round4_guilty) {
-        content += `**If You're Guilty:**\n${character.round4_guilty}\n\n`;
+        content += `**If You're Guilty:**\n${cleanMarkdownHeaders(character.round4_guilty)}\n\n`;
       }
 
       if (character.round4_accomplice) {
-        content += `**If You're an Accomplice:**\n${character.round4_accomplice}\n\n`;
+        content += `**If You're an Accomplice:**\n${cleanMarkdownHeaders(character.round4_accomplice)}\n\n`;
       }
     }
-      
+
     if (character.final_innocent) {
-      content += `**If You're Innocent:**\n${character.final_innocent}\n\n`;
+      content += `**If You're Innocent (Final):**\n${cleanMarkdownHeaders(character.final_innocent)}\n\n`;
     }
-    
+
     if (character.final_guilty) {
-      content += `**If You're Guilty:**\n${character.final_guilty}\n\n`;
+      content += `**If You're Guilty (Final):**\n${cleanMarkdownHeaders(character.final_guilty)}\n\n`;
     }
-    
+
     if (character.final_accomplice) {
-      content += `**If You're an Accomplice:**\n${character.final_accomplice}\n\n`;
+      content += `**If You're an Accomplice (Final):**\n${cleanMarkdownHeaders(character.final_accomplice)}\n\n`;
     }
 
     if (character.accusations) {
-      content += `${character.accusations}\n\n`;
+      content += `${cleanMarkdownHeaders(character.accusations)}\n\n`;
     }
-    
+
     return content;
   };
 
@@ -234,7 +245,7 @@ const CharacterAccess: React.FC = () => {
             <h1 className="text-2xl font-bold">{t('character.access.welcome', { name: assignment.guest_name })}</h1>
           </div>
           <p className="text-muted-foreground">
-            {t('character.access.guide.description')}
+            View your complete character guide and game instructions below.
           </p>
         </div>
 
