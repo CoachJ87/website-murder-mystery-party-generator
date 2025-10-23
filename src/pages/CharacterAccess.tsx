@@ -18,18 +18,15 @@ interface CharacterAssignment {
     secret: string;
     introduction: string;
     rumors: string;
-    round1_statement: string;
-    round2_statement: string;
-    round3_statement: string;
     round2_questions: string;
     round3_questions: string;
-    round4_questions: string;
     round2_innocent: string;
     round2_guilty: string;
     round2_accomplice: string;
     round3_innocent: string;
     round3_guilty: string;
     round3_accomplice: string;
+    round4_questions: string;
     round4_innocent: string;
     round4_guilty: string;
     round4_accomplice: string;
@@ -66,66 +63,42 @@ const CharacterAccess: React.FC = () => {
 
     try {
       setLoading(true);
-      
-      const { data, error } = await supabase
+
+      // First, get the character assignment
+      const { data: assignmentData, error: assignmentError } = await supabase
         .from('character_assignments')
-        .select(`
-          id,
-          guest_name,
-          guest_email,
-          mystery_characters!inner (
-            character_name,
-            description,
-            background,
-            secret,
-            introduction,
-            rumors,
-            round1_statement,
-            round2_statement,
-            round3_statement,
-            round2_questions,
-            round3_questions,
-            round4_questions,
-            round2_innocent,
-            round2_guilty,
-            round2_accomplice,
-            round3_innocent,
-            round3_guilty,
-            round3_accomplice,
-            round4_innocent,
-            round4_guilty,
-            round4_accomplice,
-            final_innocent,
-            final_guilty,
-            final_accomplice,
-            relationships,
-            secrets
-          )
-        `)
+        .select('id, guest_name, guest_email, character_id')
         .eq('access_token', token)
         .eq('is_sent', true)
         .single();
 
-      if (error) {
-        if (error.code === 'PGRST116') {
-          setError('Character assignment not found or access denied. This link may be invalid or expired.');
-        } else {
-          console.error('Database error:', error);
-          setError(`Error loading character: ${error.message}`);
-        }
+      if (assignmentError) {
+        console.error('Assignment error:', assignmentError);
+        setError('Character assignment not found or access denied.');
         return;
       }
 
-      if (!data) {
-        setError('Character assignment not found');
+      // Then, get the character details
+      const { data: characterData, error: characterError } = await supabase
+        .from('mystery_characters')
+        .select('*')
+        .eq('id', assignmentData.character_id)
+        .single();
+
+      if (characterError) {
+        console.error('Character error:', characterError);
+        setError('Character data not found.');
         return;
       }
 
-      setAssignment(data);
+      // Combine the data
+      setAssignment({
+        ...assignmentData,
+        mystery_characters: characterData
+      });
     } catch (error: any) {
       console.error('Error loading character assignment:', error);
       setError(`Failed to load character: ${error.message || 'Unknown error'}`);
-      toast.error('Failed to load character assignment');
     } finally {
       setLoading(false);
     }
@@ -154,34 +127,53 @@ const CharacterAccess: React.FC = () => {
       content += `## Rumors You Know\n\n${character.rumors}\n\n`;
     }
     
-    // Add round statements and responses
-    if (character.round1_statement) {
-      content += `## Round 1: Initial Statement\n\n${character.round1_statement}\n\n`;
-    }
-    
-    if (character.round2_statement) {
-      content += `## Round 2: Motives\n\n${character.round2_statement}\n\n`;
-    
-      if (character.round2_questions) {
-        content += `### Questions to Ask\n\n${character.round2_questions}\n\n`;
-      }
-      
+    // Add round responses
+    if (character.round2_questions) {
+      content += `## Round 2 Questions\n\n${character.round2_questions}\n\n`;
+
       if (character.round2_innocent) {
         content += `**If You're Innocent:**\n${character.round2_innocent}\n\n`;
       }
-      
+
       if (character.round2_guilty) {
         content += `**If You're Guilty:**\n${character.round2_guilty}\n\n`;
       }
-      
+
       if (character.round2_accomplice) {
         content += `**If You're an Accomplice:**\n${character.round2_accomplice}\n\n`;
       }
     }
-    
-    // Continue with rounds 3 and 4...
-    if (character.round3_statement) {
-      content += `## Round 3: Method\n\n${character.round3_statement}\n\n`;
+
+    if (character.round3_questions) {
+      content += `## Round 3 Questions\n\n${character.round3_questions}\n\n`;
+
+      if (character.round3_innocent) {
+        content += `**If You're Innocent:**\n${character.round3_innocent}\n\n`;
+      }
+
+      if (character.round3_guilty) {
+        content += `**If You're Guilty:**\n${character.round3_guilty}\n\n`;
+      }
+
+      if (character.round3_accomplice) {
+        content += `**If You're an Accomplice:**\n${character.round3_accomplice}\n\n`;
+      }
+    }
+
+    if (character.round4_questions) {
+      content += `## Round 4 Questions\n\n${character.round4_questions}\n\n`;
+
+      if (character.round4_innocent) {
+        content += `**If You're Innocent:**\n${character.round4_innocent}\n\n`;
+      }
+
+      if (character.round4_guilty) {
+        content += `**If You're Guilty:**\n${character.round4_guilty}\n\n`;
+      }
+
+      if (character.round4_accomplice) {
+        content += `**If You're an Accomplice:**\n${character.round4_accomplice}\n\n`;
+      }
     }
       
     if (character.final_innocent) {
@@ -293,7 +285,7 @@ const CharacterAccess: React.FC = () => {
                   ),
                 }}
               >
-                {buildCharacterGuideContent(assignment.mystery_characters, t)}
+                {buildCharacterGuideContent(assignment.mystery_characters)}
               </ReactMarkdown>
             </div>
           </CardContent>
