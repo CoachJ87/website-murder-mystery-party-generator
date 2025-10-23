@@ -106,7 +106,8 @@ const CharacterAccess: React.FC = () => {
 
   const cleanMarkdownHeaders = (text: string): string => {
     return text
-      .replace(/^## (YOUR BACKGROUND|YOUR SECRET|YOUR RELATIONSHIPS|ROUND \d+:.*|QUESTIONS TO ASK|.*RESPONSES|FINAL STATEMENT.*|ACCUSATIONS|YOUR ACCUSATION)/gm, '')
+      .replace(/^(#{1,6} )?(YOUR BACKGROUND|YOUR SECRET|YOUR RELATIONSHIPS|RUMORS TO SPREAD|ROUND \d+:.*|QUESTIONS TO ASK|INNOCENT RESPONSES|GUILTY RESPONSES|FINAL STATEMENT.*|ACCUSATIONS|YOUR ACCUSATION)/gm, '')
+      .replace(/^(If You're Innocent:|If You're Guilty:|If You're an Accomplice:)/gm, '')
       .replace(/Point form script: (•[^•]+)/g, (match, content) => {
         const items = content.split('•').filter(i => i.trim());
         return '\n' + items.map(item => `- ${item.trim()}`).join('\n');
@@ -123,24 +124,24 @@ const CharacterAccess: React.FC = () => {
     }
 
     if (character.background) {
-      content += `### Your Background\n\n${cleanMarkdownHeaders(character.background)}\n\n`;
+      content += `${cleanMarkdownHeaders(character.background)}\n\n`;
     }
 
     if (character.secret) {
-      content += `### Your Secret\n\n${cleanMarkdownHeaders(character.secret)}\n\n`;
+      content += `${cleanMarkdownHeaders(character.secret)}\n\n`;
     }
 
     if (character.introduction) {
-      content += `### Introduction\n\n${cleanMarkdownHeaders(character.introduction)}\n\n`;
+      content += `${cleanMarkdownHeaders(character.introduction)}\n\n`;
     }
 
     if (character.rumors) {
-      content += `### Rumors You Know\n\n${cleanMarkdownHeaders(character.rumors)}\n\n`;
+      content += `${cleanMarkdownHeaders(character.rumors)}\n\n`;
     }
 
     // Add round responses
     if (character.round2_questions) {
-      content += `### Round 2 Questions\n\n${cleanMarkdownHeaders(character.round2_questions)}\n\n`;
+      content += `${cleanMarkdownHeaders(character.round2_questions)}\n\n`;
 
       if (character.round2_innocent) {
         content += `**If You're Innocent:**\n${cleanMarkdownHeaders(character.round2_innocent)}\n\n`;
@@ -156,7 +157,7 @@ const CharacterAccess: React.FC = () => {
     }
 
     if (character.round3_questions) {
-      content += `### Round 3 Questions\n\n${cleanMarkdownHeaders(character.round3_questions)}\n\n`;
+      content += `${cleanMarkdownHeaders(character.round3_questions)}\n\n`;
 
       if (character.round3_innocent) {
         content += `**If You're Innocent:**\n${cleanMarkdownHeaders(character.round3_innocent)}\n\n`;
@@ -172,7 +173,7 @@ const CharacterAccess: React.FC = () => {
     }
 
     if (character.round4_questions) {
-      content += `### Round 4 Questions\n\n${cleanMarkdownHeaders(character.round4_questions)}\n\n`;
+      content += `${cleanMarkdownHeaders(character.round4_questions)}\n\n`;
 
       if (character.round4_innocent) {
         content += `**If You're Innocent:**\n${cleanMarkdownHeaders(character.round4_innocent)}\n\n`;
