@@ -60,8 +60,8 @@ const initPromise = i18n
   .init({
     resources,
     
-    // Default language
-    lng: 'en',
+    // Default language - undefined lets detector choose
+    lng: undefined,
     
     // Configure fallback language
     fallbackLng: {
