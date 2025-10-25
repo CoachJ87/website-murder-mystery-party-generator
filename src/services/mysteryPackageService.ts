@@ -358,7 +358,6 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
         .from("mystery_packages")
         .insert({
           conversation_id: mysteryId,
-          legacy_content: "",
           generation_status: initialStatus,
           generation_started_at: new Date().toISOString(),
           created_at: new Date().toISOString(),
