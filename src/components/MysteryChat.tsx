@@ -275,13 +275,8 @@ export default function MysteryChat({
     try {
       console.log("=== Starting AI Request for Initial Response ===");
       
-      const systemPrompt = createSystemMessage({
-        theme: currentTheme,
-        playerCount: currentPlayerCount,
-        hasAccomplice: currentHasAccomplice,
-        scriptType: currentScriptType,
-        additionalDetails: currentAdditionalDetails
-      });
+      // Use null to let Edge Function use MYSTERY_FREE_PROMPT environment variable
+      const systemPrompt = null;
 
       const messagesToSend = messages.map(msg => ({
         role: msg.is_ai ? "assistant" : "user",
@@ -356,13 +351,8 @@ export default function MysteryChat({
     setIsAiTyping(true);
 
     try {
-      const systemPrompt = createSystemMessage({
-        theme: currentTheme,
-        playerCount: currentPlayerCount,
-        hasAccomplice: currentHasAccomplice,
-        scriptType: currentScriptType,
-        additionalDetails: currentAdditionalDetails
-      });
+      // Use null to let Edge Function use MYSTERY_FREE_PROMPT environment variable
+      const systemPrompt = null;
 
       const messagesToSend = newMessages.map(msg => ({
         role: msg.is_ai ? "assistant" : "user",
