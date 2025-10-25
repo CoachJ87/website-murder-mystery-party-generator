@@ -35,7 +35,7 @@ serve(async (req) => {
     // Retrieve conversation data with user_id and messages
     const { data: conversation, error: conversationError } = await supabase
       .from("conversations")
-      .select("*, messages(*), user_id, theme, player_count, script_type, has_accomplice, additional_details")
+      .select("*, messages(*), user_id, title, theme, player_count, script_type, has_accomplice")
       .eq("id", conversationId)
       .single();
 
@@ -78,7 +78,7 @@ serve(async (req) => {
         }).join("\n\n---\n\n")
       : "";
 
-    // Create complete webhook payload matching Make.com expectations
+    // Simplified payload with only essential data
     const webhookPayload = {
       userId,
       userEmail,
@@ -92,10 +92,8 @@ serve(async (req) => {
       hasAccomplice: conversation.has_accomplice || false
     };
 
-    console.log(`Sending complete payload to webhook: ${webhookUrl}`);
+    console.log(`Sending simplified payload to webhook: ${webhookUrl}`);
     console.log(`Payload size: ${JSON.stringify(webhookPayload).length} characters`);
-    console.log(`Payload fields: ${Object.keys(webhookPayload).join(', ')}`);
-    console.log(`Payload preview:`, JSON.stringify(webhookPayload, null, 2));
 
     // Check if webhook URL is configured
     if (!webhookUrl) {
