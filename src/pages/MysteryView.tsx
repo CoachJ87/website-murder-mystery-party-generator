@@ -31,7 +31,6 @@ interface MysteryPackageData {
   timeline?: string;
   hostingTips?: string;
   evidenceCards?: string;
-  relationshipMatrix?: string;
   detectiveScript?: string;
 }
 
@@ -100,7 +99,6 @@ const MysteryView = () => {
           timeline,
           hosting_tips,
           evidence_cards,
-          relationship_matrix,
           detective_script,
           id
         `)
@@ -127,7 +125,6 @@ const MysteryView = () => {
           timeline: packageData.timeline,
           hostingTips: packageData.hosting_tips,
           evidenceCards: packageData.evidence_cards,
-          relationshipMatrix: packageData.relationship_matrix,
           detectiveScript: packageData.detective_script,
         };
         
