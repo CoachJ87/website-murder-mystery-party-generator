@@ -57,6 +57,19 @@ serve(async (req) => {
       console.warn("Warning: No user_id found for conversation");
     }
 
+    // Fetch user email and name from auth
+    let userEmail = null;
+    let userName = null;
+
+    if (userId) {
+      const { data: authUser, error: authError } = await supabase.auth.admin.getUserById(userId);
+      
+      if (authUser && authUser.user) {
+        userEmail = authUser.user.email;
+        userName = authUser.user.user_metadata?.name || authUser.user.email?.split('@')[0] || 'User';
+      }
+    }
+
     // Format all messages into a concatenated string for easier parsing
     const conversationContent = conversation.messages
       ? conversation.messages.map((msg: any) => {
@@ -68,6 +81,8 @@ serve(async (req) => {
     // Simplified payload with only essential data
     const webhookPayload = {
       userId,
+      userEmail,
+      userName,
       conversationId,
       conversationContent
     };
