@@ -393,178 +393,53 @@ export async function generateCompletePackage(mysteryId: string, testMode = fals
         }))
       : [];
 
-    // Flatten the payload structure for Make.com compatibility
-    const webhookPayload = {
-      // Required parameters at root level
-      model: "claude-3-sonnet-20240229",
-      max_tokens: 4000,
-      // Provide messages as JSON string to maintain flat structure while meeting required param
-      messages: JSON.stringify(formattedMessages),
-      
-      // Flatten messages array into individual parameters
-      message_count: conversation.messages?.length || 0,
-      message_1_role: conversation.messages?.[0]?.role || "user",
-      message_1_content: conversation.messages?.[0]?.content || "",
-      message_2_role: conversation.messages?.[1]?.role || "",
-      message_2_content: conversation.messages?.[1]?.content || "",
-      
-      // All other data as flat parameters
-      userId: conversation.user_id,
-      conversationId: mysteryId,
-      callback_domain: currentDomain,
-      callback_url: `${currentDomain}/api/generation-complete`,
-      environment: process.env.NODE_ENV || 'production',
-      title: conversation.title || null,
-      content: conversationContent,
-      playerCount: conversation.player_count || null,
-      theme: conversation.theme || null,
-      scriptType: conversation.script_type || 'full',
-      hasAccomplice: conversation.has_accomplice || false,
-      testMode: testMode || false
-    };
-
-    // Debug logging of the final payload
-    console.log('=== WEBHOOK PAYLOAD DEBUG ===');
-    console.log('Payload being sent to Make.com:', JSON.stringify(webhookPayload, null, 2));
-    console.log('=== END WEBHOOK PAYLOAD ===');
-    
-    // Log individual parameter verification
-    console.log('=== PARAMETER VERIFICATION ===');
-    console.log('model exists:', 'model' in webhookPayload);
-    console.log('max_tokens exists:', 'max_tokens' in webhookPayload);
-    console.log('messages exists:', 'messages' in webhookPayload);
-    console.log('message_count:', webhookPayload.message_count);
-    console.log('message_1_role exists:', 'message_1_role' in webhookPayload);
-    console.log('message_1_content exists:', 'message_1_content' in webhookPayload);
-    console.log('=== END PARAMETER VERIFICATION ===');
-
-    // Log the final payload being sent
-    console.log('=== FINAL PAYLOAD ===');
-    console.log(JSON.stringify(webhookPayload, null, 2));
-    console.log('=== END FINAL PAYLOAD ===');
-
-    // Log request details before making the call
-    console.log("=== WEBHOOK REQUEST DEBUG ===");
-    console.log("Making request to:", "https://hook.eu2.make.com/rvbxk8barcrchw5vops26fp8zqv14kxp");
-    console.log("Payload size:", JSON.stringify(webhookPayload).length, "characters");
-    console.log("Request headers:", { 'Content-Type': 'application/json' });
-    console.log("=== END WEBHOOK REQUEST DEBUG ===");
-
-    // Helper function to send webhook with different content types
-    const sendWebhook = async (contentType: 'json' | 'form' | 'formData') => {
-      let headers: Record<string, string> = {};
-      let body: string | FormData;
-      
-      if (contentType === 'json') {
-        headers['Content-Type'] = 'application/json';
-        body = JSON.stringify(webhookPayload);
-      } else if (contentType === 'form') {
-        headers['Content-Type'] = 'application/x-www-form-urlencoded';
-        const formData = new URLSearchParams();
-        Object.entries(webhookPayload).forEach(([key, value]) => {
-          if (value !== null && value !== undefined) {
-            formData.append(key, String(value));
-          }
-        });
-        body = formData.toString();
-      } else {
-        // formData (multipart/form-data)
-        const formData = new FormData();
-        Object.entries(webhookPayload).forEach(([key, value]) => {
-          if (value !== null && value !== undefined) {
-            if (typeof value === 'object' && !(value instanceof File)) {
-              formData.append(key, JSON.stringify(value));
-            } else {
-              formData.append(key, value as any);
-            }
-          }
-        });
-        body = formData;
-      }
-
-      console.log(`=== SENDING WEBHOOK (${contentType}) ===`);
-      console.log('Headers:', headers);
-      console.log('Body:', body);
-      
-      try {
-        const response = await fetch("https://hook.eu2.make.com/rvbxk8barcrchw5vops26fp8zqv14kxp", {
-          method: 'POST',
-          headers: headers,
-          body: body as BodyInit
-        });
-        
-        console.log(`=== WEBHOOK RESPONSE (${contentType}) ===`);
-        console.log('Status:', response.status, response.statusText);
-        console.log('Headers:', Object.fromEntries(response.headers.entries()));
-        
-        const responseText = await response.text();
-        console.log('Response:', responseText);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status} - ${responseText}`);
+    // Call Supabase Edge Function instead of direct webhook
+    console.log("Calling mystery-webhook-trigger Edge Function");
+    const { data: webhookResponse, error: webhookError } = await supabase.functions.invoke(
+      'mystery-webhook-trigger',
+      {
+        body: {
+          conversationId: mysteryId,
+          testMode: testMode
         }
-        
-        return { success: true, response: responseText };
-      } catch (error) {
-        console.error(`Webhook error (${contentType}):`, error);
-        return { 
-          success: false, 
-          error: error instanceof Error ? error.message : String(error),
-          contentType
-        };
       }
-    };
-    
-    // Try different content types in sequence
-    const contentTypes = ['json', 'form', 'formData'] as const;
-    let lastError: Error | string = '';
-    
-    for (const contentType of contentTypes) {
-      console.log(`\n=== TRYING CONTENT TYPE: ${contentType} ===`);
-      const result = await sendWebhook(contentType);
-      
-      if (result.success) {
-        console.log(`✓ Successfully sent with ${contentType}`);
-        // Update status to indicate webhook was sent successfully
-        await supabase
-          .from("mystery_packages")
-          .update({
-            generation_status: {
-              status: 'in_progress',
-              progress: 20,
-              currentStep: 'Processing by external service...'
-            },
-            updated_at: new Date().toISOString()
-          })
-          .eq("id", packageId);
-          
-        return "Package generation started successfully";
-      } else {
-        lastError = result.error || 'Unknown error';
-        console.warn(`✗ Failed with ${contentType}:`, lastError);
-      }
+    );
+
+    if (webhookError) {
+      console.error("Edge Function error:", webhookError);
+
+      // Update status to failed
+      await supabase
+        .from("mystery_packages")
+        .update({
+          generation_status: {
+            status: 'failed',
+            progress: 0,
+            currentStep: 'Failed to trigger generation',
+            error: webhookError.message,
+            resumable: true
+          },
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", packageId);
+
+      throw new Error(`Failed to trigger generation: ${webhookError.message}`);
     }
-    
-    // If we get here, all content types failed
-    console.error("=== ALL WEBHOOK ATTEMPTS FAILED ===");
-    console.error("Last error:", lastError);
-    
-    // Update status to failed
+
+    console.log("Edge Function response:", webhookResponse);
+
+    // Update status to indicate webhook was sent successfully
     await supabase
       .from("mystery_packages")
       .update({
         generation_status: {
-          status: 'failed',
-          progress: 0,
-          currentStep: 'Failed to send to external service',
-          error: String(lastError),
-          resumable: true
+          status: 'in_progress',
+          progress: 20,
+          currentStep: 'Processing by external service...'
         },
         updated_at: new Date().toISOString()
       })
       .eq("id", packageId);
-      
-    throw new Error(`All webhook attempts failed. Last error: ${lastError}`);
   } catch (e) {
     console.error("Unexpected error in generateCompletePackage:", e);
     
