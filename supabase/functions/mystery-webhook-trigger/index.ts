@@ -90,10 +90,10 @@ serve(async (req) => {
     const webhookPayload = {
       model: "claude-sonnet-4-20250514",
       max_tokens: 4000,
-      messages: JSON.stringify(conversation.messages.map((msg: any) => ({
+      messages: conversation.messages.map((msg: any) => ({
         role: msg.role,
         content: msg.content
-      }))),
+      })),
       message_count: conversation.messages.length,
       ...messageFields,
       userId,
