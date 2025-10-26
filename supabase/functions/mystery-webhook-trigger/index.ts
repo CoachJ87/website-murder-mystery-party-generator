@@ -5,7 +5,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 // Configure CORS headers
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "*",
 };
 
 // Initialize Supabase client with environment variables
@@ -79,17 +79,37 @@ serve(async (req) => {
       : "";
 
     // Simplified payload with only essential data
+    // Build individual message fields for Make.com
+    const messageFields: any = {};
+    conversation.messages.forEach((msg: any, index: number) => {
+      const msgNum = index + 1;
+      messageFields[`message_${msgNum}_role`] = msg.role;
+      messageFields[`message_${msgNum}_content`] = msg.content;
+    });
+
     const webhookPayload = {
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 4000,
+      messages: JSON.stringify(conversation.messages.map((msg: any) => ({
+        role: msg.role,
+        content: msg.content
+      }))),
+      message_count: conversation.messages.length,
+      ...messageFields,
       userId,
       userEmail,
       userName,
       conversationId,
-      conversationContent,
-      title: conversation.title || null,
+      callback_domain: testMode ? "http://localhost:5173" : "https://www.mysterymaker.party",
+      callback_url: testMode ? "http://localhost:5173/api/generation-complete" : "https://www.mysterymaker.party/api/generation-complete",
+      environment: testMode ? "development" : "production",
+      title: conversation.title || `Mystery - ${conversation.player_count} Players`,
       playerCount: conversation.player_count || null,
       theme: conversation.theme || null,
       scriptType: conversation.script_type || 'full',
-      hasAccomplice: conversation.has_accomplice || false
+      hasAccomplice: conversation.has_accomplice || false,
+      testMode,
+      conversationContent
     };
 
     console.log(`Sending simplified payload to webhook: ${webhookUrl}`);

@@ -200,6 +200,37 @@ const MysteryView = () => {
            "Mystery Package";
   }, [extractedTitle, mystery]);
 
+  // Save extracted title to database when available
+  useEffect(() => {
+    const updateMysteryTitle = async () => {
+      if (!mystery?.id) return;
+
+      const aiGeneratedTitle = extractedTitle();
+
+      // Only update if we have a valid extracted title
+      if (!aiGeneratedTitle) return;
+
+      // Only update if current title is the default format
+      const isDefaultTitle = mystery.title?.includes(' - ') && mystery.title?.includes('Players');
+      if (!isDefaultTitle) return;
+
+      console.log('🏷️ Updating mystery title to:', aiGeneratedTitle);
+
+      const { error } = await supabase
+        .from('conversations')
+        .update({ title: aiGeneratedTitle })
+        .eq('id', mystery.id);
+
+      if (error) {
+        console.error('Failed to update mystery title:', error);
+      } else {
+        console.log('✅ Mystery title updated successfully');
+      }
+    };
+
+    updateMysteryTitle();
+  }, [mystery?.id, mystery?.title, extractedTitle, messages]);
+
   // Resume generation handler
   const handleResumeGeneration = useCallback(async () => {
     if (!id) {
