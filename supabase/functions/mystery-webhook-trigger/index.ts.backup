@@ -154,19 +154,14 @@ serve(async (req) => {
 
     // Parse webhook response data
     let responseData;
-    const contentType = webhookResponse.headers.get('content-type');
     try {
-      if (contentType && contentType.includes('application/json')) {
-        responseData = await webhookResponse.json();
-        console.log("Webhook response data:", responseData);
-      } else {
-        const textResponse = await webhookResponse.text();
-        console.log("Webhook text response:", textResponse);
-        responseData = { rawResponse: textResponse };
-      }
-    } catch (error) {
-      console.warn("Error parsing webhook response:", error);
-      responseData = { error: "Could not parse response" };
+      responseData = await webhookResponse.json();
+      console.log("Webhook response data:", responseData);
+    } catch (jsonError) {
+      console.warn("Could not parse webhook response as JSON:", jsonError);
+      const textResponse = await webhookResponse.text();
+      console.log("Webhook text response:", textResponse);
+      responseData = { rawResponse: textResponse };
     }
 
     // Update conversation to mark it as processed
