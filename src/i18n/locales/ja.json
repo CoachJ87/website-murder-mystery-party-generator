@@ -1,19 +1,19 @@
 {
   "navigation": {
     "home": "Home",
-    "dashboard": "Dashboard",
+    "dashboard": "ダッシュボード",
     "signIn": "Sign In",
     "signUp": "Sign Up",
-    "signOut": "Sign Out",
+    "signOut": "サインアウト",
     "account": "Account Settings",
     "support": "サポート"
   },
   "hero": {
-    "title": "Create Murder Mystery Parties in Minutes",
-    "subtitle": "Design custom mysteries exactly how you want them - any theme, any characters, any setting.",
-    "subtitleAuth": "Design custom mysteries exactly how you want them - any theme, any characters, any setting.",
-    "placeholder": "A 1920s speakeasy murder mystery with jazz musicians...",
-    "placeholderAuth": "A 1920s speakeasy murder mystery with jazz musicians...",
+    "title": "数分で殺人ミステリーパーティーを作成",
+    "subtitle": "お好みのテーマ、キャラクター、設定でカスタムミステリーをデザイン。",
+    "subtitleAuth": "お好みのテーマ、キャラクター、設定でカスタムミステリーをデザイン。",
+    "placeholder": "1920年代の酒場でジャズミュージシャンが登場する殺人ミステリー...",
+    "placeholderAuth": "1920年代の酒場でジャズミュージシャンが登場する殺人ミステリー...",
     "themes": {
       "1920sSpeakeasy": "1920s Speakeasy",
       "hollywoodMurder": "Hollywood Murder",
@@ -97,799 +97,815 @@
   },
   "howItWorks": {
     "step1": {
-      "title": "Describe your ideal murder mystery.",
-      "description": "Tell us your unique vision - any theme, characters, or setting you want."
+      "title": "理想的な殺人ミステリーを説明してください。",
+      "description": "お好みのテーマ、キャラクター、設定など、独自のビジョンをお聞かせください。"
     },
     "step2": {
-      "title": "We create your custom mystery instantly.",
-      "description": "Our AI generates everything exactly how you want it - characters, clues, and story."
+      "title": "カスタムミステリーを即座に作成します。",
+      "description": "AIがお望み通りに、キャラクター、手がかり、ストーリーをすべて生成します。"
     },
     "step3": {
-      "title": "Perfect your mystery with our editor.",
-      "description": "Refine and adjust until your mystery is exactly right for your group."
+      "title": "エディターでミステリーを完成させます。",
+      "description": "グループに完璧になるまで、改良と調整を行います。"
     },
     "step4": {
-      "title": "Get everything you need to host and share.",
-      "description": "Download and easily share all materials with your players."
+      "title": "ホストと共有に必要なすべてを入手。",
+      "description": "すべての資料をダウンロードし、プレイヤーと簡単に共有できます。"
     }
   },
   "features": {
-    "title": "Everything You Need Included",
+    "title": "必要なものすべてが含まれています",
     "step1": {
-      "step": "Step 1",
-      "title": "Unlimited Customization",
-      "content": "Any theme, any characters, any setting - create mysteries exactly how you envision them."
+      "step": "ステップ 1",
+      "title": "無制限のカスタマイズ",
+      "content": "お好みのテーマ、キャラクター、設定 - 思い描く通りにミステリーを作成できます。"
     },
     "step2": {
-      "step": "Step 2",
-      "title": "Complete Character Profiles",
-      "content": "Detailed backgrounds, motivations, and secrets tailored specifically for your mystery."
+      "step": "ステップ 2",
+      "title": "完全なキャラクタープロフィール",
+      "content": "ミステリー専用に作成された詳細な背景、動機、秘密。"
     },
     "step3": {
-      "step": "Step 3",
-      "title": "Easy Host Guide",
-      "content": "Step-by-step instructions to run your custom mystery with confidence."
+      "step": "ステップ 3",
+      "title": "簡単なホストガイド",
+      "content": "カスタムミステリーを自信を持って実行するためのステップバイステップの手順。"
     }
   },
   "testimonials": {
-    "title": "What Others Are Saying",
+    "title": "利用者の声",
     "testimonial1": {
-      "text": "My friends and I still talk about our murder mystery night. The characters were so detailed and the plot twists were perfect!",
-      "author": "Jed"
+      "text": "友人たちと私は今でも殺人ミステリーナイトについて話しています。キャラクターはとても詳細で、プロットのひねりは完璧でした！",
+      "author": "ジェド"
     },
     "testimonial2": {
-      "text": "So easy to set up! I was worried about hosting for 12 people, but the materials made it simple and everyone had a blast.",
-      "author": "Laura"
+      "text": "とても簡単にセットアップできました！12人のホスティングを心配していましたが、資料のおかげで簡単で、みんな大喜びでした。",
+      "author": "ローラ"
     },
     "testimonial3": {
-      "text": "Third murder mystery party using this service and they keep getting better. The customization options are amazing.",
-      "author": "Alex"
+      "text": "このサービスを使った3回目の殺人ミステリーパーティーで、どんどん良くなっています。カスタマイズオプションが素晴らしいです。",
+      "author": "アレックス"
     }
   },
   "videoDemo": {
     "title": "デモを見る"
   },
   "support": {
-    "title": "Need More Help?",
-    "description": "Visit our comprehensive support center for FAQs, hosting tips, and more information about using our Mystery Maker.",
-    "button": "Visit Support Center",
+    "title": "さらにサポートが必要ですか？",
+    "description": "FAQ、ホスティングのヒント、Mystery Makerの使用に関する詳細情報については、包括的なサポートセンターをご覧ください。",
+    "button": "サポートセンターを訪問",
     "email": "support@mysterymaker.party"
   },
   "footer": {
-    "tagline": "Craft captivating murder mysteries at the speed of imagination.",
-    "quickLinks": "Quick Links",
-    "company": "Company",
+    "tagline": "想像のスピードで魅惑的な殺人ミステリーを作成。",
+    "quickLinks": "クイックリンク",
+    "company": "会社",
     "links": {
-      "home": "Home",
-      "support": "Support",
-      "contact": "Contact",
-      "privacy": "Privacy Policy"
+      "home": "ホーム",
+      "support": "サポート",
+      "contact": "お問い合わせ",
+      "privacy": "プライバシーポリシー"
     },
     "copyright": "Mystery Maker, Inc. All rights reserved."
   },
   "auth": {
     "signIn": {
-      "title": "Welcome Back",
-      "subtitle": "Sign in to your account to continue creating amazing mysteries",
-      "email": "Email Address",
-      "password": "Password",
-      "rememberMe": "Remember me",
-      "forgotPassword": "Forgot your password?",
-      "noAccount": "Don't have an account?",
-      "signUpLink": "Sign up here",
-      "submitButton": "Sign In",
-      "signingIn": "Signing in...",
-      "orDivider": "or continue with",
-      "googleButton": "Continue with Google"
+      "title": "お帰りなさい",
+      "subtitle": "アカウントにサインインして、素晴らしいミステリーの作成を続けてください",
+      "email": "メールアドレス",
+      "password": "パスワード",
+      "rememberMe": "ログイン状態を保持",
+      "forgotPassword": "パスワードをお忘れですか？",
+      "noAccount": "アカウントをお持ちでないですか？",
+      "signUpLink": "こちらで登録",
+      "submitButton": "サインイン",
+      "signingIn": "サインイン中...",
+      "orDivider": "または次の方法で続行",
+      "googleButton": "Googleで続行"
     },
     "signUp": {
-      "title": "Create Your Account",
-      "subtitle": "Join thousands of mystery makers and start creating today",
-      "name": "Full Name",
-      "email": "Email Address",
-      "password": "Password",
-      "confirmPassword": "Confirm Password",
-      "terms": "I agree to the",
-      "termsLink": "Terms of Service",
-      "privacy": "Privacy Policy",
-      "and": "and",
-      "hasAccount": "Already have an account?",
-      "signInLink": "Sign in here",
-      "submitButton": "Create Account",
-      "creatingAccount": "Creating account...",
-      "orDivider": "or continue with",
-      "googleButton": "Continue with Google"
+      "title": "アカウントを作成",
+      "subtitle": "数千人のミステリーメーカーに参加して、今日から作成を始めましょう",
+      "name": "氏名",
+      "email": "メールアドレス",
+      "password": "パスワード",
+      "confirmPassword": "パスワードを確認",
+      "terms": "同意します",
+      "termsLink": "利用規約",
+      "privacy": "プライバシーポリシー",
+      "and": "および",
+      "hasAccount": "すでにアカウントをお持ちですか？",
+      "signInLink": "こちらでサインイン",
+      "submitButton": "アカウントを作成",
+      "creatingAccount": "アカウント作成中...",
+      "orDivider": "または次の方法で続行",
+      "googleButton": "Googleで続行"
     },
     "forgotPassword": {
-      "title": "Reset Your Password",
-      "subtitle": "Enter your email address and we'll send you a link to reset your password",
-      "email": "Email Address",
-      "submitButton": "Send Reset Link",
-      "sending": "Sending...",
-      "backToSignIn": "Back to sign in",
+      "title": "パスワードをリセット",
+      "subtitle": "メールアドレスを入力すると、パスワードリセット用のリンクをお送りします",
+      "email": "メールアドレス",
+      "submitButton": "リセットリンクを送信",
+      "sending": "送信中...",
+      "backToSignIn": "サインインに戻る",
       "checkEmail": {
-        "title": "Check Your Email",
-        "message": "We've sent a password reset link to",
-        "noEmail": "Didn't receive an email?",
-        "tryAgain": "Try again",
-        "returnToSignIn": "Return to Sign In"
+        "title": "メールを確認してください",
+        "message": "パスワードリセット用のリンクを送信しました",
+        "noEmail": "メールが届きませんでしたか？",
+        "tryAgain": "再試行",
+        "returnToSignIn": "サインインに戻る"
       }
     },
     "resetPassword": {
-      "title": "Set New Password",
-      "subtitle": "Create a new password for your account",
-      "password": "New Password",
-      "confirmPassword": "Confirm New Password",
-      "submitButton": "Update Password",
-      "updating": "Updating...",
-      "success": "Password updated successfully"
+      "title": "新しいパスワードを設定",
+      "subtitle": "アカウントの新しいパスワードを作成してください",
+      "password": "新しいパスワード",
+      "confirmPassword": "新しいパスワードを確認",
+      "submitButton": "パスワードを更新",
+      "updating": "更新中...",
+      "success": "パスワードが正常に更新されました"
     },
     "errors": {
-      "invalidCredentials": "Invalid email or password",
-      "emailAlreadyExists": "An account with this email already exists",
-      "weakPassword": "Password must be at least 6 characters",
-      "passwordMismatch": "Passwords do not match",
-      "invalidEmail": "Please enter a valid email address",
-      "requiredField": "This field is required",
-      "termsRequired": "You must accept the terms of service",
-      "networkError": "Network error. Please try again.",
-      "unknownError": "Something went wrong. Please try again."
+      "invalidCredentials": "メールアドレスまたはパスワードが無効です",
+      "emailAlreadyExists": "このメールアドレスのアカウントは既に存在します",
+      "weakPassword": "パスワードは6文字以上である必要があります",
+      "passwordMismatch": "パスワードが一致しません",
+      "invalidEmail": "有効なメールアドレスを入力してください",
+      "requiredField": "この項目は必須です",
+      "termsRequired": "利用規約に同意する必要があります",
+      "networkError": "ネットワークエラーです。もう一度お試しください。",
+      "unknownError": "問題が発生しました。もう一度お試しください。"
     },
     "success": {
-      "accountCreated": "Account created successfully! Please check your email to verify your account.",
-      "passwordReset": "Password reset email sent successfully",
-      "passwordUpdated": "Password updated successfully",
-      "signedOut": "Signed out successfully"
+      "accountCreated": "アカウントが正常に作成されました！メールを確認してアカウントを認証してください。",
+      "passwordReset": "パスワードリセットメールが正常に送信されました",
+      "passwordUpdated": "パスワードが正常に更新されました",
+      "signedOut": "正常にサインアウトしました"
     }
   },
   "dashboard": {
-    "title": "Your Murder Mysteries",
-    "subtitle": "View, edit and manage all your created mysteries",
+    "title": "あなたの殺人ミステリー",
+    "subtitle": "作成したすべてのミステリーを表示、編集、管理",
     "welcome": {
-      "title": "Welcome back",
-      "subtitle": "Ready to create your next mystery masterpiece?",
-      "noMysteries": "You haven't created any mysteries yet",
-      "getStarted": "Get started by creating your first mystery"
+      "title": "お帰りなさい",
+      "subtitle": "次のミステリー傑作を作成する準備はできていますか？",
+      "noMysteries": "まだミステリーを作成していません",
+      "getStarted": "最初のミステリーを作成して始めましょう"
     },
     "mysteries": {
-      "title": "Your Mysteries",
-      "searchPlaceholder": "Search mysteries...",
-      "deleteSuccess": "Mystery moved to archive",
-      "deleteFailed": "Failed to archive mystery",
+      "title": "あなたのミステリー",
+      "searchPlaceholder": "ミステリーを検索...",
+      "deleteSuccess": "ミステリーをアーカイブに移動しました",
+      "deleteFailed": "ミステリーのアーカイブに失敗しました",
       "filter": {
-        "all": "All Mysteries",
-        "drafts": "Drafts",
-        "completed": "Completed",
-        "purchased": "Purchased",
-        "archived": "Archived"
+        "all": "すべてのミステリー",
+        "drafts": "下書き",
+        "completed": "完了",
+        "purchased": "購入済み",
+        "archived": "アーカイブ済み"
       },
       "empty": {
-        "title": "No mysteries found",
-        "description": "Create your first mystery to get started",
-        "searchResult": "No mysteries match your search"
+        "title": "ミステリーが見つかりません",
+        "description": "最初のミステリーを作成して始めましょう",
+        "searchResult": "検索に一致するミステリーがありません"
       },
       "card": {
-        "players": "{{count}} players",
-        "created": "Created",
-        "lastEdited": "Last edited",
-        "theme": "Theme: {{theme}}",
+        "players": "{{count}}人のプレイヤー",
+        "created": "作成日",
+        "lastEdited": "最終編集日",
+        "theme": "テーマ: {{theme}}",
         "actions": {
-          "view": "View",
-          "chat": "Chat",
-          "delete": "Delete",
-          "viewProgress": "View Progress",
-          "progress": "Progress",
-          "editMystery": "Edit Mystery",
-          "edit": "Edit",
-          "archive": "Archive",
-          "deleteTitle": "Delete"
+          "view": "表示",
+          "chat": "チャット",
+          "delete": "削除",
+          "viewProgress": "進捗を表示",
+          "progress": "進捗",
+          "editMystery": "ミステリーを編集",
+          "edit": "編集",
+          "archive": "アーカイブ",
+          "deleteTitle": "削除"
         },
         "deleteDialog": {
-          "title": "Delete Mystery",
-          "description": "Are you sure you want to delete this mystery? This action cannot be undone."
+          "title": "ミステリーを削除",
+          "description": "このミステリーを削除してもよろしいですか？この操作は元に戻せません。"
         },
-        "generationInProgress": "Generation in progress...",
-        "editedDate": "Edited {{date}}"
+        "generationInProgress": "生成中...",
+        "editedDate": "{{date}}に編集"
       },
       "status": {
-        "completed": "Completed",
-        "draft": "Draft",
-        "purchased": "Purchased",
-        "unknown": "Unknown",
-        "done": "Done",
-        "bought": "Bought",
-        "generating": "Generating...",
-        "generatingShort": "Gen..."
+        "completed": "完了",
+        "draft": "下書き",
+        "purchased": "購入済み",
+        "unknown": "不明",
+        "done": "完了",
+        "bought": "購入済み",
+        "generating": "生成中...",
+        "generatingShort": "生成..."
       },
-      "showingCount": "Showing {{count}} of {{total}} mysteries"
+      "showingCount": "{{total}}件中{{count}}件のミステリーを表示"
     },
     "stats": {
-      "totalMysteries": "Total Mysteries",
-      "completedMysteries": "Completed",
-      "purchasedMysteries": "Purchased",
-      "totalPlayers": "Total Players Hosted"
+      "totalMysteries": "総ミステリー数",
+      "completedMysteries": "完了",
+      "purchasedMysteries": "購入済み",
+      "totalPlayers": "ホストした総プレイヤー数"
     },
-    "backToDashboard": "Back to Dashboard",
+    "backToDashboard": "ダッシュボードに戻る",
     "buttons": {
-      "createFirstMystery": "Create Your First Mystery"
+      "createFirstMystery": "最初のミステリーを作成"
     },
     "errors": {
-      "loadFailed": "Failed to load your mysteries"
+      "loadFailed": "ミステリーの読み込みに失敗しました"
     }
   },
   "account": {
-    "title": "Account Settings",
+    "title": "アカウント設定",
     "tabs": {
-      "profile": "Profile",
-      "security": "Security"
+      "profile": "プロフィール",
+      "security": "セキュリティ"
     },
     "profile": {
-      "title": "Profile Information",
-      "description": "Update your account profile information",
-      "name": "Full Name",
-      "email": "Email Address",
-      "emailNote": "Email cannot be changed",
-      "saveButton": "Save Changes",
-      "saving": "Saving...",
-      "success": "Profile updated successfully"
+      "title": "プロフィール情報",
+      "description": "アカウントのプロフィール情報を更新",
+      "name": "氏名",
+      "email": "メールアドレス",
+      "emailNote": "メールアドレスは変更できません",
+      "saveButton": "変更を保存",
+      "saving": "保存中...",
+      "success": "プロフィールが正常に更新されました"
     },
     "security": {
       "password": {
-        "title": "Change Password",
-        "description": "Update your password to keep your account secure",
-        "currentPassword": "Current Password",
-        "newPassword": "New Password",
-        "confirmPassword": "Confirm New Password",
-        "updateButton": "Update Password",
-        "updating": "Updating...",
-        "success": "Password updated successfully"
+        "title": "パスワードを変更",
+        "description": "アカウントのセキュリティを保つためにパスワードを更新",
+        "currentPassword": "現在のパスワード",
+        "newPassword": "新しいパスワード",
+        "confirmPassword": "新しいパスワードを確認",
+        "updateButton": "パスワードを更新",
+        "updating": "更新中...",
+        "success": "パスワードが正常に更新されました"
       },
       "deleteAccount": {
-        "title": "Delete Account",
-        "description": "Permanently delete your account and all associated data",
-        "warning": "This action cannot be undone. All your mysteries and data will be permanently deleted.",
-        "confirmText": "Type DELETE to confirm",
-        "deleteButton": "Delete Account",
-        "deleting": "Deleting...",
-        "success": "Account deleted successfully"
+        "title": "アカウントを削除",
+        "description": "アカウントと関連するすべてのデータを完全に削除",
+        "warning": "この操作は元に戻せません。すべてのミステリーとデータが完全に削除されます。",
+        "confirmText": "確認のため「DELETE」と入力してください",
+        "deleteButton": "アカウントを削除",
+        "deleting": "削除中...",
+        "success": "アカウントが正常に削除されました"
       }
     }
   },
   "mysteryCreation": {
     "scriptType": {
-      "full": "full",
-      "pointForm": "point form",
-      "both": "both full and point form"
+      "full": "フルスクリプト",
+      "pointForm": "要点形式",
+      "both": "フルスクリプトと要点形式の両方"
     },
     "sections": {
-      "premise": "Premise",
-      "victim": "Victim",
-      "characterList": "Character List",
-      "players": "players",
-      "murderMethod": "Murder Method"
+      "premise": "前提",
+      "victim": "被害者",
+      "characterList": "キャラクターリスト",
+      "players": "プレイヤー",
+      "murderMethod": "殺害方法"
     },
     "wizard": {
-      "title": "Create Your Mystery",
+      "title": "ミステリーを作成",
       "step1": {
-        "title": "Tell Us Your Vision",
-        "description": "Describe your ideal murder mystery party"
+        "title": "ビジョンをお聞かせください",
+        "description": "理想的な殺人ミステリーパーティーを説明してください"
       },
       "step2": {
-        "title": "Review & Refine",
-        "description": "Perfect your mystery with our AI assistant"
+        "title": "レビューと改良",
+        "description": "AIアシスタントでミステリーを完成させます"
       },
       "step3": {
-        "title": "Complete Package",
-        "description": "Get everything you need to host"
+        "title": "完全パッケージ",
+        "description": "ホストに必要なすべてを入手"
       },
       "prompt": {
-        "defaultStart": "I want to create a murder mystery",
-        "withTheme": "The theme/setting should be {{theme}} for {{playerCount}} players with {{scriptType}} scripts",
-        "withoutTheme": "This is for {{playerCount}} players with {{scriptType}} scripts",
-        "withAccomplice": "Include an accomplice mechanism in the mystery",
-        "withoutAccomplice": "Do not include an accomplice mechanism in the mystery",
-        "additionalDetails": "Additional details include: {{details}}"
+        "defaultStart": "殺人ミステリーを作成したいです",
+        "withTheme": "テーマ/設定は{{theme}}で、{{playerCount}}人のプレイヤー向け、{{scriptType}}スクリプトです",
+        "withoutTheme": "これは{{playerCount}}人のプレイヤー向け、{{scriptType}}スクリプトです",
+        "withAccomplice": "ミステリーに共犯者メカニズムを含める",
+        "withoutAccomplice": "ミステリーに共犯者メカニズムを含めない",
+        "additionalDetails": "追加の詳細には次のものが含まれます: {{details}}"
       }
     },
     "editor": {
-      "title": "Mystery Editor",
-      "characters": "Characters",
-      "story": "Story",
-      "clues": "Clues",
-      "hostGuide": "Host Guide",
-      "save": "Save Draft",
-      "publish": "Complete Mystery",
-      "saving": "Saving...",
-      "publishing": "Publishing...",
-      "saved": "Draft saved",
-      "published": "Mystery completed"
+      "title": "ミステリーエディター",
+      "characters": "キャラクター",
+      "story": "ストーリー",
+      "clues": "手がかり",
+      "hostGuide": "ホストガイド",
+      "save": "下書きを保存",
+      "publish": "ミステリーを完成",
+      "saving": "保存中...",
+      "publishing": "公開中...",
+      "saved": "下書きが保存されました",
+      "published": "ミステリーが完成しました"
     },
     "guidance": {
-      "describe": "Describe your mystery in detail - the more specific you are, the better we can create it for you",
-      "examples": "Try: 'A 1920s speakeasy murder mystery with 8 characters including a jazz singer, bartender, and mob boss'",
-      "playerCount": "How many players will participate?",
-      "theme": "What's the setting or theme?",
-      "special": "Any special requirements or constraints?",
+      "describe": "ミステリーを詳細に説明してください - 具体的であればあるほど、より良いものを作成できます",
+      "examples": "例: 「ジャズ歌手、バーテンダー、マフィアのボスを含む8人のキャラクターによる1920年代の酒場殺人ミステリー」",
+      "playerCount": "何人のプレイヤーが参加しますか？",
+      "theme": "設定やテーマは何ですか？",
+      "special": "特別な要件や制約はありますか？",
       "initialPrompt": {
-        "withTheme": "Let's create a murder mystery with a {{theme}} theme. Please guide me through creating this mystery step by step.",
-        "withoutTheme": "Let's create a murder mystery. Please guide me through creating this mystery step by step."
+        "withTheme": "{{theme}}テーマの殺人ミステリーを作成しましょう。このミステリーの作成を段階的にガイドしてください。",
+        "withoutTheme": "殺人ミステリーを作成しましょう。このミステリーの作成を段階的にガイドしてください。"
       }
     },
-    "editTitle": "Edit Mystery",
-    "createTitle": "Create New Mystery",
+    "editTitle": "ミステリーを編集",
+    "createTitle": "新しいミステリーを作成",
     "form": {
-      "description": "Fill out the form below to generate your custom murder mystery"
+      "description": "以下のフォームに記入して、カスタム殺人ミステリーを生成してください"
     },
     "buttons": {
-      "generateFullMystery": "Generate Full Mystery"
+      "generateFullMystery": "完全なミステリーを生成"
     },
     "errors": {
-      "signInToSave": "Please sign in to save your mystery",
-      "saveFailed": "Failed to save mystery",
-      "loadFailed": "Failed to load mystery",
-      "loadMessagesFailed": "Failed to load conversation messages",
-      "loadConversationFailed": "Failed to load conversation",
-      "initialPrompt": "Please provide a prompt for your mystery",
-      "saveMessageFailed": "Failed to save message"
+      "signInToSave": "ミステリーを保存するにはサインインしてください",
+      "saveFailed": "ミステリーの保存に失敗しました",
+      "loadFailed": "ミステリーの読み込みに失敗しました",
+      "loadMessagesFailed": "会話メッセージの読み込みに失敗しました",
+      "loadConversationFailed": "会話の読み込みに失敗しました",
+      "initialPrompt": "ミステリーのプロンプトを入力してください",
+      "saveMessageFailed": "メッセージの保存に失敗しました"
     },
     "success": {
-      "setupComplete": "Mystery setup complete! Starting chat..."
+      "setupComplete": "ミステリーのセットアップが完了しました！チャットを開始します..."
     }
   },
   "mysteryForm": {
-    "userRequestLabel": "What you want to create",
-    "userRequestDescription": "Your original request from the homepage",
-    "themeLabel": "Theme/Setting Details (Optional)",
-    "themePlaceholder": "e.g., time period, setting specifics, must-have's, etc.",
-    "themeDescription": "Choose a specific theme or setting for your murder mystery",
-    "playerCountLabel": "How many players will participate?",
-    "playerCountPlaceholder": "Select number of players",
-    "playerCountItem": "{{count}} players",
-    "playerCountDescription": "Choose between 4 and 32 players for your murder mystery.",
-    "accompliceLabel": "Include Accomplice Mechanism",
-    "accompliceDescription": "Best for games with 10 or more players",
-    "scriptTypeLabel": "Script Detail Level",
-    "scriptTypeFullLabel": "Full Scripts - Complete dialogue and detailed instructions",
-    "scriptTypePointFormLabel": "Point Form - Key points and bullet summaries",
-    "scriptTypeBothLabel": "Both Formats - Full scripts AND point form notes",
-    "additionalDetailsLabel": "Additional Details (Optional)",
-    "additionalDetailsPlaceholder": "Any specific requirements, special rules, or additional context for your mystery...",
-    "additionalDetailsDescription": "Provide any extra details or special requests for your mystery",
-    "startChat": "Start AI Chat",
-    "startingChat": "Starting Chat..."
+    "userRequestLabel": "作成したいもの",
+    "userRequestDescription": "ホームページからの元のリクエスト",
+    "themeLabel": "テーマ/設定の詳細（オプション）",
+    "themePlaceholder": "例: 時代、設定の詳細、必須事項など",
+    "themeDescription": "殺人ミステリーの特定のテーマまたは設定を選択してください",
+    "playerCountLabel": "何人のプレイヤーが参加しますか？",
+    "playerCountPlaceholder": "プレイヤー数を選択",
+    "playerCountItem": "{{count}}人のプレイヤー",
+    "playerCountDescription": "殺人ミステリーのプレイヤーは4人から32人まで選択できます。",
+    "accompliceLabel": "共犯者メカニズムを含める",
+    "accompliceDescription": "10人以上のプレイヤーがいるゲームに最適",
+    "scriptTypeLabel": "スクリプトの詳細レベル",
+    "scriptTypeFullLabel": "フルスクリプト - 完全な対話と詳細な指示",
+    "scriptTypePointFormLabel": "要点形式 - 重要なポイントと箇条書きの要約",
+    "scriptTypeBothLabel": "両方の形式 - フルスクリプトと要点形式のノート",
+    "additionalDetailsLabel": "追加の詳細（オプション）",
+    "additionalDetailsPlaceholder": "ミステリーの特定の要件、特別なルール、または追加のコンテキスト...",
+    "additionalDetailsDescription": "ミステリーの追加の詳細または特別なリクエストを提供してください",
+    "startChat": "AIチャットを開始",
+    "startingChat": "チャットを開始中..."
   },
   "supportPage": {
-    "title": "Support Center",
-    "subtitle": "Find answers to common questions, contact our support team, and get everything you need to create amazing mystery parties.",
+    "title": "サポートセンター",
+    "subtitle": "よくある質問の回答を見つけ、サポートチームに連絡し、素晴らしいミステリーパーティーを作成するために必要なすべてを入手してください。",
     "tabs": {
-      "faqs": "FAQs",
-      "contact": "Contact Us"
+      "faqs": "よくある質問",
+      "contact": "お問い合わせ"
     },
     "faqs": {
-      "title": "Frequently Asked Questions",
-      "description": "Find answers to common questions about Mystery Maker",
+      "title": "よくある質問",
+      "description": "Mystery Makerに関するよくある質問の回答を見つける",
       "categories": {
-        "aboutMysteryMaker": "About Mystery Maker",
-        "gameMechanics": "Game Mechanics",
-        "hostingPlanning": "Hosting & Planning",
-        "accountBilling": "Account & Billing"
+        "aboutMysteryMaker": "Mystery Makerについて",
+        "gameMechanics": "ゲームメカニクス",
+        "hostingPlanning": "ホスティングと計画",
+        "accountBilling": "アカウントと請求"
       },
       "questions": {
         "whatIsMysteryMaker": {
-          "question": "What is Mystery Maker and how does it work?",
-          "answer": "Mystery Maker is an AI-powered platform that creates custom murder mystery parties exactly how you want them. Tell us your unique vision - any theme, characters, or setting - and our AI generates everything you need: character profiles, clues, and host materials tailored specifically for your party."
+          "question": "Mystery Makerとは何ですか？どのように機能しますか？",
+          "answer": "Mystery Makerは、お客様の望む通りにカスタムマーダーミステリーパーティーを作成するAI搭載プラットフォームです。テーマ、キャラクター、設定など、独自のビジョンをお伝えください。AIがキャラクタープロフィール、手がかり、ホスト用資料など、パーティー専用に必要なすべてを生成します。"
         },
         "creationProcess": {
-          "question": "How does the creation and purchase process work?",
-          "answer": "Simple! First, describe your ideal murder mystery and we'll create a custom preview for free. When you're happy with your mystery, purchase the complete package for $24.99. You'll instantly get everything needed to host: detailed character profiles, host guide, and all game materials."
+          "question": "作成と購入のプロセスはどのように機能しますか？",
+          "answer": "簡単です！まず、理想的なマーダーミステリーを説明すると、無料でカスタムプレビューを作成します。ミステリーに満足したら、24.99ドルで完全パッケージを購入してください。ホストに必要なすべて（詳細なキャラクタープロフィール、ホストガイド、すべてのゲーム素材）を即座に入手できます。"
         },
         "saveWork": {
-          "question": "Can I save my work and come back to it later?",
-          "answer": "Yes! All your custom mysteries are saved to your account so you can return and edit them anytime."
+          "question": "作業を保存して後で戻ることはできますか？",
+          "answer": "はい！すべてのカスタムミステリーはアカウントに保存されるので、いつでも戻って編集できます。"
         },
         "replayable": {
-          "question": "Are these murder mysteries replayable?",
-          "answer": "Absolutely! Our mysteries include variable elements so each playthrough feels fresh, even with the same group. You can host your custom mystery as many times as you want."
+          "question": "これらのマーダーミステリーは繰り返しプレイできますか？",
+          "answer": "もちろん！ミステリーには可変要素が含まれているため、同じグループでも毎回新鮮な感覚が味わえます。カスタムミステリーを何度でもホストできます。"
         },
         "playerCount": {
-          "question": "How many players do I need?",
-          "answer": "Our system creates mysteries for any group size you specify - from intimate gatherings of 4-6 players to larger parties of 15+ players. Just tell us your player count and we'll design accordingly."
+          "question": "何人のプレイヤーが必要ですか？",
+          "answer": "システムは指定したグループサイズに合わせてミステリーを作成します。4〜6人の親密な集まりから15人以上の大規模パーティーまで対応します。プレイヤー数を教えていただければ、それに応じて設計します。"
         },
         "modifyMystery": {
-          "question": "Can I modify my mystery after creating it?",
-          "answer": "Of course! Use our editor to refine and adjust your mystery until it's exactly right for your group. Change characters, themes, or complexity anytime."
+          "question": "作成後にミステリーを変更できますか？",
+          "answer": "もちろん！エディターを使用して、グループに完璧になるまでミステリーを改良・調整できます。キャラクター、テーマ、複雑さをいつでも変更できます。"
         },
         "lastMinuteChanges": {
-          "question": "What if I need to add or remove players at the last minute?",
-          "answer": "No problem! Our flexible system allows you to adjust your player count even after creating your mystery. The AI will adapt the story and characters to accommodate these changes."
+          "question": "土壇場でプレイヤーを追加または削除する必要がある場合はどうなりますか？",
+          "answer": "問題ありません！柔軟なシステムにより、ミステリーを作成した後でもプレイヤー数を調整できます。AIがこれらの変更に対応してストーリーとキャラクターを適応させます。"
         },
         "whatIncluded": {
-          "question": "What's included in my custom mystery package?",
-          "answer": "Everything you need: a comprehensive host guide with step-by-step instructions, detailed character profiles for each player, clues, evidence, and all game materials. No additional preparation required."
+          "question": "カスタムミステリーパッケージには何が含まれていますか？",
+          "answer": "必要なすべてが含まれています：ステップバイステップの指示を含む包括的なホストガイド、各プレイヤーの詳細なキャラクタープロフィール、手がかり、証拠、すべてのゲーム素材。追加の準備は不要です。"
         },
         "gameDuration": {
-          "question": "How long does a typical game last?",
-          "answer": "Most mysteries run 2-3 hours, but you control the pacing. Our host guide includes timing suggestions that you can adjust to fit your schedule."
+          "question": "典型的なゲームはどのくらい続きますか？",
+          "answer": "ほとんどのミステリーは2〜3時間続きますが、ペースはお客様がコントロールします。ホストガイドには、スケジュールに合わせて調整できるタイミングの提案が含まれています。"
         },
         "themedMysteries": {
-          "question": "Do you offer themed mysteries for special occasions?",
-          "answer": "We create any theme you can imagine! From classic 1920s speakeasies to space stations to fairy tale kingdoms - tell us your vision and we'll make it happen."
+          "question": "特別な機会のためのテーマ別ミステリーを提供していますか？",
+          "answer": "想像できるあらゆるテーマを作成します！古典的な1920年代の酒場から宇宙ステーション、おとぎ話の王国まで、ビジョンをお聞かせください。実現させます。"
         },
         "ageRecommendation": {
-          "question": "Is there an age recommendation for your mysteries?",
-          "answer": "Our standard mysteries work great for adults and teens (13+). You can also request family-friendly themes when creating your mystery for younger players."
+          "question": "ミステリーの年齢推奨はありますか？",
+          "answer": "標準的なミステリーは大人とティーンエイジャー（13歳以上）に最適です。若いプレイヤー向けにミステリーを作成する際は、家族向けのテーマをリクエストすることもできます。"
         },
         "freePreview": {
-          "question": "What's included in the free preview?",
-          "answer": "You can create unlimited mystery previews for free, including the basic story premise and character concepts. This lets you explore different ideas before purchasing."
+          "question": "無料プレビューには何が含まれていますか？",
+          "answer": "無制限のミステリープレビューを無料で作成でき、基本的なストーリーの前提とキャラクターのコンセプトが含まれます。これにより、購入前にさまざまなアイデアを探索できます。"
         },
         "purchaseIncludes": {
-          "question": "What do I get when I purchase a mystery?",
-          "answer": "For $24.99, you receive everything needed to host: comprehensive host guide, detailed character profiles for each player, clues, evidence, and all game materials ready to use."
+          "question": "ミステリーを購入すると何が手に入りますか？",
+          "answer": "24.99ドルで、ホストに必要なすべてを受け取ります：包括的なホストガイド、各プレイヤーの詳細なキャラクタープロフィール、手がかり、証拠、すぐに使用できるすべてのゲーム素材。"
         },
         "refund": {
-          "question": "Can I get a refund if I'm not satisfied?",
-          "answer": "Absolutely! If you're not completely satisfied with your purchase, contact us within 7 days and we'll issue a full refund, no questions asked."
+          "question": "満足できない場合、返金を受けられますか？",
+          "answer": "もちろんです！購入に完全に満足できない場合は、7日以内にお問い合わせください。質問なしで全額返金いたします。"
+        },
+        "gameDesignEngagement": {
+          "question": "ゲームデザインはどのようにして全員が関与し続けることを保証しますか？",
+          "answer": "私たちのミステリーは、硬直したストーリーラインではなく、豊かなキャラクターの相互作用に焦点を当てています。各キャラクターには、自然なゲームプレイを促進する詳細な背景と動機があり、すべてのプレイヤーが体験全体を通じて積極的に関与し続けることを保証します。"
+        },
+        "dynamicMurderer": {
+          "question": "なぜ手がかりは最初から特定の殺人者を指していないのですか？",
+          "answer": "殺人者は、ゲームプレイ中に明らかになった手がかりに基づいて第1ラウンド後に決定されます。この動的なアプローチは、手がかりが段階的に構築されることを意味し、パーティーの雰囲気でいくつかの詳細が見逃されてもミステリーを解決可能にします。"
+        },
+        "flexiblePlayerCount": {
+          "question": "誰かが土壇場で来られない場合はどうなりますか？",
+          "answer": "私たちの柔軟なデザインは土壇場の変更に対応します。ゲームは1人のキャラクターが重要な情報を保持することに依存していないため、ミステリーを壊すことなくプレイヤー数を調整できます。"
+        },
+        "characterFocused": {
+          "question": "なぜプロット中心ではなくキャラクター中心なのですか？",
+          "answer": "何年もの経験から、過度に具体的な手がかりはパーティーで見逃されることを学びました。私たちのキャラクター主導のアプローチは、ミステリーが相互作用を通じて自然に展開することを意味します。"
         }
       }
     },
     "contact": {
-      "title": "Contact Us",
-      "description": "Need more help? We're here for you",
-      "intro": "Our support team is ready to help with any questions about creating your perfect mystery party with Mystery Maker.",
+      "title": "お問い合わせ",
+      "description": "さらにサポートが必要ですか？お手伝いします",
+      "intro": "サポートチームは、Mystery Makerで完璧なミステリーパーティーを作成することに関するあらゆる質問に対応する準備ができています。",
       "form": {
-        "name": "Name",
-        "email": "Email Address",
-        "subject": "Subject",
-        "message": "Message",
-        "namePlaceholder": "Your name",
-        "emailPlaceholder": "your.email@example.com",
-        "subjectPlaceholder": "What is your message about?",
-        "messagePlaceholder": "How can we help you?",
-        "sendButton": "Send Message",
-        "sending": "Sending...",
-        "success": "Thank you for contacting us! We'll get back to you within 24 hours.",
-        "error": "Failed to send message. Please try again later."
+        "name": "名前",
+        "email": "メールアドレス",
+        "subject": "件名",
+        "message": "メッセージ",
+        "namePlaceholder": "お名前を入力してください",
+        "emailPlaceholder": "あなたのメール@example.com",
+        "subjectPlaceholder": "件名を入力してください",
+        "messagePlaceholder": "メッセージを入力してください...",
+        "sendButton": "メッセージを送信",
+        "sending": "送信中...",
+        "success": "メッセージが正常に送信されました！すぐにご連絡いたします。",
+        "error": "メッセージの送信に失敗しました。もう一度お試しください。"
       }
     }
   },
   "chat": {
-    "title": "Murder Mystery Creator",
-    "public": "Public",
-    "private": "Private",
-    "initialGreeting": "Hello! I'm your AI development assistant. Let me help you create a murder mystery. How many players do you want for your murder mystery?",
-    "inputPlaceholder": "Type your message...",
-    "signInPrompt": "Please <1>sign in</1> to use private mode",
-    "errorResponse": "I'm having trouble responding right now. Please try again.",
-    "errorResponseWithFallback": "I'm experiencing some technical difficulties. How many players do you want for your murder mystery?",
-    "connectionErrorResponse": "I'm having trouble connecting right now. How many players do you want for your murder mystery?",
-    "placeholder": "Share your ideas for the mystery...",
-    "loadingMessages": "Loading previous messages...",
+    "title": "殺人ミステリークリエイター",
+    "public": "公開",
+    "private": "プライベート",
+    "initialGreeting": "こんにちは！AIデベロップメントアシスタントです。殺人ミステリーの作成をお手伝いします。何人のプレイヤーでミステリーを作成したいですか？",
+    "inputPlaceholder": "メッセージを入力...",
+    "signInPrompt": "プライベートモードを使用するには<1>サインイン</1>してください",
+    "errorResponse": "現在応答できません。もう一度お試しください。",
+    "errorResponseWithFallback": "技術的な問題が発生しています。何人のプレイヤーでミステリーを作成したいですか？",
+    "connectionErrorResponse": "現在接続に問題があります。何人のプレイヤーでミステリーを作成したいですか？",
+    "placeholder": "ミステリーのアイデアを共有してください...",
+    "loadingMessages": "以前のメッセージを読み込み中...",
     "errors": {
-      "responseFailed": "Failed to get AI response. Please try again.",
-      "aiUnavailable": "I apologize, but I'm having trouble responding right now. Please try again in a moment."
+      "responseFailed": "AI応答の取得に失敗しました。もう一度お試しください。",
+      "aiUnavailable": "申し訳ございませんが、現在応答できません。しばらくしてからもう一度お試しください。"
     }
   },
   "sendToGuests": {
-    "title": "Send Character Guides to Your Guests",
-    "description": "Enter email addresses for each character to send personalized guides directly to your guests. Each guest will only receive their own character information.",
+    "title": "ゲストにキャラクターガイドを送信",
+    "description": "各キャラクターのメールアドレスを入力して、ゲストに直接パーソナライズされたガイドを送信します。各ゲストは自分のキャラクター情報のみを受け取ります。",
     "status": {
-      "sent": "Sent"
+      "sent": "送信済み"
     },
     "emailPlaceholder": "guest@example.com",
     "buttons": {
-      "sending": "Sending...",
-      "send": "Send Character Guides"
+      "sending": "送信中...",
+      "send": "キャラクターガイドを送信"
     },
     "errors": {
-      "noValidEmails": "Please add at least one valid email address",
-      "sendFailed": "Failed to send some emails. Please try again."
+      "noValidEmails": "少なくとも1つの有効なメールアドレスを追加してください",
+      "sendFailed": "一部のメールの送信に失敗しました。もう一度お試しください。"
     },
     "success": {
-      "sentCount": "Sent character guides to {{count}} guests"
+      "sentCount": "{{count}}人のゲストにキャラクターガイドを送信しました"
     }
   },
   "common": {
     "buttons": {
-      "createNew": "Create New Mystery",
-      "getStarted": "Get Started",
-      "learnMore": "Learn More",
-      "tryNow": "Try Now",
-      "continue": "Continue",
-      "cancel": "Cancel",
-      "save": "Save",
-      "delete": "Delete",
-      "edit": "Edit",
-      "close": "Close",
-      "back": "Back",
-      "next": "Next",
-      "previous": "Previous",
-      "finish": "Finish",
-      "submit": "Submit",
-      "confirm": "Confirm",
-      "yes": "Yes",
-      "no": "No"
+      "createNew": "新しいミステリーを作成",
+      "getStarted": "始める",
+      "learnMore": "詳細を見る",
+      "tryNow": "今すぐ試す",
+      "continue": "続ける",
+      "cancel": "キャンセル",
+      "save": "保存",
+      "delete": "削除",
+      "edit": "編集",
+      "close": "閉じる",
+      "back": "戻る",
+      "next": "次へ",
+      "previous": "前へ",
+      "finish": "完了",
+      "submit": "送信",
+      "confirm": "確認",
+      "yes": "はい",
+      "no": "いいえ"
     },
     "labels": {
-      "loading": "Loading...",
-      "pleaseWait": "Please wait...",
-      "error": "Error",
-      "success": "Success",
-      "warning": "Warning",
-      "info": "Information",
-      "required": "Required",
-      "optional": "Optional"
+      "loading": "読み込み中...",
+      "pleaseWait": "お待ちください...",
+      "error": "エラー",
+      "success": "成功",
+      "warning": "警告",
+      "info": "情報",
+      "required": "必須",
+      "optional": "オプション"
     },
     "messages": {
-      "welcome": "Welcome!",
-      "thankYou": "Thank you!",
-      "comingSoon": "Coming Soon",
-      "notFound": "Not Found",
-      "somethingWentWrong": "Something went wrong",
-      "tryAgain": "Please try again",
-      "noResultsFound": "No results found",
-      "loadingContent": "Loading content...",
-      "savingChanges": "Saving changes...",
-      "changesSuccess": "Changes saved successfully",
-      "changesCanceled": "Changes canceled",
-      "aiThinking": "AI is thinking..."
+      "welcome": "ようこそ！",
+      "thankYou": "ありがとうございます！",
+      "comingSoon": "近日公開",
+      "notFound": "見つかりません",
+      "somethingWentWrong": "問題が発生しました",
+      "tryAgain": "もう一度お試しください",
+      "noResultsFound": "結果が見つかりません",
+      "loadingContent": "コンテンツを読み込み中...",
+      "savingChanges": "変更を保存中...",
+      "changesSuccess": "変更が正常に保存されました",
+      "changesCanceled": "変更がキャンセルされました",
+      "aiThinking": "AIが考えています..."
     },
     "validation": {
-      "required": "This field is required",
-      "invalidEmail": "Please enter a valid email address",
-      "passwordTooShort": "Password must be at least 6 characters",
-      "passwordMismatch": "Passwords do not match",
-      "invalidFormat": "Invalid format",
-      "tooShort": "Too short",
-      "tooLong": "Too long",
-      "invalidCharacters": "Contains invalid characters"
+      "required": "この項目は必須です",
+      "invalidEmail": "有効なメールアドレスを入力してください",
+      "passwordTooShort": "パスワードは6文字以上である必要があります",
+      "passwordMismatch": "パスワードが一致しません",
+      "invalidFormat": "無効な形式です",
+      "tooShort": "短すぎます",
+      "tooLong": "長すぎます",
+      "invalidCharacters": "無効な文字が含まれています"
     },
     "states": {
-      "draft": "Draft",
-      "inProgress": "In Progress",
-      "completed": "Completed",
-      "published": "Published",
-      "archived": "Archived",
-      "deleted": "Deleted"
+      "draft": "下書き",
+      "inProgress": "進行中",
+      "completed": "完了",
+      "published": "公開済み",
+      "archived": "アーカイブ済み",
+      "deleted": "削除済み"
     },
     "modals": {
       "confirmDelete": {
-        "title": "Confirm Deletion",
-        "message": "Are you sure you want to delete this item? This action cannot be undone.",
-        "confirmButton": "Delete",
-        "cancelButton": "Cancel"
+        "title": "削除の確認",
+        "message": "このアイテムを削除してもよろしいですか？この操作は元に戻せません。",
+        "confirmButton": "削除",
+        "cancelButton": "キャンセル"
       },
       "unsavedChanges": {
-        "title": "Unsaved Changes",
-        "message": "You have unsaved changes. Do you want to save them before leaving?",
-        "saveButton": "Save Changes",
-        "discardButton": "Discard Changes",
-        "cancelButton": "Cancel"
+        "title": "未保存の変更",
+        "message": "未保存の変更があります。終了する前に保存しますか？",
+        "saveButton": "変更を保存",
+        "discardButton": "変更を破棄",
+        "cancelButton": "キャンセル"
       }
     },
     "notifications": {
-      "welcomeBack": "Welcome back!",
-      "signedOut": "You have been signed out",
-      "sessionExpired": "Your session has expired. Please sign in again.",
-      "connectionLost": "Connection lost. Trying to reconnect...",
-      "connectionRestored": "Connection restored",
-      "updateAvailable": "A new version is available. Refresh to update.",
-      "offlineMode": "You are currently offline",
-      "deleteSuccess": "{{item}} deleted successfully",
-      "deleteFailed": "Failed to delete {{item}}",
-      "archiveSuccess": "{{item}} archived successfully",
-      "archiveFailed": "Failed to archive {{item}}",
-      "updatedSuccess": "{{item}} updated successfully",
-      "updateFailed": "Failed to update {{item}}"
+      "welcomeBack": "お帰りなさい！",
+      "signedOut": "サインアウトしました",
+      "sessionExpired": "セッションの有効期限が切れました。もう一度サインインしてください。",
+      "connectionLost": "接続が失われました。再接続を試みています...",
+      "connectionRestored": "接続が復元されました",
+      "updateAvailable": "新しいバージョンが利用可能です。更新するには更新してください。",
+      "offlineMode": "現在オフラインです",
+      "deleteSuccess": "{{item}}が正常に削除されました",
+      "deleteFailed": "{{item}}の削除に失敗しました",
+      "archiveSuccess": "{{item}}が正常にアーカイブされました",
+      "archiveFailed": "{{item}}のアーカイブに失敗しました",
+      "updatedSuccess": "{{item}}が正常に更新されました",
+      "updateFailed": "{{item}}の更新に失敗しました"
     }
   },
   "character": {
     "detail": {
-      "description": "Character Description",
-      "background": "Background", 
-      "relationships": "Relationships",
-      "secrets": "Secrets",
-      "whereabouts": "Whereabouts During the Murder",
-      "introduction": "Introduction",
-      "round1": "Round 1: Initial Investigation",
-      "round2": "Round 2: Deeper Revelations", 
-      "round3": "Round 3: Final Clues",
-      "finalStatement": "Final Statement",
-      "questioningOptions": "Questioning Options",
-      "askTarget": "Ask {{target}}: \"{{question}}\""
+      "description": "キャラクター説明",
+      "background": "背景",
+      "relationships": "関係",
+      "secrets": "秘密",
+      "whereabouts": "殺害時の居場所",
+      "introduction": "紹介",
+      "round1": "ラウンド1: 初期調査",
+      "round2": "ラウンド2: より深い暴露",
+      "round3": "ラウンド3: 最終的な手がかり",
+      "finalStatement": "最終声明",
+      "questioningOptions": "質問オプション",
+      "askTarget": "{{target}}に尋ねる: \"{{question}}\""
     },
     "import": {
-      "title": "Mystery Characters",
-      "description": "Manage the characters in your murder mystery",
-      "importButton": "Import Characters",
-      "loading": "Loading characters...",
-      "noCharacters": "No characters yet",
-      "importPrompt": "Import character data to populate your murder mystery.",
-      "foundCount": "{{count}} characters found in database",
-      "deleteConfirm": "Are you sure you want to delete {{name}}?",
-      "deleteSuccess": "Deleted character: {{name}}",
-      "deleteFailed": "Failed to delete character",
-      "refreshSuccess": "Character list refreshed",
-      "refreshFailed": "Failed to refresh character data",
-      "loadFailed": "Failed to load character data",
+      "title": "ミステリーキャラクター",
+      "description": "殺人ミステリーのキャラクターを管理",
+      "importButton": "キャラクターをインポート",
+      "loading": "キャラクターを読み込み中...",
+      "noCharacters": "まだキャラクターがありません",
+      "importPrompt": "殺人ミステリーを入力するためにキャラクターデータをインポートします。",
+      "foundCount": "データベースで{{count}}人のキャラクターが見つかりました",
+      "deleteConfirm": "{{name}}を削除してもよろしいですか？",
+      "deleteSuccess": "キャラクターを削除しました: {{name}}",
+      "deleteFailed": "キャラクターの削除に失敗しました",
+      "refreshSuccess": "キャラクターリストが更新されました",
+      "refreshFailed": "キャラクターデータの更新に失敗しました",
+      "loadFailed": "キャラクターデータの読み込みに失敗しました",
       "table": {
-        "name": "Character Name",
-        "details": "Details", 
-        "scripts": "Scripts",
-        "actions": "Actions",
+        "name": "キャラクター名",
+        "details": "詳細",
+        "scripts": "スクリプト",
+        "actions": "アクション",
         "badges": {
-          "description": "Description",
-          "background": "Background",
-          "relationships": "Relationships",
-          "secrets": "Secrets",
-          "intro": "Intro",
-          "round1": "Round 1",
-          "round2": "Round 2", 
-          "round3": "Round 3"
+          "description": "説明",
+          "background": "背景",
+          "relationships": "関係",
+          "secrets": "秘密",
+          "intro": "紹介",
+          "round1": "ラウンド1",
+          "round2": "ラウンド2",
+          "round3": "ラウンド3"
         }
       }
     },
     "access": {
-      "welcome": "Welcome, {{name}}!",
-      "subtitle": "Here's your character guide for the mystery game",
-      "loading": "Loading your character...",
-      "accessDenied": "Access Denied",
-      "notFound": "Character assignment not found.",
+      "welcome": "ようこそ、{{name}}さん！",
+      "subtitle": "ミステリーゲームのキャラクターガイドです",
+      "loading": "キャラクターを読み込み中...",
+      "accessDenied": "アクセスが拒否されました",
+      "notFound": "キャラクター割り当てが見つかりません。",
       "guide": {
-        "yourCharacter": "{{name}} - Your Character",
-        "yourBackground": "Your Background",
-        "yourSecret": "Your Secret", 
-        "introduction": "Introduction",
-        "rumorsYouKnow": "Rumors You Know",
-        "round1": "Round 1: Initial Statement",
-        "round2": "Round 2: Motives",
-        "round3": "Round 3: Method",
-        "questionsToAsk": "Questions to Ask",
-        "ifInnocent": "If You're Innocent:",
-        "ifGuilty": "If You're Guilty:",
-        "ifAccomplice": "If You're an Accomplice:"
+        "yourCharacter": "{{name}} - あなたのキャラクター",
+        "yourBackground": "あなたの背景",
+        "yourSecret": "あなたの秘密",
+        "introduction": "紹介",
+        "rumorsYouKnow": "あなたが知っている噂",
+        "round1": "ラウンド1: 初期声明",
+        "round2": "ラウンド2: 動機",
+        "round3": "ラウンド3: 方法",
+        "questionsToAsk": "尋ねる質問",
+        "ifInnocent": "あなたが無実の場合:",
+        "ifGuilty": "あなたが有罪の場合:",
+        "ifAccomplice": "あなたが共犯者の場合:"
       }
     },
     "dialog": {
-      "title": "Import Character Data",
-      "subtitle": "Paste your character data below:",
-      "pasteButton": "Paste from Clipboard",
-      "pasteSuccess": "Text pasted from clipboard",
-      "pasteError": "Could not access clipboard. Please paste manually.",
-      "placeholder": "Paste CHARACTER GUIDE content here...",
-      "instructions": "Character data should include sections for:",
+      "title": "キャラクターデータをインポート",
+      "subtitle": "以下にキャラクターデータを貼り付けてください:",
+      "pasteButton": "クリップボードから貼り付け",
+      "pasteSuccess": "クリップボードからテキストを貼り付けました",
+      "pasteError": "クリップボードにアクセスできませんでした。手動で貼り付けてください。",
+      "placeholder": "CHARACTER GUIDEの内容をここに貼り付けてください...",
+      "instructions": "キャラクターデータには以下のセクションが含まれている必要があります:",
       "sections": [
         "CHARACTER DESCRIPTION",
-        "BACKGROUND", 
+        "BACKGROUND",
         "RELATIONSHIPS",
         "SECRETS",
         "WHEREABOUTS",
-        "Round statements (ROUND 1, ROUND 2, etc.)"
+        "ラウンド声明 (ROUND 1, ROUND 2, など)"
       ],
-      "importButton": "Import Characters",
-      "importing": "Importing...",
-      "cancel": "Cancel",
-      "enterData": "Please enter or paste character data",
-      "importSuccess": "Characters imported successfully",
-      "importFailed": "Failed to import character data",
-      "importError": "An unexpected error occurred during import"
+      "importButton": "キャラクターをインポート",
+      "importing": "インポート中...",
+      "cancel": "キャンセル",
+      "enterData": "キャラクターデータを入力または貼り付けてください",
+      "importSuccess": "キャラクターが正常にインポートされました",
+      "importFailed": "キャラクターデータのインポートに失敗しました",
+      "importError": "インポート中に予期しないエラーが発生しました"
     },
     "guestManager": {
-      "title": "Share Characters with Guests",
-      "subtitle": "Assign each character to a guest and send via email",
+      "title": "ゲストとキャラクターを共有",
+      "subtitle": "各キャラクターをゲストに割り当て、メールで送信",
       "table": {
-        "character": "Character",
-        "guestName": "Guest Name", 
-        "email": "Email",
-        "action": "Action"
+        "character": "キャラクター",
+        "guestName": "ゲスト名",
+        "email": "メール",
+        "action": "アクション"
       },
       "placeholders": {
-        "guestName": "Guest's name",
+        "guestName": "ゲストの名前",
         "email": "guest@example.com"
       },
       "buttons": {
-        "edit": "Edit",
-        "send": "Send",
-        "sendAll": "Send All",
-        "close": "Close"
+        "edit": "編集",
+        "send": "送信",
+        "sendAll": "すべて送信",
+        "close": "閉じる"
       },
       "status": {
-        "sent": "Sent"
+        "sent": "送信済み"
       },
-      "assignedCount": "{{count}} characters assigned",
+      "assignedCount": "{{count}}人のキャラクターが割り当てられました",
       "toasts": {
-        "characterSent": "Character sent to {{name}}!",
-        "sendFailed": "Failed to send character assignment",
-        "loadFailed": "Failed to load existing assignments",
-        "updateFailed": "Failed to update assignment",
-        "noValidAssignments": "No valid assignments to send",
-        "allSent": "Sent {{count}} character assignments!",
-        "sendSomeFailed": "Failed to send some assignments"
+        "characterSent": "キャラクターが{{name}}に送信されました！",
+        "sendFailed": "キャラクター割り当ての送信に失敗しました",
+        "loadFailed": "既存の割り当ての読み込みに失敗しました",
+        "updateFailed": "割り当ての更新に失敗しました",
+        "noValidAssignments": "送信する有効な割り当てがありません",
+        "allSent": "{{count}}件のキャラクター割り当てを送信しました！",
+        "sendSomeFailed": "一部の割り当ての送信に失敗しました"
       }
     },
     "roles": {
-      "title": "Character Roles",
-      "description": "Assign the murderer role for your mystery",
-      "murderer": "Murderer",
-      "required": "Required",
-      "noneSelected": "None selected",
-      "murdererDescription": "The character who committed the murder",
-      "saveRoles": "Save Roles",
-      "saving": "Saving...",
-      "saveSuccess": "Character roles saved successfully",
-      "saveFailed": "Failed to save character roles",
-      "loadFailed": "Failed to load character data"
+      "title": "キャラクターの役割",
+      "description": "ミステリーの殺人者の役割を割り当てる",
+      "murderer": "殺人者",
+      "required": "必須",
+      "noneSelected": "選択なし",
+      "murdererDescription": "殺人を犯したキャラクター",
+      "saveRoles": "役割を保存",
+      "saving": "保存中...",
+      "saveSuccess": "キャラクターの役割が正常に保存されました",
+      "saveFailed": "キャラクターの役割の保存に失敗しました",
+      "loadFailed": "キャラクターデータの読み込みに失敗しました"
     }
   },
   "payment": {
     "success": {
-      "message": "Payment successful! Your purchase is complete.",
-      "verifying": "Verifying your payment...",
-      "redirecting": "Redirecting you to your mystery..."
+      "message": "支払いが成功しました！購入が完了しました。",
+      "verifying": "支払いを確認中...",
+      "redirecting": "ミステリーにリダイレクト中..."
     }
   },
   "purchase": {
     "toasts": {
-      "success": "Purchase successful! You now have full access to this mystery package.",
-      "cancel": "Purchase cancelled. You can try again when you're ready.",
-      "loadFailed": "Failed to load mystery details.",
-      "notFound": "Mystery not found.",
-      "devPurchaseSim": "Simulating purchase in dev mode...",
-      "devPurchaseSuccess": "Purchase simulated! Redirecting to generate package...",
-      "devPurchaseFailed": "Failed to simulate purchase.",
-      "signInRequired": "Please sign in to purchase this mystery.",
-      "checkoutRedirect": "Redirecting to secure checkout...",
-      "checkoutFailed": "Failed to redirect to checkout. Please try again.",
-      "genericError": "An error occurred while loading mystery details."
+      "success": "購入が成功しました！このミステリーパッケージへのフルアクセスが可能になりました。",
+      "cancel": "購入がキャンセルされました。準備ができたら再度お試しください。",
+      "loadFailed": "ミステリーの詳細の読み込みに失敗しました。",
+      "notFound": "ミステリーが見つかりません。",
+      "devPurchaseSim": "開発モードで購入をシミュレート中...",
+      "devPurchaseSuccess": "購入がシミュレートされました！パッケージ生成にリダイレクト中...",
+      "devPurchaseFailed": "購入のシミュレートに失敗しました。",
+      "signInRequired": "このミステリーを購入するにはサインインしてください。",
+      "checkoutRedirect": "安全な決済にリダイレクト中...",
+      "checkoutFailed": "決済へのリダイレクトに失敗しました。もう一度お試しください。",
+      "genericError": "ミステリーの詳細を読み込み中にエラーが発生しました。"
     },
-    "title": "Complete Your Purchase",
-    "subtitle": "Get full access to your murder mystery package",
+    "title": "購入を完了",
+    "subtitle": "殺人ミステリーパッケージへのフルアクセスを取得",
     "package": {
-      "title": "Murder Mystery Package",
-      "description": "One-time purchase, instant access",
-      "priceDescription": "Complete murder mystery package with all character materials, clues, and hosting instructions.",
-      "whatsIncluded": "What's included:",
+      "title": "殺人ミステリーパッケージ",
+      "description": "一回限りの購入、即座のアクセス",
+      "priceDescription": "すべてのキャラクター素材、手がかり、ホスティング指示を含む完全な殺人ミステリーパッケージ。",
+      "whatsIncluded": "含まれるもの:",
       "includes": [
-        "Full character profiles for all suspects",
-        "Host guide with step-by-step instructions",
-        "Printable character sheets",
-        "Evidence and clue cards",
-        "Timeline of events",
-        "Solution reveal script",
-        "PDF downloads of all materials"
+        "すべての容疑者の完全なキャラクタープロフィール",
+        "ステップバイステップの指示を含むホストガイド",
+        "印刷可能なキャラクターシート",
+        "証拠と手がかりカード",
+        "イベントのタイムライン",
+        "解決の明かしスクリプト",
+        "すべての素材のPDFダウンロード"
       ]
     },
     "buttons": {
-      "processing": "Processing...",
-      "complete": "Complete Purchase",
-      "backToDesign": "Back to Mystery Design"
+      "processing": "処理中...",
+      "complete": "購入を完了",
+      "backToDesign": "ミステリーデザインに戻る"
     },
     "notes": {
-      "title": "Important Notes",
+      "title": "重要な注意事項",
       "items": [
-        "This is a one-time purchase for this specific mystery package",
-        "You'll have permanent access to download all materials",
-        "Content is for personal use only, not for commercial redistribution",
-        "Need help? Contact our support at {{email}}"
+        "これはこの特定のミステリーパッケージの一回限りの購入です",
+        "すべての素材をダウンロードする永久アクセスが可能です",
+        "コンテンツは個人使用のみで、商業的な再配布は不可です",
+        "サポートが必要ですか？{{email}}までお問い合わせください"
       ]
     },
     "preview": {
-      "defaultTitle": "Custom Murder Mystery",
-      "characterPlaceholder": "Character details will be revealed in the full package.",
-      "characterPlaceholderFull": "Full character description available in the purchased package.",
-      "evidencePlaceholder": "Evidence details available in the full package.",
-      "title": "Murder Mystery Preview",
-      "playersLabel": "Players",
-      "playersCount": "{{count}} Players",
-      "unknownPlayers": "Unknown # of Players",
-      "storyTitle": "Story Preview",
-      "unlockMessage": "Purchase to unlock the complete mystery package with all character details, clues, and materials.",
-      "whatsIncluded": "What's included in the full package:",
+      "defaultTitle": "カスタム殺人ミステリー",
+      "characterPlaceholder": "キャラクターの詳細は完全パッケージで明らかになります。",
+      "characterPlaceholderFull": "完全なキャラクター説明は購入したパッケージで利用可能です。",
+      "evidencePlaceholder": "証拠の詳細は完全パッケージで利用可能です。",
+      "title": "殺人ミステリープレビュー",
+      "playersLabel": "プレイヤー",
+      "playersCount": "{{count}}人のプレイヤー",
+      "unknownPlayers": "不明なプレイヤー数",
+      "storyTitle": "ストーリープレビュー",
+      "unlockMessage": "すべてのキャラクターの詳細、手がかり、素材を含む完全なミステリーパッケージをロック解除するには購入してください。",
+      "whatsIncluded": "完全パッケージに含まれるもの:",
       "packageIncludes": [
-        "Detailed host guide with complete setup instructions",
-        "Character guides for each player", 
-        "Evidence cards and printable materials",
-        "Full gameplay script and timeline"
+        "完全なセットアップ指示を含む詳細なホストガイド",
+        "各プレイヤーのキャラクターガイド",
+        "証拠カードと印刷可能な素材",
+        "完全なゲームプレイスクリプトとタイムライン"
       ]
     }
   },
@@ -902,108 +918,108 @@
     }
   },
   "mysteryPackage": {
-    "shareWithGuests": "Share With Guests",
+    "shareWithGuests": "ゲストと共有",
     "tabs": {
-      "hostGuide": "Host Guide",
-      "characters": "Characters ({{count}})",
-      "clues": "Evidence",
-      "inspector": "Detective Guide",
-      "relationships": "Relationships"
+      "hostGuide": "ホストガイド",
+      "characters": "キャラクター ({{count}})",
+      "clues": "証拠",
+      "inspector": "探偵ガイド",
+      "relationships": "関係"
     },
     "mobileTabs": {
-      "host": "Host",
-      "characters": "Characters ({{count}})",
-      "clues": "Evidence",
-      "inspector": "Detective",
-      "relations": "Relations"
+      "host": "ホスト",
+      "characters": "キャラクター ({{count}})",
+      "clues": "証拠",
+      "inspector": "探偵",
+      "relations": "関係"
     },
     "loading": {
-      "generating": "Generating...",
-      "generatingMessage": "Currently generating your complete mystery. This process is now in progress.<br />This page will automatically refresh once the mystery is complete.",
-      "characters": "Developing unique character profiles with backgrounds, motivations, and secrets for your mystery game.",
-      "clues": "Crafting evidence cards, clues, and investigative materials that will help solve your mystery.",
-      "inspector": "Writing the detective's script and investigation timeline to guide the mystery solving process.",
-      "matrix": "Building the character relationship matrix showing connections, conflicts, and hidden relationships."
+      "generating": "生成中...",
+      "generatingMessage": "完全なミステリーを生成中です。このプロセスは現在進行中です。<br />ミステリーが完成すると、このページは自動的に更新されます。",
+      "characters": "ミステリーゲーム用の背景、動機、秘密を持つユニークなキャラクタープロフィールを開発中です。",
+      "clues": "ミステリーを解くのに役立つ証拠カード、手がかり、調査資料を作成中です。",
+      "inspector": "ミステリー解決プロセスをガイドする探偵のスクリプトと調査タイムラインを執筆中です。",
+      "matrix": "つながり、対立、隠された関係を示すキャラクター関係マトリックスを構築中です。"
     },
     "placeholder": {
-      "title": "Ready to Generate Your Mystery",
-      "description": "Click the button below to start generating your complete mystery package with all materials included.",
-      "button": "Generate Package",
-      "characters": "Character guides will be available after generation starts.",
-      "clues": "Evidence cards will be available after generation starts.",
-      "inspector": "Detective guide will be available after generation starts.",
-      "matrix": "Relationship matrix will be available after generation starts."
+      "title": "ミステリーを生成する準備ができました",
+      "description": "以下のボタンをクリックして、すべての素材を含む完全なミステリーパッケージの生成を開始します。",
+      "button": "パッケージを生成",
+      "characters": "キャラクターガイドは生成開始後に利用可能になります。",
+      "clues": "証拠カードは生成開始後に利用可能になります。",
+      "inspector": "探偵ガイドは生成開始後に利用可能になります。",
+      "matrix": "関係マトリックスは生成開始後に利用可能になります。"
     },
     "matrix": {
-      "title": "Character Relationship Matrix"
-}
+      "title": "キャラクター関係マトリックス"
+    }
   },
   "blog": {
-    "title": "Murder Mystery Blog",
-    "subtitle": "Tips, guides, and inspiration for your next mystery party",
-    "backToHome": "Back to Home",
-    "readMore": "Read more →",
-    "minRead": "min read",
-    "publishedOn": "Published on",
-    "by": "By",
-    "relatedPosts": "Related posts",
-    "noPostsFound": "No blog posts found.",
-    "loading": "Loading...",
-    "error": "Failed to load blog posts.",
-    "errorTitle": "Error",
-    "tryAgain": "Try Again",
-    "checkBackLater": "Check back later for new articles!"
+    "title": "殺人ミステリーブログ",
+    "subtitle": "次のミステリーパーティーのためのヒント、ガイド、インスピレーション",
+    "backToHome": "ホームに戻る",
+    "readMore": "続きを読む →",
+    "minRead": "分で読む",
+    "publishedOn": "公開日",
+    "by": "著者",
+    "relatedPosts": "関連記事",
+    "noPostsFound": "ブログ記事が見つかりません。",
+    "loading": "読み込み中...",
+    "error": "ブログ記事の読み込みに失敗しました。",
+    "errorTitle": "エラー",
+    "tryAgain": "もう一度試す",
+    "checkBackLater": "新しい記事は後でもう一度確認してください！"
   },
   "chatbot": {
     "toasts": {
-      "invalidId": "Invalid conversation ID",
-      "loadFailed": "Could not load your previous conversation",
-      "offlineMode": "Using offline mode - some features may be limited",
-      "requestError": "Error processing your request",
-      "generationSuccess": "Mystery generated successfully!",
-      "urlUnavailable": "Chatbot URL not available yet"
+      "invalidId": "無効な会話ID",
+      "loadFailed": "以前の会話を読み込めませんでした",
+      "offlineMode": "オフラインモードを使用中 - 一部の機能が制限される場合があります",
+      "requestError": "リクエストの処理中にエラーが発生しました",
+      "generationSuccess": "ミステリーが正常に生成されました！",
+      "urlUnavailable": "チャットボットのURLはまだ利用できません"
     },
-    "welcomeMessage": "Welcome to the Murder Mystery Creator! Describe the type of mystery you'd like to create, or ask me for suggestions.",
-    "newConversationTitle": "New Murder Mystery",
+    "welcomeMessage": "殺人ミステリークリエイターへようこそ！作成したいミステリーのタイプを説明するか、提案を求めてください。",
+    "newConversationTitle": "新しい殺人ミステリー",
     "fallbackResponses": [
-      "I'd love to help you create a murder mystery. What theme or setting would you like for your mystery?",
-      "That's a great choice! Now, let's think about the victim. Who would you like the victim to be?",
-      "Interesting! Now we need some suspects. Could you describe 2-3 characters who might have motives to commit this crime?",
-      "Those are compelling suspects. Let's add some clues. What kind of evidence might be found at the scene?",
-      "Your mystery is taking shape! To continue developing the details of your story, let's think about what other elements we might include."
+      "殺人ミステリーの作成をお手伝いしたいと思います。ミステリーのテーマや設定はどのようなものがよろしいですか？",
+      "素晴らしい選択です！次に、被害者について考えましょう。被害者を誰にしたいですか？",
+      "興味深いですね！次は容疑者が必要です。この犯罪を犯す動機があるかもしれない2〜3人のキャラクターを説明していただけますか？",
+      "魅力的な容疑者ですね。手がかりを追加しましょう。現場でどのような証拠が見つかる可能性がありますか？",
+      "ミステリーの形が整ってきました！ストーリーの詳細を引き続き開発するために、他にどのような要素を含めるか考えてみましょう。"
     ],
-    "title": "Create Your Murder Mystery",
+    "title": "殺人ミステリーを作成",
     "buttons": {
-      "external": "External",
-      "openFull": "Open Full Chatbot",
-      "finalize": "Finalize",
-      "finalizeMystery": "Finalize Mystery"
+      "external": "外部",
+      "openFull": "フルチャットボットを開く",
+      "finalize": "完成させる",
+      "finalizeMystery": "ミステリーを完成させる"
     },
-    "creatorTitle": "Murder Mystery Creator",
-    "placeholder": "Type your ideas for the murder mystery...",
-    "finalizePrompt": "When you're satisfied with your mystery, finalize it to continue."
+    "creatorTitle": "殺人ミステリークリエイター",
+    "placeholder": "殺人ミステリーのアイデアを入力してください...",
+    "finalizePrompt": "ミステリーに満足したら、完成させて続行してください。"
   },
   "homeDashboard": {
-    "title": "Your Mysteries",
-    "searchPlaceholder": "Search mysteries...",
-    "loadMore": "Load More",
-    "loading": "Loading...",
+    "title": "あなたのミステリー",
+    "searchPlaceholder": "ミステリーを検索...",
+    "loadMore": "さらに読み込む",
+    "loading": "読み込み中...",
     "empty": {
-      "title": "You haven't created any mysteries yet",
-      "description": "Use the input box above to start creating your first murder mystery!"
+      "title": "まだミステリーを作成していません",
+      "description": "上の入力ボックスを使用して、最初の殺人ミステリーの作成を始めましょう！"
     },
     "errors": {
-      "loadFailed": "Failed to load some mysteries. Please refresh the page."
+      "loadFailed": "一部のミステリーの読み込みに失敗しました。ページを更新してください。"
     }
   },
   "mysteryDashboard": {
-    "title": "Mystery Dashboard",
-    "description": "Manage your created mysteries, start new ones, or explore sample content.",
+    "title": "ミステリーダッシュボード",
+    "description": "作成したミステリーを管理し、新しいミステリーを開始するか、サンプルコンテンツを探索します。",
     "tabs": {
-      "all": "All",
-      "drafts": "Drafts",
-      "purchased": "Purchased",
-      "archived": "Archived"
+      "all": "すべて",
+      "drafts": "下書き",
+      "purchased": "購入済み",
+      "archived": "アーカイブ済み"
     }
   }
 }

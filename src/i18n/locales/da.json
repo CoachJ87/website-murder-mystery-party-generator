@@ -530,6 +530,22 @@
         "refund": {
           "question": "Can I get a refund if I'm not satisfied?",
           "answer": "Absolutely! If you're not completely satisfied with your purchase, contact us within 7 days and we'll issue a full refund, no questions asked."
+        },
+        "gameDesignEngagement": {
+          "question": "Hvordan sikrer jeres spildesign, at alle forbliver engagerede?",
+          "answer": "Vores mysterier fokuserer på rige karakterinteraktioner snarere end rigide historielinjer. Hver karakter har detaljerede baggrunde og motivationer, der driver naturligt gameplay og sikrer, at alle spillere forbliver aktivt involveret gennem hele oplevelsen."
+        },
+        "dynamicMurderer": {
+          "question": "Hvorfor peger sporedne ikke på en specifik morder fra starten?",
+          "answer": "Morderen bestemmes efter første runde baseret på spor afsløret under spillet. Denne dynamiske tilgang betyder, at spor opbygges progressivt, hvilket gør mysteriet løseligt, selvom nogle detaljer går tabt i feststemningen."
+        },
+        "flexiblePlayerCount": {
+          "question": "Hvad sker der, hvis nogen ikke kan deltage i sidste øjeblik?",
+          "answer": "Vores fleksible design imødekommer ændringer i sidste øjeblik. Da spillet ikke er afhængigt af, at én karakter har kritisk information, kan du justere dit antal spillere uden at ødelægge mysteriet."
+        },
+        "characterFocused": {
+          "question": "Hvorfor karakterfokuseret i stedet for plotfokuseret?",
+          "answer": "Års erfaring har lært os, at alt for specifikke spor går tabt til fester. Vores karakterdrevne tilgang betyder, at mysteriet udfolder sig naturligt gennem interaktioner."
         }
       }
     },
@@ -686,13 +702,13 @@
   "character": {
     "detail": {
       "description": "Character Description",
-      "background": "Background", 
+      "background": "Background",
       "relationships": "Relationships",
       "secrets": "Secrets",
       "whereabouts": "Whereabouts During the Murder",
       "introduction": "Introduction",
       "round1": "Round 1: Initial Investigation",
-      "round2": "Round 2: Deeper Revelations", 
+      "round2": "Round 2: Deeper Revelations",
       "round3": "Round 3: Final Clues",
       "finalStatement": "Final Statement",
       "questioningOptions": "Questioning Options",
@@ -714,7 +730,7 @@
       "loadFailed": "Failed to load character data",
       "table": {
         "name": "Character Name",
-        "details": "Details", 
+        "details": "Details",
         "scripts": "Scripts",
         "actions": "Actions",
         "badges": {
@@ -724,7 +740,7 @@
           "secrets": "Secrets",
           "intro": "Intro",
           "round1": "Round 1",
-          "round2": "Round 2", 
+          "round2": "Round 2",
           "round3": "Round 3"
         }
       }
@@ -738,7 +754,7 @@
       "guide": {
         "yourCharacter": "{{name}} - Your Character",
         "yourBackground": "Your Background",
-        "yourSecret": "Your Secret", 
+        "yourSecret": "Your Secret",
         "introduction": "Introduction",
         "rumorsYouKnow": "Rumors You Know",
         "round1": "Round 1: Initial Statement",
@@ -760,7 +776,7 @@
       "instructions": "Character data should include sections for:",
       "sections": [
         "CHARACTER DESCRIPTION",
-        "BACKGROUND", 
+        "BACKGROUND",
         "RELATIONSHIPS",
         "SECRETS",
         "WHEREABOUTS",
@@ -779,7 +795,7 @@
       "subtitle": "Assign each character to a guest and send via email",
       "table": {
         "character": "Character",
-        "guestName": "Guest Name", 
+        "guestName": "Guest Name",
         "email": "Email",
         "action": "Action"
       },
@@ -887,7 +903,7 @@
       "whatsIncluded": "What's included in the full package:",
       "packageIncludes": [
         "Detailed host guide with complete setup instructions",
-        "Character guides for each player", 
+        "Character guides for each player",
         "Evidence cards and printable materials",
         "Full gameplay script and timeline"
       ]
@@ -936,7 +952,7 @@
     },
     "matrix": {
       "title": "Character Relationship Matrix"
-}
+    }
   },
   "blog": {
     "title": "Murder Mystery Blog",

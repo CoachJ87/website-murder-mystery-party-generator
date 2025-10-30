@@ -530,6 +530,22 @@
         "refund": {
           "question": "¿Puedo obtener un reembolso si no estoy satisfecho?",
           "answer": "¡Absolutamente! Si no estás completamente satisfecho con tu compra, contáctanos dentro de los 7 días y te emitiremos un reembolso completo, sin preguntas."
+        },
+        "gameDesignEngagement": {
+          "question": "¿Cómo asegura su diseño de juego que todos permanezcan comprometidos?",
+          "answer": "Nuestros misterios se centran en interacciones ricas de personajes en lugar de historias rígidas. Cada personaje tiene antecedentes y motivaciones detalladas que impulsan el juego natural, asegurando que todos los jugadores permanezcan activamente involucrados durante toda la experiencia."
+        },
+        "dynamicMurderer": {
+          "question": "¿Por qué las pistas no apuntan a un asesino específico desde el principio?",
+          "answer": "El asesino se determina después de la primera ronda según las pistas reveladas durante el juego. Este enfoque dinámico significa que las pistas se construyen progresivamente, haciendo que el misterio sea resoluble incluso si se pierden algunos detalles en el ambiente de fiesta."
+        },
+        "flexiblePlayerCount": {
+          "question": "¿Qué sucede si alguien no puede asistir en el último minuto?",
+          "answer": "Nuestro diseño flexible acomoda cambios de último minuto. Como el juego no depende de que un personaje tenga información crítica, puede ajustar su número de jugadores sin romper el misterio."
+        },
+        "characterFocused": {
+          "question": "¿Por qué centrado en personajes en lugar de centrado en la trama?",
+          "answer": "Años de experiencia nos enseñaron que las pistas demasiado específicas se pierden en las fiestas. Nuestro enfoque impulsado por personajes significa que el misterio se desarrolla naturalmente a través de interacciones."
         }
       }
     },

@@ -1,862 +1,878 @@
 {
-    "navigation": {
-      "home": "Início",
-      "dashboard": "Painel",
-      "signIn": "Entrar",
-      "signUp": "Cadastrar",
-      "signOut": "Sair",
-      "account": "Configurações da Conta",
-      "support": "Suporte"
+  "navigation": {
+    "home": "Início",
+    "dashboard": "Painel",
+    "signIn": "Entrar",
+    "signUp": "Cadastrar",
+    "signOut": "Sair",
+    "account": "Configurações da Conta",
+    "support": "Suporte"
+  },
+  "hero": {
+    "title": "Crie Festas de Mistério de Assassinato em Minutos",
+    "subtitle": "Crie mistérios personalizados exatamente como você quer – qualquer tema, qualquer personagem, qualquer cenário.",
+    "subtitleAuth": "Crie mistérios personalizados exatamente como você quer – qualquer tema, qualquer personagem, qualquer cenário.",
+    "placeholder": "Um mistério de assassinato em um speakeasy dos anos 1920 com músicos de jazz...",
+    "placeholderAuth": "Um mistério de assassinato em um speakeasy dos anos 1920 com músicos de jazz...",
+    "themes": {
+      "1920sSpeakeasy": "Speakeasy Anos 1920",
+      "hollywoodMurder": "Assassinato em Hollywood",
+      "castleMystery": "Mistério do Castelo",
+      "sciFiMystery": "Mistério de Ficção Científica",
+      "artGalleryOpening": "Abertura de Galeria de Arte",
+      "bakeryCompetition": "Competição de Panificação",
+      "mountainSkiResort": "Estação de Esqui na Montanha",
+      "luxuryTrainJourney": "Viagem de Trem de Luxo",
+      "historicUniversity": "Universidade Histórica",
+      "pokerTournament": "Torneio de Poker",
+      "barbieDreamworld": "Mundo dos Sonhos da Barbie",
+      "dystopianWaterworld": "Mundo Aquático Distópico",
+      "jungleSteampunk": "Steampunk na Selva",
+      "magicalBakery": "Padaria Mágica",
+      "gamingTournament": "Torneio de Jogos",
+      "synthwave80s": "Synthwave Anos 80",
+      "beachResort": "Resort de Praia",
+      "operaHouse": "Casa de Ópera",
+      "wineCountry": "Região Vinícola",
+      "safariAdventure": "Aventura de Safári",
+      "fashionShow": "Desfile de Moda",
+      "casinoNight": "Noite de Cassino",
+      "fairyTaleKingdom": "Reino de Contos de Fadas",
+      "spaceColony": "Colônia Espacial",
+      "superheroAcademy": "Academia de Super-Heróis",
+      "underwaterCity": "Cidade Subaquática",
+      "wildWestSaloon": "Saloon do Velho Oeste",
+      "vikingFeast": "Banquete Viking",
+      "candyKingdom": "Reino dos Doces",
+      "dragonsLair": "Covil do Dragão",
+      "timeTravelersBall": "Baile dos Viajantes do Tempo",
+      "atlantisRising": "Atlantis Ressurgindo",
+      "toyBoxAdventure": "Aventura na Caixa de Brinquedos",
+      "vampireMasquerade": "Baile de Máscaras de Vampiros",
+      "dimensionHopping": "Salto Dimensional",
+      "cyberpunkNightclub": "Boate Cyberpunk",
+      "ghostShip": "Navio Fantasma",
+      "sentientPlantColony": "Colônia de Plantas Sencientes"
     },
-    "hero": {
-      "title": "Crie Festas de Mistério de Assassinato em Minutos",
-      "subtitle": "Crie mistérios personalizados exatamente como você quer – qualquer tema, qualquer personagem, qualquer cenário.",
-      "subtitleAuth": "Crie mistérios personalizados exatamente como você quer – qualquer tema, qualquer personagem, qualquer cenário.",
-      "placeholder": "Um mistério de assassinato em um speakeasy dos anos 1920 com músicos de jazz...",
-      "placeholderAuth": "Um mistério de assassinato em um speakeasy dos anos 1920 com músicos de jazz...",
-      "themes": {
-        "1920sSpeakeasy": "Speakeasy Anos 1920",
-        "hollywoodMurder": "Assassinato em Hollywood",
-        "castleMystery": "Mistério do Castelo",
-        "sciFiMystery": "Mistério de Ficção Científica",
-        "artGalleryOpening": "Abertura de Galeria de Arte",
-        "bakeryCompetition": "Competição de Panificação",
-        "mountainSkiResort": "Estação de Esqui na Montanha",
-        "luxuryTrainJourney": "Viagem de Trem de Luxo",
-        "historicUniversity": "Universidade Histórica",
-        "pokerTournament": "Torneio de Poker",
-        "barbieDreamworld": "Mundo dos Sonhos da Barbie",
-        "dystopianWaterworld": "Mundo Aquático Distópico",
-        "jungleSteampunk": "Steampunk na Selva",
-        "magicalBakery": "Padaria Mágica",
-        "gamingTournament": "Torneio de Jogos",
-        "synthwave80s": "Synthwave Anos 80",
-        "beachResort": "Resort de Praia",
-        "operaHouse": "Casa de Ópera",
-        "wineCountry": "Região Vinícola",
-        "safariAdventure": "Aventura de Safári",
-        "fashionShow": "Desfile de Moda",
-        "casinoNight": "Noite de Cassino",
-        "fairyTaleKingdom": "Reino de Contos de Fadas",
-        "spaceColony": "Colônia Espacial",
-        "superheroAcademy": "Academia de Super-Heróis",
-        "underwaterCity": "Cidade Subaquática",
-        "wildWestSaloon": "Saloon do Velho Oeste",
-        "vikingFeast": "Banquete Viking",
-        "candyKingdom": "Reino dos Doces",
-        "dragonsLair": "Covil do Dragão",
-        "timeTravelersBall": "Baile dos Viajantes do Tempo",
-        "atlantisRising": "Atlantis Ressurgindo",
-        "toyBoxAdventure": "Aventura na Caixa de Brinquedos",
-        "vampireMasquerade": "Baile de Máscaras de Vampiros",
-        "dimensionHopping": "Salto Dimensional",
-        "cyberpunkNightclub": "Boate Cyberpunk",
-        "ghostShip": "Navio Fantasma",
-        "sentientPlantColony": "Colônia de Plantas Sencientes"
-      },
-      "prompts": {
-        "1920sSpeakeasy": "Quero organizar um mistério de assassinato com tema Speakeasy dos anos 1920, ambientado na era da Lei Seca.",
-        "hollywoodMurder": "Projete um mistério de assassinato ambientado em um set de film de Hollywood na era de ouro do cinema.",
-        "castleMystery": "Desenvolva um mistério de assassinato que se passa em um castelo medieval isolado convertido em um hotel de luxo.",
-        "sciFiMystery": "Crie um mistério de assassinato a bordo de uma estação espacial de pesquisa orbitando um exoplaneta recém-descoberto.",
-        "artGalleryOpening": "Crie um mistério de assassinato em uma prestigiosa galeria de arte durante uma inauguração de exposição de alto perfil.",
-        "bakeryCompetition": "Projete um mistério de assassinato centrado em uma competição de panificação de uma pequena cidade.",
-        "mountainSkiResort": "Desenvolva um mistério de assassinato em um isolado resort de esqui na montanha durante uma nevasca.",
-        "luxuryTrainJourney": "Crie um mistério ambientado em uma luxuosa viagem de trem pelos Alpes Suíços.",
-        "historicUniversity": "Construa um mistério de assassinato que se passa em uma universidade histórica com um passado assombrado.",
-        "pokerTournament": "Crie um mistério durante um torneio de pôquer de altas apostas.",
-        "barbieDreamworld": "Projete um mistério de assassinato em um mundo dos sonhos inspirado na Barbie, onde tudo é rosa e perfeito.",
-        "dystopianWaterworld": "Crie um mistério futurista distópico onde a água é o recurso mais precioso.",
-        "jungleSteampunk": "Desenvolva um mistério de assassinato ambientado na selva com tecnologia e vibrações steampunk.",
-        "magicalBakery": "Crie um mistério de assassinato em uma padaria mágica onde sobremesas encantadas são a especialidade.",
-        "gamingTournament": "Projete um mistério com tema de videogame onde os jogadores estão em um torneio de jogos.",
-        "synthwave80s": "Crie um mistério ambientado em uma década de 80 alternativa onde a música synthwave controla as emoções.",
-        "beachResort": "Desenvolva um mistério de assassinato em um resort de praia tropical.",
-        "operaHouse": "Crie um mistério ambientado em uma noite de estreia em uma casa de ópera histórica.",
-        "wineCountry": "Projete um 'quem matou' em uma prestigiosa vinícola durante a temporada de colheita.",
-        "safariAdventure": "Crie um mistério de assassinato durante uma expedição de safári africana.",
-        "fashionShow": "Construa um mistério nos bastidores de um desfile de moda de alto perfil.",
-        "casinoNight": "Crie um mistério durante uma noite de cassino de caridade.",
-        "fairyTaleKingdom": "Projete um mistério de assassinato em um reino encantado de contos de fadas.",
-        "spaceColony": "Crie um mistério na primeira colônia humana em Marte.",
-        "superheroAcademy": "Desenvolva um mistério em uma escola para jovens super-heróis em treinamento.",
-        "underwaterCity": "Crie um mistério de assassinato em uma cidade subaquática futurista.",
-        "wildWestSaloon": "Projete um mistério em uma cidade fronteiriça durante a corrida do ouro.",
-        "vikingFeast": "Crie um mistério de assassinato durante uma celebração tradicional Viking.",
-        "candyKingdom": "Crie um mistério de assassinato em um mundo onde tudo é feito de doces e açúcar.",
-        "dragonsLair": "Projete um mistério em um mundo de fantasia medieval onde humanos e dragões coexistem.",
-        "timeTravelersBall": "Crie um mistério de assassinato em uma reunião onde os participantes vêm de diferentes períodos de tempo.",
-        "atlantisRising": "Desenvolva um mistério na cidade antiga de Atlântida, recém-surgida.",
-        "toyBoxAdventure": "Crie um mistério onde os brinquedos ganham vida quando os humanos não estão olhando.",
-        "vampireMasquerade": "Projete um mistério no baile de sangue anual de uma exclusiva sociedade de vampiros.",
-        "dimensionHopping": "Crie um mistério que abrange múltiplos universos paralelos.",
-        "cyberpunkNightclub": "Crie um mistério de assassinato em uma boate cyberpunk neon.",
-        "ghostShip": "Projete um mistério a bordo de um navio lendário que desapareceu séculos atrás e misteriosamente retornou.",
-        "sentientPlantColony": "Crie um mistério de assassinato em uma sociedade de plantas inteligentes e móveis com uma hierarquia social complexa."
-      }
+    "prompts": {
+      "1920sSpeakeasy": "Quero organizar um mistério de assassinato com tema Speakeasy dos anos 1920, ambientado na era da Lei Seca.",
+      "hollywoodMurder": "Projete um mistério de assassinato ambientado em um set de film de Hollywood na era de ouro do cinema.",
+      "castleMystery": "Desenvolva um mistério de assassinato que se passa em um castelo medieval isolado convertido em um hotel de luxo.",
+      "sciFiMystery": "Crie um mistério de assassinato a bordo de uma estação espacial de pesquisa orbitando um exoplaneta recém-descoberto.",
+      "artGalleryOpening": "Crie um mistério de assassinato em uma prestigiosa galeria de arte durante uma inauguração de exposição de alto perfil.",
+      "bakeryCompetition": "Projete um mistério de assassinato centrado em uma competição de panificação de uma pequena cidade.",
+      "mountainSkiResort": "Desenvolva um mistério de assassinato em um isolado resort de esqui na montanha durante uma nevasca.",
+      "luxuryTrainJourney": "Crie um mistério ambientado em uma luxuosa viagem de trem pelos Alpes Suíços.",
+      "historicUniversity": "Construa um mistério de assassinato que se passa em uma universidade histórica com um passado assombrado.",
+      "pokerTournament": "Crie um mistério durante um torneio de pôquer de altas apostas.",
+      "barbieDreamworld": "Projete um mistério de assassinato em um mundo dos sonhos inspirado na Barbie, onde tudo é rosa e perfeito.",
+      "dystopianWaterworld": "Crie um mistério futurista distópico onde a água é o recurso mais precioso.",
+      "jungleSteampunk": "Desenvolva um mistério de assassinato ambientado na selva com tecnologia e vibrações steampunk.",
+      "magicalBakery": "Crie um mistério de assassinato em uma padaria mágica onde sobremesas encantadas são a especialidade.",
+      "gamingTournament": "Projete um mistério com tema de videogame onde os jogadores estão em um torneio de jogos.",
+      "synthwave80s": "Crie um mistério ambientado em uma década de 80 alternativa onde a música synthwave controla as emoções.",
+      "beachResort": "Desenvolva um mistério de assassinato em um resort de praia tropical.",
+      "operaHouse": "Crie um mistério ambientado em uma noite de estreia em uma casa de ópera histórica.",
+      "wineCountry": "Projete um 'quem matou' em uma prestigiosa vinícola durante a temporada de colheita.",
+      "safariAdventure": "Crie um mistério de assassinato durante uma expedição de safári africana.",
+      "fashionShow": "Construa um mistério nos bastidores de um desfile de moda de alto perfil.",
+      "casinoNight": "Crie um mistério durante uma noite de cassino de caridade.",
+      "fairyTaleKingdom": "Projete um mistério de assassinato em um reino encantado de contos de fadas.",
+      "spaceColony": "Crie um mistério na primeira colônia humana em Marte.",
+      "superheroAcademy": "Desenvolva um mistério em uma escola para jovens super-heróis em treinamento.",
+      "underwaterCity": "Crie um mistério de assassinato em uma cidade subaquática futurista.",
+      "wildWestSaloon": "Projete um mistério em uma cidade fronteiriça durante a corrida do ouro.",
+      "vikingFeast": "Crie um mistério de assassinato durante uma celebração tradicional Viking.",
+      "candyKingdom": "Crie um mistério de assassinato em um mundo onde tudo é feito de doces e açúcar.",
+      "dragonsLair": "Projete um mistério em um mundo de fantasia medieval onde humanos e dragões coexistem.",
+      "timeTravelersBall": "Crie um mistério de assassinato em uma reunião onde os participantes vêm de diferentes períodos de tempo.",
+      "atlantisRising": "Desenvolva um mistério na cidade antiga de Atlântida, recém-surgida.",
+      "toyBoxAdventure": "Crie um mistério onde os brinquedos ganham vida quando os humanos não estão olhando.",
+      "vampireMasquerade": "Projete um mistério no baile de sangue anual de uma exclusiva sociedade de vampiros.",
+      "dimensionHopping": "Crie um mistério que abrange múltiplos universos paralelos.",
+      "cyberpunkNightclub": "Crie um mistério de assassinato em uma boate cyberpunk neon.",
+      "ghostShip": "Projete um mistério a bordo de um navio lendário que desapareceu séculos atrás e misteriosamente retornou.",
+      "sentientPlantColony": "Crie um mistério de assassinato em uma sociedade de plantas inteligentes e móveis com uma hierarquia social complexa."
+    }
+  },
+  "howItWorks": {
+    "step1": {
+      "title": "Descreva o seu mistério de assassinato ideal.",
+      "description": "Conte-nos a sua visão única - qualquer tema, personagens ou ambiente que você desejar."
     },
-    "howItWorks": {
-      "step1": {
-        "title": "Descreva o seu mistério de assassinato ideal.",
-        "description": "Conte-nos a sua visão única - qualquer tema, personagens ou ambiente que você desejar."
-      },
-      "step2": {
-        "title": "Criamos o seu mistério personalizado instantaneamente.",
-        "description": "Nossa IA gera tudo exatamente como você quer – personagens, pistas e enredo."
-      },
-      "step3": {
-        "title": "Aperfeiçoe o seu mistério com o nosso editor.",
-        "description": "Ajuste e personalize até que o seu mistério esteja perfeito para o seu grupo."
-      },
-      "step4": {
-        "title": "Obtenha tudo o que precisa para hospedar e compartilhar.",
-        "description": "Baixe e compartilhe facilmente todos os materiais com os seus jogadores."
-      }
+    "step2": {
+      "title": "Criamos o seu mistério personalizado instantaneamente.",
+      "description": "Nossa IA gera tudo exatamente como você quer – personagens, pistas e enredo."
     },
-    "features": {
-      "title": "Tudo o que você precisa está incluído",
-      "step1": {
-        "step": "Passo 1",
-        "title": "Personalização Ilimitada",
-        "content": "Qualquer tema, personagem, cenário - crie mistérios exatamente como você os imagina."
-      },
-      "step2": {
-        "step": "Passo 2",
-        "title": "Perfis Completos de Personagens",
-        "content": "Histórias detalhadas, motivações e segredos, feitos sob medida para o seu mistério."
-      },
-      "step3": {
-        "step": "Passo 3",
-        "title": "Guia do Anfitrião Fácil",
-        "content": "Instruções passo a passo para liderar seu mistério personalizado com confiança."
-      }
+    "step3": {
+      "title": "Aperfeiçoe o seu mistério com o nosso editor.",
+      "description": "Ajuste e personalize até que o seu mistério esteja perfeito para o seu grupo."
     },
-    "testimonials": {
-      "title": "O que os Outros Dizem",
-      "testimonial1": {
-        "text": "Meus amigos ainda estão falando sobre nossa noite de mistério de assassinato. Os personagens eram tão detalhados e as reviravoltas na trama eram perfeitas!",
-        "author": "Jed"
-      },
-      "testimonial2": {
-        "text": "Tão fácil de configurar! Eu estava preocupada em hospedar para 12 pessoas, mas os materiais tornaram tudo simples e todos se divertiram muito.",
-        "author": "Laura"
-      },
-      "testimonial3": {
-        "text": "Terceira festa de mistério de assassinato usando este serviço e elas continuam melhorando. As opções de personalização são incríveis.",
-        "author": "Alex"
-      }
+    "step4": {
+      "title": "Obtenha tudo o que precisa para hospedar e compartilhar.",
+      "description": "Baixe e compartilhe facilmente todos os materiais com os seus jogadores."
+    }
+  },
+  "features": {
+    "title": "Tudo o que você precisa está incluído",
+    "step1": {
+      "step": "Passo 1",
+      "title": "Personalização Ilimitada",
+      "content": "Qualquer tema, personagem, cenário - crie mistérios exatamente como você os imagina."
     },
-    "videoDemo": {
+    "step2": {
+      "step": "Passo 2",
+      "title": "Perfis Completos de Personagens",
+      "content": "Histórias detalhadas, motivações e segredos, feitos sob medida para o seu mistério."
+    },
+    "step3": {
+      "step": "Passo 3",
+      "title": "Guia do Anfitrião Fácil",
+      "content": "Instruções passo a passo para liderar seu mistério personalizado com confiança."
+    }
+  },
+  "testimonials": {
+    "title": "O que os Outros Dizem",
+    "testimonial1": {
+      "text": "Meus amigos ainda estão falando sobre nossa noite de mistério de assassinato. Os personagens eram tão detalhados e as reviravoltas na trama eram perfeitas!",
+      "author": "Jed"
+    },
+    "testimonial2": {
+      "text": "Tão fácil de configurar! Eu estava preocupada em hospedar para 12 pessoas, mas os materiais tornaram tudo simples e todos se divertiram muito.",
+      "author": "Laura"
+    },
+    "testimonial3": {
+      "text": "Terceira festa de mistério de assassinato usando este serviço e elas continuam melhorando. As opções de personalização são incríveis.",
+      "author": "Alex"
+    }
+  },
+  "videoDemo": {
     "title": "Assistir a uma demonstração"
   },
   "support": {
-      "title": "Precisa de Mais Ajuda?",
-      "description": "Visite nosso centro de suporte abrangente para perguntas frequentes, dicas de hospedagem e mais informações sobre como usar nosso Criador de Mistérios.",
-      "button": "Visitar Centro de Suporte",
-      "email": "support@mysterymaker.party"
+    "title": "Precisa de Mais Ajuda?",
+    "description": "Visite nosso centro de suporte abrangente para perguntas frequentes, dicas de hospedagem e mais informações sobre como usar nosso Criador de Mistérios.",
+    "button": "Visitar Centro de Suporte",
+    "email": "support@mysterymaker.party"
+  },
+  "footer": {
+    "tagline": "Crie mistérios de assassinato cativantes com a velocidade da imaginação.",
+    "quickLinks": "Links Rápidos",
+    "company": "Empresa",
+    "links": {
+      "home": "Início",
+      "support": "Suporte",
+      "contact": "Contato",
+      "privacy": "Política de Privacidade"
     },
-    "footer": {
-      "tagline": "Crie mistérios de assassinato cativantes com a velocidade da imaginação.",
-      "quickLinks": "Links Rápidos",
-      "company": "Empresa",
-      "links": {
-        "home": "Início",
-        "support": "Suporte",
-        "contact": "Contato",
-        "privacy": "Política de Privacidade"
-      },
-      "copyright": "Mystery Maker, Inc. Todos os direitos reservados."
+    "copyright": "Mystery Maker, Inc. Todos os direitos reservados."
+  },
+  "auth": {
+    "signIn": {
+      "title": "Bem-vindo de Volta",
+      "subtitle": "Faça login em sua conta para continuar criando mistérios incríveis",
+      "email": "Endereço de E-mail",
+      "password": "Senha",
+      "rememberMe": "Lembrar-me",
+      "forgotPassword": "Esqueceu a senha?",
+      "noAccount": "Não tem uma conta?",
+      "signUpLink": "Cadastre-se aqui",
+      "submitButton": "Entrar",
+      "signingIn": "Entrando...",
+      "orDivider": "ou continue com",
+      "googleButton": "Continuar com o Google"
     },
-    "auth": {
-      "signIn": {
-        "title": "Bem-vindo de Volta",
-        "subtitle": "Faça login em sua conta para continuar criando mistérios incríveis",
-        "email": "Endereço de E-mail",
-        "password": "Senha",
-        "rememberMe": "Lembrar-me",
-        "forgotPassword": "Esqueceu a senha?",
-        "noAccount": "Não tem uma conta?",
-        "signUpLink": "Cadastre-se aqui",
-        "submitButton": "Entrar",
-        "signingIn": "Entrando...",
-        "orDivider": "ou continue com",
-        "googleButton": "Continuar com o Google"
+    "signUp": {
+      "title": "Crie Sua Conta",
+      "subtitle": "Junte-se a milhares de criadores de mistério e comece a criar hoje",
+      "name": "Nome Completo",
+      "email": "Endereço de E-mail",
+      "password": "Senha",
+      "confirmPassword": "Confirmar Senha",
+      "terms": "Eu concordo com os",
+      "termsLink": "Termos de Serviço",
+      "privacy": "Política de Privacidade",
+      "and": "e",
+      "hasAccount": "Já tem uma conta?",
+      "signInLink": "Faça login aqui",
+      "submitButton": "Criar Conta",
+      "creatingAccount": "Criando conta...",
+      "orDivider": "ou continue com",
+      "googleButton": "Continuar com o Google"
+    },
+    "forgotPassword": {
+      "title": "Recuperar Senha",
+      "subtitle": "Digite seu endereço de e-mail e enviaremos um link para redefinir sua senha",
+      "email": "Endereço de E-mail",
+      "submitButton": "Enviar Link de Recuperação",
+      "sending": "Enviando...",
+      "backToSignIn": "Voltar para o login",
+      "checkEmail": {
+        "title": "Verifique Seu E-mail",
+        "message": "Enviamos um link de redefinição de senha para",
+        "noEmail": "Não recebeu o e-mail?",
+        "tryAgain": "Tentar novamente",
+        "returnToSignIn": "Voltar para o Login"
+      }
+    },
+    "resetPassword": {
+      "title": "Definir Nova Senha",
+      "subtitle": "Crie uma nova senha para sua conta",
+      "password": "Nova Senha",
+      "confirmPassword": "Confirmar Nova Senha",
+      "submitButton": "Atualizar Senha",
+      "updating": "Atualizando...",
+      "success": "Senha atualizada com sucesso"
+    },
+    "errors": {
+      "invalidCredentials": "E-mail ou senha inválidos",
+      "emailAlreadyExists": "Já existe uma conta com este e-mail",
+      "weakPassword": "A senha deve ter no mínimo 6 caracteres",
+      "passwordMismatch": "As senhas não coincidem",
+      "invalidEmail": "Por favor, insira um endereço de e-mail válido",
+      "requiredField": "Este campo é obrigatório",
+      "termsRequired": "Você deve aceitar os termos de serviço",
+      "networkError": "Erro de rede. Por favor, tente novamente.",
+      "unknownError": "Algo deu errado. Por favor, tente novamente."
+    },
+    "success": {
+      "accountCreated": "Conta criada com sucesso! Verifique seu e-mail para verificar sua conta.",
+      "passwordReset": "E-mail de redefinição de senha enviado com sucesso",
+      "passwordUpdated": "Senha atualizada com sucesso",
+      "signedOut": "Desconectado com sucesso"
+    }
+  },
+  "dashboard": {
+    "title": "Seus Mistérios de Assassinato",
+    "subtitle": "Visualize, edite e gerencie todos os seus mistérios criados",
+    "welcome": {
+      "title": "Bem-vindo(a) de volta",
+      "subtitle": "Pronto(a) para criar sua próxima obra-prima de mistério?",
+      "noMysteries": "Você ainda não criou nenhum mistério",
+      "getStarted": "Comece a criar seu primeiro mistério"
+    },
+    "mysteries": {
+      "title": "Seus Mistérios",
+      "searchPlaceholder": "Buscar mistérios...",
+      "deleteSuccess": "Mistério movido para o arquivo",
+      "deleteFailed": "Falha ao arquivar mistério",
+      "filter": {
+        "all": "Todos os Mistérios",
+        "drafts": "Rascunhos",
+        "completed": "Concluídos",
+        "purchased": "Comprados",
+        "archived": "Arquivados"
       },
-      "signUp": {
-        "title": "Crie Sua Conta",
-        "subtitle": "Junte-se a milhares de criadores de mistério e comece a criar hoje",
-        "name": "Nome Completo",
-        "email": "Endereço de E-mail",
-        "password": "Senha",
-        "confirmPassword": "Confirmar Senha",
-        "terms": "Eu concordo com os",
-        "termsLink": "Termos de Serviço",
-        "privacy": "Política de Privacidade",
-        "and": "e",
-        "hasAccount": "Já tem uma conta?",
-        "signInLink": "Faça login aqui",
-        "submitButton": "Criar Conta",
-        "creatingAccount": "Criando conta...",
-        "orDivider": "ou continue com",
-        "googleButton": "Continuar com o Google"
+      "empty": {
+        "title": "Nenhum mistério encontrado",
+        "description": "Crie seu primeiro mistério para começar",
+        "searchResult": "Nenhum mistério corresponde à sua busca"
       },
-      "forgotPassword": {
-        "title": "Recuperar Senha",
-        "subtitle": "Digite seu endereço de e-mail e enviaremos um link para redefinir sua senha",
-        "email": "Endereço de E-mail",
-        "submitButton": "Enviar Link de Recuperação",
-        "sending": "Enviando...",
-        "backToSignIn": "Voltar para o login",
-        "checkEmail": {
-          "title": "Verifique Seu E-mail",
-          "message": "Enviamos um link de redefinição de senha para",
-          "noEmail": "Não recebeu o e-mail?",
-          "tryAgain": "Tentar novamente",
-          "returnToSignIn": "Voltar para o Login"
-        }
+      "card": {
+        "players": "{{count}} jogadores",
+        "created": "Criado",
+        "lastEdited": "Última Edição",
+        "theme": "Tema: {{theme}}",
+        "actions": {
+          "view": "Visualizar",
+          "chat": "Conversar",
+          "delete": "Excluir",
+          "viewProgress": "Ver Progresso",
+          "progress": "Progresso",
+          "editMystery": "Editar Mistério",
+          "edit": "Editar",
+          "archive": "Arquivar",
+          "deleteTitle": "Excluir"
+        },
+        "deleteDialog": {
+          "title": "Excluir Mistério",
+          "description": "Tem certeza de que deseja excluir este mistério? Esta ação não pode ser desfeita."
+        },
+        "generationInProgress": "Geração em andamento...",
+        "editedDate": "Editado em {{date}}"
       },
-      "resetPassword": {
-        "title": "Definir Nova Senha",
-        "subtitle": "Crie uma nova senha para sua conta",
-        "password": "Nova Senha",
+      "status": {
+        "completed": "Concluído",
+        "draft": "Rascunho",
+        "purchased": "Comprado",
+        "unknown": "Desconhecido",
+        "done": "Pronto",
+        "bought": "Comprado",
+        "generating": "Gerando...",
+        "generatingShort": "Ger..."
+      },
+      "showingCount": "Mostrando {{count}} de {{total}} mistérios"
+    },
+    "stats": {
+      "totalMysteries": "Total de Mistérios",
+      "completedMysteries": "Concluídos",
+      "purchasedMysteries": "Comprados",
+      "totalPlayers": "Total de Jogadores Recebidos"
+    },
+    "backToDashboard": "Voltar para o Painel",
+    "buttons": {
+      "createFirstMystery": "Criar Seu Primeiro Mistério"
+    },
+    "errors": {
+      "loadFailed": "Falha ao carregar seus mistérios"
+    }
+  },
+  "account": {
+    "title": "Configurações da Conta",
+    "tabs": {
+      "profile": "Perfil",
+      "security": "Segurança"
+    },
+    "profile": {
+      "title": "Informações do Perfil",
+      "description": "Atualize as informações do seu perfil de conta",
+      "name": "Nome Completo",
+      "email": "Endereço de E-mail",
+      "emailNote": "O e-mail não pode ser alterado",
+      "saveButton": "Salvar Alterações",
+      "saving": "Salvando...",
+      "success": "Perfil atualizado com sucesso"
+    },
+    "security": {
+      "password": {
+        "title": "Alterar Senha",
+        "description": "Atualize sua senha para manter sua conta segura",
+        "currentPassword": "Senha Atual",
+        "newPassword": "Nova Senha",
         "confirmPassword": "Confirmar Nova Senha",
-        "submitButton": "Atualizar Senha",
+        "updateButton": "Atualizar Senha",
         "updating": "Atualizando...",
         "success": "Senha atualizada com sucesso"
       },
-      "errors": {
-        "invalidCredentials": "E-mail ou senha inválidos",
-        "emailAlreadyExists": "Já existe uma conta com este e-mail",
-        "weakPassword": "A senha deve ter no mínimo 6 caracteres",
-        "passwordMismatch": "As senhas não coincidem",
-        "invalidEmail": "Por favor, insira um endereço de e-mail válido",
-        "requiredField": "Este campo é obrigatório",
-        "termsRequired": "Você deve aceitar os termos de serviço",
-        "networkError": "Erro de rede. Por favor, tente novamente.",
-        "unknownError": "Algo deu errado. Por favor, tente novamente."
+      "deleteAccount": {
+        "title": "Excluir Conta",
+        "description": "Exclua sua conta e todos os dados associados permanentemente",
+        "warning": "Esta ação não pode ser desfeita. Todos os seus mistérios e dados serão excluídos permanentemente.",
+        "confirmText": "Digite EXCLUIR para confirmar",
+        "deleteButton": "Excluir Conta",
+        "deleting": "Excluindo...",
+        "success": "Conta excluída com sucesso"
+      }
+    }
+  },
+  "mysteryCreation": {
+    "scriptType": {
+      "full": "completo",
+      "pointForm": "em tópicos",
+      "both": "completo e em tópicos"
+    },
+    "sections": {
+      "premise": "Premissa",
+      "victim": "Vítima",
+      "characterList": "Lista de Personagens",
+      "players": "jogadores",
+      "murderMethod": "Método de Assassinato"
+    },
+    "wizard": {
+      "title": "Crie Seu Mistério",
+      "step1": {
+        "title": "Conte-nos sua visão",
+        "description": "Descreva sua festa de mistério de assassinato ideal"
       },
-      "success": {
-        "accountCreated": "Conta criada com sucesso! Verifique seu e-mail para verificar sua conta.",
-        "passwordReset": "E-mail de redefinição de senha enviado com sucesso",
-        "passwordUpdated": "Senha atualizada com sucesso",
-        "signedOut": "Desconectado com sucesso"
+      "step2": {
+        "title": "Revisar e Refinar",
+        "description": "Aperfeiçoe seu mistério com nosso assistente de IA"
+      },
+      "step3": {
+        "title": "Pacote Completo",
+        "description": "Obtenha tudo o que precisa para hospedar"
+      },
+      "prompt": {
+        "defaultStart": "Quero criar um mistério de assassinato",
+        "withTheme": "O tema/ambiente deve ser {{theme}} para {{playerCount}} jogadores com scripts {{scriptType}}",
+        "withoutTheme": "É para {{playerCount}} jogadores com scripts {{scriptType}}",
+        "withAccomplice": "Inclua um mecanismo de cúmplice no mistério",
+        "withoutAccomplice": "Não inclua um mecanismo de cúmplice no mistério",
+        "additionalDetails": "Detalhes adicionais são: {{details}}"
       }
     },
-    "dashboard": {
-      "title": "Seus Mistérios de Assassinato",
-      "subtitle": "Visualize, edite e gerencie todos os seus mistérios criados",
-      "welcome": {
-        "title": "Bem-vindo(a) de volta",
-        "subtitle": "Pronto(a) para criar sua próxima obra-prima de mistério?",
-        "noMysteries": "Você ainda não criou nenhum mistério",
-        "getStarted": "Comece a criar seu primeiro mistério"
-      },
-      "mysteries": {
-        "title": "Seus Mistérios",
-        "searchPlaceholder": "Buscar mistérios...",
-        "deleteSuccess": "Mistério movido para o arquivo",
-        "deleteFailed": "Falha ao arquivar mistério",
-        "filter": {
-          "all": "Todos os Mistérios",
-          "drafts": "Rascunhos",
-          "completed": "Concluídos",
-          "purchased": "Comprados",
-          "archived": "Arquivados"
-        },
-        "empty": {
-          "title": "Nenhum mistério encontrado",
-          "description": "Crie seu primeiro mistério para começar",
-          "searchResult": "Nenhum mistério corresponde à sua busca"
-        },
-        "card": {
-          "players": "{{count}} jogadores",
-          "created": "Criado",
-          "lastEdited": "Última Edição",
-          "theme": "Tema: {{theme}}",
-          "actions": {
-            "view": "Visualizar",
-            "chat": "Conversar",
-            "delete": "Excluir",
-            "viewProgress": "Ver Progresso",
-            "progress": "Progresso",
-            "editMystery": "Editar Mistério",
-            "edit": "Editar",
-            "archive": "Arquivar",
-            "deleteTitle": "Excluir"
-          },
-          "deleteDialog": {
-            "title": "Excluir Mistério",
-            "description": "Tem certeza de que deseja excluir este mistério? Esta ação não pode ser desfeita."
-          },
-          "generationInProgress": "Geração em andamento...",
-          "editedDate": "Editado em {{date}}"
-        },
-        "status": {
-          "completed": "Concluído",
-          "draft": "Rascunho",
-          "purchased": "Comprado",
-          "unknown": "Desconhecido",
-          "done": "Pronto",
-          "bought": "Comprado",
-          "generating": "Gerando...",
-          "generatingShort": "Ger..."
-        },
-        "showingCount": "Mostrando {{count}} de {{total}} mistérios"
-      },
-      "stats": {
-        "totalMysteries": "Total de Mistérios",
-        "completedMysteries": "Concluídos",
-        "purchasedMysteries": "Comprados",
-        "totalPlayers": "Total de Jogadores Recebidos"
-      },
-      "backToDashboard": "Voltar para o Painel",
-      "buttons": {
-        "createFirstMystery": "Criar Seu Primeiro Mistério"
-      },
-      "errors": {
-        "loadFailed": "Falha ao carregar seus mistérios"
+    "editor": {
+      "title": "Editor de Mistério",
+      "characters": "Personagens",
+      "story": "História",
+      "clues": "Pistas",
+      "hostGuide": "Guia do Anfitrião",
+      "save": "Salvar Rascunho",
+      "publish": "Finalizar Mistério",
+      "saving": "Salvando...",
+      "publishing": "Publicando...",
+      "saved": "Rascunho salvo",
+      "published": "Mistério finalizado"
+    },
+    "guidance": {
+      "describe": "Descreva seu mistério em detalhes - quanto mais específico você for, melhor poderemos criá-lo para você",
+      "examples": "Tente: 'Um mistério de assassinato em um speakeasy dos anos 1920 com 8 personagens, incluindo uma cantora de jazz, um barman e um chefão da máfia'",
+      "playerCount": "Quantos jogadores participarão?",
+      "theme": "Qual é o cenário ou tema?",
+      "special": "Quaisquer requisitos ou restrições especiais?",
+      "initialPrompt": {
+        "withTheme": "Vamos criar um mistério de assassinato com tema {{theme}}. Por favor, me guie passo a passo na criação deste mistério.",
+        "withoutTheme": "Vamos criar um mistério de assassinato. Por favor, me guie passo a passo na criação deste mistério."
       }
     },
-    "account": {
-      "title": "Configurações da Conta",
-      "tabs": {
-        "profile": "Perfil",
-        "security": "Segurança"
+    "editTitle": "Editar Mistério",
+    "createTitle": "Criar Novo Mistério",
+    "form": {
+      "description": "Preencha o formulário abaixo para gerar seu mistério de assassinato personalizado"
+    },
+    "buttons": {
+      "generateFullMystery": "Gerar Mistério Completo"
+    },
+    "errors": {
+      "signInToSave": "Por favor, faça login para salvar seu mistério",
+      "saveFailed": "Falha ao salvar mistério",
+      "loadFailed": "Falha ao carregar mistério",
+      "loadMessagesFailed": "Falha ao carregar mensagens da conversa",
+      "loadConversationFailed": "Falha ao carregar conversa",
+      "initialPrompt": "Por favor, forneça um prompt para o seu mistério",
+      "saveMessageFailed": "Falha ao salvar mensagem"
+    },
+    "success": {
+      "setupComplete": "Configuração do mistério completa! Iniciando o bate-papo..."
+    }
+  },
+  "mysteryForm": {
+    "userRequestLabel": "O que você deseja criar",
+    "userRequestDescription": "Seu pedido original da página inicial",
+    "themeLabel": "Detalhes do Tema/Cenário (Opcional)",
+    "themePlaceholder": "ex: período de tempo, cenário específico, itens obrigatórios, etc.",
+    "themeDescription": "Escolha um tema ou cenário específico para o seu mistério de assassinato",
+    "playerCountLabel": "Quantos jogadores participarão?",
+    "playerCountPlaceholder": "Selecionar número de jogadores",
+    "playerCountItem": "{{count}} jogadores",
+    "playerCountDescription": "Escolha entre 4 e 32 jogadores para o seu mistério de assassinato.",
+    "accompliceLabel": "Incluir Mecanismo de Cúmplice",
+    "accompliceDescription": "Melhor para jogos com 10 ou mais jogadores",
+    "scriptTypeLabel": "Nível de Detalhe do Roteiro",
+    "scriptTypeFullLabel": "Roteiros Completos - Diálogos completos e instruções detalhadas",
+    "scriptTypePointFormLabel": "Em Tópicos - Pontos-chave e resumos em forma de lista",
+    "scriptTypeBothLabel": "Ambos os Formatos - Roteiros completos E notas em tópicos",
+    "additionalDetailsLabel": "Detalhes Adicionais (Opcional)",
+    "additionalDetailsPlaceholder": "Quaisquer requisitos específicos, regras especiais ou contexto adicional para o seu mistério...",
+    "additionalDetailsDescription": "Forneça quaisquer detalhes adicionais ou solicitações especiais para o seu mistério",
+    "startChat": "Iniciar Chat com IA",
+    "startingChat": "Iniciando chat..."
+  },
+  "supportPage": {
+    "title": "Central de Suporte",
+    "subtitle": "Encontre respostas para perguntas frequentes, entre em contato com nossa equipe de suporte e obtenha tudo o que você precisa para criar festas de mistério incríveis.",
+    "tabs": {
+      "faqs": "Perguntas Frequentes",
+      "contact": "Entre em Contato"
+    },
+    "faqs": {
+      "title": "Perguntas Frequentes",
+      "description": "Encontre respostas para perguntas comuns sobre o Mystery Maker",
+      "categories": {
+        "aboutMysteryMaker": "Sobre o Mystery Maker",
+        "gameMechanics": "Mecânica do Jogo",
+        "hostingPlanning": "Hospedagem e Planejamento",
+        "accountBilling": "Conta e Faturamento"
       },
-      "profile": {
-        "title": "Informações do Perfil",
-        "description": "Atualize as informações do seu perfil de conta",
-        "name": "Nome Completo",
-        "email": "Endereço de E-mail",
-        "emailNote": "O e-mail não pode ser alterado",
-        "saveButton": "Salvar Alterações",
-        "saving": "Salvando...",
-        "success": "Perfil atualizado com sucesso"
-      },
-      "security": {
-        "password": {
-          "title": "Alterar Senha",
-          "description": "Atualize sua senha para manter sua conta segura",
-          "currentPassword": "Senha Atual",
-          "newPassword": "Nova Senha",
-          "confirmPassword": "Confirmar Nova Senha",
-          "updateButton": "Atualizar Senha",
-          "updating": "Atualizando...",
-          "success": "Senha atualizada com sucesso"
+      "questions": {
+        "whatIsMysteryMaker": {
+          "question": "O que é o Mystery Maker e como funciona?",
+          "answer": "Mystery Maker é uma plataforma alimentada por IA que cria festas de mistério de assassinato personalizadas exatamente como você quer. Conte-nos sua visão única - qualquer tema, personagens ou ambiente - e nossa IA gera tudo o que você precisa: perfis de personagens, pistas e materiais do anfitrião feitos sob medida para sua festa."
         },
-        "deleteAccount": {
-          "title": "Excluir Conta",
-          "description": "Exclua sua conta e todos os dados associados permanentemente",
-          "warning": "Esta ação não pode ser desfeita. Todos os seus mistérios e dados serão excluídos permanentemente.",
-          "confirmText": "Digite EXCLUIR para confirmar",
-          "deleteButton": "Excluir Conta",
-          "deleting": "Excluindo...",
-          "success": "Conta excluída com sucesso"
+        "creationProcess": {
+          "question": "Como funciona o processo de criação e compra?",
+          "answer": "É fácil! Primeiro, descreva seu mistério de assassinato ideal, e criaremos uma prévia personalizada gratuitamente. Se você estiver satisfeito com seu mistério, compre o pacote completo por $24,99. Você receberá instantaneamente tudo o que precisa para hospedar: perfis detalhados de personagens, um guia do anfitrião e todos os materiais do jogo."
+        },
+        "saveWork": {
+          "question": "Posso salvar meu trabalho e voltar a ele mais tarde?",
+          "answer": "Sim! Todos os seus mistérios personalizados são salvos em sua conta, permitindo que você retorne e edite a qualquer momento."
+        },
+        "replayable": {
+          "question": "Esses mistérios de assassinato são rejogáveis?",
+          "answer": "Com certeza! Nossos mistérios incluem elementos variáveis para que cada jogada pareça nova, mesmo com o mesmo grupo. Você pode hospedar seu mistério personalizado quantas vezes quiser."
+        },
+        "playerCount": {
+          "question": "Quantos jogadores preciso?",
+          "answer": "Nosso sistema cria mistérios para qualquer tamanho de grupo que você especificar - desde reuniões íntimas de 4-6 jogadores até festas maiores de 15+ jogadores. Basta nos dizer o número de jogadores e nós projetaremos de acordo."
+        },
+        "modifyMystery": {
+          "question": "Posso modificar meu mistério depois de criá-lo?",
+          "answer": "Claro! Use nosso editor para ajustar e personalizar seu mistério até que esteja perfeito para seu grupo. Modifique personagens, temas ou complexidade a qualquer momento."
+        },
+        "lastMinuteChanges": {
+          "question": "E se eu precisar adicionar ou remover jogadores no último minuto?",
+          "answer": "Sem problemas! Nosso sistema flexível permite que você ajuste o número de jogadores mesmo depois de criar seu mistério. A IA ajustará a história e os personagens para acomodar essas mudanças."
+        },
+        "whatIncluded": {
+          "question": "O que está incluído no meu pacote de mistério personalizado?",
+          "answer": "Tudo o que você precisa: um guia abrangente do anfitrião com instruções passo a passo, perfis detalhados de personagens para cada jogador, pistas, evidências e todos os materiais do jogo. Nenhuma preparação extra é necessária."
+        },
+        "gameDuration": {
+          "question": "Quanto tempo dura um jogo típico?",
+          "answer": "A maioria dos mistérios dura de 2 a 3 horas, mas você define o ritmo. Nosso guia do anfitrião inclui sugestões de tempo que você pode ajustar ao seu horário."
+        },
+        "themedMysteries": {
+          "question": "Vocês oferecem mistérios temáticos para ocasiões especiais?",
+          "answer": "Criamos qualquer tema que você possa imaginar! De clássicos speakeasies dos anos 1920 a estações espaciais e reinos de contos de fadas - conte-nos sua visão e nós a tornaremos realidade."
+        },
+        "ageRecommendation": {
+          "question": "Existe uma recomendação de idade para seus mistérios?",
+          "answer": "Nossos mistérios padrão funcionam muito bem para adultos e adolescentes (13+). Você também pode solicitar temas familiares ao criar seu mistério para jogadores mais jovens."
+        },
+        "freePreview": {
+          "question": "O que está incluído na prévia gratuita?",
+          "answer": "Você pode criar prévias de mistério ilimitadas gratuitamente, incluindo o enredo básico e os conceitos de personagens. Isso permite que você explore diferentes ideias antes de comprar."
+        },
+        "purchaseIncludes": {
+          "question": "O que eu recebo quando compro um mistério?",
+          "answer": "Por $24,99, você receberá tudo o que é necessário para hospedar: um guia abrangente do anfitrião, perfis detalhados de personagens para cada jogador, pistas, evidências e todos os materiais do jogo, prontos para uso."
+        },
+        "refund": {
+          "question": "Posso obter um reembolso se não estiver satisfeito?",
+          "answer": "Com certeza! Se você não estiver totalmente satisfeito com sua compra, entre em contato conosco em até 7 dias e faremos um reembolso total, sem perguntas."
+        },
+        "gameDesignEngagement": {
+          "question": "Como o design do seu jogo garante que todos permaneçam engajados?",
+          "answer": "Nossos mistérios focam em interações ricas entre personagens em vez de histórias rígidas. Cada personagem tem históricos e motivações detalhados que impulsionam o gameplay natural, garantindo que todos os jogadores permaneçam ativamente envolvidos durante toda a experiência."
+        },
+        "dynamicMurderer": {
+          "question": "Por que as pistas não apontam para um assassino específico desde o início?",
+          "answer": "O assassino é determinado após a primeira rodada com base nas pistas reveladas durante o jogo. Esta abordagem dinâmica significa que as pistas se constroem progressivamente, tornando o mistério solucionável mesmo que alguns detalhes sejam perdidos no ambiente de festa."
+        },
+        "flexiblePlayerCount": {
+          "question": "O que acontece se alguém não puder comparecer no último minuto?",
+          "answer": "Nosso design flexível acomoda mudanças de última hora. Como o jogo não depende de um personagem segurando informações críticas, você pode ajustar seu número de jogadores sem quebrar o mistério."
+        },
+        "characterFocused": {
+          "question": "Por que focado em personagens em vez de focado no enredo?",
+          "answer": "Anos de experiência nos ensinaram que pistas muito específicas são perdidas em festas. Nossa abordagem orientada por personagens significa que o mistério se desenrola naturalmente através de interações."
         }
       }
     },
-    "mysteryCreation": {
-      "scriptType": {
-        "full": "completo",
-        "pointForm": "em tópicos",
-        "both": "completo e em tópicos"
-      },
-      "sections": {
-        "premise": "Premissa",
-        "victim": "Vítima",
-        "characterList": "Lista de Personagens",
-        "players": "jogadores",
-        "murderMethod": "Método de Assassinato"
-      },
-      "wizard": {
-        "title": "Crie Seu Mistério",
-        "step1": {
-          "title": "Conte-nos sua visão",
-          "description": "Descreva sua festa de mistério de assassinato ideal"
-        },
-        "step2": {
-          "title": "Revisar e Refinar",
-          "description": "Aperfeiçoe seu mistério com nosso assistente de IA"
-        },
-        "step3": {
-          "title": "Pacote Completo",
-          "description": "Obtenha tudo o que precisa para hospedar"
-        },
-        "prompt": {
-          "defaultStart": "Quero criar um mistério de assassinato",
-          "withTheme": "O tema/ambiente deve ser {{theme}} para {{playerCount}} jogadores com scripts {{scriptType}}",
-          "withoutTheme": "É para {{playerCount}} jogadores com scripts {{scriptType}}",
-          "withAccomplice": "Inclua um mecanismo de cúmplice no mistério",
-          "withoutAccomplice": "Não inclua um mecanismo de cúmplice no mistério",
-          "additionalDetails": "Detalhes adicionais são: {{details}}"
-        }
-      },
-      "editor": {
-        "title": "Editor de Mistério",
-        "characters": "Personagens",
-        "story": "História",
-        "clues": "Pistas",
-        "hostGuide": "Guia do Anfitrião",
-        "save": "Salvar Rascunho",
-        "publish": "Finalizar Mistério",
-        "saving": "Salvando...",
-        "publishing": "Publicando...",
-        "saved": "Rascunho salvo",
-        "published": "Mistério finalizado"
-      },
-      "guidance": {
-        "describe": "Descreva seu mistério em detalhes - quanto mais específico você for, melhor poderemos criá-lo para você",
-        "examples": "Tente: 'Um mistério de assassinato em um speakeasy dos anos 1920 com 8 personagens, incluindo uma cantora de jazz, um barman e um chefão da máfia'",
-        "playerCount": "Quantos jogadores participarão?",
-        "theme": "Qual é o cenário ou tema?",
-        "special": "Quaisquer requisitos ou restrições especiais?",
-        "initialPrompt": {
-          "withTheme": "Vamos criar um mistério de assassinato com tema {{theme}}. Por favor, me guie passo a passo na criação deste mistério.",
-          "withoutTheme": "Vamos criar um mistério de assassinato. Por favor, me guie passo a passo na criação deste mistério."
-        }
-      },
-      "editTitle": "Editar Mistério",
-      "createTitle": "Criar Novo Mistério",
+    "contact": {
+      "title": "Entre em Contato",
+      "description": "Precisa de mais ajuda? Estamos aqui para você",
+      "intro": "Nossa equipe de suporte está pronta para ajudar com quaisquer dúvidas que você possa ter sobre a criação de sua festa de mistério perfeita com o Mystery Maker.",
       "form": {
-        "description": "Preencha o formulário abaixo para gerar seu mistério de assassinato personalizado"
-      },
-      "buttons": {
-        "generateFullMystery": "Gerar Mistério Completo"
-      },
-      "errors": {
-        "signInToSave": "Por favor, faça login para salvar seu mistério",
-        "saveFailed": "Falha ao salvar mistério",
-        "loadFailed": "Falha ao carregar mistério",
-        "loadMessagesFailed": "Falha ao carregar mensagens da conversa",
-        "loadConversationFailed": "Falha ao carregar conversa",
-        "initialPrompt": "Por favor, forneça um prompt para o seu mistério",
-        "saveMessageFailed": "Falha ao salvar mensagem"
-      },
-      "success": {
-        "setupComplete": "Configuração do mistério completa! Iniciando o bate-papo..."
+        "name": "Nome",
+        "email": "E-mail",
+        "subject": "Assunto",
+        "message": "Mensagem",
+        "namePlaceholder": "Seu nome",
+        "emailPlaceholder": "seu.email@exemplo.com",
+        "subjectPlaceholder": "Sobre o que é sua mensagem?",
+        "messagePlaceholder": "Como podemos ajudar?",
+        "sendButton": "Enviar Mensagem",
+        "sending": "Enviando...",
+        "success": "Obrigado pela sua mensagem! Entraremos em contato em 24 horas.",
+        "error": "Falha ao enviar mensagem. Por favor, tente novamente mais tarde."
       }
+    }
+  },
+  "chatbot": {
+    "toasts": {
+      "invalidId": "ID de conversa inválido",
+      "loadFailed": "Não foi possível carregar sua conversa anterior",
+      "offlineMode": "Modo offline em uso - algumas funcionalidades podem ser limitadas",
+      "requestError": "Erro ao processar sua solicitação",
+      "generationSuccess": "Mistério gerado com sucesso!",
+      "urlUnavailable": "URL do chatbot ainda não disponível"
     },
-    "mysteryForm": {
-      "userRequestLabel": "O que você deseja criar",
-      "userRequestDescription": "Seu pedido original da página inicial",
-      "themeLabel": "Detalhes do Tema/Cenário (Opcional)",
-      "themePlaceholder": "ex: período de tempo, cenário específico, itens obrigatórios, etc.",
-      "themeDescription": "Escolha um tema ou cenário específico para o seu mistério de assassinato",
-      "playerCountLabel": "Quantos jogadores participarão?",
-      "playerCountPlaceholder": "Selecionar número de jogadores",
-      "playerCountItem": "{{count}} jogadores",
-      "playerCountDescription": "Escolha entre 4 e 32 jogadores para o seu mistério de assassinato.",
-      "accompliceLabel": "Incluir Mecanismo de Cúmplice",
-      "accompliceDescription": "Melhor para jogos com 10 ou mais jogadores",
-      "scriptTypeLabel": "Nível de Detalhe do Roteiro",
-      "scriptTypeFullLabel": "Roteiros Completos - Diálogos completos e instruções detalhadas",
-      "scriptTypePointFormLabel": "Em Tópicos - Pontos-chave e resumos em forma de lista",
-      "scriptTypeBothLabel": "Ambos os Formatos - Roteiros completos E notas em tópicos",
-      "additionalDetailsLabel": "Detalhes Adicionais (Opcional)",
-      "additionalDetailsPlaceholder": "Quaisquer requisitos específicos, regras especiais ou contexto adicional para o seu mistério...",
-      "additionalDetailsDescription": "Forneça quaisquer detalhes adicionais ou solicitações especiais para o seu mistério",
-      "startChat": "Iniciar Chat com IA",
-      "startingChat": "Iniciando chat..."
+    "welcomeMessage": "Bem-vindo ao Criador de Mistério de Assassinato! Descreva o tipo de mistério que você deseja criar, ou me peça sugestões.",
+    "newConversationTitle": "Novo Mistério de Assassinato",
+    "fallbackResponses": [
+      "Ficarei feliz em ajudá-lo a criar um mistério de assassinato. Qual tema ou cenário você gostaria para o seu mistério?",
+      "Essa é uma ótima escolha! Agora, vamos pensar na vítima. Quem você gostaria que fosse a vítima?",
+      "Interessante! Agora, precisamos de alguns suspeitos. Você poderia descrever 2-3 personagens que possam ter motivos para cometer este crime?",
+      "Esses são suspeitos convincentes. Vamos adicionar algumas pistas. Que tipo de evidência poderia ser encontrada na cena do crime?",
+      "Seu mistério está tomando forma! Para continuar desenvolvendo os detalhes de sua história, vamos pensar em quais outros elementos podemos incluir."
+    ],
+    "title": "Crie Seu Mistério de Assassinato",
+    "buttons": {
+      "external": "Externo",
+      "openFull": "Abrir Chatbot Completo",
+      "finalize": "Finalizar",
+      "finalizeMystery": "Finalizar Mistério"
     },
-    "supportPage": {
-      "title": "Central de Suporte",
-      "subtitle": "Encontre respostas para perguntas frequentes, entre em contato com nossa equipe de suporte e obtenha tudo o que você precisa para criar festas de mistério incríveis.",
-      "tabs": {
-        "faqs": "Perguntas Frequentes",
-        "contact": "Entre em Contato"
-      },
-      "faqs": {
-        "title": "Perguntas Frequentes",
-        "description": "Encontre respostas para perguntas comuns sobre o Mystery Maker",
-        "categories": {
-          "aboutMysteryMaker": "Sobre o Mystery Maker",
-          "gameMechanics": "Mecânica do Jogo",
-          "hostingPlanning": "Hospedagem e Planejamento",
-          "accountBilling": "Conta e Faturamento"
-        },
-        "questions": {
-          "whatIsMysteryMaker": {
-            "question": "O que é o Mystery Maker e como funciona?",
-            "answer": "Mystery Maker é uma plataforma alimentada por IA que cria festas de mistério de assassinato personalizadas exatamente como você quer. Conte-nos sua visão única - qualquer tema, personagens ou ambiente - e nossa IA gera tudo o que você precisa: perfis de personagens, pistas e materiais do anfitrião feitos sob medida para sua festa."
-          },
-          "creationProcess": {
-            "question": "Como funciona o processo de criação e compra?",
-            "answer": "É fácil! Primeiro, descreva seu mistério de assassinato ideal, e criaremos uma prévia personalizada gratuitamente. Se você estiver satisfeito com seu mistério, compre o pacote completo por $24,99. Você receberá instantaneamente tudo o que precisa para hospedar: perfis detalhados de personagens, um guia do anfitrião e todos os materiais do jogo."
-          },
-          "saveWork": {
-            "question": "Posso salvar meu trabalho e voltar a ele mais tarde?",
-            "answer": "Sim! Todos os seus mistérios personalizados são salvos em sua conta, permitindo que você retorne e edite a qualquer momento."
-          },
-          "replayable": {
-            "question": "Esses mistérios de assassinato são rejogáveis?",
-            "answer": "Com certeza! Nossos mistérios incluem elementos variáveis para que cada jogada pareça nova, mesmo com o mesmo grupo. Você pode hospedar seu mistério personalizado quantas vezes quiser."
-          },
-          "playerCount": {
-            "question": "Quantos jogadores preciso?",
-            "answer": "Nosso sistema cria mistérios para qualquer tamanho de grupo que você especificar - desde reuniões íntimas de 4-6 jogadores até festas maiores de 15+ jogadores. Basta nos dizer o número de jogadores e nós projetaremos de acordo."
-          },
-          "modifyMystery": {
-            "question": "Posso modificar meu mistério depois de criá-lo?",
-            "answer": "Claro! Use nosso editor para ajustar e personalizar seu mistério até que esteja perfeito para seu grupo. Modifique personagens, temas ou complexidade a qualquer momento."
-          },
-          "lastMinuteChanges": {
-            "question": "E se eu precisar adicionar ou remover jogadores no último minuto?",
-            "answer": "Sem problemas! Nosso sistema flexível permite que você ajuste o número de jogadores mesmo depois de criar seu mistério. A IA ajustará a história e os personagens para acomodar essas mudanças."
-          },
-          "whatIncluded": {
-            "question": "O que está incluído no meu pacote de mistério personalizado?",
-            "answer": "Tudo o que você precisa: um guia abrangente do anfitrião com instruções passo a passo, perfis detalhados de personagens para cada jogador, pistas, evidências e todos os materiais do jogo. Nenhuma preparação extra é necessária."
-          },
-          "gameDuration": {
-            "question": "Quanto tempo dura um jogo típico?",
-            "answer": "A maioria dos mistérios dura de 2 a 3 horas, mas você define o ritmo. Nosso guia do anfitrião inclui sugestões de tempo que você pode ajustar ao seu horário."
-          },
-          "themedMysteries": {
-            "question": "Vocês oferecem mistérios temáticos para ocasiões especiais?",
-            "answer": "Criamos qualquer tema que você possa imaginar! De clássicos speakeasies dos anos 1920 a estações espaciais e reinos de contos de fadas - conte-nos sua visão e nós a tornaremos realidade."
-          },
-          "ageRecommendation": {
-            "question": "Existe uma recomendação de idade para seus mistérios?",
-            "answer": "Nossos mistérios padrão funcionam muito bem para adultos e adolescentes (13+). Você também pode solicitar temas familiares ao criar seu mistério para jogadores mais jovens."
-          },
-          "freePreview": {
-            "question": "O que está incluído na prévia gratuita?",
-            "answer": "Você pode criar prévias de mistério ilimitadas gratuitamente, incluindo o enredo básico e os conceitos de personagens. Isso permite que você explore diferentes ideias antes de comprar."
-          },
-          "purchaseIncludes": {
-            "question": "O que eu recebo quando compro um mistério?",
-            "answer": "Por $24,99, você receberá tudo o que é necessário para hospedar: um guia abrangente do anfitrião, perfis detalhados de personagens para cada jogador, pistas, evidências e todos os materiais do jogo, prontos para uso."
-          },
-          "refund": {
-            "question": "Posso obter um reembolso se não estiver satisfeito?",
-            "answer": "Com certeza! Se você não estiver totalmente satisfeito com sua compra, entre em contato conosco em até 7 dias e faremos um reembolso total, sem perguntas."
-          }
-        }
-      },
-      "contact": {
-        "title": "Entre em Contato",
-        "description": "Precisa de mais ajuda? Estamos aqui para você",
-        "intro": "Nossa equipe de suporte está pronta para ajudar com quaisquer dúvidas que você possa ter sobre a criação de sua festa de mistério perfeita com o Mystery Maker.",
-        "form": {
-          "name": "Nome",
-          "email": "E-mail",
-          "subject": "Assunto",
-          "message": "Mensagem",
-          "namePlaceholder": "Seu nome",
-          "emailPlaceholder": "seu.email@exemplo.com",
-          "subjectPlaceholder": "Sobre o que é sua mensagem?",
-          "messagePlaceholder": "Como podemos ajudar?",
-          "sendButton": "Enviar Mensagem",
-          "sending": "Enviando...",
-          "success": "Obrigado pela sua mensagem! Entraremos em contato em 24 horas.",
-          "error": "Falha ao enviar mensagem. Por favor, tente novamente mais tarde."
-        }
-      }
+    "creatorTitle": "Criador de Mistério de Assassinato",
+    "placeholder": "Digite suas ideias para o mistério de assassinato...",
+    "finalizePrompt": "Quando estiver satisfeito com seu mistério, finalize-o para continuar."
+  },
+  "homeDashboard": {
+    "title": "Seus Mistérios",
+    "searchPlaceholder": "Buscar mistérios...",
+    "loadMore": "Carregar Mais",
+    "loading": "Carregando...",
+    "empty": {
+      "title": "Você ainda não criou nenhum mistério",
+      "description": "Use a caixa de entrada acima para começar a criar seu primeiro mistério de assassinato!"
     },
-    "chatbot": {
-      "toasts": {
-        "invalidId": "ID de conversa inválido",
-        "loadFailed": "Não foi possível carregar sua conversa anterior",
-        "offlineMode": "Modo offline em uso - algumas funcionalidades podem ser limitadas",
-        "requestError": "Erro ao processar sua solicitação",
-        "generationSuccess": "Mistério gerado com sucesso!",
-        "urlUnavailable": "URL do chatbot ainda não disponível"
-      },
-      "welcomeMessage": "Bem-vindo ao Criador de Mistério de Assassinato! Descreva o tipo de mistério que você deseja criar, ou me peça sugestões.",
-      "newConversationTitle": "Novo Mistério de Assassinato",
-      "fallbackResponses": [
-        "Ficarei feliz em ajudá-lo a criar um mistério de assassinato. Qual tema ou cenário você gostaria para o seu mistério?",
-        "Essa é uma ótima escolha! Agora, vamos pensar na vítima. Quem você gostaria que fosse a vítima?",
-        "Interessante! Agora, precisamos de alguns suspeitos. Você poderia descrever 2-3 personagens que possam ter motivos para cometer este crime?",
-        "Esses são suspeitos convincentes. Vamos adicionar algumas pistas. Que tipo de evidência poderia ser encontrada na cena do crime?",
-        "Seu mistério está tomando forma! Para continuar desenvolvendo os detalhes de sua história, vamos pensar em quais outros elementos podemos incluir."
-      ],
-      "title": "Crie Seu Mistério de Assassinato",
-      "buttons": {
-        "external": "Externo",
-        "openFull": "Abrir Chatbot Completo",
-        "finalize": "Finalizar",
-        "finalizeMystery": "Finalizar Mistério"
-      },
-      "creatorTitle": "Criador de Mistério de Assassinato",
-      "placeholder": "Digite suas ideias para o mistério de assassinato...",
-      "finalizePrompt": "Quando estiver satisfeito com seu mistério, finalize-o para continuar."
+    "errors": {
+      "loadFailed": "Falha ao carregar alguns mistérios. Por favor, atualize a página."
+    }
+  },
+  "mysteryDashboard": {
+    "title": "Painel de Mistérios",
+    "description": "Gerencie seus mistérios criados, inicie novos ou explore conteúdo de exemplo.",
+    "tabs": {
+      "all": "Todos",
+      "drafts": "Rascunhos",
+      "purchased": "Comprados",
+      "archived": "Arquivados"
+    }
+  },
+  "sendToGuests": {
+    "title": "Enviar Guias de Personagens para Seus Convidados",
+    "description": "Insira os endereços de e-mail para cada personagem para enviar guias personalizados diretamente aos seus convidados. Cada convidado receberá apenas suas próprias informações de personagem.",
+    "status": {
+      "sent": "Enviado"
     },
-    "homeDashboard": {
-      "title": "Seus Mistérios",
-      "searchPlaceholder": "Buscar mistérios...",
-      "loadMore": "Carregar Mais",
+    "emailPlaceholder": "convidado@exemplo.com",
+    "buttons": {
+      "sending": "Enviando...",
+      "send": "Enviar Guias de Personagens"
+    },
+    "errors": {
+      "noValidEmails": "Adicione pelo menos um e-mail válido",
+      "sendFailed": "Falha ao enviar alguns e-mails. Por favor, tente novamente."
+    },
+    "success": {
+      "sentCount": "Guias de personagens enviados para {{count}} convidados"
+    }
+  },
+  "common": {
+    "buttons": {
+      "createNew": "Criar Novo Mistério",
+      "getStarted": "Começar",
+      "learnMore": "Saber Mais",
+      "tryNow": "Experimentar Agora",
+      "continue": "Continuar",
+      "cancel": "Cancelar",
+      "save": "Salvar",
+      "delete": "Excluir",
+      "edit": "Editar",
+      "close": "Fechar",
+      "back": "Voltar",
+      "next": "Próximo",
+      "previous": "Anterior",
+      "finish": "Finalizar",
+      "submit": "Enviar",
+      "confirm": "Confirmar",
+      "yes": "Sim",
+      "no": "Não"
+    },
+    "labels": {
       "loading": "Carregando...",
-      "empty": {
-        "title": "Você ainda não criou nenhum mistério",
-        "description": "Use a caixa de entrada acima para começar a criar seu primeiro mistério de assassinato!"
+      "pleaseWait": "Por favor, aguarde.",
+      "error": "Erro",
+      "success": "Sucesso",
+      "warning": "Aviso",
+      "info": "Informação",
+      "required": "Obrigatório",
+      "optional": "Opcional"
+    },
+    "messages": {
+      "welcome": "Bem-vindo(a)!",
+      "thankYou": "Obrigado(a)!",
+      "comingSoon": "Em Breve",
+      "notFound": "Não Encontrado",
+      "somethingWentWrong": "Algo deu errado",
+      "tryAgain": "Tentar novamente",
+      "noResultsFound": "Nenhum resultado encontrado",
+      "loadingContent": "Carregando conteúdo...",
+      "savingChanges": "Salvando alterações...",
+      "changesSuccess": "Alterações salvas com sucesso",
+      "changesCanceled": "Alterações canceladas",
+      "aiThinking": "IA pensando..."
+    },
+    "validation": {
+      "required": "Este campo é obrigatório",
+      "invalidEmail": "Por favor, insira um endereço de e-mail válido",
+      "passwordTooShort": "A senha deve ter no mínimo 6 caracteres",
+      "passwordMismatch": "As senhas não coincidem",
+      "invalidFormat": "Formato inválido",
+      "tooShort": "Muito curto",
+      "tooLong": "Muito longo",
+      "invalidCharacters": "Contém caracteres inválidos"
+    },
+    "states": {
+      "draft": "Rascunho",
+      "inProgress": "Em Andamento",
+      "completed": "Concluído",
+      "published": "Publicado",
+      "archived": "Arquivado",
+      "deleted": "Excluído"
+    },
+    "modals": {
+      "confirmDelete": {
+        "title": "Confirmar Exclusão",
+        "message": "Tem certeza de que deseja excluir este item? Esta ação não pode ser desfeita.",
+        "confirmButton": "Excluir",
+        "cancelButton": "Cancelar"
       },
-      "errors": {
-        "loadFailed": "Falha ao carregar alguns mistérios. Por favor, atualize a página."
+      "unsavedChanges": {
+        "title": "Alterações Não Salvas",
+        "message": "Você tem alterações não salvas. Deseja salvá-las antes de sair?",
+        "saveButton": "Salvar Alterações",
+        "discardButton": "Descartar Alterações",
+        "cancelButton": "Cancelar"
       }
     },
-    "mysteryDashboard": {
-      "title": "Painel de Mistérios",
-      "description": "Gerencie seus mistérios criados, inicie novos ou explore conteúdo de exemplo.",
-      "tabs": {
-        "all": "Todos",
-        "drafts": "Rascunhos",
-        "purchased": "Comprados",
-        "archived": "Arquivados"
+    "notifications": {
+      "welcomeBack": "Bem-vindo(a) de volta!",
+      "signedOut": "Você foi desconectado(a)",
+      "sessionExpired": "Sua sessão expirou. Por favor, faça login novamente.",
+      "connectionLost": "Conexão perdida. Tentando reconectar...",
+      "connectionRestored": "Conexão restaurada",
+      "updateAvailable": "Uma nova versão está disponível. Atualize para a nova versão.",
+      "offlineMode": "Você está atualmente offline",
+      "deleteSuccess": "{{item}} excluído(a) com sucesso",
+      "deleteFailed": "Falha ao excluir {{item}}",
+      "archiveSuccess": "{{item}} arquivado(a) com sucesso",
+      "archiveFailed": "Falha ao arquivar {{item}}",
+      "updatedSuccess": "{{item}} atualizado(a) com sucesso",
+      "updateFailed": "Falha ao atualizar {{item}}"
+    }
+  },
+  "character": {
+    "detail": {
+      "description": "Descrição do Personagem",
+      "background": "História",
+      "relationships": "Relacionamentos",
+      "secrets": "Segredos",
+      "whereabouts": "Paradeiro Durante o Assassinato",
+      "introduction": "Introdução",
+      "round1": "Rodada 1: Investigação Inicial",
+      "round2": "Rodada 2: Revelações Mais Profundas",
+      "round3": "Rodada 3: Pistas Finais",
+      "finalStatement": "Declaração Final",
+      "questioningOptions": "Opções de Questionamento",
+      "askTarget": "Pergunte a {{target}}: \"{{question}}\""
+    },
+    "import": {
+      "title": "Personagens do Mistério",
+      "description": "Gerenciar os personagens em seu mistério de assassinato",
+      "importButton": "Importar Personagens",
+      "loading": "Carregando personagens...",
+      "noCharacters": "Nenhum personagem ainda",
+      "importPrompt": "Importe dados de personagens para preencher seu mistério de assassinato.",
+      "foundCount": "{{count}} personagens encontrados no banco de dados",
+      "deleteConfirm": "Tem certeza de que deseja excluir {{name}}?",
+      "deleteSuccess": "Personagem excluído: {{name}}",
+      "deleteFailed": "Falha ao excluir personagem",
+      "refreshSuccess": "Lista de personagens atualizada",
+      "refreshFailed": "Falha ao atualizar dados de personagens",
+      "loadFailed": "Falha ao carregar dados de personagens",
+      "table": {
+        "name": "Nome do Personagem",
+        "details": "Detalhes",
+        "scripts": "Scripts",
+        "actions": "Ações",
+        "badges": {
+          "description": "Descrição",
+          "background": "História",
+          "relationships": "Relacionamentos",
+          "secrets": "Segredos",
+          "intro": "Intro",
+          "round1": "Rodada 1",
+          "round2": "Rodada 2",
+          "round3": "Rodada 3"
+        }
       }
     },
-    "sendToGuests": {
-      "title": "Enviar Guias de Personagens para Seus Convidados",
-      "description": "Insira os endereços de e-mail para cada personagem para enviar guias personalizados diretamente aos seus convidados. Cada convidado receberá apenas suas próprias informações de personagem.",
+    "access": {
+      "welcome": "Bem-vindo(a), {{name}}!",
+      "subtitle": "Aqui está o seu guia de personagem para o jogo de mistério",
+      "loading": "Carregando seu personagem...",
+      "accessDenied": "Acesso Negado",
+      "notFound": "Atribuição de personagem não encontrada.",
+      "guide": {
+        "yourCharacter": "{{name}} - Seu Personagem",
+        "yourBackground": "Sua História",
+        "yourSecret": "Seu Segredo",
+        "introduction": "Introdução",
+        "rumorsYouKnow": "Rumores que Você Conhece",
+        "round1": "Rodada 1: Declaração Inicial",
+        "round2": "Rodada 2: Motivos",
+        "round3": "Rodada 3: Método",
+        "questionsToAsk": "Perguntas a Fazer",
+        "ifInnocent": "Se Você For Inocente:",
+        "ifGuilty": "Se Você For Culpado:",
+        "ifAccomplice": "Se Você For Um Cúmplice:"
+      }
+    },
+    "dialog": {
+      "title": "Importar Dados de Personagens",
+      "subtitle": "Cole seus dados de personagens abaixo:",
+      "pasteButton": "Colar da Área de Transferência",
+      "pasteSuccess": "Texto colado da área de transferência",
+      "pasteError": "Acesso à área de transferência negado. Por favor, cole manualmente.",
+      "placeholder": "Cole o conteúdo do GUIA DO PERSONAGEM aqui...",
+      "instructions": "Os dados do personagem devem conter as seguintes seções:",
+      "sections": [
+        "DESCRIÇÃO DO PERSONAGEM",
+        "HISTÓRIA",
+        "RELACIONAMENTOS",
+        "SEGREDOS",
+        "PARADEIRO",
+        "Declarações da Rodada (RODADA 1, RODADA 2, etc.)"
+      ],
+      "importButton": "Importar Personagens",
+      "importing": "Importando...",
+      "cancel": "Cancelar",
+      "enterData": "Por favor, insira ou cole os dados do personagem",
+      "importSuccess": "Personagens importados com sucesso",
+      "importFailed": "Falha ao importar dados de personagens",
+      "importError": "Ocorreu um erro inesperado durante a importação"
+    },
+    "guestManager": {
+      "title": "Compartilhar Personagens com Convidados",
+      "subtitle": "Atribua cada personagem a um convidado e envie por e-mail",
+      "table": {
+        "character": "Personagem",
+        "guestName": "Nome do Convidado",
+        "email": "E-mail",
+        "action": "Ação"
+      },
+      "placeholders": {
+        "guestName": "Nome do convidado",
+        "email": "convidado@exemplo.com"
+      },
+      "buttons": {
+        "edit": "Editar",
+        "send": "Enviar",
+        "sendAll": "Enviar Todos",
+        "close": "Fechar"
+      },
       "status": {
         "sent": "Enviado"
       },
-      "emailPlaceholder": "convidado@exemplo.com",
-      "buttons": {
-        "sending": "Enviando...",
-        "send": "Enviar Guias de Personagens"
-      },
-      "errors": {
-        "noValidEmails": "Adicione pelo menos um e-mail válido",
-        "sendFailed": "Falha ao enviar alguns e-mails. Por favor, tente novamente."
-      },
-      "success": {
-        "sentCount": "Guias de personagens enviados para {{count}} convidados"
+      "assignedCount": "{{count}} personagens atribuídos",
+      "toasts": {
+        "characterSent": "Personagem enviado para {{name}}!",
+        "sendFailed": "Falha ao enviar atribuição de personagem",
+        "loadFailed": "Falha ao carregar atribuições existentes",
+        "updateFailed": "Falha ao atualizar atribuição",
+        "noValidAssignments": "Nenhuma atribuição válida para enviar",
+        "allSent": "{{count}} atribuições de personagens enviadas!",
+        "sendSomeFailed": "Falha ao enviar algumas atribuições"
       }
     },
-    "common": {
-      "buttons": {
-        "createNew": "Criar Novo Mistério",
-        "getStarted": "Começar",
-        "learnMore": "Saber Mais",
-        "tryNow": "Experimentar Agora",
-        "continue": "Continuar",
-        "cancel": "Cancelar",
-        "save": "Salvar",
-        "delete": "Excluir",
-        "edit": "Editar",
-        "close": "Fechar",
-        "back": "Voltar",
-        "next": "Próximo",
-        "previous": "Anterior",
-        "finish": "Finalizar",
-        "submit": "Enviar",
-        "confirm": "Confirmar",
-        "yes": "Sim",
-        "no": "Não"
-      },
-      "labels": {
-        "loading": "Carregando...",
-        "pleaseWait": "Por favor, aguarde.",
-        "error": "Erro",
-        "success": "Sucesso",
-        "warning": "Aviso",
-        "info": "Informação",
-        "required": "Obrigatório",
-        "optional": "Opcional"
-      },
-      "messages": {
-        "welcome": "Bem-vindo(a)!",
-        "thankYou": "Obrigado(a)!",
-        "comingSoon": "Em Breve",
-        "notFound": "Não Encontrado",
-        "somethingWentWrong": "Algo deu errado",
-        "tryAgain": "Tentar novamente",
-        "noResultsFound": "Nenhum resultado encontrado",
-        "loadingContent": "Carregando conteúdo...",
-        "savingChanges": "Salvando alterações...",
-        "changesSuccess": "Alterações salvas com sucesso",
-        "changesCanceled": "Alterações canceladas",
-        "aiThinking": "IA pensando..."
-      },
-      "validation": {
-        "required": "Este campo é obrigatório",
-        "invalidEmail": "Por favor, insira um endereço de e-mail válido",
-        "passwordTooShort": "A senha deve ter no mínimo 6 caracteres",
-        "passwordMismatch": "As senhas não coincidem",
-        "invalidFormat": "Formato inválido",
-        "tooShort": "Muito curto",
-        "tooLong": "Muito longo",
-        "invalidCharacters": "Contém caracteres inválidos"
-      },
-      "states": {
-        "draft": "Rascunho",
-        "inProgress": "Em Andamento",
-        "completed": "Concluído",
-        "published": "Publicado",
-        "archived": "Arquivado",
-        "deleted": "Excluído"
-      },
-      "modals": {
-        "confirmDelete": {
-          "title": "Confirmar Exclusão",
-          "message": "Tem certeza de que deseja excluir este item? Esta ação não pode ser desfeita.",
-          "confirmButton": "Excluir",
-          "cancelButton": "Cancelar"
-        },
-        "unsavedChanges": {
-          "title": "Alterações Não Salvas",
-          "message": "Você tem alterações não salvas. Deseja salvá-las antes de sair?",
-          "saveButton": "Salvar Alterações",
-          "discardButton": "Descartar Alterações",
-          "cancelButton": "Cancelar"
-        }
-      },
-      "notifications": {
-        "welcomeBack": "Bem-vindo(a) de volta!",
-        "signedOut": "Você foi desconectado(a)",
-        "sessionExpired": "Sua sessão expirou. Por favor, faça login novamente.",
-        "connectionLost": "Conexão perdida. Tentando reconectar...",
-        "connectionRestored": "Conexão restaurada",
-        "updateAvailable": "Uma nova versão está disponível. Atualize para a nova versão.",
-        "offlineMode": "Você está atualmente offline",
-        "deleteSuccess": "{{item}} excluído(a) com sucesso",
-        "deleteFailed": "Falha ao excluir {{item}}",
-        "archiveSuccess": "{{item}} arquivado(a) com sucesso",
-        "archiveFailed": "Falha ao arquivar {{item}}",
-        "updatedSuccess": "{{item}} atualizado(a) com sucesso",
-        "updateFailed": "Falha ao atualizar {{item}}"
-      }
-    },
-    "character": {
-      "detail": {
-        "description": "Descrição do Personagem",
-        "background": "História",
-        "relationships": "Relacionamentos",
-        "secrets": "Segredos",
-        "whereabouts": "Paradeiro Durante o Assassinato",
-        "introduction": "Introdução",
-        "round1": "Rodada 1: Investigação Inicial",
-        "round2": "Rodada 2: Revelações Mais Profundas",
-        "round3": "Rodada 3: Pistas Finais",
-        "finalStatement": "Declaração Final",
-        "questioningOptions": "Opções de Questionamento",
-        "askTarget": "Pergunte a {{target}}: \"{{question}}\""
-      },
-      "import": {
-        "title": "Personagens do Mistério",
-        "description": "Gerenciar os personagens em seu mistério de assassinato",
-        "importButton": "Importar Personagens",
-        "loading": "Carregando personagens...",
-        "noCharacters": "Nenhum personagem ainda",
-        "importPrompt": "Importe dados de personagens para preencher seu mistério de assassinato.",
-        "foundCount": "{{count}} personagens encontrados no banco de dados",
-        "deleteConfirm": "Tem certeza de que deseja excluir {{name}}?",
-        "deleteSuccess": "Personagem excluído: {{name}}",
-        "deleteFailed": "Falha ao excluir personagem",
-        "refreshSuccess": "Lista de personagens atualizada",
-        "refreshFailed": "Falha ao atualizar dados de personagens",
-        "loadFailed": "Falha ao carregar dados de personagens",
-        "table": {
-          "name": "Nome do Personagem",
-          "details": "Detalhes",
-          "scripts": "Scripts",
-          "actions": "Ações",
-          "badges": {
-            "description": "Descrição",
-            "background": "História",
-            "relationships": "Relacionamentos",
-            "secrets": "Segredos",
-            "intro": "Intro",
-            "round1": "Rodada 1",
-            "round2": "Rodada 2",
-            "round3": "Rodada 3"
-          }
-        }
-      },
-      "access": {
-        "welcome": "Bem-vindo(a), {{name}}!",
-        "subtitle": "Aqui está o seu guia de personagem para o jogo de mistério",
-        "loading": "Carregando seu personagem...",
-        "accessDenied": "Acesso Negado",
-        "notFound": "Atribuição de personagem não encontrada.",
-        "guide": {
-          "yourCharacter": "{{name}} - Seu Personagem",
-          "yourBackground": "Sua História",
-          "yourSecret": "Seu Segredo",
-          "introduction": "Introdução",
-          "rumorsYouKnow": "Rumores que Você Conhece",
-          "round1": "Rodada 1: Declaração Inicial",
-          "round2": "Rodada 2: Motivos",
-          "round3": "Rodada 3: Método",
-          "questionsToAsk": "Perguntas a Fazer",
-          "ifInnocent": "Se Você For Inocente:",
-          "ifGuilty": "Se Você For Culpado:",
-          "ifAccomplice": "Se Você For Um Cúmplice:"
-        }
-      },
-      "dialog": {
-        "title": "Importar Dados de Personagens",
-        "subtitle": "Cole seus dados de personagens abaixo:",
-        "pasteButton": "Colar da Área de Transferência",
-        "pasteSuccess": "Texto colado da área de transferência",
-        "pasteError": "Acesso à área de transferência negado. Por favor, cole manualmente.",
-        "placeholder": "Cole o conteúdo do GUIA DO PERSONAGEM aqui...",
-        "instructions": "Os dados do personagem devem conter as seguintes seções:",
-        "sections": [
-          "DESCRIÇÃO DO PERSONAGEM",
-          "HISTÓRIA",
-          "RELACIONAMENTOS",
-          "SEGREDOS",
-          "PARADEIRO",
-          "Declarações da Rodada (RODADA 1, RODADA 2, etc.)"
-        ],
-        "importButton": "Importar Personagens",
-        "importing": "Importando...",
-        "cancel": "Cancelar",
-        "enterData": "Por favor, insira ou cole os dados do personagem",
-        "importSuccess": "Personagens importados com sucesso",
-        "importFailed": "Falha ao importar dados de personagens",
-        "importError": "Ocorreu um erro inesperado durante a importação"
-      },
-      "guestManager": {
-        "title": "Compartilhar Personagens com Convidados",
-        "subtitle": "Atribua cada personagem a um convidado e envie por e-mail",
-        "table": {
-          "character": "Personagem",
-          "guestName": "Nome do Convidado",
-          "email": "E-mail",
-          "action": "Ação"
-        },
-        "placeholders": {
-          "guestName": "Nome do convidado",
-          "email": "convidado@exemplo.com"
-        },
-        "buttons": {
-          "edit": "Editar",
-          "send": "Enviar",
-          "sendAll": "Enviar Todos",
-          "close": "Fechar"
-        },
-        "status": {
-          "sent": "Enviado"
-        },
-        "assignedCount": "{{count}} personagens atribuídos",
-        "toasts": {
-          "characterSent": "Personagem enviado para {{name}}!",
-          "sendFailed": "Falha ao enviar atribuição de personagem",
-          "loadFailed": "Falha ao carregar atribuições existentes",
-          "updateFailed": "Falha ao atualizar atribuição",
-          "noValidAssignments": "Nenhuma atribuição válida para enviar",
-          "allSent": "{{count}} atribuições de personagens enviadas!",
-          "sendSomeFailed": "Falha ao enviar algumas atribuições"
-        }
-      },
-      "roles": {
-        "title": "Funções dos Personagens",
-        "description": "Atribua a função de assassino para o seu mistério",
-        "murderer": "Assassino",
-        "required": "Obrigatório",
-        "noneSelected": "Nenhum selecionado",
-        "murdererDescription": "O personagem que cometeu o assassinato",
-        "saveRoles": "Salvar Funções",
-        "saving": "Salvando...",
-        "saveSuccess": "Funções de personagem salvas com sucesso",
-        "saveFailed": "Falha ao salvar funções de personagem",
-        "loadFailed": "Falha ao carregar dados de personagem"
-      }
-    },
-    "blog": {
+    "roles": {
+      "title": "Funções dos Personagens",
+      "description": "Atribua a função de assassino para o seu mistério",
+      "murderer": "Assassino",
+      "required": "Obrigatório",
+      "noneSelected": "Nenhum selecionado",
+      "murdererDescription": "O personagem que cometeu o assassinato",
+      "saveRoles": "Salvar Funções",
+      "saving": "Salvando...",
+      "saveSuccess": "Funções de personagem salvas com sucesso",
+      "saveFailed": "Falha ao salvar funções de personagem",
+      "loadFailed": "Falha ao carregar dados de personagem"
+    }
+  },
+  "blog": {
     "title": "Blog de Mistério",
     "subtitle": "Dicas, guias e inspiração para sua próxima festa misteriosa",
     "backToHome": "Voltar ao Início",
@@ -870,113 +886,113 @@
     "error": "Falha ao carregar posts do blog."
   },
   "purchase": {
-      "toasts": {
-        "success": "Compra bem-sucedida! Agora você tem acesso total a este pacote de mistério.",
-        "cancel": "Compra cancelada. Você pode tentar novamente quando estiver pronto.",
-        "loadFailed": "Falha ao carregar detalhes do mistério.",
-        "notFound": "Mistério não encontrado.",
-        "devPurchaseSim": "Simulando compra em modo de desenvolvimento...",
-        "devPurchaseSuccess": "Compra simulada! Redirecionando para a geração do pacote...",
-        "devPurchaseFailed": "Falha ao simular compra.",
-        "signInRequired": "Por favor, faça login para comprar este mistério.",
-        "checkoutRedirect": "Redirecionando para o checkout seguro...",
-        "checkoutFailed": "Falha ao redirecionar para o checkout. Por favor, tente novamente.",
-        "genericError": "Ocorreu um erro ao carregar os detalhes do mistério."
-      },
-      "title": "Complete Sua Compra",
-      "subtitle": "Obtenha acesso total ao seu pacote de mistério de assassinato",
-      "package": {
-        "title": "Pacote de Mistério de Assassinato",
-        "description": "Compra única, acesso instantâneo",
-        "priceDescription": "Pacote completo de mistério de assassinato com todos os materiais de personagem, pistas e instruções de hospedagem.",
-        "whatsIncluded": "O que está incluído:",
-        "includes": [
-          "Perfis completos de personagens para todos os suspeitos",
-          "Guia do anfitrião com instruções passo a passo",
-          "Fichas de personagem para impressão",
-          "Cartões de evidências e pistas",
-          "Linha do tempo dos eventos",
-          "Roteiro de revelação da solução",
-          "Downloads em PDF de todos os materiais"
-        ]
-      },
-      "buttons": {
-        "processing": "Processando...",
-        "complete": "Finalizar Compra",
-        "backToDesign": "Voltar para o Design do Mistério"
-      },
-      "notes": {
-        "title": "Notas Importantes",
-        "items": [
-          "Esta é uma compra única para este pacote de mistério específico",
-          "Você terá acesso permanente para baixar todos os materiais",
-          "O conteúdo é apenas para uso pessoal, não para redistribuição comercial",
-          "Precisa de ajuda? Entre em contato com nosso suporte via {{email}}"
-        ]
-      },
-      "preview": {
-        "defaultTitle": "Mistério de Assassinato Personalizado",
-        "characterPlaceholder": "Detalhes dos personagens serão revelados no pacote completo.",
-        "characterPlaceholderFull": "Descrição completa do personagem disponível no pacote comprado.",
-        "evidencePlaceholder": "Detalhes das evidências disponíveis no pacote completo.",
-        "title": "Prévia do Mistério de Assassinato",
-        "playersLabel": "Jogadores",
-        "playersCount": "{{count}} Jogadores",
-        "unknownPlayers": "Número de jogadores desconhecido",
-        "storyTitle": "Prévia da História",
-        "unlockMessage": "Compre para desbloquear o pacote completo do mistério com todos os detalhes dos personagens, pistas e materiais.",
-        "whatsIncluded": "O que está incluído no pacote completo:",
-        "packageIncludes": [
-          "Guia detalhado do anfitrião com instruções completas de configuração",
-          "Guias de personagens para cada jogador",
-          "Cartões de evidências e materiais para impressão",
-          "Roteiro completo do jogo e linha do tempo"
-        ]
-      }
+    "toasts": {
+      "success": "Compra bem-sucedida! Agora você tem acesso total a este pacote de mistério.",
+      "cancel": "Compra cancelada. Você pode tentar novamente quando estiver pronto.",
+      "loadFailed": "Falha ao carregar detalhes do mistério.",
+      "notFound": "Mistério não encontrado.",
+      "devPurchaseSim": "Simulando compra em modo de desenvolvimento...",
+      "devPurchaseSuccess": "Compra simulada! Redirecionando para a geração do pacote...",
+      "devPurchaseFailed": "Falha ao simular compra.",
+      "signInRequired": "Por favor, faça login para comprar este mistério.",
+      "checkoutRedirect": "Redirecionando para o checkout seguro...",
+      "checkoutFailed": "Falha ao redirecionar para o checkout. Por favor, tente novamente.",
+      "genericError": "Ocorreu um erro ao carregar os detalhes do mistério."
     },
-    "mysteryPackage": {
-      "shareWithGuests": "Compartilhar com Convidados",
-      "tabs": {
-        "hostGuide": "Guia do Anfitrião",
-        "characters": "Personagens ({{count}})",
-        "clues": "Evidências",
-        "inspector": "Guia do Inspetor",
-        "relationships": "Relacionamentos"
-      },
-      "mobileTabs": {
-        "host": "Anfitrião",
-        "characters": "Personagens ({{count}})",
-        "clues": "Evidências",
-        "inspector": "Inspetor",
-        "relations": "Relações"
-      },
-      "loading": {
-        "generating": "Gerando...",
-        "generatingMessage": "Estamos gerando seu pacote de mistério completo. Este processo levará aproximadamente de 3 a 5 minutos.<br />Esta página será atualizada automaticamente assim que o mistério for concluído.",
-        "characters": "Desenvolvendo perfis de personagens únicos com histórias, motivações e segredos para o seu jogo de mistério.",
-        "clues": "Criando cartões de evidências, pistas e materiais de investigação que ajudarão a resolver seu mistério.",
-        "inspector": "Escrevendo o roteiro do inspetor e a linha do tempo da investigação para guiar a resolução do mistério.",
-        "matrix": "Construindo a matriz de relacionamento dos personagens mostrando conexões, conflitos e relacionamentos ocultos."
-      },
-      "placeholder": {
-        "title": "Pronto para Gerar Seu Mistério",
-        "description": "Clique no botão abaixo para gerar seu pacote de mistério completo com todos os materiais.",
-        "button": "Gerar Pacote",
-        "characters": "Guias de personagens estarão disponíveis após o início da geração.",
-        "clues": "Cartões de evidências estarão disponíveis após o início da geração.",
-        "inspector": "O guia do inspetor estará disponível após o início da geração.",
-        "matrix": "A matriz de relacionamento estará disponível após o início da geração."
-      },
-      "matrix": {
-        "title": "Matriz de Relacionamento de Personagens"
-      }
+    "title": "Complete Sua Compra",
+    "subtitle": "Obtenha acesso total ao seu pacote de mistério de assassinato",
+    "package": {
+      "title": "Pacote de Mistério de Assassinato",
+      "description": "Compra única, acesso instantâneo",
+      "priceDescription": "Pacote completo de mistério de assassinato com todos os materiais de personagem, pistas e instruções de hospedagem.",
+      "whatsIncluded": "O que está incluído:",
+      "includes": [
+        "Perfis completos de personagens para todos os suspeitos",
+        "Guia do anfitrião com instruções passo a passo",
+        "Fichas de personagem para impressão",
+        "Cartões de evidências e pistas",
+        "Linha do tempo dos eventos",
+        "Roteiro de revelação da solução",
+        "Downloads em PDF de todos os materiais"
+      ]
     },
-    "mysteryView": {
-      "timing": {
-        "small": "5-10 minutos",
-        "medium": "15-30 minutos",
-        "large": "30-45 minutos",
-        "xlarge": "45-60 minutos"
-      }
+    "buttons": {
+      "processing": "Processando...",
+      "complete": "Finalizar Compra",
+      "backToDesign": "Voltar para o Design do Mistério"
+    },
+    "notes": {
+      "title": "Notas Importantes",
+      "items": [
+        "Esta é uma compra única para este pacote de mistério específico",
+        "Você terá acesso permanente para baixar todos os materiais",
+        "O conteúdo é apenas para uso pessoal, não para redistribuição comercial",
+        "Precisa de ajuda? Entre em contato com nosso suporte via {{email}}"
+      ]
+    },
+    "preview": {
+      "defaultTitle": "Mistério de Assassinato Personalizado",
+      "characterPlaceholder": "Detalhes dos personagens serão revelados no pacote completo.",
+      "characterPlaceholderFull": "Descrição completa do personagem disponível no pacote comprado.",
+      "evidencePlaceholder": "Detalhes das evidências disponíveis no pacote completo.",
+      "title": "Prévia do Mistério de Assassinato",
+      "playersLabel": "Jogadores",
+      "playersCount": "{{count}} Jogadores",
+      "unknownPlayers": "Número de jogadores desconhecido",
+      "storyTitle": "Prévia da História",
+      "unlockMessage": "Compre para desbloquear o pacote completo do mistério com todos os detalhes dos personagens, pistas e materiais.",
+      "whatsIncluded": "O que está incluído no pacote completo:",
+      "packageIncludes": [
+        "Guia detalhado do anfitrião com instruções completas de configuração",
+        "Guias de personagens para cada jogador",
+        "Cartões de evidências e materiais para impressão",
+        "Roteiro completo do jogo e linha do tempo"
+      ]
+    }
+  },
+  "mysteryPackage": {
+    "shareWithGuests": "Compartilhar com Convidados",
+    "tabs": {
+      "hostGuide": "Guia do Anfitrião",
+      "characters": "Personagens ({{count}})",
+      "clues": "Evidências",
+      "inspector": "Guia do Inspetor",
+      "relationships": "Relacionamentos"
+    },
+    "mobileTabs": {
+      "host": "Anfitrião",
+      "characters": "Personagens ({{count}})",
+      "clues": "Evidências",
+      "inspector": "Inspetor",
+      "relations": "Relações"
+    },
+    "loading": {
+      "generating": "Gerando...",
+      "generatingMessage": "Estamos gerando seu pacote de mistério completo. Este processo levará aproximadamente de 3 a 5 minutos.<br />Esta página será atualizada automaticamente assim que o mistério for concluído.",
+      "characters": "Desenvolvendo perfis de personagens únicos com histórias, motivações e segredos para o seu jogo de mistério.",
+      "clues": "Criando cartões de evidências, pistas e materiais de investigação que ajudarão a resolver seu mistério.",
+      "inspector": "Escrevendo o roteiro do inspetor e a linha do tempo da investigação para guiar a resolução do mistério.",
+      "matrix": "Construindo a matriz de relacionamento dos personagens mostrando conexões, conflitos e relacionamentos ocultos."
+    },
+    "placeholder": {
+      "title": "Pronto para Gerar Seu Mistério",
+      "description": "Clique no botão abaixo para gerar seu pacote de mistério completo com todos os materiais.",
+      "button": "Gerar Pacote",
+      "characters": "Guias de personagens estarão disponíveis após o início da geração.",
+      "clues": "Cartões de evidências estarão disponíveis após o início da geração.",
+      "inspector": "O guia do inspetor estará disponível após o início da geração.",
+      "matrix": "A matriz de relacionamento estará disponível após o início da geração."
+    },
+    "matrix": {
+      "title": "Matriz de Relacionamento de Personagens"
+    }
+  },
+  "mysteryView": {
+    "timing": {
+      "small": "5-10 minutos",
+      "medium": "15-30 minutos",
+      "large": "30-45 minutos",
+      "xlarge": "45-60 minutos"
     }
   }
+}

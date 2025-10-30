@@ -1,19 +1,19 @@
 {
   "navigation": {
     "home": "Home",
-    "dashboard": "Dashboard",
+    "dashboard": "대시보드",
     "signIn": "Sign In",
     "signUp": "Sign Up",
-    "signOut": "Sign Out",
+    "signOut": "로그아웃",
     "account": "Account Settings",
     "support": "지원"
   },
   "hero": {
-    "title": "Create Murder Mystery Parties in Minutes",
-    "subtitle": "Design custom mysteries exactly how you want them - any theme, any characters, any setting.",
-    "subtitleAuth": "Design custom mysteries exactly how you want them - any theme, any characters, any setting.",
-    "placeholder": "A 1920s speakeasy murder mystery with jazz musicians...",
-    "placeholderAuth": "A 1920s speakeasy murder mystery with jazz musicians...",
+    "title": "몇 분 만에 살인 미스터리 파티 만들기",
+    "subtitle": "원하는 테마, 캐릭터, 설정으로 맞춤 미스터리를 디자인하세요.",
+    "subtitleAuth": "원하는 테마, 캐릭터, 설정으로 맞춤 미스터리를 디자인하세요.",
+    "placeholder": "재즈 뮤지션이 등장하는 1920년대 주류 밀매점 살인 미스터리...",
+    "placeholderAuth": "재즈 뮤지션이 등장하는 1920년대 주류 밀매점 살인 미스터리...",
     "themes": {
       "1920sSpeakeasy": "1920s Speakeasy",
       "hollywoodMurder": "Hollywood Murder",
@@ -97,799 +97,815 @@
   },
   "howItWorks": {
     "step1": {
-      "title": "Describe your ideal murder mystery.",
-      "description": "Tell us your unique vision - any theme, characters, or setting you want."
+      "title": "이상적인 살인 미스터리를 설명하세요.",
+      "description": "원하는 테마, 캐릭터 또는 설정 등 독특한 비전을 알려주세요."
     },
     "step2": {
-      "title": "We create your custom mystery instantly.",
-      "description": "Our AI generates everything exactly how you want it - characters, clues, and story."
+      "title": "맞춤 미스터리를 즉시 생성합니다.",
+      "description": "AI가 원하는 대로 캐릭터, 단서, 스토리를 모두 생성합니다."
     },
     "step3": {
-      "title": "Perfect your mystery with our editor.",
-      "description": "Refine and adjust until your mystery is exactly right for your group."
+      "title": "에디터로 미스터리를 완성하세요.",
+      "description": "그룹에 완벽할 때까지 다듬고 조정하세요."
     },
     "step4": {
-      "title": "Get everything you need to host and share.",
-      "description": "Download and easily share all materials with your players."
+      "title": "호스팅과 공유에 필요한 모든 것을 받으세요.",
+      "description": "모든 자료를 다운로드하고 플레이어와 쉽게 공유하세요."
     }
   },
   "features": {
-    "title": "Everything You Need Included",
+    "title": "필요한 모든 것이 포함되어 있습니다",
     "step1": {
-      "step": "Step 1",
-      "title": "Unlimited Customization",
-      "content": "Any theme, any characters, any setting - create mysteries exactly how you envision them."
+      "step": "1단계",
+      "title": "무제한 커스터마이징",
+      "content": "원하는 테마, 캐릭터, 설정 - 상상하는 대로 미스터리를 만드세요."
     },
     "step2": {
-      "step": "Step 2",
-      "title": "Complete Character Profiles",
-      "content": "Detailed backgrounds, motivations, and secrets tailored specifically for your mystery."
+      "step": "2단계",
+      "title": "완전한 캐릭터 프로필",
+      "content": "미스터리에 맞춰 특별히 제작된 상세한 배경, 동기, 비밀."
     },
     "step3": {
-      "step": "Step 3",
-      "title": "Easy Host Guide",
-      "content": "Step-by-step instructions to run your custom mystery with confidence."
+      "step": "3단계",
+      "title": "쉬운 호스트 가이드",
+      "content": "맞춤 미스터리를 자신 있게 진행하기 위한 단계별 지침."
     }
   },
   "testimonials": {
-    "title": "What Others Are Saying",
+    "title": "다른 사람들의 의견",
     "testimonial1": {
-      "text": "My friends and I still talk about our murder mystery night. The characters were so detailed and the plot twists were perfect!",
-      "author": "Jed"
+      "text": "친구들과 저는 아직도 살인 미스터리 밤에 대해 이야기합니다. 캐릭터가 너무 상세했고 반전이 완벽했어요!",
+      "author": "제드"
     },
     "testimonial2": {
-      "text": "So easy to set up! I was worried about hosting for 12 people, but the materials made it simple and everyone had a blast.",
-      "author": "Laura"
+      "text": "설정이 너무 쉬웠어요! 12명을 호스팅하는 게 걱정됐는데, 자료 덕분에 간단했고 모두가 즐거운 시간을 보냈습니다.",
+      "author": "로라"
     },
     "testimonial3": {
-      "text": "Third murder mystery party using this service and they keep getting better. The customization options are amazing.",
-      "author": "Alex"
+      "text": "이 서비스를 사용한 세 번째 살인 미스터리 파티인데 계속 좋아지고 있어요. 커스터마이징 옵션이 놀랍습니다.",
+      "author": "알렉스"
     }
   },
   "videoDemo": {
     "title": "데모 보기"
   },
   "support": {
-    "title": "Need More Help?",
-    "description": "Visit our comprehensive support center for FAQs, hosting tips, and more information about using our Mystery Maker.",
-    "button": "Visit Support Center",
+    "title": "추가 도움이 필요하신가요?",
+    "description": "FAQ, 호스팅 팁, Mystery Maker 사용에 대한 자세한 정보는 포괄적인 지원 센터를 방문하세요.",
+    "button": "지원 센터 방문",
     "email": "support@mysterymaker.party"
   },
   "footer": {
-    "tagline": "Craft captivating murder mysteries at the speed of imagination.",
-    "quickLinks": "Quick Links",
-    "company": "Company",
+    "tagline": "상상의 속도로 매혹적인 살인 미스터리를 만드세요.",
+    "quickLinks": "빠른 링크",
+    "company": "회사",
     "links": {
-      "home": "Home",
-      "support": "Support",
-      "contact": "Contact",
-      "privacy": "Privacy Policy"
+      "home": "홈",
+      "support": "지원",
+      "contact": "문의",
+      "privacy": "개인정보 보호정책"
     },
     "copyright": "Mystery Maker, Inc. All rights reserved."
   },
   "auth": {
     "signIn": {
-      "title": "Welcome Back",
-      "subtitle": "Sign in to your account to continue creating amazing mysteries",
-      "email": "Email Address",
-      "password": "Password",
-      "rememberMe": "Remember me",
-      "forgotPassword": "Forgot your password?",
-      "noAccount": "Don't have an account?",
-      "signUpLink": "Sign up here",
-      "submitButton": "Sign In",
-      "signingIn": "Signing in...",
-      "orDivider": "or continue with",
-      "googleButton": "Continue with Google"
+      "title": "환영합니다",
+      "subtitle": "계정에 로그인하여 멋진 미스터리 만들기를 계속하세요",
+      "email": "이메일 주소",
+      "password": "비밀번호",
+      "rememberMe": "로그인 상태 유지",
+      "forgotPassword": "비밀번호를 잊으셨나요?",
+      "noAccount": "계정이 없으신가요?",
+      "signUpLink": "여기서 가입하세요",
+      "submitButton": "로그인",
+      "signingIn": "로그인 중...",
+      "orDivider": "또는 다음으로 계속",
+      "googleButton": "Google로 계속"
     },
     "signUp": {
-      "title": "Create Your Account",
-      "subtitle": "Join thousands of mystery makers and start creating today",
-      "name": "Full Name",
-      "email": "Email Address",
-      "password": "Password",
-      "confirmPassword": "Confirm Password",
-      "terms": "I agree to the",
-      "termsLink": "Terms of Service",
-      "privacy": "Privacy Policy",
-      "and": "and",
-      "hasAccount": "Already have an account?",
-      "signInLink": "Sign in here",
-      "submitButton": "Create Account",
-      "creatingAccount": "Creating account...",
-      "orDivider": "or continue with",
-      "googleButton": "Continue with Google"
+      "title": "계정 만들기",
+      "subtitle": "수천 명의 미스터리 메이커와 함께하고 오늘부터 만들기 시작하세요",
+      "name": "이름",
+      "email": "이메일 주소",
+      "password": "비밀번호",
+      "confirmPassword": "비밀번호 확인",
+      "terms": "동의합니다",
+      "termsLink": "이용 약관",
+      "privacy": "개인정보 보호정책",
+      "and": "및",
+      "hasAccount": "이미 계정이 있으신가요?",
+      "signInLink": "여기서 로그인하세요",
+      "submitButton": "계정 만들기",
+      "creatingAccount": "계정 생성 중...",
+      "orDivider": "또는 다음으로 계속",
+      "googleButton": "Google로 계속"
     },
     "forgotPassword": {
-      "title": "Reset Your Password",
-      "subtitle": "Enter your email address and we'll send you a link to reset your password",
-      "email": "Email Address",
-      "submitButton": "Send Reset Link",
-      "sending": "Sending...",
-      "backToSignIn": "Back to sign in",
+      "title": "비밀번호 재설정",
+      "subtitle": "이메일 주소를 입력하시면 비밀번호 재설정 링크를 보내드립니다",
+      "email": "이메일 주소",
+      "submitButton": "재설정 링크 보내기",
+      "sending": "전송 중...",
+      "backToSignIn": "로그인으로 돌아가기",
       "checkEmail": {
-        "title": "Check Your Email",
-        "message": "We've sent a password reset link to",
-        "noEmail": "Didn't receive an email?",
-        "tryAgain": "Try again",
-        "returnToSignIn": "Return to Sign In"
+        "title": "이메일을 확인하세요",
+        "message": "비밀번호 재설정 링크를 보냈습니다",
+        "noEmail": "이메일을 받지 못하셨나요?",
+        "tryAgain": "다시 시도",
+        "returnToSignIn": "로그인으로 돌아가기"
       }
     },
     "resetPassword": {
-      "title": "Set New Password",
-      "subtitle": "Create a new password for your account",
-      "password": "New Password",
-      "confirmPassword": "Confirm New Password",
-      "submitButton": "Update Password",
-      "updating": "Updating...",
-      "success": "Password updated successfully"
+      "title": "새 비밀번호 설정",
+      "subtitle": "계정의 새 비밀번호를 만드세요",
+      "password": "새 비밀번호",
+      "confirmPassword": "새 비밀번호 확인",
+      "submitButton": "비밀번호 업데이트",
+      "updating": "업데이트 중...",
+      "success": "비밀번호가 성공적으로 업데이트되었습니다"
     },
     "errors": {
-      "invalidCredentials": "Invalid email or password",
-      "emailAlreadyExists": "An account with this email already exists",
-      "weakPassword": "Password must be at least 6 characters",
-      "passwordMismatch": "Passwords do not match",
-      "invalidEmail": "Please enter a valid email address",
-      "requiredField": "This field is required",
-      "termsRequired": "You must accept the terms of service",
-      "networkError": "Network error. Please try again.",
-      "unknownError": "Something went wrong. Please try again."
+      "invalidCredentials": "이메일 또는 비밀번호가 잘못되었습니다",
+      "emailAlreadyExists": "이 이메일로 된 계정이 이미 존재합니다",
+      "weakPassword": "비밀번호는 최소 6자 이상이어야 합니다",
+      "passwordMismatch": "비밀번호가 일치하지 않습니다",
+      "invalidEmail": "유효한 이메일 주소를 입력하세요",
+      "requiredField": "이 필드는 필수입니다",
+      "termsRequired": "이용 약관에 동의해야 합니다",
+      "networkError": "네트워크 오류입니다. 다시 시도하세요.",
+      "unknownError": "문제가 발생했습니다. 다시 시도하세요."
     },
     "success": {
-      "accountCreated": "Account created successfully! Please check your email to verify your account.",
-      "passwordReset": "Password reset email sent successfully",
-      "passwordUpdated": "Password updated successfully",
-      "signedOut": "Signed out successfully"
+      "accountCreated": "계정이 성공적으로 생성되었습니다! 이메일을 확인하여 계정을 인증하세요.",
+      "passwordReset": "비밀번호 재설정 이메일이 성공적으로 전송되었습니다",
+      "passwordUpdated": "비밀번호가 성공적으로 업데이트되었습니다",
+      "signedOut": "성공적으로 로그아웃되었습니다"
     }
   },
   "dashboard": {
-    "title": "Your Murder Mysteries",
-    "subtitle": "View, edit and manage all your created mysteries",
+    "title": "나의 살인 미스터리",
+    "subtitle": "생성한 모든 미스터리를 보고, 편집하고, 관리하세요",
     "welcome": {
-      "title": "Welcome back",
-      "subtitle": "Ready to create your next mystery masterpiece?",
-      "noMysteries": "You haven't created any mysteries yet",
-      "getStarted": "Get started by creating your first mystery"
+      "title": "환영합니다",
+      "subtitle": "다음 미스터리 걸작을 만들 준비가 되셨나요?",
+      "noMysteries": "아직 미스터리를 만들지 않았습니다",
+      "getStarted": "첫 번째 미스터리를 만들어 시작하세요"
     },
     "mysteries": {
-      "title": "Your Mysteries",
-      "searchPlaceholder": "Search mysteries...",
-      "deleteSuccess": "Mystery moved to archive",
-      "deleteFailed": "Failed to archive mystery",
+      "title": "나의 미스터리",
+      "searchPlaceholder": "미스터리 검색...",
+      "deleteSuccess": "미스터리를 아카이브로 이동했습니다",
+      "deleteFailed": "미스터리 아카이브에 실패했습니다",
       "filter": {
-        "all": "All Mysteries",
-        "drafts": "Drafts",
-        "completed": "Completed",
-        "purchased": "Purchased",
-        "archived": "Archived"
+        "all": "모든 미스터리",
+        "drafts": "초안",
+        "completed": "완료됨",
+        "purchased": "구매함",
+        "archived": "보관됨"
       },
       "empty": {
-        "title": "No mysteries found",
-        "description": "Create your first mystery to get started",
-        "searchResult": "No mysteries match your search"
+        "title": "미스터리를 찾을 수 없습니다",
+        "description": "첫 번째 미스터리를 만들어 시작하세요",
+        "searchResult": "검색과 일치하는 미스터리가 없습니다"
       },
       "card": {
-        "players": "{{count}} players",
-        "created": "Created",
-        "lastEdited": "Last edited",
-        "theme": "Theme: {{theme}}",
+        "players": "{{count}}명의 플레이어",
+        "created": "생성일",
+        "lastEdited": "마지막 편집",
+        "theme": "테마: {{theme}}",
         "actions": {
-          "view": "View",
-          "chat": "Chat",
-          "delete": "Delete",
-          "viewProgress": "View Progress",
-          "progress": "Progress",
-          "editMystery": "Edit Mystery",
-          "edit": "Edit",
-          "archive": "Archive",
-          "deleteTitle": "Delete"
+          "view": "보기",
+          "chat": "채팅",
+          "delete": "삭제",
+          "viewProgress": "진행 상황 보기",
+          "progress": "진행 상황",
+          "editMystery": "미스터리 편집",
+          "edit": "편집",
+          "archive": "보관",
+          "deleteTitle": "삭제"
         },
         "deleteDialog": {
-          "title": "Delete Mystery",
-          "description": "Are you sure you want to delete this mystery? This action cannot be undone."
+          "title": "미스터리 삭제",
+          "description": "이 미스터리를 삭제하시겠습니까? 이 작업은 취소할 수 없습니다."
         },
-        "generationInProgress": "Generation in progress...",
-        "editedDate": "Edited {{date}}"
+        "generationInProgress": "생성 중...",
+        "editedDate": "{{date}}에 편집됨"
       },
       "status": {
-        "completed": "Completed",
-        "draft": "Draft",
-        "purchased": "Purchased",
-        "unknown": "Unknown",
-        "done": "Done",
-        "bought": "Bought",
-        "generating": "Generating...",
-        "generatingShort": "Gen..."
+        "completed": "완료됨",
+        "draft": "초안",
+        "purchased": "구매함",
+        "unknown": "알 수 없음",
+        "done": "완료",
+        "bought": "구매함",
+        "generating": "생성 중...",
+        "generatingShort": "생성..."
       },
-      "showingCount": "Showing {{count}} of {{total}} mysteries"
+      "showingCount": "총 {{total}}개 중 {{count}}개의 미스터리 표시"
     },
     "stats": {
-      "totalMysteries": "Total Mysteries",
-      "completedMysteries": "Completed",
-      "purchasedMysteries": "Purchased",
-      "totalPlayers": "Total Players Hosted"
+      "totalMysteries": "총 미스터리",
+      "completedMysteries": "완료됨",
+      "purchasedMysteries": "구매함",
+      "totalPlayers": "호스팅한 총 플레이어"
     },
-    "backToDashboard": "Back to Dashboard",
+    "backToDashboard": "대시보드로 돌아가기",
     "buttons": {
-      "createFirstMystery": "Create Your First Mystery"
+      "createFirstMystery": "첫 번째 미스터리 만들기"
     },
     "errors": {
-      "loadFailed": "Failed to load your mysteries"
+      "loadFailed": "미스터리를 불러오는데 실패했습니다"
     }
   },
   "account": {
-    "title": "Account Settings",
+    "title": "계정 설정",
     "tabs": {
-      "profile": "Profile",
-      "security": "Security"
+      "profile": "프로필",
+      "security": "보안"
     },
     "profile": {
-      "title": "Profile Information",
-      "description": "Update your account profile information",
-      "name": "Full Name",
-      "email": "Email Address",
-      "emailNote": "Email cannot be changed",
-      "saveButton": "Save Changes",
-      "saving": "Saving...",
-      "success": "Profile updated successfully"
+      "title": "프로필 정보",
+      "description": "계정 프로필 정보 업데이트",
+      "name": "이름",
+      "email": "이메일 주소",
+      "emailNote": "이메일은 변경할 수 없습니다",
+      "saveButton": "변경사항 저장",
+      "saving": "저장 중...",
+      "success": "프로필이 성공적으로 업데이트되었습니다"
     },
     "security": {
       "password": {
-        "title": "Change Password",
-        "description": "Update your password to keep your account secure",
-        "currentPassword": "Current Password",
-        "newPassword": "New Password",
-        "confirmPassword": "Confirm New Password",
-        "updateButton": "Update Password",
-        "updating": "Updating...",
-        "success": "Password updated successfully"
+        "title": "비밀번호 변경",
+        "description": "계정을 안전하게 유지하기 위해 비밀번호 업데이트",
+        "currentPassword": "현재 비밀번호",
+        "newPassword": "새 비밀번호",
+        "confirmPassword": "새 비밀번호 확인",
+        "updateButton": "비밀번호 업데이트",
+        "updating": "업데이트 중...",
+        "success": "비밀번호가 성공적으로 업데이트되었습니다"
       },
       "deleteAccount": {
-        "title": "Delete Account",
-        "description": "Permanently delete your account and all associated data",
-        "warning": "This action cannot be undone. All your mysteries and data will be permanently deleted.",
-        "confirmText": "Type DELETE to confirm",
-        "deleteButton": "Delete Account",
-        "deleting": "Deleting...",
-        "success": "Account deleted successfully"
+        "title": "계정 삭제",
+        "description": "계정과 관련된 모든 데이터를 영구적으로 삭제",
+        "warning": "이 작업은 취소할 수 없습니다. 모든 미스터리와 데이터가 영구적으로 삭제됩니다.",
+        "confirmText": "확인을 위해 \"DELETE\"를 입력하세요",
+        "deleteButton": "계정 삭제",
+        "deleting": "삭제 중...",
+        "success": "계정이 성공적으로 삭제되었습니다"
       }
     }
   },
   "mysteryCreation": {
     "scriptType": {
-      "full": "full",
-      "pointForm": "point form",
-      "both": "both full and point form"
+      "full": "전체 스크립트",
+      "pointForm": "요약 형식",
+      "both": "전체 스크립트 및 요약 형식 모두"
     },
     "sections": {
-      "premise": "Premise",
-      "victim": "Victim",
-      "characterList": "Character List",
-      "players": "players",
-      "murderMethod": "Murder Method"
+      "premise": "전제",
+      "victim": "피해자",
+      "characterList": "캐릭터 목록",
+      "players": "플레이어",
+      "murderMethod": "살해 방법"
     },
     "wizard": {
-      "title": "Create Your Mystery",
+      "title": "미스터리 만들기",
       "step1": {
-        "title": "Tell Us Your Vision",
-        "description": "Describe your ideal murder mystery party"
+        "title": "비전을 알려주세요",
+        "description": "이상적인 살인 미스터리 파티를 설명하세요"
       },
       "step2": {
-        "title": "Review & Refine",
-        "description": "Perfect your mystery with our AI assistant"
+        "title": "검토 및 다듬기",
+        "description": "AI 어시스턴트로 미스터리를 완성하세요"
       },
       "step3": {
-        "title": "Complete Package",
-        "description": "Get everything you need to host"
+        "title": "완전한 패키지",
+        "description": "호스팅에 필요한 모든 것을 받으세요"
       },
       "prompt": {
-        "defaultStart": "I want to create a murder mystery",
-        "withTheme": "The theme/setting should be {{theme}} for {{playerCount}} players with {{scriptType}} scripts",
-        "withoutTheme": "This is for {{playerCount}} players with {{scriptType}} scripts",
-        "withAccomplice": "Include an accomplice mechanism in the mystery",
-        "withoutAccomplice": "Do not include an accomplice mechanism in the mystery",
-        "additionalDetails": "Additional details include: {{details}}"
+        "defaultStart": "살인 미스터리를 만들고 싶습니다",
+        "withTheme": "테마/설정은 {{theme}}이고, {{playerCount}}명의 플레이어, {{scriptType}} 스크립트입니다",
+        "withoutTheme": "{{playerCount}}명의 플레이어, {{scriptType}} 스크립트입니다",
+        "withAccomplice": "미스터리에 공범 메커니즘 포함",
+        "withoutAccomplice": "미스터리에 공범 메커니즘 포함하지 않음",
+        "additionalDetails": "추가 세부정보 포함: {{details}}"
       }
     },
     "editor": {
-      "title": "Mystery Editor",
-      "characters": "Characters",
-      "story": "Story",
-      "clues": "Clues",
-      "hostGuide": "Host Guide",
-      "save": "Save Draft",
-      "publish": "Complete Mystery",
-      "saving": "Saving...",
-      "publishing": "Publishing...",
-      "saved": "Draft saved",
-      "published": "Mystery completed"
+      "title": "미스터리 에디터",
+      "characters": "캐릭터",
+      "story": "스토리",
+      "clues": "단서",
+      "hostGuide": "호스트 가이드",
+      "save": "초안 저장",
+      "publish": "미스터리 완성",
+      "saving": "저장 중...",
+      "publishing": "게시 중...",
+      "saved": "초안이 저장되었습니다",
+      "published": "미스터리가 완성되었습니다"
     },
     "guidance": {
-      "describe": "Describe your mystery in detail - the more specific you are, the better we can create it for you",
-      "examples": "Try: 'A 1920s speakeasy murder mystery with 8 characters including a jazz singer, bartender, and mob boss'",
-      "playerCount": "How many players will participate?",
-      "theme": "What's the setting or theme?",
-      "special": "Any special requirements or constraints?",
+      "describe": "미스터리를 자세히 설명하세요 - 구체적일수록 더 잘 만들 수 있습니다",
+      "examples": "예: \"재즈 가수, 바텐더, 마피아 보스를 포함한 8명의 캐릭터가 등장하는 1920년대 주류 밀매점 살인 미스터리\"",
+      "playerCount": "몇 명의 플레이어가 참여하나요?",
+      "theme": "설정이나 테마는 무엇인가요?",
+      "special": "특별한 요구사항이나 제약사항이 있나요?",
       "initialPrompt": {
-        "withTheme": "Let's create a murder mystery with a {{theme}} theme. Please guide me through creating this mystery step by step.",
-        "withoutTheme": "Let's create a murder mystery. Please guide me through creating this mystery step by step."
+        "withTheme": "{{theme}} 테마로 살인 미스터리를 만들어 봅시다. 이 미스터리를 만드는 과정을 단계별로 안내해 주세요.",
+        "withoutTheme": "살인 미스터리를 만들어 봅시다. 이 미스터리를 만드는 과정을 단계별로 안내해 주세요."
       }
     },
-    "editTitle": "Edit Mystery",
-    "createTitle": "Create New Mystery",
+    "editTitle": "미스터리 편집",
+    "createTitle": "새 미스터리 만들기",
     "form": {
-      "description": "Fill out the form below to generate your custom murder mystery"
+      "description": "아래 양식을 작성하여 맞춤 살인 미스터리를 생성하세요"
     },
     "buttons": {
-      "generateFullMystery": "Generate Full Mystery"
+      "generateFullMystery": "전체 미스터리 생성"
     },
     "errors": {
-      "signInToSave": "Please sign in to save your mystery",
-      "saveFailed": "Failed to save mystery",
-      "loadFailed": "Failed to load mystery",
-      "loadMessagesFailed": "Failed to load conversation messages",
-      "loadConversationFailed": "Failed to load conversation",
-      "initialPrompt": "Please provide a prompt for your mystery",
-      "saveMessageFailed": "Failed to save message"
+      "signInToSave": "미스터리를 저장하려면 로그인하세요",
+      "saveFailed": "미스터리 저장에 실패했습니다",
+      "loadFailed": "미스터리를 불러오는데 실패했습니다",
+      "loadMessagesFailed": "대화 메시지를 불러오는데 실패했습니다",
+      "loadConversationFailed": "대화를 불러오는데 실패했습니다",
+      "initialPrompt": "미스터리에 대한 프롬프트를 제공하세요",
+      "saveMessageFailed": "메시지 저장에 실패했습니다"
     },
     "success": {
-      "setupComplete": "Mystery setup complete! Starting chat..."
+      "setupComplete": "미스터리 설정 완료! 채팅을 시작합니다..."
     }
   },
   "mysteryForm": {
-    "userRequestLabel": "What you want to create",
-    "userRequestDescription": "Your original request from the homepage",
-    "themeLabel": "Theme/Setting Details (Optional)",
-    "themePlaceholder": "e.g., time period, setting specifics, must-have's, etc.",
-    "themeDescription": "Choose a specific theme or setting for your murder mystery",
-    "playerCountLabel": "How many players will participate?",
-    "playerCountPlaceholder": "Select number of players",
-    "playerCountItem": "{{count}} players",
-    "playerCountDescription": "Choose between 4 and 32 players for your murder mystery.",
-    "accompliceLabel": "Include Accomplice Mechanism",
-    "accompliceDescription": "Best for games with 10 or more players",
-    "scriptTypeLabel": "Script Detail Level",
-    "scriptTypeFullLabel": "Full Scripts - Complete dialogue and detailed instructions",
-    "scriptTypePointFormLabel": "Point Form - Key points and bullet summaries",
-    "scriptTypeBothLabel": "Both Formats - Full scripts AND point form notes",
-    "additionalDetailsLabel": "Additional Details (Optional)",
-    "additionalDetailsPlaceholder": "Any specific requirements, special rules, or additional context for your mystery...",
-    "additionalDetailsDescription": "Provide any extra details or special requests for your mystery",
-    "startChat": "Start AI Chat",
-    "startingChat": "Starting Chat..."
+    "userRequestLabel": "만들고 싶은 것",
+    "userRequestDescription": "홈페이지에서의 원래 요청",
+    "themeLabel": "테마/설정 세부정보 (선택사항)",
+    "themePlaceholder": "예: 시대, 설정 세부사항, 필수 사항 등",
+    "themeDescription": "살인 미스터리의 특정 테마 또는 설정을 선택하세요",
+    "playerCountLabel": "몇 명의 플레이어가 참여하나요?",
+    "playerCountPlaceholder": "플레이어 수 선택",
+    "playerCountItem": "{{count}}명의 플레이어",
+    "playerCountDescription": "살인 미스터리에 4명에서 32명까지 플레이어를 선택하세요.",
+    "accompliceLabel": "공범 메커니즘 포함",
+    "accompliceDescription": "10명 이상의 플레이어가 있는 게임에 적합",
+    "scriptTypeLabel": "스크립트 세부 수준",
+    "scriptTypeFullLabel": "전체 스크립트 - 완전한 대화 및 상세한 지침",
+    "scriptTypePointFormLabel": "요약 형식 - 주요 포인트 및 간단한 요약",
+    "scriptTypeBothLabel": "두 형식 모두 - 전체 스크립트 및 요약 노트",
+    "additionalDetailsLabel": "추가 세부정보 (선택사항)",
+    "additionalDetailsPlaceholder": "미스터리에 대한 특정 요구사항, 특별한 규칙 또는 추가 컨텍스트...",
+    "additionalDetailsDescription": "미스터리에 대한 추가 세부정보 또는 특별한 요청을 제공하세요",
+    "startChat": "AI 채팅 시작",
+    "startingChat": "채팅 시작 중..."
   },
   "supportPage": {
-    "title": "Support Center",
-    "subtitle": "Find answers to common questions, contact our support team, and get everything you need to create amazing mystery parties.",
+    "title": "지원 센터",
+    "subtitle": "일반적인 질문에 대한 답변을 찾고, 지원팀에 연락하고, 멋진 미스터리 파티를 만드는 데 필요한 모든 것을 얻으세요.",
     "tabs": {
-      "faqs": "FAQs",
-      "contact": "Contact Us"
+      "faqs": "자주 묻는 질문",
+      "contact": "문의하기"
     },
     "faqs": {
-      "title": "Frequently Asked Questions",
-      "description": "Find answers to common questions about Mystery Maker",
+      "title": "자주 묻는 질문",
+      "description": "Mystery Maker에 대한 일반적인 질문에 대한 답변 찾기",
       "categories": {
-        "aboutMysteryMaker": "About Mystery Maker",
-        "gameMechanics": "Game Mechanics",
-        "hostingPlanning": "Hosting & Planning",
-        "accountBilling": "Account & Billing"
+        "aboutMysteryMaker": "Mystery Maker 정보",
+        "gameMechanics": "게임 메커니즘",
+        "hostingPlanning": "호스팅 및 계획",
+        "accountBilling": "계정 및 결제"
       },
       "questions": {
         "whatIsMysteryMaker": {
-          "question": "What is Mystery Maker and how does it work?",
-          "answer": "Mystery Maker is an AI-powered platform that creates custom murder mystery parties exactly how you want them. Tell us your unique vision - any theme, characters, or setting - and our AI generates everything you need: character profiles, clues, and host materials tailored specifically for your party."
+          "question": "Mystery Maker란 무엇이며 어떻게 작동하나요?",
+          "answer": "Mystery Maker는 원하는 대로 맞춤형 살인 미스터리 파티를 만드는 AI 기반 플랫폼입니다. 테마, 캐릭터, 설정 등 독특한 비전을 알려주시면 AI가 캐릭터 프로필, 단서, 파티 전용 호스트 자료 등 필요한 모든 것을 생성합니다."
         },
         "creationProcess": {
-          "question": "How does the creation and purchase process work?",
-          "answer": "Simple! First, describe your ideal murder mystery and we'll create a custom preview for free. When you're happy with your mystery, purchase the complete package for $24.99. You'll instantly get everything needed to host: detailed character profiles, host guide, and all game materials."
+          "question": "생성 및 구매 프로세스는 어떻게 작동하나요?",
+          "answer": "간단합니다! 먼저 이상적인 살인 미스터리를 설명하면 무료로 맞춤 미리보기를 만들어 드립니다. 미스터리가 마음에 들면 $24.99에 전체 패키지를 구매하세요. 호스팅에 필요한 모든 것(상세한 캐릭터 프로필, 호스트 가이드, 모든 게임 자료)을 즉시 받을 수 있습니다."
         },
         "saveWork": {
-          "question": "Can I save my work and come back to it later?",
-          "answer": "Yes! All your custom mysteries are saved to your account so you can return and edit them anytime."
+          "question": "작업을 저장하고 나중에 돌아올 수 있나요?",
+          "answer": "네! 모든 맞춤 미스터리는 계정에 저장되므로 언제든지 돌아와서 편집할 수 있습니다."
         },
         "replayable": {
-          "question": "Are these murder mysteries replayable?",
-          "answer": "Absolutely! Our mysteries include variable elements so each playthrough feels fresh, even with the same group. You can host your custom mystery as many times as you want."
+          "question": "이 살인 미스터리는 반복해서 플레이할 수 있나요?",
+          "answer": "물론입니다! 미스터리에는 가변 요소가 포함되어 있어 같은 그룹이라도 매번 새로운 느낌을 받습니다. 맞춤 미스터리를 원하는 만큼 호스팅할 수 있습니다."
         },
         "playerCount": {
-          "question": "How many players do I need?",
-          "answer": "Our system creates mysteries for any group size you specify - from intimate gatherings of 4-6 players to larger parties of 15+ players. Just tell us your player count and we'll design accordingly."
+          "question": "몇 명의 플레이어가 필요한가요?",
+          "answer": "시스템은 지정한 그룹 크기에 맞춰 미스터리를 생성합니다. 4~6명의 친밀한 모임부터 15명 이상의 대규모 파티까지 가능합니다. 플레이어 수를 알려주시면 그에 맞춰 디자인합니다."
         },
         "modifyMystery": {
-          "question": "Can I modify my mystery after creating it?",
-          "answer": "Of course! Use our editor to refine and adjust your mystery until it's exactly right for your group. Change characters, themes, or complexity anytime."
+          "question": "생성 후 미스터리를 수정할 수 있나요?",
+          "answer": "물론입니다! 에디터를 사용하여 그룹에 완벽할 때까지 미스터리를 다듬고 조정할 수 있습니다. 캐릭터, 테마 또는 복잡성을 언제든지 변경하세요."
         },
         "lastMinuteChanges": {
-          "question": "What if I need to add or remove players at the last minute?",
-          "answer": "No problem! Our flexible system allows you to adjust your player count even after creating your mystery. The AI will adapt the story and characters to accommodate these changes."
+          "question": "막판에 플레이어를 추가하거나 제거해야 하면 어떻게 되나요?",
+          "answer": "문제없습니다! 유연한 시스템을 통해 미스터리를 만든 후에도 플레이어 수를 조정할 수 있습니다. AI가 이러한 변경 사항을 수용하도록 스토리와 캐릭터를 조정합니다."
         },
         "whatIncluded": {
-          "question": "What's included in my custom mystery package?",
-          "answer": "Everything you need: a comprehensive host guide with step-by-step instructions, detailed character profiles for each player, clues, evidence, and all game materials. No additional preparation required."
+          "question": "맞춤 미스터리 패키지에는 무엇이 포함되나요?",
+          "answer": "필요한 모든 것이 포함됩니다: 단계별 지침이 포함된 포괄적인 호스트 가이드, 각 플레이어를 위한 상세한 캐릭터 프로필, 단서, 증거, 모든 게임 자료. 추가 준비가 필요하지 않습니다."
         },
         "gameDuration": {
-          "question": "How long does a typical game last?",
-          "answer": "Most mysteries run 2-3 hours, but you control the pacing. Our host guide includes timing suggestions that you can adjust to fit your schedule."
+          "question": "일반적인 게임은 얼마나 지속되나요?",
+          "answer": "대부분의 미스터리는 2~3시간 동안 진행되지만 속도는 본인이 조절합니다. 호스트 가이드에는 일정에 맞게 조정할 수 있는 타이밍 제안이 포함되어 있습니다."
         },
         "themedMysteries": {
-          "question": "Do you offer themed mysteries for special occasions?",
-          "answer": "We create any theme you can imagine! From classic 1920s speakeasies to space stations to fairy tale kingdoms - tell us your vision and we'll make it happen."
+          "question": "특별한 행사를 위한 테마 미스터리를 제공하나요?",
+          "answer": "상상할 수 있는 모든 테마를 만듭니다! 고전적인 1920년대 주류밀매점부터 우주 정거장, 동화 왕국까지 - 비전을 알려주시면 실현시켜 드립니다."
         },
         "ageRecommendation": {
-          "question": "Is there an age recommendation for your mysteries?",
-          "answer": "Our standard mysteries work great for adults and teens (13+). You can also request family-friendly themes when creating your mystery for younger players."
+          "question": "미스터리에 연령 권장 사항이 있나요?",
+          "answer": "표준 미스터리는 성인과 청소년(13세 이상)에게 적합합니다. 어린 플레이어를 위한 미스터리를 만들 때 가족 친화적인 테마를 요청할 수도 있습니다."
         },
         "freePreview": {
-          "question": "What's included in the free preview?",
-          "answer": "You can create unlimited mystery previews for free, including the basic story premise and character concepts. This lets you explore different ideas before purchasing."
+          "question": "무료 미리보기에는 무엇이 포함되나요?",
+          "answer": "무제한 미스터리 미리보기를 무료로 만들 수 있으며, 기본 스토리 전제와 캐릭터 개념이 포함됩니다. 이를 통해 구매 전에 다양한 아이디어를 탐색할 수 있습니다."
         },
         "purchaseIncludes": {
-          "question": "What do I get when I purchase a mystery?",
-          "answer": "For $24.99, you receive everything needed to host: comprehensive host guide, detailed character profiles for each player, clues, evidence, and all game materials ready to use."
+          "question": "미스터리를 구매하면 무엇을 받나요?",
+          "answer": "$24.99에 호스팅에 필요한 모든 것을 받습니다: 포괄적인 호스트 가이드, 각 플레이어를 위한 상세한 캐릭터 프로필, 단서, 증거, 바로 사용할 수 있는 모든 게임 자료."
         },
         "refund": {
-          "question": "Can I get a refund if I'm not satisfied?",
-          "answer": "Absolutely! If you're not completely satisfied with your purchase, contact us within 7 days and we'll issue a full refund, no questions asked."
+          "question": "만족하지 못하면 환불받을 수 있나요?",
+          "answer": "물론입니다! 구매에 완전히 만족하지 못하면 7일 이내에 연락하시면 질문 없이 전액 환불해 드립니다."
+        },
+        "gameDesignEngagement": {
+          "question": "게임 디자인이 모든 사람의 참여를 어떻게 보장하나요?",
+          "answer": "우리의 미스터리는 경직된 스토리라인이 아닌 풍부한 캐릭터 상호작용에 초점을 맞춥니다. 각 캐릭터는 자연스러운 게임플레이를 이끄는 상세한 배경과 동기를 가지고 있어 모든 플레이어가 전체 경험 동안 적극적으로 참여하도록 보장합니다."
+        },
+        "dynamicMurderer": {
+          "question": "왜 단서가 처음부터 특정 살인자를 가리키지 않나요?",
+          "answer": "살인자는 게임플레이 중 드러난 단서를 기반으로 첫 라운드 후에 결정됩니다. 이 동적 접근 방식은 단서가 점진적으로 구축되어 파티 분위기에서 일부 세부 사항이 놓쳐도 미스터리를 해결할 수 있게 합니다."
+        },
+        "flexiblePlayerCount": {
+          "question": "누군가 막판에 올 수 없으면 어떻게 되나요?",
+          "answer": "우리의 유연한 디자인은 막판 변경 사항을 수용합니다. 게임이 한 캐릭터가 중요한 정보를 보유하는 것에 의존하지 않기 때문에 미스터리를 깨지 않고 플레이어 수를 조정할 수 있습니다."
+        },
+        "characterFocused": {
+          "question": "왜 플롯 중심이 아닌 캐릭터 중심인가요?",
+          "answer": "수년간의 경험을 통해 지나치게 구체적인 단서는 파티에서 놓치게 된다는 것을 배웠습니다. 우리의 캐릭터 주도 접근 방식은 미스터리가 상호작용을 통해 자연스럽게 전개됨을 의미합니다."
         }
       }
     },
     "contact": {
-      "title": "Contact Us",
-      "description": "Need more help? We're here for you",
-      "intro": "Our support team is ready to help with any questions about creating your perfect mystery party with Mystery Maker.",
+      "title": "문의하기",
+      "description": "추가 도움이 필요하신가요? 저희가 도와드리겠습니다",
+      "intro": "지원팀은 Mystery Maker로 완벽한 미스터리 파티를 만드는 것에 대한 모든 질문에 답변할 준비가 되어 있습니다.",
       "form": {
-        "name": "Name",
-        "email": "Email Address",
-        "subject": "Subject",
-        "message": "Message",
-        "namePlaceholder": "Your name",
-        "emailPlaceholder": "your.email@example.com",
-        "subjectPlaceholder": "What is your message about?",
-        "messagePlaceholder": "How can we help you?",
-        "sendButton": "Send Message",
-        "sending": "Sending...",
-        "success": "Thank you for contacting us! We'll get back to you within 24 hours.",
-        "error": "Failed to send message. Please try again later."
+        "name": "이름",
+        "email": "이메일 주소",
+        "subject": "제목",
+        "message": "메시지",
+        "namePlaceholder": "이름을 입력하세요",
+        "emailPlaceholder": "이메일@example.com",
+        "subjectPlaceholder": "제목을 입력하세요",
+        "messagePlaceholder": "메시지를 입력하세요...",
+        "sendButton": "메시지 보내기",
+        "sending": "전송 중...",
+        "success": "메시지가 성공적으로 전송되었습니다! 곧 연락드리겠습니다.",
+        "error": "메시지 전송에 실패했습니다. 다시 시도해 주세요."
       }
     }
   },
   "chat": {
-    "title": "Murder Mystery Creator",
-    "public": "Public",
-    "private": "Private",
-    "initialGreeting": "Hello! I'm your AI development assistant. Let me help you create a murder mystery. How many players do you want for your murder mystery?",
-    "inputPlaceholder": "Type your message...",
-    "signInPrompt": "Please <1>sign in</1> to use private mode",
-    "errorResponse": "I'm having trouble responding right now. Please try again.",
-    "errorResponseWithFallback": "I'm experiencing some technical difficulties. How many players do you want for your murder mystery?",
-    "connectionErrorResponse": "I'm having trouble connecting right now. How many players do you want for your murder mystery?",
-    "placeholder": "Share your ideas for the mystery...",
-    "loadingMessages": "Loading previous messages...",
+    "title": "살인 미스터리 크리에이터",
+    "public": "공개",
+    "private": "비공개",
+    "initialGreeting": "안녕하세요! AI 개발 어시스턴트입니다. 살인 미스터리를 만드는 것을 도와드리겠습니다. 살인 미스터리에 몇 명의 플레이어를 원하시나요?",
+    "inputPlaceholder": "메시지를 입력하세요...",
+    "signInPrompt": "비공개 모드를 사용하려면 <1>로그인</1>하세요",
+    "errorResponse": "지금 응답하는데 문제가 있습니다. 다시 시도하세요.",
+    "errorResponseWithFallback": "기술적인 문제가 발생했습니다. 살인 미스터리에 몇 명의 플레이어를 원하시나요?",
+    "connectionErrorResponse": "지금 연결에 문제가 있습니다. 살인 미스터리에 몇 명의 플레이어를 원하시나요?",
+    "placeholder": "미스터리에 대한 아이디어를 공유하세요...",
+    "loadingMessages": "이전 메시지 불러오는 중...",
     "errors": {
-      "responseFailed": "Failed to get AI response. Please try again.",
-      "aiUnavailable": "I apologize, but I'm having trouble responding right now. Please try again in a moment."
+      "responseFailed": "AI 응답을 받는데 실패했습니다. 다시 시도하세요.",
+      "aiUnavailable": "죄송합니다만, 지금 응답하는데 문제가 있습니다. 잠시 후 다시 시도하세요."
     }
   },
   "sendToGuests": {
-    "title": "Send Character Guides to Your Guests",
-    "description": "Enter email addresses for each character to send personalized guides directly to your guests. Each guest will only receive their own character information.",
+    "title": "게스트에게 캐릭터 가이드 보내기",
+    "description": "각 캐릭터의 이메일 주소를 입력하여 게스트에게 직접 맞춤형 가이드를 보내세요. 각 게스트는 자신의 캐릭터 정보만 받습니다.",
     "status": {
-      "sent": "Sent"
+      "sent": "전송됨"
     },
     "emailPlaceholder": "guest@example.com",
     "buttons": {
-      "sending": "Sending...",
-      "send": "Send Character Guides"
+      "sending": "전송 중...",
+      "send": "캐릭터 가이드 보내기"
     },
     "errors": {
-      "noValidEmails": "Please add at least one valid email address",
-      "sendFailed": "Failed to send some emails. Please try again."
+      "noValidEmails": "최소 하나의 유효한 이메일 주소를 추가하세요",
+      "sendFailed": "일부 이메일 전송에 실패했습니다. 다시 시도하세요."
     },
     "success": {
-      "sentCount": "Sent character guides to {{count}} guests"
+      "sentCount": "{{count}}명의 게스트에게 캐릭터 가이드를 보냈습니다"
     }
   },
   "common": {
     "buttons": {
-      "createNew": "Create New Mystery",
-      "getStarted": "Get Started",
-      "learnMore": "Learn More",
-      "tryNow": "Try Now",
-      "continue": "Continue",
-      "cancel": "Cancel",
-      "save": "Save",
-      "delete": "Delete",
-      "edit": "Edit",
-      "close": "Close",
-      "back": "Back",
-      "next": "Next",
-      "previous": "Previous",
-      "finish": "Finish",
-      "submit": "Submit",
-      "confirm": "Confirm",
-      "yes": "Yes",
-      "no": "No"
+      "createNew": "새 미스터리 만들기",
+      "getStarted": "시작하기",
+      "learnMore": "더 알아보기",
+      "tryNow": "지금 시도",
+      "continue": "계속",
+      "cancel": "취소",
+      "save": "저장",
+      "delete": "삭제",
+      "edit": "편집",
+      "close": "닫기",
+      "back": "뒤로",
+      "next": "다음",
+      "previous": "이전",
+      "finish": "완료",
+      "submit": "제출",
+      "confirm": "확인",
+      "yes": "예",
+      "no": "아니요"
     },
     "labels": {
-      "loading": "Loading...",
-      "pleaseWait": "Please wait...",
-      "error": "Error",
-      "success": "Success",
-      "warning": "Warning",
-      "info": "Information",
-      "required": "Required",
-      "optional": "Optional"
+      "loading": "로딩 중...",
+      "pleaseWait": "잠시만 기다려주세요...",
+      "error": "오류",
+      "success": "성공",
+      "warning": "경고",
+      "info": "정보",
+      "required": "필수",
+      "optional": "선택사항"
     },
     "messages": {
-      "welcome": "Welcome!",
-      "thankYou": "Thank you!",
-      "comingSoon": "Coming Soon",
-      "notFound": "Not Found",
-      "somethingWentWrong": "Something went wrong",
-      "tryAgain": "Please try again",
-      "noResultsFound": "No results found",
-      "loadingContent": "Loading content...",
-      "savingChanges": "Saving changes...",
-      "changesSuccess": "Changes saved successfully",
-      "changesCanceled": "Changes canceled",
-      "aiThinking": "AI is thinking..."
+      "welcome": "환영합니다!",
+      "thankYou": "감사합니다!",
+      "comingSoon": "곧 출시",
+      "notFound": "찾을 수 없음",
+      "somethingWentWrong": "문제가 발생했습니다",
+      "tryAgain": "다시 시도하세요",
+      "noResultsFound": "결과를 찾을 수 없습니다",
+      "loadingContent": "콘텐츠 로딩 중...",
+      "savingChanges": "변경사항 저장 중...",
+      "changesSuccess": "변경사항이 성공적으로 저장되었습니다",
+      "changesCanceled": "변경사항이 취소되었습니다",
+      "aiThinking": "AI가 생각하고 있습니다..."
     },
     "validation": {
-      "required": "This field is required",
-      "invalidEmail": "Please enter a valid email address",
-      "passwordTooShort": "Password must be at least 6 characters",
-      "passwordMismatch": "Passwords do not match",
-      "invalidFormat": "Invalid format",
-      "tooShort": "Too short",
-      "tooLong": "Too long",
-      "invalidCharacters": "Contains invalid characters"
+      "required": "이 필드는 필수입니다",
+      "invalidEmail": "유효한 이메일 주소를 입력하세요",
+      "passwordTooShort": "비밀번호는 최소 6자 이상이어야 합니다",
+      "passwordMismatch": "비밀번호가 일치하지 않습니다",
+      "invalidFormat": "잘못된 형식입니다",
+      "tooShort": "너무 짧습니다",
+      "tooLong": "너무 깁니다",
+      "invalidCharacters": "잘못된 문자가 포함되어 있습니다"
     },
     "states": {
-      "draft": "Draft",
-      "inProgress": "In Progress",
-      "completed": "Completed",
-      "published": "Published",
-      "archived": "Archived",
-      "deleted": "Deleted"
+      "draft": "초안",
+      "inProgress": "진행 중",
+      "completed": "완료됨",
+      "published": "게시됨",
+      "archived": "보관됨",
+      "deleted": "삭제됨"
     },
     "modals": {
       "confirmDelete": {
-        "title": "Confirm Deletion",
-        "message": "Are you sure you want to delete this item? This action cannot be undone.",
-        "confirmButton": "Delete",
-        "cancelButton": "Cancel"
+        "title": "삭제 확인",
+        "message": "이 항목을 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.",
+        "confirmButton": "삭제",
+        "cancelButton": "취소"
       },
       "unsavedChanges": {
-        "title": "Unsaved Changes",
-        "message": "You have unsaved changes. Do you want to save them before leaving?",
-        "saveButton": "Save Changes",
-        "discardButton": "Discard Changes",
-        "cancelButton": "Cancel"
+        "title": "저장되지 않은 변경사항",
+        "message": "저장되지 않은 변경사항이 있습니다. 나가기 전에 저장하시겠습니까?",
+        "saveButton": "변경사항 저장",
+        "discardButton": "변경사항 삭제",
+        "cancelButton": "취소"
       }
     },
     "notifications": {
-      "welcomeBack": "Welcome back!",
-      "signedOut": "You have been signed out",
-      "sessionExpired": "Your session has expired. Please sign in again.",
-      "connectionLost": "Connection lost. Trying to reconnect...",
-      "connectionRestored": "Connection restored",
-      "updateAvailable": "A new version is available. Refresh to update.",
-      "offlineMode": "You are currently offline",
-      "deleteSuccess": "{{item}} deleted successfully",
-      "deleteFailed": "Failed to delete {{item}}",
-      "archiveSuccess": "{{item}} archived successfully",
-      "archiveFailed": "Failed to archive {{item}}",
-      "updatedSuccess": "{{item}} updated successfully",
-      "updateFailed": "Failed to update {{item}}"
+      "welcomeBack": "환영합니다!",
+      "signedOut": "로그아웃되었습니다",
+      "sessionExpired": "세션이 만료되었습니다. 다시 로그인하세요.",
+      "connectionLost": "연결이 끊어졌습니다. 재연결을 시도하는 중...",
+      "connectionRestored": "연결이 복원되었습니다",
+      "updateAvailable": "새 버전이 있습니다. 업데이트하려면 새로고침하세요.",
+      "offlineMode": "현재 오프라인입니다",
+      "deleteSuccess": "{{item}}이(가) 성공적으로 삭제되었습니다",
+      "deleteFailed": "{{item}} 삭제에 실패했습니다",
+      "archiveSuccess": "{{item}}이(가) 성공적으로 보관되었습니다",
+      "archiveFailed": "{{item}} 보관에 실패했습니다",
+      "updatedSuccess": "{{item}}이(가) 성공적으로 업데이트되었습니다",
+      "updateFailed": "{{item}} 업데이트에 실패했습니다"
     }
   },
   "character": {
     "detail": {
-      "description": "Character Description",
-      "background": "Background", 
-      "relationships": "Relationships",
-      "secrets": "Secrets",
-      "whereabouts": "Whereabouts During the Murder",
-      "introduction": "Introduction",
-      "round1": "Round 1: Initial Investigation",
-      "round2": "Round 2: Deeper Revelations", 
-      "round3": "Round 3: Final Clues",
-      "finalStatement": "Final Statement",
-      "questioningOptions": "Questioning Options",
-      "askTarget": "Ask {{target}}: \"{{question}}\""
+      "description": "캐릭터 설명",
+      "background": "배경",
+      "relationships": "관계",
+      "secrets": "비밀",
+      "whereabouts": "살해 당시 행방",
+      "introduction": "소개",
+      "round1": "라운드 1: 초기 조사",
+      "round2": "라운드 2: 더 깊은 폭로",
+      "round3": "라운드 3: 최종 단서",
+      "finalStatement": "최종 진술",
+      "questioningOptions": "질문 옵션",
+      "askTarget": "{{target}}에게 묻기: \"{{question}}\""
     },
     "import": {
-      "title": "Mystery Characters",
-      "description": "Manage the characters in your murder mystery",
-      "importButton": "Import Characters",
-      "loading": "Loading characters...",
-      "noCharacters": "No characters yet",
-      "importPrompt": "Import character data to populate your murder mystery.",
-      "foundCount": "{{count}} characters found in database",
-      "deleteConfirm": "Are you sure you want to delete {{name}}?",
-      "deleteSuccess": "Deleted character: {{name}}",
-      "deleteFailed": "Failed to delete character",
-      "refreshSuccess": "Character list refreshed",
-      "refreshFailed": "Failed to refresh character data",
-      "loadFailed": "Failed to load character data",
+      "title": "미스터리 캐릭터",
+      "description": "살인 미스터리의 캐릭터 관리",
+      "importButton": "캐릭터 가져오기",
+      "loading": "캐릭터 로딩 중...",
+      "noCharacters": "아직 캐릭터가 없습니다",
+      "importPrompt": "살인 미스터리를 채우기 위해 캐릭터 데이터를 가져오세요.",
+      "foundCount": "데이터베이스에서 {{count}}명의 캐릭터를 찾았습니다",
+      "deleteConfirm": "{{name}}을(를) 삭제하시겠습니까?",
+      "deleteSuccess": "캐릭터 삭제됨: {{name}}",
+      "deleteFailed": "캐릭터 삭제 실패",
+      "refreshSuccess": "캐릭터 목록이 새로고침되었습니다",
+      "refreshFailed": "캐릭터 데이터 새로고침 실패",
+      "loadFailed": "캐릭터 데이터 로드 실패",
       "table": {
-        "name": "Character Name",
-        "details": "Details", 
-        "scripts": "Scripts",
-        "actions": "Actions",
+        "name": "캐릭터 이름",
+        "details": "세부정보",
+        "scripts": "스크립트",
+        "actions": "작업",
         "badges": {
-          "description": "Description",
-          "background": "Background",
-          "relationships": "Relationships",
-          "secrets": "Secrets",
-          "intro": "Intro",
-          "round1": "Round 1",
-          "round2": "Round 2", 
-          "round3": "Round 3"
+          "description": "설명",
+          "background": "배경",
+          "relationships": "관계",
+          "secrets": "비밀",
+          "intro": "소개",
+          "round1": "라운드 1",
+          "round2": "라운드 2",
+          "round3": "라운드 3"
         }
       }
     },
     "access": {
-      "welcome": "Welcome, {{name}}!",
-      "subtitle": "Here's your character guide for the mystery game",
-      "loading": "Loading your character...",
-      "accessDenied": "Access Denied",
-      "notFound": "Character assignment not found.",
+      "welcome": "환영합니다, {{name}}님!",
+      "subtitle": "미스터리 게임을 위한 캐릭터 가이드입니다",
+      "loading": "캐릭터 로딩 중...",
+      "accessDenied": "액세스 거부됨",
+      "notFound": "캐릭터 할당을 찾을 수 없습니다.",
       "guide": {
-        "yourCharacter": "{{name}} - Your Character",
-        "yourBackground": "Your Background",
-        "yourSecret": "Your Secret", 
-        "introduction": "Introduction",
-        "rumorsYouKnow": "Rumors You Know",
-        "round1": "Round 1: Initial Statement",
-        "round2": "Round 2: Motives",
-        "round3": "Round 3: Method",
-        "questionsToAsk": "Questions to Ask",
-        "ifInnocent": "If You're Innocent:",
-        "ifGuilty": "If You're Guilty:",
-        "ifAccomplice": "If You're an Accomplice:"
+        "yourCharacter": "{{name}} - 당신의 캐릭터",
+        "yourBackground": "당신의 배경",
+        "yourSecret": "당신의 비밀",
+        "introduction": "소개",
+        "rumorsYouKnow": "당신이 아는 소문",
+        "round1": "라운드 1: 초기 진술",
+        "round2": "라운드 2: 동기",
+        "round3": "라운드 3: 방법",
+        "questionsToAsk": "물어볼 질문",
+        "ifInnocent": "당신이 무죄인 경우:",
+        "ifGuilty": "당신이 유죄인 경우:",
+        "ifAccomplice": "당신이 공범인 경우:"
       }
     },
     "dialog": {
-      "title": "Import Character Data",
-      "subtitle": "Paste your character data below:",
-      "pasteButton": "Paste from Clipboard",
-      "pasteSuccess": "Text pasted from clipboard",
-      "pasteError": "Could not access clipboard. Please paste manually.",
-      "placeholder": "Paste CHARACTER GUIDE content here...",
-      "instructions": "Character data should include sections for:",
+      "title": "캐릭터 데이터 가져오기",
+      "subtitle": "아래에 캐릭터 데이터를 붙여넣으세요:",
+      "pasteButton": "클립보드에서 붙여넣기",
+      "pasteSuccess": "클립보드에서 텍스트를 붙여넣었습니다",
+      "pasteError": "클립보드에 액세스할 수 없습니다. 수동으로 붙여넣으세요.",
+      "placeholder": "CHARACTER GUIDE 내용을 여기에 붙여넣으세요...",
+      "instructions": "캐릭터 데이터에는 다음 섹션이 포함되어야 합니다:",
       "sections": [
         "CHARACTER DESCRIPTION",
-        "BACKGROUND", 
+        "BACKGROUND",
         "RELATIONSHIPS",
         "SECRETS",
         "WHEREABOUTS",
-        "Round statements (ROUND 1, ROUND 2, etc.)"
+        "라운드 진술 (ROUND 1, ROUND 2, 등)"
       ],
-      "importButton": "Import Characters",
-      "importing": "Importing...",
-      "cancel": "Cancel",
-      "enterData": "Please enter or paste character data",
-      "importSuccess": "Characters imported successfully",
-      "importFailed": "Failed to import character data",
-      "importError": "An unexpected error occurred during import"
+      "importButton": "캐릭터 가져오기",
+      "importing": "가져오는 중...",
+      "cancel": "취소",
+      "enterData": "캐릭터 데이터를 입력하거나 붙여넣으세요",
+      "importSuccess": "캐릭터를 성공적으로 가져왔습니다",
+      "importFailed": "캐릭터 데이터 가져오기 실패",
+      "importError": "가져오는 중 예기치 않은 오류가 발생했습니다"
     },
     "guestManager": {
-      "title": "Share Characters with Guests",
-      "subtitle": "Assign each character to a guest and send via email",
+      "title": "게스트와 캐릭터 공유",
+      "subtitle": "각 캐릭터를 게스트에게 할당하고 이메일로 전송",
       "table": {
-        "character": "Character",
-        "guestName": "Guest Name", 
-        "email": "Email",
-        "action": "Action"
+        "character": "캐릭터",
+        "guestName": "게스트 이름",
+        "email": "이메일",
+        "action": "작업"
       },
       "placeholders": {
-        "guestName": "Guest's name",
+        "guestName": "게스트 이름",
         "email": "guest@example.com"
       },
       "buttons": {
-        "edit": "Edit",
-        "send": "Send",
-        "sendAll": "Send All",
-        "close": "Close"
+        "edit": "편집",
+        "send": "전송",
+        "sendAll": "모두 전송",
+        "close": "닫기"
       },
       "status": {
-        "sent": "Sent"
+        "sent": "전송됨"
       },
-      "assignedCount": "{{count}} characters assigned",
+      "assignedCount": "{{count}}명의 캐릭터가 할당되었습니다",
       "toasts": {
-        "characterSent": "Character sent to {{name}}!",
-        "sendFailed": "Failed to send character assignment",
-        "loadFailed": "Failed to load existing assignments",
-        "updateFailed": "Failed to update assignment",
-        "noValidAssignments": "No valid assignments to send",
-        "allSent": "Sent {{count}} character assignments!",
-        "sendSomeFailed": "Failed to send some assignments"
+        "characterSent": "캐릭터가 {{name}}에게 전송되었습니다!",
+        "sendFailed": "캐릭터 할당 전송 실패",
+        "loadFailed": "기존 할당 로드 실패",
+        "updateFailed": "할당 업데이트 실패",
+        "noValidAssignments": "전송할 유효한 할당이 없습니다",
+        "allSent": "{{count}}개의 캐릭터 할당을 전송했습니다!",
+        "sendSomeFailed": "일부 할당 전송 실패"
       }
     },
     "roles": {
-      "title": "Character Roles",
-      "description": "Assign the murderer role for your mystery",
-      "murderer": "Murderer",
-      "required": "Required",
-      "noneSelected": "None selected",
-      "murdererDescription": "The character who committed the murder",
-      "saveRoles": "Save Roles",
-      "saving": "Saving...",
-      "saveSuccess": "Character roles saved successfully",
-      "saveFailed": "Failed to save character roles",
-      "loadFailed": "Failed to load character data"
+      "title": "캐릭터 역할",
+      "description": "미스터리의 살인자 역할 할당",
+      "murderer": "살인자",
+      "required": "필수",
+      "noneSelected": "선택 안 됨",
+      "murdererDescription": "살인을 저지른 캐릭터",
+      "saveRoles": "역할 저장",
+      "saving": "저장 중...",
+      "saveSuccess": "캐릭터 역할이 성공적으로 저장되었습니다",
+      "saveFailed": "캐릭터 역할 저장 실패",
+      "loadFailed": "캐릭터 데이터 로드 실패"
     }
   },
   "payment": {
     "success": {
-      "message": "Payment successful! Your purchase is complete.",
-      "verifying": "Verifying your payment...",
-      "redirecting": "Redirecting you to your mystery..."
+      "message": "결제 성공! 구매가 완료되었습니다.",
+      "verifying": "결제 확인 중...",
+      "redirecting": "미스터리로 리디렉션 중..."
     }
   },
   "purchase": {
     "toasts": {
-      "success": "Purchase successful! You now have full access to this mystery package.",
-      "cancel": "Purchase cancelled. You can try again when you're ready.",
-      "loadFailed": "Failed to load mystery details.",
-      "notFound": "Mystery not found.",
-      "devPurchaseSim": "Simulating purchase in dev mode...",
-      "devPurchaseSuccess": "Purchase simulated! Redirecting to generate package...",
-      "devPurchaseFailed": "Failed to simulate purchase.",
-      "signInRequired": "Please sign in to purchase this mystery.",
-      "checkoutRedirect": "Redirecting to secure checkout...",
-      "checkoutFailed": "Failed to redirect to checkout. Please try again.",
-      "genericError": "An error occurred while loading mystery details."
+      "success": "구매 성공! 이제 이 미스터리 패키지에 완전히 액세스할 수 있습니다.",
+      "cancel": "구매가 취소되었습니다. 준비되면 다시 시도할 수 있습니다.",
+      "loadFailed": "미스터리 세부정보를 불러오는데 실패했습니다.",
+      "notFound": "미스터리를 찾을 수 없습니다.",
+      "devPurchaseSim": "개발 모드에서 구매 시뮬레이션 중...",
+      "devPurchaseSuccess": "구매가 시뮬레이션되었습니다! 패키지 생성으로 리디렉션 중...",
+      "devPurchaseFailed": "구매 시뮬레이션에 실패했습니다.",
+      "signInRequired": "이 미스터리를 구매하려면 로그인하세요.",
+      "checkoutRedirect": "안전한 결제로 리디렉션 중...",
+      "checkoutFailed": "결제로 리디렉션하는데 실패했습니다. 다시 시도하세요.",
+      "genericError": "미스터리 세부정보를 불러오는 중 오류가 발생했습니다."
     },
-    "title": "Complete Your Purchase",
-    "subtitle": "Get full access to your murder mystery package",
+    "title": "구매 완료",
+    "subtitle": "살인 미스터리 패키지에 완전히 액세스하세요",
     "package": {
-      "title": "Murder Mystery Package",
-      "description": "One-time purchase, instant access",
-      "priceDescription": "Complete murder mystery package with all character materials, clues, and hosting instructions.",
-      "whatsIncluded": "What's included:",
+      "title": "살인 미스터리 패키지",
+      "description": "일회성 구매, 즉시 액세스",
+      "priceDescription": "모든 캐릭터 자료, 단서, 호스팅 지침이 포함된 완전한 살인 미스터리 패키지.",
+      "whatsIncluded": "포함 사항:",
       "includes": [
-        "Full character profiles for all suspects",
-        "Host guide with step-by-step instructions",
-        "Printable character sheets",
-        "Evidence and clue cards",
-        "Timeline of events",
-        "Solution reveal script",
-        "PDF downloads of all materials"
+        "모든 용의자의 완전한 캐릭터 프로필",
+        "단계별 지침이 포함된 호스트 가이드",
+        "인쇄 가능한 캐릭터 시트",
+        "증거 및 단서 카드",
+        "사건 타임라인",
+        "해결 공개 스크립트",
+        "모든 자료의 PDF 다운로드"
       ]
     },
     "buttons": {
-      "processing": "Processing...",
-      "complete": "Complete Purchase",
-      "backToDesign": "Back to Mystery Design"
+      "processing": "처리 중...",
+      "complete": "구매 완료",
+      "backToDesign": "미스터리 디자인으로 돌아가기"
     },
     "notes": {
-      "title": "Important Notes",
+      "title": "중요 사항",
       "items": [
-        "This is a one-time purchase for this specific mystery package",
-        "You'll have permanent access to download all materials",
-        "Content is for personal use only, not for commercial redistribution",
-        "Need help? Contact our support at {{email}}"
+        "이것은 이 특정 미스터리 패키지에 대한 일회성 구매입니다",
+        "모든 자료를 다운로드할 수 있는 영구 액세스 권한이 있습니다",
+        "콘텐츠는 개인 사용만 가능하며 상업적 재배포는 불가합니다",
+        "도움이 필요하신가요? {{email}}로 문의하세요"
       ]
     },
     "preview": {
-      "defaultTitle": "Custom Murder Mystery",
-      "characterPlaceholder": "Character details will be revealed in the full package.",
-      "characterPlaceholderFull": "Full character description available in the purchased package.",
-      "evidencePlaceholder": "Evidence details available in the full package.",
-      "title": "Murder Mystery Preview",
-      "playersLabel": "Players",
-      "playersCount": "{{count}} Players",
-      "unknownPlayers": "Unknown # of Players",
-      "storyTitle": "Story Preview",
-      "unlockMessage": "Purchase to unlock the complete mystery package with all character details, clues, and materials.",
-      "whatsIncluded": "What's included in the full package:",
+      "defaultTitle": "맞춤 살인 미스터리",
+      "characterPlaceholder": "캐릭터 세부정보는 전체 패키지에서 공개됩니다.",
+      "characterPlaceholderFull": "전체 캐릭터 설명은 구매한 패키지에서 사용할 수 있습니다.",
+      "evidencePlaceholder": "증거 세부정보는 전체 패키지에서 사용할 수 있습니다.",
+      "title": "살인 미스터리 미리보기",
+      "playersLabel": "플레이어",
+      "playersCount": "{{count}}명의 플레이어",
+      "unknownPlayers": "알 수 없는 플레이어 수",
+      "storyTitle": "스토리 미리보기",
+      "unlockMessage": "모든 캐릭터 세부정보, 단서 및 자료가 포함된 완전한 미스터리 패키지를 잠금 해제하려면 구매하세요.",
+      "whatsIncluded": "전체 패키지에 포함된 내용:",
       "packageIncludes": [
-        "Detailed host guide with complete setup instructions",
-        "Character guides for each player", 
-        "Evidence cards and printable materials",
-        "Full gameplay script and timeline"
+        "완전한 설정 지침이 포함된 상세한 호스트 가이드",
+        "각 플레이어를 위한 캐릭터 가이드",
+        "증거 카드 및 인쇄 가능한 자료",
+        "전체 게임플레이 스크립트 및 타임라인"
       ]
     }
   },
@@ -902,108 +918,108 @@
     }
   },
   "mysteryPackage": {
-    "shareWithGuests": "Share With Guests",
+    "shareWithGuests": "게스트와 공유",
     "tabs": {
-      "hostGuide": "Host Guide",
-      "characters": "Characters ({{count}})",
-      "clues": "Evidence",
-      "inspector": "Detective Guide",
-      "relationships": "Relationships"
+      "hostGuide": "호스트 가이드",
+      "characters": "캐릭터 ({{count}})",
+      "clues": "증거",
+      "inspector": "탐정 가이드",
+      "relationships": "관계"
     },
     "mobileTabs": {
-      "host": "Host",
-      "characters": "Characters ({{count}})",
-      "clues": "Evidence",
-      "inspector": "Detective",
-      "relations": "Relations"
+      "host": "호스트",
+      "characters": "캐릭터 ({{count}})",
+      "clues": "증거",
+      "inspector": "탐정",
+      "relations": "관계"
     },
     "loading": {
-      "generating": "Generating...",
-      "generatingMessage": "Currently generating your complete mystery. This process is now in progress.<br />This page will automatically refresh once the mystery is complete.",
-      "characters": "Developing unique character profiles with backgrounds, motivations, and secrets for your mystery game.",
-      "clues": "Crafting evidence cards, clues, and investigative materials that will help solve your mystery.",
-      "inspector": "Writing the detective's script and investigation timeline to guide the mystery solving process.",
-      "matrix": "Building the character relationship matrix showing connections, conflicts, and hidden relationships."
+      "generating": "생성 중...",
+      "generatingMessage": "완전한 미스터리를 생성하고 있습니다. 이 프로세스는 현재 진행 중입니다.<br />미스터리가 완성되면 이 페이지가 자동으로 새로고침됩니다.",
+      "characters": "미스터리 게임을 위한 배경, 동기, 비밀이 있는 독특한 캐릭터 프로필을 개발하고 있습니다.",
+      "clues": "미스터리를 해결하는 데 도움이 되는 증거 카드, 단서, 조사 자료를 제작하고 있습니다.",
+      "inspector": "미스터리 해결 프로세스를 안내할 탐정의 스크립트와 조사 타임라인을 작성하고 있습니다.",
+      "matrix": "연결, 갈등, 숨겨진 관계를 보여주는 캐릭터 관계 매트릭스를 구축하고 있습니다."
     },
     "placeholder": {
-      "title": "Ready to Generate Your Mystery",
-      "description": "Click the button below to start generating your complete mystery package with all materials included.",
-      "button": "Generate Package",
-      "characters": "Character guides will be available after generation starts.",
-      "clues": "Evidence cards will be available after generation starts.",
-      "inspector": "Detective guide will be available after generation starts.",
-      "matrix": "Relationship matrix will be available after generation starts."
+      "title": "미스터리를 생성할 준비가 되었습니다",
+      "description": "아래 버튼을 클릭하여 모든 자료가 포함된 완전한 미스터리 패키지 생성을 시작하세요.",
+      "button": "패키지 생성",
+      "characters": "캐릭터 가이드는 생성 시작 후 사용할 수 있습니다.",
+      "clues": "증거 카드는 생성 시작 후 사용할 수 있습니다.",
+      "inspector": "탐정 가이드는 생성 시작 후 사용할 수 있습니다.",
+      "matrix": "관계 매트릭스는 생성 시작 후 사용할 수 있습니다."
     },
     "matrix": {
-      "title": "Character Relationship Matrix"
-}
+      "title": "캐릭터 관계 매트릭스"
+    }
   },
   "blog": {
-    "title": "Murder Mystery Blog",
-    "subtitle": "Tips, guides, and inspiration for your next mystery party",
-    "backToHome": "Back to Home",
-    "readMore": "Read more →",
-    "minRead": "min read",
-    "publishedOn": "Published on",
-    "by": "By",
-    "relatedPosts": "Related posts",
-    "noPostsFound": "No blog posts found.",
-    "loading": "Loading...",
-    "error": "Failed to load blog posts.",
-    "errorTitle": "Error",
-    "tryAgain": "Try Again",
-    "checkBackLater": "Check back later for new articles!"
+    "title": "살인 미스터리 블로그",
+    "subtitle": "다음 미스터리 파티를 위한 팁, 가이드, 영감",
+    "backToHome": "홈으로 돌아가기",
+    "readMore": "더 읽기 →",
+    "minRead": "분 읽기",
+    "publishedOn": "게시일",
+    "by": "작성자",
+    "relatedPosts": "관련 게시물",
+    "noPostsFound": "블로그 게시물을 찾을 수 없습니다.",
+    "loading": "로딩 중...",
+    "error": "블로그 게시물을 불러오는데 실패했습니다.",
+    "errorTitle": "오류",
+    "tryAgain": "다시 시도",
+    "checkBackLater": "새 기사는 나중에 다시 확인하세요!"
   },
   "chatbot": {
     "toasts": {
-      "invalidId": "Invalid conversation ID",
-      "loadFailed": "Could not load your previous conversation",
-      "offlineMode": "Using offline mode - some features may be limited",
-      "requestError": "Error processing your request",
-      "generationSuccess": "Mystery generated successfully!",
-      "urlUnavailable": "Chatbot URL not available yet"
+      "invalidId": "잘못된 대화 ID",
+      "loadFailed": "이전 대화를 불러올 수 없습니다",
+      "offlineMode": "오프라인 모드 사용 중 - 일부 기능이 제한될 수 있습니다",
+      "requestError": "요청 처리 중 오류 발생",
+      "generationSuccess": "미스터리가 성공적으로 생성되었습니다!",
+      "urlUnavailable": "챗봇 URL이 아직 사용 불가능합니다"
     },
-    "welcomeMessage": "Welcome to the Murder Mystery Creator! Describe the type of mystery you'd like to create, or ask me for suggestions.",
-    "newConversationTitle": "New Murder Mystery",
+    "welcomeMessage": "살인 미스터리 크리에이터에 오신 것을 환영합니다! 만들고 싶은 미스터리 유형을 설명하거나 제안을 요청하세요.",
+    "newConversationTitle": "새 살인 미스터리",
     "fallbackResponses": [
-      "I'd love to help you create a murder mystery. What theme or setting would you like for your mystery?",
-      "That's a great choice! Now, let's think about the victim. Who would you like the victim to be?",
-      "Interesting! Now we need some suspects. Could you describe 2-3 characters who might have motives to commit this crime?",
-      "Those are compelling suspects. Let's add some clues. What kind of evidence might be found at the scene?",
-      "Your mystery is taking shape! To continue developing the details of your story, let's think about what other elements we might include."
+      "살인 미스터리를 만드는 것을 도와드리고 싶습니다. 미스터리의 테마나 설정은 어떤 것을 원하시나요?",
+      "훌륭한 선택입니다! 이제 피해자에 대해 생각해 봅시다. 피해자를 누구로 하고 싶으신가요?",
+      "흥미롭네요! 이제 용의자가 필요합니다. 이 범죄를 저지를 동기가 있을 수 있는 2~3명의 캐릭터를 설명해 주시겠습니까?",
+      "설득력 있는 용의자들입니다. 단서를 추가해 봅시다. 현장에서 어떤 종류의 증거가 발견될 수 있을까요?",
+      "미스터리가 형태를 갖추고 있습니다! 스토리의 세부 사항을 계속 개발하기 위해 어떤 다른 요소를 포함할 수 있을지 생각해 봅시다."
     ],
-    "title": "Create Your Murder Mystery",
+    "title": "살인 미스터리 만들기",
     "buttons": {
-      "external": "External",
-      "openFull": "Open Full Chatbot",
-      "finalize": "Finalize",
-      "finalizeMystery": "Finalize Mystery"
+      "external": "외부",
+      "openFull": "전체 챗봇 열기",
+      "finalize": "완성",
+      "finalizeMystery": "미스터리 완성"
     },
-    "creatorTitle": "Murder Mystery Creator",
-    "placeholder": "Type your ideas for the murder mystery...",
-    "finalizePrompt": "When you're satisfied with your mystery, finalize it to continue."
+    "creatorTitle": "살인 미스터리 크리에이터",
+    "placeholder": "살인 미스터리에 대한 아이디어를 입력하세요...",
+    "finalizePrompt": "미스터리에 만족하면 완성하여 계속 진행하세요."
   },
   "homeDashboard": {
-    "title": "Your Mysteries",
-    "searchPlaceholder": "Search mysteries...",
-    "loadMore": "Load More",
-    "loading": "Loading...",
+    "title": "나의 미스터리",
+    "searchPlaceholder": "미스터리 검색...",
+    "loadMore": "더 보기",
+    "loading": "로딩 중...",
     "empty": {
-      "title": "You haven't created any mysteries yet",
-      "description": "Use the input box above to start creating your first murder mystery!"
+      "title": "아직 미스터리를 만들지 않았습니다",
+      "description": "위의 입력 상자를 사용하여 첫 번째 살인 미스터리 만들기를 시작하세요!"
     },
     "errors": {
-      "loadFailed": "Failed to load some mysteries. Please refresh the page."
+      "loadFailed": "일부 미스터리를 불러오는데 실패했습니다. 페이지를 새로고침하세요."
     }
   },
   "mysteryDashboard": {
-    "title": "Mystery Dashboard",
-    "description": "Manage your created mysteries, start new ones, or explore sample content.",
+    "title": "미스터리 대시보드",
+    "description": "생성한 미스터리를 관리하고, 새 미스터리를 시작하거나, 샘플 콘텐츠를 탐색하세요.",
     "tabs": {
-      "all": "All",
-      "drafts": "Drafts",
-      "purchased": "Purchased",
-      "archived": "Archived"
+      "all": "전체",
+      "drafts": "초안",
+      "purchased": "구매함",
+      "archived": "보관됨"
     }
   }
 }

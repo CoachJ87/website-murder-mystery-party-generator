@@ -530,6 +530,22 @@
         "refund": {
           "question": "Kann ich eine Rückerstattung erhalten, wenn ich nicht zufrieden bin?",
           "answer": "Absolut! Wenn Sie mit Ihrem Kauf nicht vollständig zufrieden sind, kontaktieren Sie uns innerhalb von 7 Tagen und wir erstatten Ihnen den vollen Betrag, ohne Fragen zu stellen."
+        },
+        "gameDesignEngagement": {
+          "question": "Wie stellt Ihr Spieldesign sicher, dass alle engagiert bleiben?",
+          "answer": "Unsere Mysterien konzentrieren sich auf reichhaltige Charakterinteraktionen statt auf starre Handlungsstränge. Jeder Charakter hat detaillierte Hintergründe und Motivationen, die natürliches Gameplay antreiben und sicherstellen, dass alle Spieler während des gesamten Erlebnisses aktiv beteiligt bleiben."
+        },
+        "dynamicMurderer": {
+          "question": "Warum weisen die Hinweise nicht von Anfang an auf einen bestimmten Mörder hin?",
+          "answer": "Der Mörder wird nach der ersten Runde basierend auf den während des Spiels aufgedeckten Hinweisen bestimmt. Dieser dynamische Ansatz bedeutet, dass sich Hinweise progressiv aufbauen, wodurch das Mysterium auch dann lösbar bleibt, wenn einige Details in der Party-Atmosphäre verpasst werden."
+        },
+        "flexiblePlayerCount": {
+          "question": "Was passiert, wenn jemand in letzter Minute nicht kommen kann?",
+          "answer": "Unser flexibles Design ermöglicht Last-Minute-Änderungen! Da das Spiel nicht darauf angewiesen ist, dass ein Charakter kritische Informationen hält, können Sie Ihre Spieleranzahl anpassen, ohne das Mysterium zu unterbrechen."
+        },
+        "characterFocused": {
+          "question": "Warum charakterzentriert statt handlungszentriert?",
+          "answer": "Jahre des Hostings haben uns gelehrt, dass übermäßig spezifische Hinweise bei Partys verpasst werden - die Leute plaudern, füllen Getränke nach und genießen sich. Unser charaktergesteuerter Ansatz bedeutet, dass sich das Mysterium natürlich durch Interaktionen entfaltet."
         }
       }
     },

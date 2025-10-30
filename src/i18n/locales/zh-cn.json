@@ -1,863 +1,878 @@
 {
-    "navigation": {
-      "home": "首页",
-      "dashboard": "仪表盘",
-      "signIn": "登录",
-      "signUp": "注册",
-      "signOut": "登出",
-      "account": "账户设置",
-      "support": "支持",
-      "support": "支持"
+  "navigation": {
+    "home": "首页",
+    "dashboard": "仪表盘",
+    "signIn": "登录",
+    "signUp": "注册",
+    "signOut": "登出",
+    "account": "账户设置",
+    "support": "支持"
+  },
+  "hero": {
+    "title": "几分钟内创建谋杀悬疑派对",
+    "subtitle": "按您所需设计定制谜团——任何主题、任何角色、任何设定。",
+    "subtitleAuth": "按您所需设计定制谜团——任何主题、任何角色、任何设定。",
+    "placeholder": "一个爵士乐手云集的1920年代地下酒吧谋杀悬疑故事...",
+    "placeholderAuth": "一个爵士乐手云集的1920年代地下酒吧谋杀悬疑故事...",
+    "themes": {
+      "1920sSpeakeasy": "1920年代地下酒吧",
+      "hollywoodMurder": "好莱坞谋杀案",
+      "castleMystery": "城堡之谜",
+      "sciFiMystery": "科幻之谜",
+      "artGalleryOpening": "艺术画廊开幕式",
+      "bakeryCompetition": "烘焙大赛",
+      "mountainSkiResort": "山区滑雪度假村",
+      "luxuryTrainJourney": "豪华火车之旅",
+      "historicUniversity": "历史悠久的大学",
+      "pokerTournament": "扑克锦标赛",
+      "barbieDreamworld": "芭比梦幻世界",
+      "dystopianWaterworld": "反乌托邦水世界",
+      "jungleSteampunk": "丛林蒸汽朋克",
+      "magicalBakery": "魔法面包店",
+      "gamingTournament": "游戏锦标赛",
+      "synthwave80s": "合成波80年代",
+      "beachResort": "海滨度假村",
+      "operaHouse": "歌剧院",
+      "wineCountry": "葡萄酒产区",
+      "safariAdventure": "狩猎冒险",
+      "fashionShow": "时装秀",
+      "casinoNight": "赌场之夜",
+      "fairyTaleKingdom": "童话王国",
+      "spaceColony": "太空殖民地",
+      "superheroAcademy": "超级英雄学院",
+      "underwaterCity": "水下城市",
+      "wildWestSaloon": "狂野西部沙龙",
+      "vikingFeast": "维京盛宴",
+      "candyKingdom": "糖果王国",
+      "dragonsLair": "龙穴",
+      "timeTravelersBall": "时间旅行者舞会",
+      "atlantisRising": "亚特兰蒂斯崛起",
+      "toyBoxAdventure": "玩具盒冒险",
+      "vampireMasquerade": "吸血鬼假面舞会",
+      "dimensionHopping": "维度跳跃",
+      "cyberpunkNightclub": "赛博朋克夜总会",
+      "ghostShip": "幽灵船",
+      "sentientPlantColony": "有感知植物殖民地"
     },
-    "hero": {
-      "title": "几分钟内创建谋杀悬疑派对",
-      "subtitle": "按您所需设计定制谜团——任何主题、任何角色、任何设定。",
-      "subtitleAuth": "按您所需设计定制谜团——任何主题、任何角色、任何设定。",
-      "placeholder": "一个爵士乐手云集的1920年代地下酒吧谋杀悬疑故事...",
-      "placeholderAuth": "一个爵士乐手云集的1920年代地下酒吧谋杀悬疑故事...",
-      "themes": {
-        "1920sSpeakeasy": "1920年代地下酒吧",
-        "hollywoodMurder": "好莱坞谋杀案",
-        "castleMystery": "城堡之谜",
-        "sciFiMystery": "科幻之谜",
-        "artGalleryOpening": "艺术画廊开幕式",
-        "bakeryCompetition": "烘焙大赛",
-        "mountainSkiResort": "山区滑雪度假村",
-        "luxuryTrainJourney": "豪华火车之旅",
-        "historicUniversity": "历史悠久的大学",
-        "pokerTournament": "扑克锦标赛",
-        "barbieDreamworld": "芭比梦幻世界",
-        "dystopianWaterworld": "反乌托邦水世界",
-        "jungleSteampunk": "丛林蒸汽朋克",
-        "magicalBakery": "魔法面包店",
-        "gamingTournament": "游戏锦标赛",
-        "synthwave80s": "合成波80年代",
-        "beachResort": "海滨度假村",
-        "operaHouse": "歌剧院",
-        "wineCountry": "葡萄酒产区",
-        "safariAdventure": "狩猎冒险",
-        "fashionShow": "时装秀",
-        "casinoNight": "赌场之夜",
-        "fairyTaleKingdom": "童话王国",
-        "spaceColony": "太空殖民地",
-        "superheroAcademy": "超级英雄学院",
-        "underwaterCity": "水下城市",
-        "wildWestSaloon": "狂野西部沙龙",
-        "vikingFeast": "维京盛宴",
-        "candyKingdom": "糖果王国",
-        "dragonsLair": "龙穴",
-        "timeTravelersBall": "时间旅行者舞会",
-        "atlantisRising": "亚特兰蒂斯崛起",
-        "toyBoxAdventure": "玩具盒冒险",
-        "vampireMasquerade": "吸血鬼假面舞会",
-        "dimensionHopping": "维度跳跃",
-        "cyberpunkNightclub": "赛博朋克夜总会",
-        "ghostShip": "幽灵船",
-        "sentientPlantColony": "有感知植物殖民地"
-      },
-      "prompts": {
-        "1920sSpeakeasy": "我想要一个以1920年代地下酒吧为主题的谋杀悬疑故事，背景设定在禁酒时期。",
-        "hollywoodMurder": "设计一个谋杀悬疑故事，背景设定在电影黄金时代的好莱坞电影片场。",
-        "castleMystery": "开发一个谋杀悬疑故事，背景设定在一个偏远的中古城堡，现已改建成豪华酒店。",
-        "sciFiMystery": "创建一个谋杀悬疑故事，发生在一艘围绕着新发现的外行星轨道运行的太空研究站上。",
-        "artGalleryOpening": "在一个著名艺术画廊的盛大开幕式上，策划一个谋杀悬疑故事。",
-        "bakeryCompetition": "设计一个围绕小镇烘焙比赛的谋杀悬疑故事。",
-        "mountainSkiResort": "在一个偏远的山区滑雪度假村，暴风雪中发生了一起谋杀悬疑事件。",
-        "luxuryTrainJourney": "创造一个发生在穿越瑞士阿尔卑斯山的豪华火车旅程中的谜团。",
-        "historicUniversity": "构建一个背景设定在历史悠久的大学里的谋杀悬疑故事，那里有一段闹鬼的历史。",
-        "pokerTournament": "策划一场高风险扑克锦标赛中的谜团。",
-        "barbieDreamworld": "设计一个以芭比为灵感的梦幻世界中的谋杀悬疑故事，那里一切都是粉色和完美的。",
-        "dystopianWaterworld": "创建一个反乌托邦未来世界的谜团，其中水是最宝贵的资源。",
-        "jungleSteampunk": "开发一个在丛林中发生的谋杀悬疑故事，充满蒸汽朋克技术和氛围。",
-        "magicalBakery": "在一个以魔法甜点为特色的魔法面包店里，创建一个谋杀悬疑故事。",
-        "gamingTournament": "设计一个电子游戏主题的谜团，玩家正在参加一场游戏锦标赛。",
-        "synthwave80s": "在一个另类的80年代中创建一个谜团，合成波音乐控制着情感。",
-        "beachResort": "开发一个发生在热带海滨度假村的谋杀悬疑故事。",
-        "operaHouse": "在一个历史悠久的歌剧院的首演之夜，创建一个谜团。",
-        "wineCountry": "在丰收季节，在一个著名的葡萄酒产区设计一个“谁是凶手”的故事。",
-        "safariAdventure": "在一次非洲狩猎探险中创建一个谋杀悬疑故事。",
-        "fashionShow": "在一次高调时装秀的后台构建一个谜团。",
-        "casinoNight": "在一次慈善赌场之夜创建一个谜团。",
-        "fairyTaleKingdom": "在一个被施了魔法的童话王国中设计一个谋杀悬疑故事。",
-        "spaceColony": "在火星上的第一个人类殖民地中创建一个谜团。",
-        "superheroAcademy": "在训练中的年轻超级英雄学校中开发一个谜团。",
-        "underwaterCity": "在一个未来的水下城市中创建一个谋杀悬疑故事。",
-        "wildWestSaloon": "在淘金热时期的边境小镇设计一个谜团。",
-        "vikingFeast": "在传统的维京盛宴中创建一个谋杀悬疑故事。",
-        "candyKingdom": "在一个所有东西都由糖果和糖制成的世界里，创建一个谋杀悬疑故事。",
-        "dragonsLair": "在一个人类和龙共存的中古奇幻世界中设计一个谜团。",
-        "timeTravelersBall": "在一个参与者来自不同时间段的聚会上，创建一个谋杀悬疑故事。",
-        "atlantisRising": "在一个最近浮出水面的古老城市亚特兰蒂斯中开发一个谜团。",
-        "toyBoxAdventure": "创建一个当人类不看时玩具会活过来的谜团。",
-        "vampireMasquerade": "在吸血鬼社会年度血腥舞会上设计一个谜团。",
-        "dimensionHopping": "创建一个跨越多个平行宇宙的谜团。",
-        "cyberpunkNightclub": "在一个霓虹闪烁的赛博朋克夜总会中创建一个谋杀悬疑故事。",
-        "ghostShip": "设计一个关于一艘几个世纪前失踪又神秘回归的传奇船只的谜团。",
-        "sentientPlantColony": "在一个由有感知、可移动的植物组成的社会中创建一个谋杀悬疑故事，它们拥有复杂的社会等级。"
-      }
+    "prompts": {
+      "1920sSpeakeasy": "我想要一个以1920年代地下酒吧为主题的谋杀悬疑故事，背景设定在禁酒时期。",
+      "hollywoodMurder": "设计一个谋杀悬疑故事，背景设定在电影黄金时代的好莱坞电影片场。",
+      "castleMystery": "开发一个谋杀悬疑故事，背景设定在一个偏远的中古城堡，现已改建成豪华酒店。",
+      "sciFiMystery": "创建一个谋杀悬疑故事，发生在一艘围绕着新发现的外行星轨道运行的太空研究站上。",
+      "artGalleryOpening": "在一个著名艺术画廊的盛大开幕式上，策划一个谋杀悬疑故事。",
+      "bakeryCompetition": "设计一个围绕小镇烘焙比赛的谋杀悬疑故事。",
+      "mountainSkiResort": "在一个偏远的山区滑雪度假村，暴风雪中发生了一起谋杀悬疑事件。",
+      "luxuryTrainJourney": "创造一个发生在穿越瑞士阿尔卑斯山的豪华火车旅程中的谜团。",
+      "historicUniversity": "构建一个背景设定在历史悠久的大学里的谋杀悬疑故事，那里有一段闹鬼的历史。",
+      "pokerTournament": "策划一场高风险扑克锦标赛中的谜团。",
+      "barbieDreamworld": "设计一个以芭比为灵感的梦幻世界中的谋杀悬疑故事，那里一切都是粉色和完美的。",
+      "dystopianWaterworld": "创建一个反乌托邦未来世界的谜团，其中水是最宝贵的资源。",
+      "jungleSteampunk": "开发一个在丛林中发生的谋杀悬疑故事，充满蒸汽朋克技术和氛围。",
+      "magicalBakery": "在一个以魔法甜点为特色的魔法面包店里，创建一个谋杀悬疑故事。",
+      "gamingTournament": "设计一个电子游戏主题的谜团，玩家正在参加一场游戏锦标赛。",
+      "synthwave80s": "在一个另类的80年代中创建一个谜团，合成波音乐控制着情感。",
+      "beachResort": "开发一个发生在热带海滨度假村的谋杀悬疑故事。",
+      "operaHouse": "在一个历史悠久的歌剧院的首演之夜，创建一个谜团。",
+      "wineCountry": "在丰收季节，在一个著名的葡萄酒产区设计一个“谁是凶手”的故事。",
+      "safariAdventure": "在一次非洲狩猎探险中创建一个谋杀悬疑故事。",
+      "fashionShow": "在一次高调时装秀的后台构建一个谜团。",
+      "casinoNight": "在一次慈善赌场之夜创建一个谜团。",
+      "fairyTaleKingdom": "在一个被施了魔法的童话王国中设计一个谋杀悬疑故事。",
+      "spaceColony": "在火星上的第一个人类殖民地中创建一个谜团。",
+      "superheroAcademy": "在训练中的年轻超级英雄学校中开发一个谜团。",
+      "underwaterCity": "在一个未来的水下城市中创建一个谋杀悬疑故事。",
+      "wildWestSaloon": "在淘金热时期的边境小镇设计一个谜团。",
+      "vikingFeast": "在传统的维京盛宴中创建一个谋杀悬疑故事。",
+      "candyKingdom": "在一个所有东西都由糖果和糖制成的世界里，创建一个谋杀悬疑故事。",
+      "dragonsLair": "在一个人类和龙共存的中古奇幻世界中设计一个谜团。",
+      "timeTravelersBall": "在一个参与者来自不同时间段的聚会上，创建一个谋杀悬疑故事。",
+      "atlantisRising": "在一个最近浮出水面的古老城市亚特兰蒂斯中开发一个谜团。",
+      "toyBoxAdventure": "创建一个当人类不看时玩具会活过来的谜团。",
+      "vampireMasquerade": "在吸血鬼社会年度血腥舞会上设计一个谜团。",
+      "dimensionHopping": "创建一个跨越多个平行宇宙的谜团。",
+      "cyberpunkNightclub": "在一个霓虹闪烁的赛博朋克夜总会中创建一个谋杀悬疑故事。",
+      "ghostShip": "设计一个关于一艘几个世纪前失踪又神秘回归的传奇船只的谜团。",
+      "sentientPlantColony": "在一个由有感知、可移动的植物组成的社会中创建一个谋杀悬疑故事，它们拥有复杂的社会等级。"
+    }
+  },
+  "howItWorks": {
+    "step1": {
+      "title": "描述您完美的谋杀悬疑故事。",
+      "description": "告诉我们您独特的愿景——任何您希望的主题、角色或设定。"
     },
-    "howItWorks": {
-      "step1": {
-        "title": "描述您完美的谋杀悬疑故事。",
-        "description": "告诉我们您独特的愿景——任何您希望的主题、角色或设定。"
-      },
-      "step2": {
-        "title": "我们即时创建您的定制谜团。",
-        "description": "我们的人工智能会按您所需生成一切——角色、线索和情节。"
-      },
-      "step3": {
-        "title": "使用我们的编辑器优化您的谜团。",
-        "description": "调整和定制，直到您的谜团完美适合您的小组。"
-      },
-      "step4": {
-        "title": "获取主持和分享所需的一切。",
-        "description": "轻松下载所有材料并与您的玩家分享。"
-      }
+    "step2": {
+      "title": "我们即时创建您的定制谜团。",
+      "description": "我们的人工智能会按您所需生成一切——角色、线索和情节。"
     },
-    "features": {
-      "title": "您所需的一切都已包含",
-      "step1": {
-        "step": "第一步",
-        "title": "无限定制",
-        "content": "任何主题、任何角色、任何设定——按您设想的那样创建谜团。"
-      },
-      "step2": {
-        "step": "第二步",
-        "title": "完整角色档案",
-        "content": "详细的背景故事、动机和秘密，专为您的谜团定制。"
-      },
-      "step3": {
-        "step": "第三步",
-        "title": "轻松主持指南",
-        "content": "分步说明，让您自信地主持定制谜团。"
-      }
+    "step3": {
+      "title": "使用我们的编辑器优化您的谜团。",
+      "description": "调整和定制，直到您的谜团完美适合您的小组。"
     },
-    "testimonials": {
-      "title": "他人评价",
-      "testimonial1": {
-        "text": "我的朋友们仍然在谈论我们的谋杀悬疑之夜。角色非常细致，情节转折也很完美！",
-        "author": "杰西卡·戴维斯"
-      },
-      "testimonial2": {
-        "text": "设置起来太容易了！我担心主持12个人，但材料让一切变得轻而易举，每个人都玩得很开心。",
-        "author": "马克·克莱因"
-      },
-      "testimonial3": {
-        "text": "这是第三次使用这项服务进行谋杀悬疑派对，它们变得越来越好。定制选项令人难以置信。",
-        "author": "阿曼达·史密斯"
-      }
+    "step4": {
+      "title": "获取主持和分享所需的一切。",
+      "description": "轻松下载所有材料并与您的玩家分享。"
+    }
+  },
+  "features": {
+    "title": "您所需的一切都已包含",
+    "step1": {
+      "step": "第一步",
+      "title": "无限定制",
+      "content": "任何主题、任何角色、任何设定——按您设想的那样创建谜团。"
     },
-    "videoDemo": {
+    "step2": {
+      "step": "第二步",
+      "title": "完整角色档案",
+      "content": "详细的背景故事、动机和秘密，专为您的谜团定制。"
+    },
+    "step3": {
+      "step": "第三步",
+      "title": "轻松主持指南",
+      "content": "分步说明，让您自信地主持定制谜团。"
+    }
+  },
+  "testimonials": {
+    "title": "他人评价",
+    "testimonial1": {
+      "text": "我的朋友们仍然在谈论我们的谋杀悬疑之夜。角色非常细致，情节转折也很完美！",
+      "author": "杰西卡·戴维斯"
+    },
+    "testimonial2": {
+      "text": "设置起来太容易了！我担心主持12个人，但材料让一切变得轻而易举，每个人都玩得很开心。",
+      "author": "马克·克莱因"
+    },
+    "testimonial3": {
+      "text": "这是第三次使用这项服务进行谋杀悬疑派对，它们变得越来越好。定制选项令人难以置信。",
+      "author": "阿曼达·史密斯"
+    }
+  },
+  "videoDemo": {
     "title": "观看演示"
   },
   "support": {
-      "title": "需要更多帮助？",
-      "description": "访问我们全面的支持中心，获取常见问题解答、主持技巧以及更多关于使用我们的谜团创建工具的信息。",
-      "button": "访问支持中心",
-      "email": "support@mysterymaker.party"
+    "title": "需要更多帮助？",
+    "description": "访问我们全面的支持中心，获取常见问题解答、主持技巧以及更多关于使用我们的谜团创建工具的信息。",
+    "button": "访问支持中心",
+    "email": "support@mysterymaker.party"
+  },
+  "footer": {
+    "tagline": "以想象的速度创造引人入胜的谋杀悬疑故事。",
+    "quickLinks": "快速链接",
+    "company": "公司",
+    "links": {
+      "home": "首页",
+      "support": "支持",
+      "contact": "联系我们",
+      "privacy": "隐私政策"
     },
-    "footer": {
-      "tagline": "以想象的速度创造引人入胜的谋杀悬疑故事。",
-      "quickLinks": "快速链接",
-      "company": "公司",
-      "links": {
-        "home": "首页",
-        "support": "支持",
-        "contact": "联系我们",
-        "privacy": "隐私政策"
-      },
-      "copyright": "Mystery Maker, Inc. 保留所有权利。"
+    "copyright": "Mystery Maker, Inc. 保留所有权利。"
+  },
+  "auth": {
+    "signIn": {
+      "title": "欢迎回来",
+      "subtitle": "登录您的账户以继续创建精彩的谜团",
+      "email": "电子邮件地址",
+      "password": "密码",
+      "rememberMe": "记住我",
+      "forgotPassword": "忘记密码？",
+      "noAccount": "还没有账户？",
+      "signUpLink": "在此注册",
+      "submitButton": "登录",
+      "signingIn": "正在登录...",
+      "orDivider": "或继续使用",
+      "googleButton": "使用 Google 继续"
     },
-    "auth": {
-      "signIn": {
-        "title": "欢迎回来",
-        "subtitle": "登录您的账户以继续创建精彩的谜团",
-        "email": "电子邮件地址",
-        "password": "密码",
-        "rememberMe": "记住我",
-        "forgotPassword": "忘记密码？",
-        "noAccount": "还没有账户？",
-        "signUpLink": "在此注册",
-        "submitButton": "登录",
-        "signingIn": "正在登录...",
-        "orDivider": "或继续使用",
-        "googleButton": "使用 Google 继续"
+    "signUp": {
+      "title": "创建您的账户",
+      "subtitle": "加入数千名谜团创建者，今天就开始创造",
+      "name": "全名",
+      "email": "电子邮件地址",
+      "password": "密码",
+      "confirmPassword": "确认密码",
+      "terms": "我同意",
+      "termsLink": "服务条款",
+      "privacy": "隐私政策",
+      "and": "和",
+      "hasAccount": "已有账户？",
+      "signInLink": "在此登录",
+      "submitButton": "创建账户",
+      "creatingAccount": "正在创建账户...",
+      "orDivider": "或继续使用",
+      "googleButton": "使用 Google 继续"
+    },
+    "forgotPassword": {
+      "title": "重置密码",
+      "subtitle": "输入您的电子邮件地址，我们将向您发送一个重置密码的链接",
+      "email": "电子邮件地址",
+      "submitButton": "发送重置链接",
+      "sending": "正在发送...",
+      "backToSignIn": "返回登录",
+      "checkEmail": {
+        "title": "检查您的电子邮件",
+        "message": "我们已将密码重置链接发送至",
+        "noEmail": "没有收到电子邮件？",
+        "tryAgain": "再试一次",
+        "returnToSignIn": "返回登录"
+      }
+    },
+    "resetPassword": {
+      "title": "设置新密码",
+      "subtitle": "为您的账户创建新密码",
+      "password": "新密码",
+      "confirmPassword": "确认新密码",
+      "submitButton": "更新密码",
+      "updating": "正在更新...",
+      "success": "密码已更新"
+    },
+    "errors": {
+      "invalidCredentials": "无效的电子邮件或密码",
+      "emailAlreadyExists": "此电子邮件地址已存在账户",
+      "weakPassword": "密码长度至少为6个字符",
+      "passwordMismatch": "密码不匹配",
+      "invalidEmail": "请输入有效的电子邮件地址",
+      "requiredField": "此字段为必填项",
+      "termsRequired": "您必须接受服务条款",
+      "networkError": "网络错误。请重试。",
+      "unknownError": "发生了一些错误。请重试。"
+    },
+    "success": {
+      "accountCreated": "账户已创建！请检查您的电子邮件以验证您的账户。",
+      "passwordReset": "密码重置电子邮件已发送",
+      "passwordUpdated": "密码已更新",
+      "signedOut": "已登出"
+    }
+  },
+  "dashboard": {
+    "title": "您的谋杀悬疑故事",
+    "subtitle": "查看、编辑和管理您所有已创建的谜团",
+    "welcome": {
+      "title": "欢迎回来",
+      "subtitle": "准备好创建您的下一个谜团杰作了吗？",
+      "noMysteries": "您尚未创建任何谜团",
+      "getStarted": "开始创建您的第一个谜团"
+    },
+    "mysteries": {
+      "title": "您的谜团",
+      "searchPlaceholder": "搜索谜团...",
+      "deleteSuccess": "谜团已移至存档",
+      "deleteFailed": "归档谜团失败",
+      "filter": {
+        "all": "所有谜团",
+        "drafts": "草稿",
+        "completed": "已完成",
+        "purchased": "已购买",
+        "archived": "已存档"
       },
-      "signUp": {
-        "title": "创建您的账户",
-        "subtitle": "加入数千名谜团创建者，今天就开始创造",
-        "name": "全名",
-        "email": "电子邮件地址",
-        "password": "密码",
-        "confirmPassword": "确认密码",
-        "terms": "我同意",
-        "termsLink": "服务条款",
-        "privacy": "隐私政策",
-        "and": "和",
-        "hasAccount": "已有账户？",
-        "signInLink": "在此登录",
-        "submitButton": "创建账户",
-        "creatingAccount": "正在创建账户...",
-        "orDivider": "或继续使用",
-        "googleButton": "使用 Google 继续"
+      "empty": {
+        "title": "未找到谜团",
+        "description": "创建您的第一个谜团以开始",
+        "searchResult": "没有谜团与您的搜索匹配"
       },
-      "forgotPassword": {
-        "title": "重置密码",
-        "subtitle": "输入您的电子邮件地址，我们将向您发送一个重置密码的链接",
-        "email": "电子邮件地址",
-        "submitButton": "发送重置链接",
-        "sending": "正在发送...",
-        "backToSignIn": "返回登录",
-        "checkEmail": {
-          "title": "检查您的电子邮件",
-          "message": "我们已将密码重置链接发送至",
-          "noEmail": "没有收到电子邮件？",
-          "tryAgain": "再试一次",
-          "returnToSignIn": "返回登录"
-        }
+      "card": {
+        "players": "{{count}} 名玩家",
+        "created": "创建于",
+        "lastEdited": "上次编辑于",
+        "theme": "主题：{{theme}}",
+        "actions": {
+          "view": "查看",
+          "chat": "聊天",
+          "delete": "删除",
+          "viewProgress": "查看进度",
+          "progress": "进度",
+          "editMystery": "编辑谜团",
+          "edit": "编辑",
+          "archive": "存档",
+          "deleteTitle": "删除"
+        },
+        "deleteDialog": {
+          "title": "删除谜团",
+          "description": "您确定要删除此谜团吗？此操作无法撤销。"
+        },
+        "generationInProgress": "正在生成中...",
+        "editedDate": "{{date}}编辑"
       },
-      "resetPassword": {
-        "title": "设置新密码",
-        "subtitle": "为您的账户创建新密码",
-        "password": "新密码",
+      "status": {
+        "completed": "已完成",
+        "draft": "草稿",
+        "purchased": "已购买",
+        "unknown": "未知",
+        "done": "完成",
+        "bought": "已购买",
+        "generating": "正在生成...",
+        "generatingShort": "正在生成..."
+      },
+      "showingCount": "显示 {{total}} 个谜团中的 {{count}} 个"
+    },
+    "stats": {
+      "totalMysteries": "总谜团数",
+      "completedMysteries": "已完成谜团",
+      "purchasedMysteries": "已购买谜团",
+      "totalPlayers": "总共主持的玩家数"
+    },
+    "backToDashboard": "返回仪表盘",
+    "buttons": {
+      "createFirstMystery": "创建您的第一个谜团"
+    },
+    "errors": {
+      "loadFailed": "加载您的谜团失败"
+    }
+  },
+  "account": {
+    "title": "账户设置",
+    "tabs": {
+      "profile": "个人资料",
+      "security": "安全"
+    },
+    "profile": {
+      "title": "个人资料信息",
+      "description": "更新您的账户个人资料信息",
+      "name": "全名",
+      "email": "电子邮件地址",
+      "emailNote": "电子邮件无法更改",
+      "saveButton": "保存更改",
+      "saving": "正在保存...",
+      "success": "个人资料已更新"
+    },
+    "security": {
+      "password": {
+        "title": "更改密码",
+        "description": "更新您的密码以确保账户安全",
+        "currentPassword": "当前密码",
+        "newPassword": "新密码",
         "confirmPassword": "确认新密码",
-        "submitButton": "更新密码",
+        "updateButton": "更新密码",
         "updating": "正在更新...",
         "success": "密码已更新"
       },
-      "errors": {
-        "invalidCredentials": "无效的电子邮件或密码",
-        "emailAlreadyExists": "此电子邮件地址已存在账户",
-        "weakPassword": "密码长度至少为6个字符",
-        "passwordMismatch": "密码不匹配",
-        "invalidEmail": "请输入有效的电子邮件地址",
-        "requiredField": "此字段为必填项",
-        "termsRequired": "您必须接受服务条款",
-        "networkError": "网络错误。请重试。",
-        "unknownError": "发生了一些错误。请重试。"
+      "deleteAccount": {
+        "title": "删除账户",
+        "description": "永久删除您的账户及所有相关数据",
+        "warning": "此操作无法撤销。您的所有谜团和数据都将被永久删除。",
+        "confirmText": "输入 DELETE 以确认",
+        "deleteButton": "删除账户",
+        "deleting": "正在删除...",
+        "success": "账户已删除"
+      }
+    }
+  },
+  "mysteryCreation": {
+    "scriptType": {
+      "full": "完整版",
+      "pointForm": "要点版",
+      "both": "完整版和要点版"
+    },
+    "sections": {
+      "premise": "前提",
+      "victim": "受害者",
+      "characterList": "角色列表",
+      "players": "玩家",
+      "murderMethod": "谋杀方式"
+    },
+    "wizard": {
+      "title": "创建您的谜团",
+      "step1": {
+        "title": "告诉我们您的愿景",
+        "description": "描述您完美的谋杀悬疑派对"
       },
-      "success": {
-        "accountCreated": "账户已创建！请检查您的电子邮件以验证您的账户。",
-        "passwordReset": "密码重置电子邮件已发送",
-        "passwordUpdated": "密码已更新",
-        "signedOut": "已登出"
+      "step2": {
+        "title": "审查和完善",
+        "description": "使用我们的人工智能助手完善您的谜团"
+      },
+      "step3": {
+        "title": "完整包",
+        "description": "获取主持所需的一切"
+      },
+      "prompt": {
+        "defaultStart": "我想创建一个谋杀悬疑故事",
+        "withTheme": "主题/背景为{{theme}}，适合{{playerCount}}位玩家，剧本为{{scriptType}}",
+        "withoutTheme": "适合{{playerCount}}位玩家，剧本为{{scriptType}}",
+        "withAccomplice": "在谜团中包含一个同谋机制",
+        "withoutAccomplice": "在谜团中不包含同谋机制",
+        "additionalDetails": "其他细节有：{{details}}"
       }
     },
-    "dashboard": {
-      "title": "您的谋杀悬疑故事",
-      "subtitle": "查看、编辑和管理您所有已创建的谜团",
-      "welcome": {
-        "title": "欢迎回来",
-        "subtitle": "准备好创建您的下一个谜团杰作了吗？",
-        "noMysteries": "您尚未创建任何谜团",
-        "getStarted": "开始创建您的第一个谜团"
-      },
-      "mysteries": {
-        "title": "您的谜团",
-        "searchPlaceholder": "搜索谜团...",
-        "deleteSuccess": "谜团已移至存档",
-        "deleteFailed": "归档谜团失败",
-        "filter": {
-          "all": "所有谜团",
-          "drafts": "草稿",
-          "completed": "已完成",
-          "purchased": "已购买",
-          "archived": "已存档"
-        },
-        "empty": {
-          "title": "未找到谜团",
-          "description": "创建您的第一个谜团以开始",
-          "searchResult": "没有谜团与您的搜索匹配"
-        },
-        "card": {
-          "players": "{{count}} 名玩家",
-          "created": "创建于",
-          "lastEdited": "上次编辑于",
-          "theme": "主题：{{theme}}",
-          "actions": {
-            "view": "查看",
-            "chat": "聊天",
-            "delete": "删除",
-            "viewProgress": "查看进度",
-            "progress": "进度",
-            "editMystery": "编辑谜团",
-            "edit": "编辑",
-            "archive": "存档",
-            "deleteTitle": "删除"
-          },
-          "deleteDialog": {
-            "title": "删除谜团",
-            "description": "您确定要删除此谜团吗？此操作无法撤销。"
-          },
-          "generationInProgress": "正在生成中...",
-          "editedDate": "{{date}}编辑"
-        },
-        "status": {
-          "completed": "已完成",
-          "draft": "草稿",
-          "purchased": "已购买",
-          "unknown": "未知",
-          "done": "完成",
-          "bought": "已购买",
-          "generating": "正在生成...",
-          "generatingShort": "正在生成..."
-        },
-        "showingCount": "显示 {{total}} 个谜团中的 {{count}} 个"
-      },
-      "stats": {
-        "totalMysteries": "总谜团数",
-        "completedMysteries": "已完成谜团",
-        "purchasedMysteries": "已购买谜团",
-        "totalPlayers": "总共主持的玩家数"
-      },
-      "backToDashboard": "返回仪表盘",
-      "buttons": {
-        "createFirstMystery": "创建您的第一个谜团"
-      },
-      "errors": {
-        "loadFailed": "加载您的谜团失败"
+    "editor": {
+      "title": "谜团编辑器",
+      "characters": "角色",
+      "story": "故事",
+      "clues": "线索",
+      "hostGuide": "主持指南",
+      "save": "保存草稿",
+      "publish": "完成谜团",
+      "saving": "正在保存...",
+      "publishing": "正在发布...",
+      "saved": "草稿已保存",
+      "published": "谜团已完成"
+    },
+    "guidance": {
+      "describe": "详细描述您的谜团——您越具体，我们就能为您创建得越好",
+      "examples": "尝试：'一个1920年代地下酒吧谋杀悬疑故事，有8个角色，包括一个爵士歌手、一个调酒师和一个黑帮老大'",
+      "playerCount": "将有多少玩家参加？",
+      "theme": "背景或主题是什么？",
+      "special": "有什么特殊要求或限制吗？",
+      "initialPrompt": {
+        "withTheme": "让我们创建一个以{{theme}}为主题的谋杀悬疑故事。请逐步指导我创建这个谜团。",
+        "withoutTheme": "让我们创建一个谋杀悬疑故事。请逐步指导我创建这个谜团。"
       }
     },
-    "account": {
-      "title": "账户设置",
-      "tabs": {
-        "profile": "个人资料",
-        "security": "安全"
+    "editTitle": "编辑谜团",
+    "createTitle": "创建新谜团",
+    "form": {
+      "description": "填写以下表格以生成您的定制谋杀悬疑故事"
+    },
+    "buttons": {
+      "generateFullMystery": "生成完整谜团"
+    },
+    "errors": {
+      "signInToSave": "请登录以保存您的谜团",
+      "saveFailed": "保存谜团失败",
+      "loadFailed": "加载谜团失败",
+      "loadMessagesFailed": "加载对话消息失败",
+      "loadConversationFailed": "加载对话失败",
+      "initialPrompt": "请为您的谜团提供一个提示",
+      "saveMessageFailed": "保存消息失败"
+    },
+    "success": {
+      "setupComplete": "谜团设置完成！正在启动聊天..."
+    }
+  },
+  "mysteryForm": {
+    "userRequestLabel": "您想创建什么",
+    "userRequestDescription": "您在主页上的原始请求",
+    "themeLabel": "主题/设定细节（可选）",
+    "themePlaceholder": "例如，时代，特定环境，必需物品等。",
+    "themeDescription": "为您的谋杀悬疑故事选择一个特定的主题或设定",
+    "playerCountLabel": "将有多少玩家参加？",
+    "playerCountPlaceholder": "选择玩家数量",
+    "playerCountItem": "{{count}}位玩家",
+    "playerCountDescription": "为您的谋杀悬疑故事选择4到32位玩家。",
+    "accompliceLabel": "包含同谋机制",
+    "accompliceDescription": "最适合10名或更多玩家的游戏",
+    "scriptTypeLabel": "剧本详细程度",
+    "scriptTypeFullLabel": "完整剧本——完整的对话和详细的说明",
+    "scriptTypePointFormLabel": "要点形式——关键点和列表摘要",
+    "scriptTypeBothLabel": "两种格式——完整剧本和要点笔记",
+    "additionalDetailsLabel": "其他详情（可选）",
+    "additionalDetailsPlaceholder": "您谜团的任何特定要求、特殊规则或其他背景信息...",
+    "additionalDetailsDescription": "提供您的谜团的任何其他详细信息或特殊要求",
+    "startChat": "开始与AI聊天",
+    "startingChat": "正在启动聊天..."
+  },
+  "supportPage": {
+    "title": "支持中心",
+    "subtitle": "查找常见问题解答，联系我们的支持团队，并获取创建精彩谜团派对所需的一切。",
+    "tabs": {
+      "faqs": "常见问题",
+      "contact": "联系我们"
+    },
+    "faqs": {
+      "title": "常见问题",
+      "description": "查找关于Mystery Maker的常见问题解答",
+      "categories": {
+        "aboutMysteryMaker": "关于Mystery Maker",
+        "gameMechanics": "游戏机制",
+        "hostingPlanning": "主持和规划",
+        "accountBilling": "账户和账单"
       },
-      "profile": {
-        "title": "个人资料信息",
-        "description": "更新您的账户个人资料信息",
-        "name": "全名",
-        "email": "电子邮件地址",
-        "emailNote": "电子邮件无法更改",
-        "saveButton": "保存更改",
-        "saving": "正在保存...",
-        "success": "个人资料已更新"
-      },
-      "security": {
-        "password": {
-          "title": "更改密码",
-          "description": "更新您的密码以确保账户安全",
-          "currentPassword": "当前密码",
-          "newPassword": "新密码",
-          "confirmPassword": "确认新密码",
-          "updateButton": "更新密码",
-          "updating": "正在更新...",
-          "success": "密码已更新"
+      "questions": {
+        "whatIsMysteryMaker": {
+          "question": "什么是Mystery Maker，它是如何运作的？",
+          "answer": "Mystery Maker是一个由AI驱动的平台，可以按您所需创建定制的谋杀悬疑派对。告诉我们您独特的愿景——任何主题、角色或设定——我们的人工智能会生成您所需的一切：角色档案、线索和为您的派对量身定制的主持材料。"
         },
-        "deleteAccount": {
-          "title": "删除账户",
-          "description": "永久删除您的账户及所有相关数据",
-          "warning": "此操作无法撤销。您的所有谜团和数据都将被永久删除。",
-          "confirmText": "输入 DELETE 以确认",
-          "deleteButton": "删除账户",
-          "deleting": "正在删除...",
-          "success": "账户已删除"
+        "creationProcess": {
+          "question": "创建和购买流程如何运作？",
+          "answer": "很简单！首先，您描述您的完美谋杀悬疑故事，我们免费创建定制预览。如果您对您的谜团满意，只需24.99美元即可购买完整包。您将立即获得主持所需的一切：详细的角色档案、主持指南和所有游戏材料。"
+        },
+        "saveWork": {
+          "question": "我可以保存我的工作并稍后返回吗？",
+          "answer": "是的！所有您的定制谜团都会保存在您的账户中，让您可以随时返回并编辑它们。"
+        },
+        "replayable": {
+          "question": "这些谋杀悬疑故事可以重玩吗？",
+          "answer": "当然！我们的谜团包含可变元素，因此即使与同一组人玩，每次游戏都会感到新鲜。您可以想主持多少次您的定制谜团就主持多少次。"
+        },
+        "playerCount": {
+          "question": "我需要多少玩家？",
+          "answer": "我们的系统可以为您指定的任何小组规模创建谜团——从4-6人的亲密聚会到15人以上的大型派对。只需告诉我们玩家数量，我们就会相应地设计。"
+        },
+        "modifyMystery": {
+          "question": "创建后可以修改我的谜团吗？",
+          "answer": "当然可以！使用我们的编辑器调整和定制您的谜团，直到它完美适合您的小组。随时更改角色、主题或复杂性。"
+        },
+        "lastMinuteChanges": {
+          "question": "如果我在最后一刻需要添加或删除玩家怎么办？",
+          "answer": "没问题！我们灵活的系统允许您即使在创建谜团后也可以调整玩家数量。AI将调整故事情节和角色以适应这些变化。"
+        },
+        "whatIncluded": {
+          "question": "我的定制谜团包包含什么？",
+          "answer": "您所需的一切：一份全面的主持指南，包含分步说明、每个玩家的详细角色档案、线索、证据和所有游戏材料。无需额外准备。"
+        },
+        "gameDuration": {
+          "question": "一场典型的游戏需要多长时间？",
+          "answer": "大多数谜团需要2-3小时，但您可以决定节奏。我们的主持指南包括您可以根据日程调整的时间建议。"
+        },
+        "themedMysteries": {
+          "question": "你们为特殊场合提供主题谜团吗？",
+          "answer": "我们可以创建任何您能想到的主题！从经典的1920年代地下酒吧到太空站和童话王国——告诉我们您的愿景，我们就会将其变为现实。"
+        },
+        "ageRecommendation": {
+          "question": "你们的谜团有年龄建议吗？",
+          "answer": "我们的标准谜团非常适合成人和青少年（13岁以上）。您也可以在创建谜团时为年幼玩家请求家庭友好型主题。"
+        },
+        "freePreview": {
+          "question": "免费预览包含什么？",
+          "answer": "您可以免费创建无限的谜团预览，包括基本故事情节和角色概念。这使您可以在购买前探索不同的想法。"
+        },
+        "purchaseIncludes": {
+          "question": "购买谜团后我能得到什么？",
+          "answer": "只需24.99美元，您将获得主持所需的一切：一份全面的主持指南、每个玩家的详细角色档案、线索、证据和所有游戏材料，即刻可用。"
+        },
+        "refund": {
+          "question": "如果不满意可以退款吗？",
+          "answer": "当然可以！如果您对购买不完全满意，请在7天内联系我们，我们将为您提供全额退款，无任何疑问。"
+        },
+        "gameDesignEngagement": {
+          "question": "您的游戏设计如何确保每个人都保持参与？",
+          "answer": "我们的谜题专注于丰富的角色互动而非僵化的故事情节。每个角色都有详细的背景和动机来推动自然的游戏玩法，确保所有玩家在整个体验中保持积极参与。"
+        },
+        "dynamicMurderer": {
+          "question": "为什么线索从一开始就不指向特定的凶手？",
+          "answer": "凶手是根据游戏过程中揭示的线索在第一轮后确定的。这种动态方法意味着线索会逐步构建，即使在派对氛围中遗漏了一些细节，谜题仍然可以解决。"
+        },
+        "flexiblePlayerCount": {
+          "question": "如果有人在最后一刻无法参加会怎样？",
+          "answer": "我们的灵活设计可以适应最后一刻的变化。由于游戏不依赖于一个角色持有关键信息，您可以调整玩家数量而不会破坏谜题。"
+        },
+        "characterFocused": {
+          "question": "为什么以角色为中心而不是以情节为中心？",
+          "answer": "多年的经验告诉我们，过于具体的线索在派对上会被遗漏。我们以角色为驱动的方法意味着谜题通过互动自然展开。"
         }
       }
     },
-    "mysteryCreation": {
-      "scriptType": {
-        "full": "完整版",
-        "pointForm": "要点版",
-        "both": "完整版和要点版"
-      },
-      "sections": {
-        "premise": "前提",
-        "victim": "受害者",
-        "characterList": "角色列表",
-        "players": "玩家",
-        "murderMethod": "谋杀方式"
-      },
-      "wizard": {
-        "title": "创建您的谜团",
-        "step1": {
-          "title": "告诉我们您的愿景",
-          "description": "描述您完美的谋杀悬疑派对"
-        },
-        "step2": {
-          "title": "审查和完善",
-          "description": "使用我们的人工智能助手完善您的谜团"
-        },
-        "step3": {
-          "title": "完整包",
-          "description": "获取主持所需的一切"
-        },
-        "prompt": {
-          "defaultStart": "我想创建一个谋杀悬疑故事",
-          "withTheme": "主题/背景为{{theme}}，适合{{playerCount}}位玩家，剧本为{{scriptType}}",
-          "withoutTheme": "适合{{playerCount}}位玩家，剧本为{{scriptType}}",
-          "withAccomplice": "在谜团中包含一个同谋机制",
-          "withoutAccomplice": "在谜团中不包含同谋机制",
-          "additionalDetails": "其他细节有：{{details}}"
-        }
-      },
-      "editor": {
-        "title": "谜团编辑器",
-        "characters": "角色",
-        "story": "故事",
-        "clues": "线索",
-        "hostGuide": "主持指南",
-        "save": "保存草稿",
-        "publish": "完成谜团",
-        "saving": "正在保存...",
-        "publishing": "正在发布...",
-        "saved": "草稿已保存",
-        "published": "谜团已完成"
-      },
-      "guidance": {
-        "describe": "详细描述您的谜团——您越具体，我们就能为您创建得越好",
-        "examples": "尝试：'一个1920年代地下酒吧谋杀悬疑故事，有8个角色，包括一个爵士歌手、一个调酒师和一个黑帮老大'",
-        "playerCount": "将有多少玩家参加？",
-        "theme": "背景或主题是什么？",
-        "special": "有什么特殊要求或限制吗？",
-        "initialPrompt": {
-          "withTheme": "让我们创建一个以{{theme}}为主题的谋杀悬疑故事。请逐步指导我创建这个谜团。",
-          "withoutTheme": "让我们创建一个谋杀悬疑故事。请逐步指导我创建这个谜团。"
-        }
-      },
-      "editTitle": "编辑谜团",
-      "createTitle": "创建新谜团",
+    "contact": {
+      "title": "联系我们",
+      "description": "需要更多帮助？我们在这里为您服务",
+      "intro": "我们的支持团队随时准备帮助您解决任何关于使用Mystery Maker创建完美谜团派对的问题。",
       "form": {
-        "description": "填写以下表格以生成您的定制谋杀悬疑故事"
-      },
-      "buttons": {
-        "generateFullMystery": "生成完整谜团"
-      },
-      "errors": {
-        "signInToSave": "请登录以保存您的谜团",
-        "saveFailed": "保存谜团失败",
-        "loadFailed": "加载谜团失败",
-        "loadMessagesFailed": "加载对话消息失败",
-        "loadConversationFailed": "加载对话失败",
-        "initialPrompt": "请为您的谜团提供一个提示",
-        "saveMessageFailed": "保存消息失败"
-      },
-      "success": {
-        "setupComplete": "谜团设置完成！正在启动聊天..."
+        "name": "姓名",
+        "email": "电子邮件",
+        "subject": "主题",
+        "message": "留言",
+        "namePlaceholder": "您的姓名",
+        "emailPlaceholder": "您的.电子邮件@example.com",
+        "subjectPlaceholder": "您的消息主题是什么？",
+        "messagePlaceholder": "我们能为您做些什么？",
+        "sendButton": "发送消息",
+        "sending": "正在发送...",
+        "success": "感谢您的留言！我们将在24小时内回复您。",
+        "error": "发送消息失败。请稍后再试。"
       }
+    }
+  },
+  "chatbot": {
+    "toasts": {
+      "invalidId": "无效的对话ID",
+      "loadFailed": "无法加载您之前的对话",
+      "offlineMode": "正在使用离线模式——部分功能可能受限",
+      "requestError": "处理您的请求时出错",
+      "generationSuccess": "谜团已生成！",
+      "urlUnavailable": "聊天机器人URL暂不可用"
     },
-    "mysteryForm": {
-      "userRequestLabel": "您想创建什么",
-      "userRequestDescription": "您在主页上的原始请求",
-      "themeLabel": "主题/设定细节（可选）",
-      "themePlaceholder": "例如，时代，特定环境，必需物品等。",
-      "themeDescription": "为您的谋杀悬疑故事选择一个特定的主题或设定",
-      "playerCountLabel": "将有多少玩家参加？",
-      "playerCountPlaceholder": "选择玩家数量",
-      "playerCountItem": "{{count}}位玩家",
-      "playerCountDescription": "为您的谋杀悬疑故事选择4到32位玩家。",
-      "accompliceLabel": "包含同谋机制",
-      "accompliceDescription": "最适合10名或更多玩家的游戏",
-      "scriptTypeLabel": "剧本详细程度",
-      "scriptTypeFullLabel": "完整剧本——完整的对话和详细的说明",
-      "scriptTypePointFormLabel": "要点形式——关键点和列表摘要",
-      "scriptTypeBothLabel": "两种格式——完整剧本和要点笔记",
-      "additionalDetailsLabel": "其他详情（可选）",
-      "additionalDetailsPlaceholder": "您谜团的任何特定要求、特殊规则或其他背景信息...",
-      "additionalDetailsDescription": "提供您的谜团的任何其他详细信息或特殊要求",
-      "startChat": "开始与AI聊天",
-      "startingChat": "正在启动聊天..."
+    "welcomeMessage": "欢迎来到谋杀悬疑创建器！描述您想创建的谜团类型，或向我寻求建议。",
+    "newConversationTitle": "新谋杀悬疑故事",
+    "fallbackResponses": [
+      "我很乐意帮助您创建一个谋杀悬疑故事。您希望您的谜团有什么主题或设定？",
+      "这是一个绝佳的选择！现在，让我们来考虑一下受害者。您希望受害者是谁？",
+      "有意思！现在我们需要一些嫌疑犯。您能描述2-3个可能有犯罪动机的角色吗？",
+      "这些都是令人信服的嫌疑犯。让我们添加一些线索。现场可能会找到什么样的证据？",
+      "您的谜团正在成形！为了继续发展您的故事细节，让我们思考一下我们可以包含哪些其他元素。"
+    ],
+    "title": "创建您的谋杀悬疑故事",
+    "buttons": {
+      "external": "外部",
+      "openFull": "打开完整聊天机器人",
+      "finalize": "完成",
+      "finalizeMystery": "完成谜团"
     },
-    "supportPage": {
-      "title": "支持中心",
-      "subtitle": "查找常见问题解答，联系我们的支持团队，并获取创建精彩谜团派对所需的一切。",
-      "tabs": {
-        "faqs": "常见问题",
-        "contact": "联系我们"
-      },
-      "faqs": {
-        "title": "常见问题",
-        "description": "查找关于Mystery Maker的常见问题解答",
-        "categories": {
-          "aboutMysteryMaker": "关于Mystery Maker",
-          "gameMechanics": "游戏机制",
-          "hostingPlanning": "主持和规划",
-          "accountBilling": "账户和账单"
-        },
-        "questions": {
-          "whatIsMysteryMaker": {
-            "question": "什么是Mystery Maker，它是如何运作的？",
-            "answer": "Mystery Maker是一个由AI驱动的平台，可以按您所需创建定制的谋杀悬疑派对。告诉我们您独特的愿景——任何主题、角色或设定——我们的人工智能会生成您所需的一切：角色档案、线索和为您的派对量身定制的主持材料。"
-          },
-          "creationProcess": {
-            "question": "创建和购买流程如何运作？",
-            "answer": "很简单！首先，您描述您的完美谋杀悬疑故事，我们免费创建定制预览。如果您对您的谜团满意，只需24.99美元即可购买完整包。您将立即获得主持所需的一切：详细的角色档案、主持指南和所有游戏材料。"
-          },
-          "saveWork": {
-            "question": "我可以保存我的工作并稍后返回吗？",
-            "answer": "是的！所有您的定制谜团都会保存在您的账户中，让您可以随时返回并编辑它们。"
-          },
-          "replayable": {
-            "question": "这些谋杀悬疑故事可以重玩吗？",
-            "answer": "当然！我们的谜团包含可变元素，因此即使与同一组人玩，每次游戏都会感到新鲜。您可以想主持多少次您的定制谜团就主持多少次。"
-          },
-          "playerCount": {
-            "question": "我需要多少玩家？",
-            "answer": "我们的系统可以为您指定的任何小组规模创建谜团——从4-6人的亲密聚会到15人以上的大型派对。只需告诉我们玩家数量，我们就会相应地设计。"
-          },
-          "modifyMystery": {
-            "question": "创建后可以修改我的谜团吗？",
-            "answer": "当然可以！使用我们的编辑器调整和定制您的谜团，直到它完美适合您的小组。随时更改角色、主题或复杂性。"
-          },
-          "lastMinuteChanges": {
-            "question": "如果我在最后一刻需要添加或删除玩家怎么办？",
-            "answer": "没问题！我们灵活的系统允许您即使在创建谜团后也可以调整玩家数量。AI将调整故事情节和角色以适应这些变化。"
-          },
-          "whatIncluded": {
-            "question": "我的定制谜团包包含什么？",
-            "answer": "您所需的一切：一份全面的主持指南，包含分步说明、每个玩家的详细角色档案、线索、证据和所有游戏材料。无需额外准备。"
-          },
-          "gameDuration": {
-            "question": "一场典型的游戏需要多长时间？",
-            "answer": "大多数谜团需要2-3小时，但您可以决定节奏。我们的主持指南包括您可以根据日程调整的时间建议。"
-          },
-          "themedMysteries": {
-            "question": "你们为特殊场合提供主题谜团吗？",
-            "answer": "我们可以创建任何您能想到的主题！从经典的1920年代地下酒吧到太空站和童话王国——告诉我们您的愿景，我们就会将其变为现实。"
-          },
-          "ageRecommendation": {
-            "question": "你们的谜团有年龄建议吗？",
-            "answer": "我们的标准谜团非常适合成人和青少年（13岁以上）。您也可以在创建谜团时为年幼玩家请求家庭友好型主题。"
-          },
-          "freePreview": {
-            "question": "免费预览包含什么？",
-            "answer": "您可以免费创建无限的谜团预览，包括基本故事情节和角色概念。这使您可以在购买前探索不同的想法。"
-          },
-          "purchaseIncludes": {
-            "question": "购买谜团后我能得到什么？",
-            "answer": "只需24.99美元，您将获得主持所需的一切：一份全面的主持指南、每个玩家的详细角色档案、线索、证据和所有游戏材料，即刻可用。"
-          },
-          "refund": {
-            "question": "如果不满意可以退款吗？",
-            "answer": "当然可以！如果您对购买不完全满意，请在7天内联系我们，我们将为您提供全额退款，无任何疑问。"
-          }
-        }
-      },
-      "contact": {
-        "title": "联系我们",
-        "description": "需要更多帮助？我们在这里为您服务",
-        "intro": "我们的支持团队随时准备帮助您解决任何关于使用Mystery Maker创建完美谜团派对的问题。",
-        "form": {
-          "name": "姓名",
-          "email": "电子邮件",
-          "subject": "主题",
-          "message": "留言",
-          "namePlaceholder": "您的姓名",
-          "emailPlaceholder": "您的.电子邮件@example.com",
-          "subjectPlaceholder": "您的消息主题是什么？",
-          "messagePlaceholder": "我们能为您做些什么？",
-          "sendButton": "发送消息",
-          "sending": "正在发送...",
-          "success": "感谢您的留言！我们将在24小时内回复您。",
-          "error": "发送消息失败。请稍后再试。"
-        }
-      }
+    "creatorTitle": "谋杀悬疑创建器",
+    "placeholder": "输入您对谋杀悬疑故事的想法...",
+    "finalizePrompt": "当您对您的谜团满意时，请完成它以继续。"
+  },
+  "homeDashboard": {
+    "title": "您的谜团",
+    "searchPlaceholder": "搜索谜团...",
+    "loadMore": "加载更多",
+    "loading": "正在加载...",
+    "empty": {
+      "title": "您尚未创建任何谜团",
+      "description": "使用上面的输入框开始创建您的第一个谋杀悬疑故事！"
     },
-    "chatbot": {
-      "toasts": {
-        "invalidId": "无效的对话ID",
-        "loadFailed": "无法加载您之前的对话",
-        "offlineMode": "正在使用离线模式——部分功能可能受限",
-        "requestError": "处理您的请求时出错",
-        "generationSuccess": "谜团已生成！",
-        "urlUnavailable": "聊天机器人URL暂不可用"
-      },
-      "welcomeMessage": "欢迎来到谋杀悬疑创建器！描述您想创建的谜团类型，或向我寻求建议。",
-      "newConversationTitle": "新谋杀悬疑故事",
-      "fallbackResponses": [
-        "我很乐意帮助您创建一个谋杀悬疑故事。您希望您的谜团有什么主题或设定？",
-        "这是一个绝佳的选择！现在，让我们来考虑一下受害者。您希望受害者是谁？",
-        "有意思！现在我们需要一些嫌疑犯。您能描述2-3个可能有犯罪动机的角色吗？",
-        "这些都是令人信服的嫌疑犯。让我们添加一些线索。现场可能会找到什么样的证据？",
-        "您的谜团正在成形！为了继续发展您的故事细节，让我们思考一下我们可以包含哪些其他元素。"
-      ],
-      "title": "创建您的谋杀悬疑故事",
-      "buttons": {
-        "external": "外部",
-        "openFull": "打开完整聊天机器人",
-        "finalize": "完成",
-        "finalizeMystery": "完成谜团"
-      },
-      "creatorTitle": "谋杀悬疑创建器",
-      "placeholder": "输入您对谋杀悬疑故事的想法...",
-      "finalizePrompt": "当您对您的谜团满意时，请完成它以继续。"
+    "errors": {
+      "loadFailed": "加载部分谜团失败。请刷新页面。"
+    }
+  },
+  "mysteryDashboard": {
+    "title": "谜团仪表盘",
+    "description": "管理您已创建的谜团，开始新的谜团，或探索示例内容。",
+    "tabs": {
+      "all": "全部",
+      "drafts": "草稿",
+      "purchased": "已购买",
+      "archived": "已存档"
+    }
+  },
+  "sendToGuests": {
+    "title": "将角色指南发送给您的客人",
+    "description": "为每个角色输入电子邮件地址，将定制指南直接发送给您的客人。每位客人只会收到他们自己的角色信息。",
+    "status": {
+      "sent": "已发送"
     },
-    "homeDashboard": {
-      "title": "您的谜团",
-      "searchPlaceholder": "搜索谜团...",
-      "loadMore": "加载更多",
+    "emailPlaceholder": "guest@example.com",
+    "buttons": {
+      "sending": "正在发送...",
+      "send": "发送角色指南"
+    },
+    "errors": {
+      "noValidEmails": "请添加至少一个有效的电子邮件地址",
+      "sendFailed": "发送部分电子邮件失败。请重试。"
+    },
+    "success": {
+      "sentCount": "已将角色指南发送给{{count}}位客人"
+    }
+  },
+  "common": {
+    "buttons": {
+      "createNew": "创建新谜团",
+      "getStarted": "开始",
+      "learnMore": "了解更多",
+      "tryNow": "立即尝试",
+      "continue": "继续",
+      "cancel": "取消",
+      "save": "保存",
+      "delete": "删除",
+      "edit": "编辑",
+      "close": "关闭",
+      "back": "返回",
+      "next": "下一步",
+      "previous": "上一步",
+      "finish": "完成",
+      "submit": "提交",
+      "confirm": "确认",
+      "yes": "是",
+      "no": "否"
+    },
+    "labels": {
       "loading": "正在加载...",
-      "empty": {
-        "title": "您尚未创建任何谜团",
-        "description": "使用上面的输入框开始创建您的第一个谋杀悬疑故事！"
+      "pleaseWait": "请稍候。",
+      "error": "错误",
+      "success": "成功",
+      "warning": "警告",
+      "info": "信息",
+      "required": "必填",
+      "optional": "可选"
+    },
+    "messages": {
+      "welcome": "欢迎！",
+      "thankYou": "谢谢！",
+      "comingSoon": "即将推出",
+      "notFound": "未找到",
+      "somethingWentWrong": "发生了一些错误",
+      "tryAgain": "请重试",
+      "noResultsFound": "未找到结果",
+      "loadingContent": "正在加载内容...",
+      "savingChanges": "正在保存更改...",
+      "changesSuccess": "更改已保存",
+      "changesCanceled": "更改已取消",
+      "aiThinking": "AI正在思考..."
+    },
+    "validation": {
+      "required": "此字段为必填项",
+      "invalidEmail": "请输入有效的电子邮件地址",
+      "passwordTooShort": "密码长度至少为6个字符",
+      "passwordMismatch": "密码不匹配",
+      "invalidFormat": "无效格式",
+      "tooShort": "太短",
+      "tooLong": "太长",
+      "invalidCharacters": "包含无效字符"
+    },
+    "states": {
+      "draft": "草稿",
+      "inProgress": "进行中",
+      "completed": "已完成",
+      "published": "已发布",
+      "archived": "已存档",
+      "deleted": "已删除"
+    },
+    "modals": {
+      "confirmDelete": {
+        "title": "确认删除",
+        "message": "您确定要删除此项目吗？此操作无法撤销。",
+        "confirmButton": "删除",
+        "cancelButton": "取消"
       },
-      "errors": {
-        "loadFailed": "加载部分谜团失败。请刷新页面。"
+      "unsavedChanges": {
+        "title": "未保存的更改",
+        "message": "您有未保存的更改。您想在离开前保存它们吗？",
+        "saveButton": "保存更改",
+        "discardButton": "放弃更改",
+        "cancelButton": "取消"
       }
     },
-    "mysteryDashboard": {
-      "title": "谜团仪表盘",
-      "description": "管理您已创建的谜团，开始新的谜团，或探索示例内容。",
-      "tabs": {
-        "all": "全部",
-        "drafts": "草稿",
-        "purchased": "已购买",
-        "archived": "已存档"
+    "notifications": {
+      "welcomeBack": "欢迎回来！",
+      "signedOut": "您已登出",
+      "sessionExpired": "您的会话已过期。请重新登录。",
+      "connectionLost": "连接丢失。正在尝试重新连接...",
+      "connectionRestored": "连接已恢复",
+      "updateAvailable": "有新版本可用。请更新到新版本。",
+      "offlineMode": "您当前处于离线模式",
+      "deleteSuccess": "{{item}}已删除",
+      "deleteFailed": "删除{{item}}失败",
+      "archiveSuccess": "{{item}}已存档",
+      "archiveFailed": "存档{{item}}失败",
+      "updatedSuccess": "{{item}}已更新",
+      "updateFailed": "更新{{item}}失败"
+    }
+  },
+  "character": {
+    "detail": {
+      "description": "角色描述",
+      "background": "背景",
+      "relationships": "关系",
+      "secrets": "秘密",
+      "whereabouts": "谋杀时的去向",
+      "introduction": "介绍",
+      "round1": "第一轮：初步调查",
+      "round2": "第二轮：深入揭示",
+      "round3": "第三轮：最终线索",
+      "finalStatement": "最终声明",
+      "questioningOptions": "提问选项",
+      "askTarget": "询问{{target}}：“{{question}}”"
+    },
+    "import": {
+      "title": "谜团角色",
+      "description": "管理您的谋杀悬疑故事中的角色",
+      "importButton": "导入角色",
+      "loading": "正在加载角色...",
+      "noCharacters": "暂无角色",
+      "importPrompt": "导入角色数据以填充您的谋杀悬疑故事。",
+      "foundCount": "在数据库中找到{{count}}个角色",
+      "deleteConfirm": "您确定要删除{{name}}吗？",
+      "deleteSuccess": "角色已删除：{{name}}",
+      "deleteFailed": "删除角色失败",
+      "refreshSuccess": "角色列表已刷新",
+      "refreshFailed": "刷新角色数据失败",
+      "loadFailed": "加载角色数据失败",
+      "table": {
+        "name": "角色名称",
+        "details": "详情",
+        "scripts": "剧本",
+        "actions": "操作",
+        "badges": {
+          "description": "描述",
+          "background": "背景",
+          "relationships": "关系",
+          "secrets": "秘密",
+          "intro": "介绍",
+          "round1": "第一轮",
+          "round2": "第二轮",
+          "round3": "第三轮"
+        }
       }
     },
-    "sendToGuests": {
-      "title": "将角色指南发送给您的客人",
-      "description": "为每个角色输入电子邮件地址，将定制指南直接发送给您的客人。每位客人只会收到他们自己的角色信息。",
+    "access": {
+      "welcome": "欢迎，{{name}}！",
+      "subtitle": "这是您的角色游戏指南",
+      "loading": "正在加载您的角色...",
+      "accessDenied": "访问被拒绝",
+      "notFound": "未找到角色分配。",
+      "guide": {
+        "yourCharacter": "{{name}} - 您的角色",
+        "yourBackground": "您的背景",
+        "yourSecret": "您的秘密",
+        "introduction": "介绍",
+        "rumorsYouKnow": "您知道的谣言",
+        "round1": "第一轮：开场白",
+        "round2": "第二轮：动机",
+        "round3": "第三轮：方法",
+        "questionsToAsk": "要问的问题",
+        "ifInnocent": "如果您是无辜的：",
+        "ifGuilty": "如果您是有罪的：",
+        "ifAccomplice": "如果您是同谋："
+      }
+    },
+    "dialog": {
+      "title": "导入角色数据",
+      "subtitle": "请在下方粘贴您的角色数据：",
+      "pasteButton": "从剪贴板粘贴",
+      "pasteSuccess": "文本已从剪贴板粘贴",
+      "pasteError": "访问剪贴板被拒绝。请手动粘贴。",
+      "placeholder": "请在此处粘贴角色指南内容...",
+      "instructions": "角色数据应包含以下部分：",
+      "sections": [
+        "角色描述",
+        "背景",
+        "关系",
+        "秘密",
+        "去向",
+        "轮次声明（第一轮，第二轮等）"
+      ],
+      "importButton": "导入角色",
+      "importing": "正在导入...",
+      "cancel": "取消",
+      "enterData": "请输入或粘贴角色数据",
+      "importSuccess": "角色已导入",
+      "importFailed": "导入角色数据失败",
+      "importError": "导入期间发生意外错误"
+    },
+    "guestManager": {
+      "title": "与客人分享角色",
+      "subtitle": "将每个角色分配给一位客人并通过电子邮件发送",
+      "table": {
+        "character": "角色",
+        "guestName": "客人姓名",
+        "email": "电子邮件",
+        "action": "操作"
+      },
+      "placeholders": {
+        "guestName": "客人姓名",
+        "email": "guest@example.com"
+      },
+      "buttons": {
+        "edit": "编辑",
+        "send": "发送",
+        "sendAll": "发送全部",
+        "close": "关闭"
+      },
       "status": {
         "sent": "已发送"
       },
-      "emailPlaceholder": "guest@example.com",
-      "buttons": {
-        "sending": "正在发送...",
-        "send": "发送角色指南"
-      },
-      "errors": {
-        "noValidEmails": "请添加至少一个有效的电子邮件地址",
-        "sendFailed": "发送部分电子邮件失败。请重试。"
-      },
-      "success": {
-        "sentCount": "已将角色指南发送给{{count}}位客人"
+      "assignedCount": "已分配{{count}}个角色",
+      "toasts": {
+        "characterSent": "角色已发送给{{name}}！",
+        "sendFailed": "发送角色分配失败",
+        "loadFailed": "加载现有分配失败",
+        "updateFailed": "更新分配失败",
+        "noValidAssignments": "没有可发送的有效分配",
+        "allSent": "{{count}}个角色分配已发送！",
+        "sendSomeFailed": "发送部分分配失败"
       }
     },
-    "common": {
-      "buttons": {
-        "createNew": "创建新谜团",
-        "getStarted": "开始",
-        "learnMore": "了解更多",
-        "tryNow": "立即尝试",
-        "continue": "继续",
-        "cancel": "取消",
-        "save": "保存",
-        "delete": "删除",
-        "edit": "编辑",
-        "close": "关闭",
-        "back": "返回",
-        "next": "下一步",
-        "previous": "上一步",
-        "finish": "完成",
-        "submit": "提交",
-        "confirm": "确认",
-        "yes": "是",
-        "no": "否"
-      },
-      "labels": {
-        "loading": "正在加载...",
-        "pleaseWait": "请稍候。",
-        "error": "错误",
-        "success": "成功",
-        "warning": "警告",
-        "info": "信息",
-        "required": "必填",
-        "optional": "可选"
-      },
-      "messages": {
-        "welcome": "欢迎！",
-        "thankYou": "谢谢！",
-        "comingSoon": "即将推出",
-        "notFound": "未找到",
-        "somethingWentWrong": "发生了一些错误",
-        "tryAgain": "请重试",
-        "noResultsFound": "未找到结果",
-        "loadingContent": "正在加载内容...",
-        "savingChanges": "正在保存更改...",
-        "changesSuccess": "更改已保存",
-        "changesCanceled": "更改已取消",
-        "aiThinking": "AI正在思考..."
-      },
-      "validation": {
-        "required": "此字段为必填项",
-        "invalidEmail": "请输入有效的电子邮件地址",
-        "passwordTooShort": "密码长度至少为6个字符",
-        "passwordMismatch": "密码不匹配",
-        "invalidFormat": "无效格式",
-        "tooShort": "太短",
-        "tooLong": "太长",
-        "invalidCharacters": "包含无效字符"
-      },
-      "states": {
-        "draft": "草稿",
-        "inProgress": "进行中",
-        "completed": "已完成",
-        "published": "已发布",
-        "archived": "已存档",
-        "deleted": "已删除"
-      },
-      "modals": {
-        "confirmDelete": {
-          "title": "确认删除",
-          "message": "您确定要删除此项目吗？此操作无法撤销。",
-          "confirmButton": "删除",
-          "cancelButton": "取消"
-        },
-        "unsavedChanges": {
-          "title": "未保存的更改",
-          "message": "您有未保存的更改。您想在离开前保存它们吗？",
-          "saveButton": "保存更改",
-          "discardButton": "放弃更改",
-          "cancelButton": "取消"
-        }
-      },
-      "notifications": {
-        "welcomeBack": "欢迎回来！",
-        "signedOut": "您已登出",
-        "sessionExpired": "您的会话已过期。请重新登录。",
-        "connectionLost": "连接丢失。正在尝试重新连接...",
-        "connectionRestored": "连接已恢复",
-        "updateAvailable": "有新版本可用。请更新到新版本。",
-        "offlineMode": "您当前处于离线模式",
-        "deleteSuccess": "{{item}}已删除",
-        "deleteFailed": "删除{{item}}失败",
-        "archiveSuccess": "{{item}}已存档",
-        "archiveFailed": "存档{{item}}失败",
-        "updatedSuccess": "{{item}}已更新",
-        "updateFailed": "更新{{item}}失败"
-      }
-    },
-    "character": {
-      "detail": {
-        "description": "角色描述",
-        "background": "背景",
-        "relationships": "关系",
-        "secrets": "秘密",
-        "whereabouts": "谋杀时的去向",
-        "introduction": "介绍",
-        "round1": "第一轮：初步调查",
-        "round2": "第二轮：深入揭示",
-        "round3": "第三轮：最终线索",
-        "finalStatement": "最终声明",
-        "questioningOptions": "提问选项",
-        "askTarget": "询问{{target}}：“{{question}}”"
-      },
-      "import": {
-        "title": "谜团角色",
-        "description": "管理您的谋杀悬疑故事中的角色",
-        "importButton": "导入角色",
-        "loading": "正在加载角色...",
-        "noCharacters": "暂无角色",
-        "importPrompt": "导入角色数据以填充您的谋杀悬疑故事。",
-        "foundCount": "在数据库中找到{{count}}个角色",
-        "deleteConfirm": "您确定要删除{{name}}吗？",
-        "deleteSuccess": "角色已删除：{{name}}",
-        "deleteFailed": "删除角色失败",
-        "refreshSuccess": "角色列表已刷新",
-        "refreshFailed": "刷新角色数据失败",
-        "loadFailed": "加载角色数据失败",
-        "table": {
-          "name": "角色名称",
-          "details": "详情",
-          "scripts": "剧本",
-          "actions": "操作",
-          "badges": {
-            "description": "描述",
-            "background": "背景",
-            "relationships": "关系",
-            "secrets": "秘密",
-            "intro": "介绍",
-            "round1": "第一轮",
-            "round2": "第二轮",
-            "round3": "第三轮"
-          }
-        }
-      },
-      "access": {
-        "welcome": "欢迎，{{name}}！",
-        "subtitle": "这是您的角色游戏指南",
-        "loading": "正在加载您的角色...",
-        "accessDenied": "访问被拒绝",
-        "notFound": "未找到角色分配。",
-        "guide": {
-          "yourCharacter": "{{name}} - 您的角色",
-          "yourBackground": "您的背景",
-          "yourSecret": "您的秘密",
-          "introduction": "介绍",
-          "rumorsYouKnow": "您知道的谣言",
-          "round1": "第一轮：开场白",
-          "round2": "第二轮：动机",
-          "round3": "第三轮：方法",
-          "questionsToAsk": "要问的问题",
-          "ifInnocent": "如果您是无辜的：",
-          "ifGuilty": "如果您是有罪的：",
-          "ifAccomplice": "如果您是同谋："
-        }
-      },
-      "dialog": {
-        "title": "导入角色数据",
-        "subtitle": "请在下方粘贴您的角色数据：",
-        "pasteButton": "从剪贴板粘贴",
-        "pasteSuccess": "文本已从剪贴板粘贴",
-        "pasteError": "访问剪贴板被拒绝。请手动粘贴。",
-        "placeholder": "请在此处粘贴角色指南内容...",
-        "instructions": "角色数据应包含以下部分：",
-        "sections": [
-          "角色描述",
-          "背景",
-          "关系",
-          "秘密",
-          "去向",
-          "轮次声明（第一轮，第二轮等）"
-        ],
-        "importButton": "导入角色",
-        "importing": "正在导入...",
-        "cancel": "取消",
-        "enterData": "请输入或粘贴角色数据",
-        "importSuccess": "角色已导入",
-        "importFailed": "导入角色数据失败",
-        "importError": "导入期间发生意外错误"
-      },
-      "guestManager": {
-        "title": "与客人分享角色",
-        "subtitle": "将每个角色分配给一位客人并通过电子邮件发送",
-        "table": {
-          "character": "角色",
-          "guestName": "客人姓名",
-          "email": "电子邮件",
-          "action": "操作"
-        },
-        "placeholders": {
-          "guestName": "客人姓名",
-          "email": "guest@example.com"
-        },
-        "buttons": {
-          "edit": "编辑",
-          "send": "发送",
-          "sendAll": "发送全部",
-          "close": "关闭"
-        },
-        "status": {
-          "sent": "已发送"
-        },
-        "assignedCount": "已分配{{count}}个角色",
-        "toasts": {
-          "characterSent": "角色已发送给{{name}}！",
-          "sendFailed": "发送角色分配失败",
-          "loadFailed": "加载现有分配失败",
-          "updateFailed": "更新分配失败",
-          "noValidAssignments": "没有可发送的有效分配",
-          "allSent": "{{count}}个角色分配已发送！",
-          "sendSomeFailed": "发送部分分配失败"
-        }
-      },
-      "roles": {
-        "title": "角色扮演",
-        "description": "分配您的谜团的凶手角色",
-        "murderer": "凶手",
-        "required": "必选",
-        "noneSelected": "未选择",
-        "murdererDescription": "实施谋杀的角色",
-        "saveRoles": "保存角色",
-        "saving": "正在保存...",
-        "saveSuccess": "角色已保存",
-        "saveFailed": "保存角色失败",
-        "loadFailed": "加载角色数据失败"
-      }
-    },
-    "blog": {
+    "roles": {
+      "title": "角色扮演",
+      "description": "分配您的谜团的凶手角色",
+      "murderer": "凶手",
+      "required": "必选",
+      "noneSelected": "未选择",
+      "murdererDescription": "实施谋杀的角色",
+      "saveRoles": "保存角色",
+      "saving": "正在保存...",
+      "saveSuccess": "角色已保存",
+      "saveFailed": "保存角色失败",
+      "loadFailed": "加载角色数据失败"
+    }
+  },
+  "blog": {
     "title": "谋杀悬疑博客",
     "subtitle": "为您的下一场悬疑派对提供技巧、指南和灵感",
     "backToHome": "返回首页",
@@ -871,113 +886,113 @@
     "error": "加载博客文章失败。"
   },
   "purchase": {
-      "toasts": {
-        "success": "购买成功！您现在可以完全访问此谜团包。",
-        "cancel": "购买已取消。您可以随时重试。",
-        "loadFailed": "加载谜团详情失败。",
-        "notFound": "未找到谜团。",
-        "devPurchaseSim": "正在开发模式下模拟购买...",
-        "devPurchaseSuccess": "模拟购买成功！正在重定向到包生成...",
-        "devPurchaseFailed": "模拟购买失败。",
-        "signInRequired": "请登录以购买此谜团。",
-        "checkoutRedirect": "正在重定向到安全结账...",
-        "checkoutFailed": "重定向到结账失败。请重试。",
-        "genericError": "加载谜团详情时发生错误。"
-      },
-      "title": "完成您的购买",
-      "subtitle": "完全访问您的谋杀悬疑包",
-      "package": {
-        "title": "谋杀悬疑包",
-        "description": "一次性购买，即时访问",
-        "priceDescription": "完整的谋杀悬疑包，包含所有角色材料、线索和主持说明。",
-        "whatsIncluded": "包含内容：",
-        "includes": [
-          "所有嫌疑犯的完整角色档案",
-          "主持指南，包含分步说明",
-          "可打印的角色表",
-          "证据和线索卡",
-          "事件时间线",
-          "解决方案揭示剧本",
-          "所有材料的PDF下载"
-        ]
-      },
-      "buttons": {
-        "processing": "正在处理...",
-        "complete": "完成购买",
-        "backToDesign": "返回谜团设计"
-      },
-      "notes": {
-        "title": "重要注意事项",
-        "items": [
-          "这是对该特定谜团包的一次性购买",
-          "您将获得永久访问权限，可以下载所有材料",
-          "内容仅供个人使用，不得用于商业再分发",
-          "需要帮助？通过{{email}}联系我们的支持"
-        ]
-      },
-      "preview": {
-        "defaultTitle": "定制谋杀悬疑故事",
-        "characterPlaceholder": "角色详情将在完整包中揭示。",
-        "characterPlaceholderFull": "完整的角色描述可在购买的包中获得。",
-        "evidencePlaceholder": "证据详情可在完整包中获得。",
-        "title": "谋杀悬疑故事预览",
-        "playersLabel": "玩家",
-        "playersCount": "{{count}}位玩家",
-        "unknownPlayers": "未知玩家数量",
-        "storyTitle": "故事预览",
-        "unlockMessage": "购买以解锁完整的谜团包，包含所有角色详情、线索和材料。",
-        "whatsIncluded": "完整包包含什么：",
-        "packageIncludes": [
-          "包含完整设置说明的详细主持指南",
-          "每个玩家的角色指南",
-          "证据和可打印材料",
-          "完整游戏剧本和时间线"
-        ]
-      }
+    "toasts": {
+      "success": "购买成功！您现在可以完全访问此谜团包。",
+      "cancel": "购买已取消。您可以随时重试。",
+      "loadFailed": "加载谜团详情失败。",
+      "notFound": "未找到谜团。",
+      "devPurchaseSim": "正在开发模式下模拟购买...",
+      "devPurchaseSuccess": "模拟购买成功！正在重定向到包生成...",
+      "devPurchaseFailed": "模拟购买失败。",
+      "signInRequired": "请登录以购买此谜团。",
+      "checkoutRedirect": "正在重定向到安全结账...",
+      "checkoutFailed": "重定向到结账失败。请重试。",
+      "genericError": "加载谜团详情时发生错误。"
     },
-    "mysteryPackage": {
-      "shareWithGuests": "与客人分享",
-      "tabs": {
-        "hostGuide": "主持指南",
-        "characters": "角色 ({{count}})",
-        "clues": "线索",
-        "inspector": "侦探指南",
-        "relationships": "关系"
-      },
-      "mobileTabs": {
-        "host": "主持",
-        "characters": "角色 ({{count}})",
-        "clues": "线索",
-        "inspector": "侦探",
-        "relations": "关系"
-      },
-      "loading": {
-        "generating": "正在生成...",
-        "generatingMessage": "我们正在生成您的完整谜团包。此过程正在进行中。<br />谜团完成后，此页面将自动更新。",
-        "characters": "正在为您的谜团游戏开发独特的角色档案，包括背景故事、动机和秘密。",
-        "clues": "正在创建证据卡、线索和调查材料，以帮助解决您的谜团。",
-        "inspector": "正在编写侦探的剧本和调查时间线，以指导谜团的解决。",
-        "matrix": "正在构建角色关系矩阵，揭示隐藏的联系、冲突和关系。"
-      },
-      "placeholder": {
-        "title": "准备生成您的谜团",
-        "description": "点击下方按钮生成您的完整谜团包，包含所有材料。",
-        "button": "生成包",
-        "characters": "角色指南将在生成开始后可用。",
-        "clues": "证据卡将在生成开始后可用。",
-        "inspector": "侦探指南将在生成开始后可用。",
-        "matrix": "关系矩阵将在生成开始后可用。"
-      },
-      "matrix": {
-        "title": "角色关系矩阵"
-      }
+    "title": "完成您的购买",
+    "subtitle": "完全访问您的谋杀悬疑包",
+    "package": {
+      "title": "谋杀悬疑包",
+      "description": "一次性购买，即时访问",
+      "priceDescription": "完整的谋杀悬疑包，包含所有角色材料、线索和主持说明。",
+      "whatsIncluded": "包含内容：",
+      "includes": [
+        "所有嫌疑犯的完整角色档案",
+        "主持指南，包含分步说明",
+        "可打印的角色表",
+        "证据和线索卡",
+        "事件时间线",
+        "解决方案揭示剧本",
+        "所有材料的PDF下载"
+      ]
     },
-    "mysteryView": {
-      "timing": {
-        "small": "5-10分钟",
-        "medium": "15-30分钟",
-        "large": "30-45分钟",
-        "xlarge": "45-60分钟"
-      }
+    "buttons": {
+      "processing": "正在处理...",
+      "complete": "完成购买",
+      "backToDesign": "返回谜团设计"
+    },
+    "notes": {
+      "title": "重要注意事项",
+      "items": [
+        "这是对该特定谜团包的一次性购买",
+        "您将获得永久访问权限，可以下载所有材料",
+        "内容仅供个人使用，不得用于商业再分发",
+        "需要帮助？通过{{email}}联系我们的支持"
+      ]
+    },
+    "preview": {
+      "defaultTitle": "定制谋杀悬疑故事",
+      "characterPlaceholder": "角色详情将在完整包中揭示。",
+      "characterPlaceholderFull": "完整的角色描述可在购买的包中获得。",
+      "evidencePlaceholder": "证据详情可在完整包中获得。",
+      "title": "谋杀悬疑故事预览",
+      "playersLabel": "玩家",
+      "playersCount": "{{count}}位玩家",
+      "unknownPlayers": "未知玩家数量",
+      "storyTitle": "故事预览",
+      "unlockMessage": "购买以解锁完整的谜团包，包含所有角色详情、线索和材料。",
+      "whatsIncluded": "完整包包含什么：",
+      "packageIncludes": [
+        "包含完整设置说明的详细主持指南",
+        "每个玩家的角色指南",
+        "证据和可打印材料",
+        "完整游戏剧本和时间线"
+      ]
+    }
+  },
+  "mysteryPackage": {
+    "shareWithGuests": "与客人分享",
+    "tabs": {
+      "hostGuide": "主持指南",
+      "characters": "角色 ({{count}})",
+      "clues": "线索",
+      "inspector": "侦探指南",
+      "relationships": "关系"
+    },
+    "mobileTabs": {
+      "host": "主持",
+      "characters": "角色 ({{count}})",
+      "clues": "线索",
+      "inspector": "侦探",
+      "relations": "关系"
+    },
+    "loading": {
+      "generating": "正在生成...",
+      "generatingMessage": "我们正在生成您的完整谜团包。此过程正在进行中。<br />谜团完成后，此页面将自动更新。",
+      "characters": "正在为您的谜团游戏开发独特的角色档案，包括背景故事、动机和秘密。",
+      "clues": "正在创建证据卡、线索和调查材料，以帮助解决您的谜团。",
+      "inspector": "正在编写侦探的剧本和调查时间线，以指导谜团的解决。",
+      "matrix": "正在构建角色关系矩阵，揭示隐藏的联系、冲突和关系。"
+    },
+    "placeholder": {
+      "title": "准备生成您的谜团",
+      "description": "点击下方按钮生成您的完整谜团包，包含所有材料。",
+      "button": "生成包",
+      "characters": "角色指南将在生成开始后可用。",
+      "clues": "证据卡将在生成开始后可用。",
+      "inspector": "侦探指南将在生成开始后可用。",
+      "matrix": "关系矩阵将在生成开始后可用。"
+    },
+    "matrix": {
+      "title": "角色关系矩阵"
+    }
+  },
+  "mysteryView": {
+    "timing": {
+      "small": "5-10分钟",
+      "medium": "15-30分钟",
+      "large": "30-45分钟",
+      "xlarge": "45-60分钟"
     }
   }
+}

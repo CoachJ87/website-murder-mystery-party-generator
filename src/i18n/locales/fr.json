@@ -530,6 +530,22 @@
         "refund": {
           "question": "Puis-je obtenir un remboursement si je ne suis pas satisfait ?",
           "answer": "Absolument ! Si vous n'êtes pas entièrement satisfait de votre achat, contactez-nous dans les 7 jours et nous vous rembourserons intégralement, sans poser de questions."
+        },
+        "gameDesignEngagement": {
+          "question": "Comment votre conception de jeu garantit-elle que tout le monde reste engagé?",
+          "answer": "Nos mystères se concentrent sur des interactions riches entre personnages plutôt que sur des intrigues rigides. Chaque personnage a des antécédents et des motivations détaillés qui stimulent un gameplay naturel, garantissant que tous les joueurs restent activement impliqués tout au long de lexpérience."
+        },
+        "dynamicMurderer": {
+          "question": "Pourquoi les indices ne pointent-ils pas vers un meurtrier spécifique dès le départ?",
+          "answer": "Le meurtrier est déterminé après le premier tour en fonction des indices révélés pendant le jeu. Cette approche dynamique signifie que les indices se construisent progressivement, rendant le mystère résolvable même si certains détails sont manqués dans latmosphère de fête."
+        },
+        "flexiblePlayerCount": {
+          "question": "Que se passe-t-il si quelquun ne peut pas venir au dernier moment?",
+          "answer": "Notre conception flexible sadapte aux changements de dernière minute. Comme le jeu ne repose pas sur un personnage détenant des informations critiques, vous pouvez ajuster votre nombre de joueurs sans casser le mystère."
+        },
+        "characterFocused": {
+          "question": "Pourquoi axé sur les personnages plutôt que sur lintrigue?",
+          "answer": "Des années dexpérience nous ont appris que les indices trop spécifiques sont manqués lors des fêtes. Notre approche axée sur les personnages signifie que le mystère se déroule naturellement à travers les interactions."
         }
       }
     },

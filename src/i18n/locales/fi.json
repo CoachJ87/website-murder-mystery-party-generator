@@ -1,827 +1,843 @@
 {
-    "navigation": {
-      "home": "Etusivu",
-      "dashboard": "Kojelauta",
-      "signIn": "Kirjaudu sisään",
-      "signUp": "Rekisteröidy",
-      "signOut": "Kirjaudu ulos",
-      "account": "Tiliasetukset",
-      "support": "Tuki"
+  "navigation": {
+    "home": "Etusivu",
+    "dashboard": "Kojelauta",
+    "signIn": "Kirjaudu sisään",
+    "signUp": "Rekisteröidy",
+    "signOut": "Kirjaudu ulos",
+    "account": "Tiliasetukset",
+    "support": "Tuki"
+  },
+  "hero": {
+    "title": "Luo murhamysteerijuhlia minuuteissa",
+    "subtitle": "Suunnittele mukautettuja mysteerejä juuri niin kuin haluat – mikä tahansa teema, mitkä tahansa hahmot, mikä tahansa ympäristö.",
+    "subtitleAuth": "Suunnittele mukautettuja mysteerejä juuri niin kuin haluat – mikä tahansa teema, mitkä tahansa hahmot, mikä tahansa ympäristö.",
+    "placeholder": "1920-luvun salakapakan murhamysteeri jazzmuusikoiden kanssa...",
+    "placeholderAuth": "1920-luvun salakapakan murhamysteeri jazzmuusikoiden kanssa...",
+    "themes": {
+      "1920sSpeakeasy": "1920-luvun salakapakka",
+      "hollywoodMurder": "Hollywood-murha",
+      "castleMystery": "Linna mysteeri",
+      "sciFiMystery": "Sci-Fi mysteeri",
+      "artGalleryOpening": "Taidemuseon avajaiset",
+      "bakeryCompetition": "Leivontakilpailu",
+      "mountainSkiResort": "Vuoristohiihtokeskus",
+      "luxuryTrainJourney": "Luksusjunamatka",
+      "historicUniversity": "Historiallinen yliopisto",
+      "pokerTournament": "Pokeriturnaus",
+      "barbieDreamworld": "Barbien unelmien maailma",
+      "dystopianWaterworld": "Dystopinen vesimaailma",
+      "jungleSteampunk": "Viidakon Steampunk",
+      "magicalBakery": "Maaginen leipomo",
+      "gamingTournament": "Peliturnaus",
+      "synthwave80s": "Synthwave 80-luku",
+      "beachResort": "Rantalomakeskus",
+      "operaHouse": "Oopperatalo",
+      "wineCountry": "Viinimaa",
+      "safariAdventure": "Safari-seikkailu",
+      "fashionShow": "Muotinäytös",
+      "casinoNight": "Kasinoyö",
+      "fairyTaleKingdom": "Satumaa",
+      "spaceColony": "Avaruussiirtokunta",
+      "superheroAcademy": "Supersankariakatemia",
+      "underwaterCity": "Vedenalainen kaupunki",
+      "wildWestSaloon": "Villin lännen saluuna",
+      "vikingFeast": "Viikinkijuhla",
+      "candyKingdom": "Karkkimaa",
+      "dragonsLair": "Lohikäärmeen luola",
+      "timeTravelersBall": "Aikamatkailijoiden tanssiaiset",
+      "atlantisRising": "Atlantis nousee",
+      "toyBoxAdventure": "Lelulaatikon seikkailu",
+      "vampireMasquerade": "Vampyyrien naamioituminen",
+      "dimensionHopping": "Dimensiohyppely",
+      "cyberpunkNightclub": "Cyberpunk-yökerho",
+      "ghostShip": "Kummituslaiva",
+      "sentientPlantColony": "Tietoinen kasvisiirtokunta"
     },
-    "hero": {
-      "title": "Luo murhamysteerijuhlia minuuteissa",
-      "subtitle": "Suunnittele mukautettuja mysteerejä juuri niin kuin haluat – mikä tahansa teema, mitkä tahansa hahmot, mikä tahansa ympäristö.",
-      "subtitleAuth": "Suunnittele mukautettuja mysteerejä juuri niin kuin haluat – mikä tahansa teema, mitkä tahansa hahmot, mikä tahansa ympäristö.",
-      "placeholder": "1920-luvun salakapakan murhamysteeri jazzmuusikoiden kanssa...",
-      "placeholderAuth": "1920-luvun salakapakan murhamysteeri jazzmuusikoiden kanssa...",
-      "themes": {
-        "1920sSpeakeasy": "1920-luvun salakapakka",
-        "hollywoodMurder": "Hollywood-murha",
-        "castleMystery": "Linna mysteeri",
-        "sciFiMystery": "Sci-Fi mysteeri",
-        "artGalleryOpening": "Taidemuseon avajaiset",
-        "bakeryCompetition": "Leivontakilpailu",
-        "mountainSkiResort": "Vuoristohiihtokeskus",
-        "luxuryTrainJourney": "Luksusjunamatka",
-        "historicUniversity": "Historiallinen yliopisto",
-        "pokerTournament": "Pokeriturnaus",
-        "barbieDreamworld": "Barbien unelmien maailma",
-        "dystopianWaterworld": "Dystopinen vesimaailma",
-        "jungleSteampunk": "Viidakon Steampunk",
-        "magicalBakery": "Maaginen leipomo",
-        "gamingTournament": "Peliturnaus",
-        "synthwave80s": "Synthwave 80-luku",
-        "beachResort": "Rantalomakeskus",
-        "operaHouse": "Oopperatalo",
-        "wineCountry": "Viinimaa",
-        "safariAdventure": "Safari-seikkailu",
-        "fashionShow": "Muotinäytös",
-        "casinoNight": "Kasinoyö",
-        "fairyTaleKingdom": "Satumaa",
-        "spaceColony": "Avaruussiirtokunta",
-        "superheroAcademy": "Supersankariakatemia",
-        "underwaterCity": "Vedenalainen kaupunki",
-        "wildWestSaloon": "Villin lännen saluuna",
-        "vikingFeast": "Viikinkijuhla",
-        "candyKingdom": "Karkkimaa",
-        "dragonsLair": "Lohikäärmeen luola",
-        "timeTravelersBall": "Aikamatkailijoiden tanssiaiset",
-        "atlantisRising": "Atlantis nousee",
-        "toyBoxAdventure": "Lelulaatikon seikkailu",
-        "vampireMasquerade": "Vampyyrien naamioituminen",
-        "dimensionHopping": "Dimensiohyppely",
-        "cyberpunkNightclub": "Cyberpunk-yökerho",
-        "ghostShip": "Kummituslaiva",
-        "sentientPlantColony": "Tietoinen kasvisiirtokunta"
-      },
-      "prompts": {
-        "1920sSpeakeasy": "Haluan luoda 1920-luvun salakapakka-aiheisen murhamysteeripelin, joka sijoittuu kieltolain aikaan.",
-        "hollywoodMurder": "Suunnittele murhamysteeri, joka sijoittuu Hollywood-elokuvien kulta-ajan elokuvasettiin.",
-        "castleMystery": "Kehitä murhamysteeri, joka sijoittuu syrjäiseen keskiaikaiseen linnaan, joka on muutettu luksushotelliksi.",
-        "sciFiMystery": "Suunnittele murhamysteeri avaruustutkimusasemalla, joka kiertää vasta löydettyä eksoplaneettaa.",
-        "artGalleryOpening": "Luo murhamysteeri, joka sijoittuu arvostettuun taidegalleriaan korkean profiilin näyttelyn avajaisissa.",
-        "bakeryCompetition": "Suunnittele murhamysteeri, joka keskittyy pienen kaupungin leivontakilpailuun.",
-        "mountainSkiResort": "Kehitä murhamysteeri syrjäisessä vuoristohiihtokeskuksessa lumimyrskyn aikana.",
-        "luxuryTrainJourney": "Luo mysteeri, joka sijoittuu ylelliselle junamatkalle Sveitsin Alppien läpi.",
-        "historicUniversity": "Luo murhamysteeri historiallisessa yliopistossa, jolla on kummitteleva menneisyys.",
-        "pokerTournament": "Luo mysteeri, joka sijoittuu korkean panoksen pokeriturnaukseen.",
-        "barbieDreamworld": "Suunnittele murhamysteeri Barbie-henkisessä unelmien maailmassa, jossa kaikki on vaaleanpunaista ja täydellistä.",
-        "dystopianWaterworld": "Luo dystooppinen tulevaisuuden mysteeri, jossa vesi on arvokkain resurssi.",
-        "jungleSteampunk": "Kehitä murhamysteeri, joka sijoittuu viidakkoon steampunk-teknologian ja tunnelman kera.",
-        "magicalBakery": "Luo murhamysteeri, joka sijoittuu maagiseen leipomoon, jossa lumotut jälkiruoat ovat erikoisuus.",
-        "gamingTournament": "Suunnittele videopelimysteeri, jossa pelaajat osallistuvat peliturnaukseen.",
-        "synthwave80s": "Luo mysteeri, joka sijoittuu vaihtoehtoiseen 80-luvun ympäristöön, jossa synthwave-musiikki hallitsee tunteita.",
-        "beachResort": "Kehitä murhamysteeri trooppisella rannikon lomakeskuksella.",
-        "operaHouse": "Luo mysteeri, joka sijoittuu historiallisen oopperatalon ensi-iltaan.",
-        "wineCountry": "Suunnittele mysteeri, joka sijoittuu arvostetulle viinitilalle sadonkorjuukauden aikana.",
-        "safariAdventure": "Luo murhamysteeri, joka sijoittuu afrikkalaisen safariretken aikana.",
-        "fashionShow": "Luo mysteeri korkean muodin muotinäytöksen kulissien taakse.",
-        "casinoNight": "Luo mysteeri hyväntekeväisyyskasinoyön aikana.",
-        "fairyTaleKingdom": "Suunnittele murhamysteeri lumottuun satukuningaskuntaan.",
-        "spaceColony": "Luo mysteeri, joka sijoittuu ensimmäiseen ihmisen siirtokuntaan Marsissa.",
-        "superheroAcademy": "Kehitä mysteeri, joka sijoittuu nuorten, koulutuksessa olevien supersankareiden kouluun.",
-        "underwaterCity": "Luo murhamysteeri futuristiseen vedenalaiseen kaupunkiin.",
-        "wildWestSaloon": "Suunnittele mysteeri, joka sijoittuu rajaseutukaupunkiin kultarynnäkönaikana.",
-        "vikingFeast": "Luo murhamysteeri perinteisten viikinkijuhlien aikana.",
-        "candyKingdom": "Luo murhamysteeri maailmaan, jossa kaikki on tehty karkeista ja sokerista.",
-        "dragonsLair": "Suunnittele mysteeri keskiaikaisessa fantasiamaailmassa, jossa ihmiset ja lohikäärmeet elävät rinnakkain.",
-        "timeTravelersBall": "Luo murhamysteeri kokoontumiseen, jossa läsnäolijat ovat eri aikakausilta.",
-        "atlantisRising": "Kehitä mysteeri, joka sijoittuu vanhaan, hiljattain uudelleen esiin nousseeseen Atlantiksen kaupunkiin.",
-        "toyBoxAdventure": "Luo mysteeri, jossa lelut heräävät eloon ihmisten ollessa poissa.",
-        "vampireMasquerade": "Suunnittele mysteeri, joka sijoittuu eksklusiivisen vampyriyhteisön vuosittaiseen veritanssiaisiin.",
-        "dimensionHopping": "Luo mysteeri, joka ulottuu useisiin rinnakkaisuniversumeihin.",
-        "cyberpunkNightclub": "Luo murhamysteeri neonvalaistuun cyberpunk-yökerhoon.",
-        "ghostShip": "Suunnittele mysteeri legendaarisella laivalla, joka katosi vuosisatoja aiemmin ja on salaperäisesti ilmestynyt uudelleen.",
-        "sentientPlantColony": "Luo murhamysteeri älykkäiden, liikkuvien kasvien yhteisössä, jolla on monimutkainen sosiaalinen hierarkia."
-      }
+    "prompts": {
+      "1920sSpeakeasy": "Haluan luoda 1920-luvun salakapakka-aiheisen murhamysteeripelin, joka sijoittuu kieltolain aikaan.",
+      "hollywoodMurder": "Suunnittele murhamysteeri, joka sijoittuu Hollywood-elokuvien kulta-ajan elokuvasettiin.",
+      "castleMystery": "Kehitä murhamysteeri, joka sijoittuu syrjäiseen keskiaikaiseen linnaan, joka on muutettu luksushotelliksi.",
+      "sciFiMystery": "Suunnittele murhamysteeri avaruustutkimusasemalla, joka kiertää vasta löydettyä eksoplaneettaa.",
+      "artGalleryOpening": "Luo murhamysteeri, joka sijoittuu arvostettuun taidegalleriaan korkean profiilin näyttelyn avajaisissa.",
+      "bakeryCompetition": "Suunnittele murhamysteeri, joka keskittyy pienen kaupungin leivontakilpailuun.",
+      "mountainSkiResort": "Kehitä murhamysteeri syrjäisessä vuoristohiihtokeskuksessa lumimyrskyn aikana.",
+      "luxuryTrainJourney": "Luo mysteeri, joka sijoittuu ylelliselle junamatkalle Sveitsin Alppien läpi.",
+      "historicUniversity": "Luo murhamysteeri historiallisessa yliopistossa, jolla on kummitteleva menneisyys.",
+      "pokerTournament": "Luo mysteeri, joka sijoittuu korkean panoksen pokeriturnaukseen.",
+      "barbieDreamworld": "Suunnittele murhamysteeri Barbie-henkisessä unelmien maailmassa, jossa kaikki on vaaleanpunaista ja täydellistä.",
+      "dystopianWaterworld": "Luo dystooppinen tulevaisuuden mysteeri, jossa vesi on arvokkain resurssi.",
+      "jungleSteampunk": "Kehitä murhamysteeri, joka sijoittuu viidakkoon steampunk-teknologian ja tunnelman kera.",
+      "magicalBakery": "Luo murhamysteeri, joka sijoittuu maagiseen leipomoon, jossa lumotut jälkiruoat ovat erikoisuus.",
+      "gamingTournament": "Suunnittele videopelimysteeri, jossa pelaajat osallistuvat peliturnaukseen.",
+      "synthwave80s": "Luo mysteeri, joka sijoittuu vaihtoehtoiseen 80-luvun ympäristöön, jossa synthwave-musiikki hallitsee tunteita.",
+      "beachResort": "Kehitä murhamysteeri trooppisella rannikon lomakeskuksella.",
+      "operaHouse": "Luo mysteeri, joka sijoittuu historiallisen oopperatalon ensi-iltaan.",
+      "wineCountry": "Suunnittele mysteeri, joka sijoittuu arvostetulle viinitilalle sadonkorjuukauden aikana.",
+      "safariAdventure": "Luo murhamysteeri, joka sijoittuu afrikkalaisen safariretken aikana.",
+      "fashionShow": "Luo mysteeri korkean muodin muotinäytöksen kulissien taakse.",
+      "casinoNight": "Luo mysteeri hyväntekeväisyyskasinoyön aikana.",
+      "fairyTaleKingdom": "Suunnittele murhamysteeri lumottuun satukuningaskuntaan.",
+      "spaceColony": "Luo mysteeri, joka sijoittuu ensimmäiseen ihmisen siirtokuntaan Marsissa.",
+      "superheroAcademy": "Kehitä mysteeri, joka sijoittuu nuorten, koulutuksessa olevien supersankareiden kouluun.",
+      "underwaterCity": "Luo murhamysteeri futuristiseen vedenalaiseen kaupunkiin.",
+      "wildWestSaloon": "Suunnittele mysteeri, joka sijoittuu rajaseutukaupunkiin kultarynnäkönaikana.",
+      "vikingFeast": "Luo murhamysteeri perinteisten viikinkijuhlien aikana.",
+      "candyKingdom": "Luo murhamysteeri maailmaan, jossa kaikki on tehty karkeista ja sokerista.",
+      "dragonsLair": "Suunnittele mysteeri keskiaikaisessa fantasiamaailmassa, jossa ihmiset ja lohikäärmeet elävät rinnakkain.",
+      "timeTravelersBall": "Luo murhamysteeri kokoontumiseen, jossa läsnäolijat ovat eri aikakausilta.",
+      "atlantisRising": "Kehitä mysteeri, joka sijoittuu vanhaan, hiljattain uudelleen esiin nousseeseen Atlantiksen kaupunkiin.",
+      "toyBoxAdventure": "Luo mysteeri, jossa lelut heräävät eloon ihmisten ollessa poissa.",
+      "vampireMasquerade": "Suunnittele mysteeri, joka sijoittuu eksklusiivisen vampyriyhteisön vuosittaiseen veritanssiaisiin.",
+      "dimensionHopping": "Luo mysteeri, joka ulottuu useisiin rinnakkaisuniversumeihin.",
+      "cyberpunkNightclub": "Luo murhamysteeri neonvalaistuun cyberpunk-yökerhoon.",
+      "ghostShip": "Suunnittele mysteeri legendaarisella laivalla, joka katosi vuosisatoja aiemmin ja on salaperäisesti ilmestynyt uudelleen.",
+      "sentientPlantColony": "Luo murhamysteeri älykkäiden, liikkuvien kasvien yhteisössä, jolla on monimutkainen sosiaalinen hierarkia."
+    }
+  },
+  "howItWorks": {
+    "step1": {
+      "title": "Kuvaile ihanteellinen murhamysteerisi.",
+      "description": "Jaa ainutlaatuinen visiosi: mikä tahansa teema, hahmo tai ympäristö, jonka haluat."
     },
-    "howItWorks": {
-      "step1": {
-        "title": "Kuvaile ihanteellinen murhamysteerisi.",
-        "description": "Jaa ainutlaatuinen visiosi: mikä tahansa teema, hahmo tai ympäristö, jonka haluat."
-      },
-      "step2": {
-        "title": "Luomme mukautetun mysteerisi välittömästi.",
-        "description": "Tekoälymme luo kaiken tarkasti toiveidesi mukaan: hahmot, vihjeet ja juonen."
-      },
-      "step3": {
-        "title": "Täydennä mysteerisi muokkaustyökalullamme.",
-        "description": "Viimeistele ja optimoi, kunnes mysteerisi on täydellinen ryhmällesi."
-      },
-      "step4": {
-        "title": "Saat kaiken tarvittavan isännöintiin ja jakamiseen.",
-        "description": "Voit helposti ladata ja jakaa kaikki materiaalit pelaajillesi."
-      }
+    "step2": {
+      "title": "Luomme mukautetun mysteerisi välittömästi.",
+      "description": "Tekoälymme luo kaiken tarkasti toiveidesi mukaan: hahmot, vihjeet ja juonen."
     },
-    "features": {
-      "title": "Kaikki olennainen sisältyy",
-      "step1": {
-        "step": "Vaihe 1",
-        "title": "Rajaton mukauttaminen",
-        "content": "Mikä tahansa teema, mitkä tahansa hahmot, mikä tahansa ympäristö – luo mysteerejä juuri niin kuin kuvittelet ne."
-      },
-      "step2": {
-        "step": "Vaihe 2",
-        "title": "Täydelliset hahmoprofiilit",
-        "content": "Syvälliset taustat, motiivit ja salaisuudet, jotka on räätälöity ainutlaatuisesti mysteeriisi."
-      },
-      "step3": {
-        "step": "Vaihe 3",
-        "title": "Helppo isännöintiopas",
-        "content": "Vaiheittaiset ohjeet, jotta voit luottavaisin mielin isännöidä räätälöityä mysteeriäsi."
-      }
+    "step3": {
+      "title": "Täydennä mysteerisi muokkaustyökalullamme.",
+      "description": "Viimeistele ja optimoi, kunnes mysteerisi on täydellinen ryhmällesi."
     },
-    "testimonials": {
-      "title": "Mitä muut sanovat",
-      "testimonial1": {
-        "text": "Ystäväni puhuvat edelleen murhamysteerioillastamme. Hahmot olivat niin yksityiskohtaisia ja juonenkäänteet täydellisiä!",
-        "author": "Jed"
-      },
-      "testimonial2": {
-        "text": "Niin helppo asentaa! Olin huolissani 12 hengen juhlien isännöimisestä, mutta materiaalit tekivät siitä vaivatonta ja kaikilla oli hauskaa.",
-        "author": "Laura"
-      },
-      "testimonial3": {
-        "text": "Kolmas murhamysteerijuhla tällä palvelulla, ja ne vain paranevat. Mukautusvaihtoehdot ovat uskomattomia.",
-        "author": "Alex"
-      }
+    "step4": {
+      "title": "Saat kaiken tarvittavan isännöintiin ja jakamiseen.",
+      "description": "Voit helposti ladata ja jakaa kaikki materiaalit pelaajillesi."
+    }
+  },
+  "features": {
+    "title": "Kaikki olennainen sisältyy",
+    "step1": {
+      "step": "Vaihe 1",
+      "title": "Rajaton mukauttaminen",
+      "content": "Mikä tahansa teema, mitkä tahansa hahmot, mikä tahansa ympäristö – luo mysteerejä juuri niin kuin kuvittelet ne."
     },
-    "videoDemo": {
+    "step2": {
+      "step": "Vaihe 2",
+      "title": "Täydelliset hahmoprofiilit",
+      "content": "Syvälliset taustat, motiivit ja salaisuudet, jotka on räätälöity ainutlaatuisesti mysteeriisi."
+    },
+    "step3": {
+      "step": "Vaihe 3",
+      "title": "Helppo isännöintiopas",
+      "content": "Vaiheittaiset ohjeet, jotta voit luottavaisin mielin isännöidä räätälöityä mysteeriäsi."
+    }
+  },
+  "testimonials": {
+    "title": "Mitä muut sanovat",
+    "testimonial1": {
+      "text": "Ystäväni puhuvat edelleen murhamysteerioillastamme. Hahmot olivat niin yksityiskohtaisia ja juonenkäänteet täydellisiä!",
+      "author": "Jed"
+    },
+    "testimonial2": {
+      "text": "Niin helppo asentaa! Olin huolissani 12 hengen juhlien isännöimisestä, mutta materiaalit tekivät siitä vaivatonta ja kaikilla oli hauskaa.",
+      "author": "Laura"
+    },
+    "testimonial3": {
+      "text": "Kolmas murhamysteerijuhla tällä palvelulla, ja ne vain paranevat. Mukautusvaihtoehdot ovat uskomattomia.",
+      "author": "Alex"
+    }
+  },
+  "videoDemo": {
     "title": "Katso demo"
   },
   "support": {
-      "title": "Tarvitsetko lisää apua?",
-      "description": "Vieraile kattavassa tukikeskuksessamme usein kysyttyjen kysymysten, isännöintivinkkien ja lisätietojen saamiseksi Mystery Creatorin käytöstä.",
-      "button": "Vieraile tukikeskuksessa",
-      "email": "support@mysterymaker.party"
+    "title": "Tarvitsetko lisää apua?",
+    "description": "Vieraile kattavassa tukikeskuksessamme usein kysyttyjen kysymysten, isännöintivinkkien ja lisätietojen saamiseksi Mystery Creatorin käytöstä.",
+    "button": "Vieraile tukikeskuksessa",
+    "email": "support@mysterymaker.party"
+  },
+  "footer": {
+    "tagline": "Luo kiehtovia murhamysteerejä mielikuvituksesi nopeudella.",
+    "quickLinks": "Pikalinkit",
+    "company": "Yritys",
+    "links": {
+      "home": "Etusivu",
+      "support": "Tuki",
+      "contact": "Yhteystiedot",
+      "privacy": "Tietosuojakäytäntö"
     },
-    "footer": {
-      "tagline": "Luo kiehtovia murhamysteerejä mielikuvituksesi nopeudella.",
-      "quickLinks": "Pikalinkit",
-      "company": "Yritys",
-      "links": {
-        "home": "Etusivu",
-        "support": "Tuki",
-        "contact": "Yhteystiedot",
-        "privacy": "Tietosuojakäytäntö"
-      },
-      "copyright": "Mystery Maker, Inc. Kaikki oikeudet pidätetään."
+    "copyright": "Mystery Maker, Inc. Kaikki oikeudet pidätetään."
+  },
+  "auth": {
+    "signIn": {
+      "title": "Tervetuloa takaisin",
+      "subtitle": "Kirjaudu sisään tilillesi jatkaaksesi upeiden mysteerien luomista",
+      "email": "Sähköposti",
+      "password": "Salasana",
+      "rememberMe": "Muista minut",
+      "forgotPassword": "Unohditko salasanan?",
+      "noAccount": "Eikö sinulla ole tiliä?",
+      "signUpLink": "Rekisteröidy tästä",
+      "submitButton": "Kirjaudu sisään",
+      "signingIn": "Kirjaudutaan sisään...",
+      "orDivider": "tai jatka käyttämällä",
+      "googleButton": "Jatka Googlella"
     },
-    "auth": {
-      "signIn": {
-        "title": "Tervetuloa takaisin",
-        "subtitle": "Kirjaudu sisään tilillesi jatkaaksesi upeiden mysteerien luomista",
-        "email": "Sähköposti",
-        "password": "Salasana",
-        "rememberMe": "Muista minut",
-        "forgotPassword": "Unohditko salasanan?",
-        "noAccount": "Eikö sinulla ole tiliä?",
-        "signUpLink": "Rekisteröidy tästä",
-        "submitButton": "Kirjaudu sisään",
-        "signingIn": "Kirjaudutaan sisään...",
-        "orDivider": "tai jatka käyttämällä",
-        "googleButton": "Jatka Googlella"
+    "signUp": {
+      "title": "Luo tilisi",
+      "subtitle": "Liity tuhansien mysteerintekijöiden joukkoon ja aloita luominen jo tänään",
+      "name": "Koko nimi",
+      "email": "Sähköposti",
+      "password": "Salasana",
+      "confirmPassword": "Vahvista salasana",
+      "terms": "Hyväksyn",
+      "termsLink": "käyttöehdot",
+      "privacy": "tietosuojakäytäntö",
+      "and": "ja",
+      "hasAccount": "Onko sinulla jo tili?",
+      "signInLink": "Kirjaudu sisään tästä",
+      "submitButton": "Luo tili",
+      "creatingAccount": "Luodaan tiliä...",
+      "orDivider": "tai jatka käyttämällä",
+      "googleButton": "Jatka Googlella"
+    },
+    "forgotPassword": {
+      "title": "Palauta salasana",
+      "subtitle": "Anna sähköpostiosoitteesi, niin lähetämme sinulle linkin salasanan palauttamiseksi",
+      "email": "Sähköposti",
+      "submitButton": "Lähetä palautuslinkki",
+      "sending": "Lähetetään...",
+      "backToSignIn": "Takaisin sisäänkirjautumiseen",
+      "checkEmail": {
+        "title": "Tarkista sähköpostisi",
+        "message": "Olemme lähettäneet salasanan palautuslinkin osoitteeseen",
+        "noEmail": "Etkö saanut sähköpostia?",
+        "tryAgain": "Yritä uudelleen",
+        "returnToSignIn": "Takaisin sisäänkirjautumiseen"
+      }
+    },
+    "resetPassword": {
+      "title": "Aseta uusi salasana",
+      "subtitle": "Luo uusi salasana tilillesi",
+      "password": "Uusi salasana",
+      "confirmPassword": "Vahvista uusi salasana",
+      "submitButton": "Päivitä salasana",
+      "updating": "Päivitetään...",
+      "success": "Salasana päivitetty"
+    },
+    "errors": {
+      "invalidCredentials": "Virheellinen sähköposti tai salasana",
+      "emailAlreadyExists": "Tällä sähköpostilla on jo tili",
+      "weakPassword": "Salasanan on oltava vähintään 6 merkkiä pitkä",
+      "passwordMismatch": "Salasanat eivät täsmää",
+      "invalidEmail": "Anna kelvollinen sähköpostiosoite",
+      "requiredField": "Tämä kenttä on pakollinen",
+      "termsRequired": "Sinun on hyväksyttävä käyttöehdot",
+      "networkError": "Verkkovirhe. Yritä uudelleen.",
+      "unknownError": "Tuntematon virhe tapahtui. Yritä uudelleen."
+    },
+    "success": {
+      "accountCreated": "Tili luotu! Tarkista sähköpostisi vahvistaaksesi tilisi.",
+      "passwordReset": "Salasanan nollauslinkki lähetetty",
+      "passwordUpdated": "Salasana päivitetty",
+      "signedOut": "Uloskirjautunut"
+    }
+  },
+  "dashboard": {
+    "title": "Murhamysteerisi",
+    "subtitle": "Tarkastele, muokkaa ja hallinnoi kaikkia luomiasi mysteerejä",
+    "welcome": {
+      "title": "Tervetuloa takaisin",
+      "subtitle": "Oletko valmis luomaan seuraavan mysteerisi?",
+      "noMysteries": "Et ole vielä luonut mysteerejä",
+      "getStarted": "Aloita luomalla ensimmäinen mysteerisi"
+    },
+    "mysteries": {
+      "title": "Mysteeriesi",
+      "searchPlaceholder": "Hae mysteerejä...",
+      "deleteSuccess": "Mysteeri arkistoitu",
+      "deleteFailed": "Mysteerin arkistointi epäonnistui",
+      "filter": {
+        "all": "Kaikki mysteerit",
+        "drafts": "Luonnokset",
+        "completed": "Valmis",
+        "purchased": "Ostettu",
+        "archived": "Arkistoitu"
       },
-      "signUp": {
-        "title": "Luo tilisi",
-        "subtitle": "Liity tuhansien mysteerintekijöiden joukkoon ja aloita luominen jo tänään",
-        "name": "Koko nimi",
-        "email": "Sähköposti",
-        "password": "Salasana",
-        "confirmPassword": "Vahvista salasana",
-        "terms": "Hyväksyn",
-        "termsLink": "käyttöehdot",
-        "privacy": "tietosuojakäytäntö",
-        "and": "ja",
-        "hasAccount": "Onko sinulla jo tili?",
-        "signInLink": "Kirjaudu sisään tästä",
-        "submitButton": "Luo tili",
-        "creatingAccount": "Luodaan tiliä...",
-        "orDivider": "tai jatka käyttämällä",
-        "googleButton": "Jatka Googlella"
+      "empty": {
+        "title": "Mysteerejä ei löytynyt",
+        "description": "Luo ensimmäinen mysteerisi päästäksesi alkuun",
+        "searchResult": "Hakuasi vastaavia mysteerejä ei löytynyt"
       },
-      "forgotPassword": {
-        "title": "Palauta salasana",
-        "subtitle": "Anna sähköpostiosoitteesi, niin lähetämme sinulle linkin salasanan palauttamiseksi",
-        "email": "Sähköposti",
-        "submitButton": "Lähetä palautuslinkki",
-        "sending": "Lähetetään...",
-        "backToSignIn": "Takaisin sisäänkirjautumiseen",
-        "checkEmail": {
-          "title": "Tarkista sähköpostisi",
-          "message": "Olemme lähettäneet salasanan palautuslinkin osoitteeseen",
-          "noEmail": "Etkö saanut sähköpostia?",
-          "tryAgain": "Yritä uudelleen",
-          "returnToSignIn": "Takaisin sisäänkirjautumiseen"
-        }
+      "card": {
+        "players": "{{count}} pelaajaa",
+        "created": "Luotu",
+        "lastEdited": "Viimeksi muokattu",
+        "theme": "Teema: {{theme}}",
+        "actions": {
+          "view": "Näytä",
+          "chat": "Chatti",
+          "delete": "Poista",
+          "viewProgress": "Näytä edistyminen",
+          "progress": "Edistyminen",
+          "editMystery": "Muokkaa mysteeriä",
+          "edit": "Muokkaa",
+          "archive": "Arkistoi",
+          "deleteTitle": "Poista"
+        },
+        "deleteDialog": {
+          "title": "Poista mysteeri",
+          "description": "Oletko varma, että haluat poistaa tämän mysteerin? Tätä toimintoa ei voi peruuttaa."
+        },
+        "generationInProgress": "Generointi käynnissä...",
+        "editedDate": "Muokattu {{date}}"
       },
-      "resetPassword": {
-        "title": "Aseta uusi salasana",
-        "subtitle": "Luo uusi salasana tilillesi",
-        "password": "Uusi salasana",
+      "status": {
+        "completed": "Valmis",
+        "draft": "Luonnos",
+        "purchased": "Ostettu",
+        "unknown": "Tuntematon",
+        "done": "Valmis",
+        "bought": "Ostettu",
+        "generating": "Generoidaan...",
+        "generatingShort": "Gen..."
+      },
+      "showingCount": "Näytetään {{count}} / {{total}} mysteeriä"
+    },
+    "stats": {
+      "totalMysteries": "Mysteerejä yhteensä",
+      "completedMysteries": "Valmiit",
+      "purchasedMysteries": "Ostetut",
+      "totalPlayers": "Isännöityjä pelaajia yhteensä"
+    },
+    "backToDashboard": "Takaisin kojelautaan",
+    "buttons": {
+      "createFirstMystery": "Luo ensimmäinen mysteerisi"
+    },
+    "errors": {
+      "loadFailed": "Mysteerejä ei voitu ladata"
+    }
+  },
+  "account": {
+    "title": "Tiliasetukset",
+    "tabs": {
+      "profile": "Profiili",
+      "security": "Turvallisuus"
+    },
+    "profile": {
+      "title": "Profiilitiedot",
+      "description": "Päivitä tilisi profiilitiedot",
+      "name": "Koko nimi",
+      "email": "Sähköposti",
+      "emailNote": "Sähköpostia ei voi muuttaa",
+      "saveButton": "Tallenna muutokset",
+      "saving": "Tallennetaan...",
+      "success": "Profiili päivitetty"
+    },
+    "security": {
+      "password": {
+        "title": "Vaihda salasana",
+        "description": "Päivitä salasanasi pitääksesi tilisi turvassa",
+        "currentPassword": "Nykyinen salasana",
+        "newPassword": "Uusi salasana",
         "confirmPassword": "Vahvista uusi salasana",
-        "submitButton": "Päivitä salasana",
+        "updateButton": "Päivitä salasana",
         "updating": "Päivitetään...",
         "success": "Salasana päivitetty"
       },
-      "errors": {
-        "invalidCredentials": "Virheellinen sähköposti tai salasana",
-        "emailAlreadyExists": "Tällä sähköpostilla on jo tili",
-        "weakPassword": "Salasanan on oltava vähintään 6 merkkiä pitkä",
-        "passwordMismatch": "Salasanat eivät täsmää",
-        "invalidEmail": "Anna kelvollinen sähköpostiosoite",
-        "requiredField": "Tämä kenttä on pakollinen",
-        "termsRequired": "Sinun on hyväksyttävä käyttöehdot",
-        "networkError": "Verkkovirhe. Yritä uudelleen.",
-        "unknownError": "Tuntematon virhe tapahtui. Yritä uudelleen."
+      "deleteAccount": {
+        "title": "Poista tili",
+        "description": "Poista tilisi ja kaikki siihen liittyvät tiedot pysyvästi",
+        "warning": "Tätä toimintoa ei voi kumota. Kaikki mysteerisi ja tietosi poistetaan pysyvästi.",
+        "confirmText": "Kirjoita POISTA vahvistaaksesi",
+        "deleteButton": "Poista tili",
+        "deleting": "Poistetaan...",
+        "success": "Tili poistettu"
+      }
+    }
+  },
+  "mysteryCreation": {
+    "scriptType": {
+      "full": "täysi",
+      "pointForm": "pistemuotoinen",
+      "both": "molemmat (täysi ja pistemuotoinen)"
+    },
+    "sections": {
+      "premise": "Perusasetelma",
+      "victim": "Uhri",
+      "characterList": "Hahmoluettelo",
+      "players": "Pelaajat",
+      "murderMethod": "Murhamenetelmä"
+    },
+    "wizard": {
+      "title": "Luo mysteerisi",
+      "step1": {
+        "title": "Kerro meille visiosi",
+        "description": "Kuvaile ihanteellinen murhamysteerijuhla"
       },
-      "success": {
-        "accountCreated": "Tili luotu! Tarkista sähköpostisi vahvistaaksesi tilisi.",
-        "passwordReset": "Salasanan nollauslinkki lähetetty",
-        "passwordUpdated": "Salasana päivitetty",
-        "signedOut": "Uloskirjautunut"
+      "step2": {
+        "title": "Tarkista ja viimeistele",
+        "description": "Täydennä mysteerisi tekoälyavustajamme avulla"
+      },
+      "step3": {
+        "title": "Täydellinen paketti",
+        "description": "Saat kaiken tarvittavan isännöintiin"
+      },
+      "prompt": {
+        "defaultStart": "Haluan luoda murhamysteerin",
+        "withTheme": "Teeman/ympäristön tulee olla {{theme}} {{playerCount}} pelaajalle skripteillä {{scriptType}}-muodossa",
+        "withoutTheme": "Tämä on {{playerCount}} pelaajalle skripteillä {{scriptType}}-muodossa",
+        "withAccomplice": "Sisällytä rikoskumppanimekanismi mysteeriin",
+        "withoutAccomplice": "Älä sisällytä rikoskumppanimekanismia mysteeriin",
+        "additionalDetails": "Lisätiedot: {{details}}"
       }
     },
-    "dashboard": {
-      "title": "Murhamysteerisi",
-      "subtitle": "Tarkastele, muokkaa ja hallinnoi kaikkia luomiasi mysteerejä",
-      "welcome": {
-        "title": "Tervetuloa takaisin",
-        "subtitle": "Oletko valmis luomaan seuraavan mysteerisi?",
-        "noMysteries": "Et ole vielä luonut mysteerejä",
-        "getStarted": "Aloita luomalla ensimmäinen mysteerisi"
-      },
-      "mysteries": {
-        "title": "Mysteeriesi",
-        "searchPlaceholder": "Hae mysteerejä...",
-        "deleteSuccess": "Mysteeri arkistoitu",
-        "deleteFailed": "Mysteerin arkistointi epäonnistui",
-        "filter": {
-          "all": "Kaikki mysteerit",
-          "drafts": "Luonnokset",
-          "completed": "Valmis",
-          "purchased": "Ostettu",
-          "archived": "Arkistoitu"
-        },
-        "empty": {
-          "title": "Mysteerejä ei löytynyt",
-          "description": "Luo ensimmäinen mysteerisi päästäksesi alkuun",
-          "searchResult": "Hakuasi vastaavia mysteerejä ei löytynyt"
-        },
-        "card": {
-          "players": "{{count}} pelaajaa",
-          "created": "Luotu",
-          "lastEdited": "Viimeksi muokattu",
-          "theme": "Teema: {{theme}}",
-          "actions": {
-            "view": "Näytä",
-            "chat": "Chatti",
-            "delete": "Poista",
-            "viewProgress": "Näytä edistyminen",
-            "progress": "Edistyminen",
-            "editMystery": "Muokkaa mysteeriä",
-            "edit": "Muokkaa",
-            "archive": "Arkistoi",
-            "deleteTitle": "Poista"
-          },
-          "deleteDialog": {
-            "title": "Poista mysteeri",
-            "description": "Oletko varma, että haluat poistaa tämän mysteerin? Tätä toimintoa ei voi peruuttaa."
-          },
-          "generationInProgress": "Generointi käynnissä...",
-          "editedDate": "Muokattu {{date}}"
-        },
-        "status": {
-          "completed": "Valmis",
-          "draft": "Luonnos",
-          "purchased": "Ostettu",
-          "unknown": "Tuntematon",
-          "done": "Valmis",
-          "bought": "Ostettu",
-          "generating": "Generoidaan...",
-          "generatingShort": "Gen..."
-        },
-        "showingCount": "Näytetään {{count}} / {{total}} mysteeriä"
-      },
-      "stats": {
-        "totalMysteries": "Mysteerejä yhteensä",
-        "completedMysteries": "Valmiit",
-        "purchasedMysteries": "Ostetut",
-        "totalPlayers": "Isännöityjä pelaajia yhteensä"
-      },
-      "backToDashboard": "Takaisin kojelautaan",
-      "buttons": {
-        "createFirstMystery": "Luo ensimmäinen mysteerisi"
-      },
-      "errors": {
-        "loadFailed": "Mysteerejä ei voitu ladata"
+    "editor": {
+      "title": "Mysteeri-editori",
+      "characters": "Hahmot",
+      "story": "Tarina",
+      "clues": "Vihjeet",
+      "hostGuide": "Isännöintiopas",
+      "save": "Tallenna luonnos",
+      "publish": "Viimeistele mysteeri",
+      "saving": "Tallennetaan...",
+      "publishing": "Julkaistaan...",
+      "saved": "Luonnos tallennettu",
+      "published": "Mysteeri viimeistelty"
+    },
+    "guidance": {
+      "describe": "Kuvaile mysteerisi yksityiskohtaisesti; mitä tarkempi olet, sitä paremmin voimme luoda sen sinulle",
+      "examples": "Esimerkki: '1920-luvun salakapakan murhamysteeri 8 hahmolla, mukaan lukien jazzlaulaja, baarimikko ja gangsteripomo'",
+      "playerCount": "Kuinka monta pelaajaa osallistuu?",
+      "theme": "Mikä on ympäristö tai teema?",
+      "special": "Onko erityisvaatimuksia tai rajoituksia?",
+      "initialPrompt": {
+        "withTheme": "Luodaan murhamysteeri teemalla {{theme}}. Opasta minut vaihe vaiheelta tämän mysteerin luomisessa.",
+        "withoutTheme": "Luodaan murhamysteeri. Opasta minut vaihe vaiheelta tämän mysteerin luomisessa."
       }
     },
-    "account": {
-      "title": "Tiliasetukset",
-      "tabs": {
-        "profile": "Profiili",
-        "security": "Turvallisuus"
+    "editTitle": "Muokkaa mysteeriä",
+    "createTitle": "Luo uusi mysteeri",
+    "form": {
+      "description": "Täytä alla oleva lomake luodaksesi mukautetun murhamysteerisi"
+    },
+    "buttons": {
+      "generateFullMystery": "Luo täydellinen mysteeri"
+    },
+    "errors": {
+      "signInToSave": "Kirjaudu sisään tallentaaksesi mysteerisi",
+      "saveFailed": "Mysteerin tallennus epäonnistui",
+      "loadFailed": "Mysteerin lataus epäonnistui",
+      "loadMessagesFailed": "Chattiviestien lataus epäonnistui",
+      "loadConversationFailed": "Keskustelun lataus epäonnistui",
+      "initialPrompt": "Anna mysteerisi kehotus",
+      "saveMessageFailed": "Viestin tallennus epäonnistui"
+    },
+    "success": {
+      "setupComplete": "Mysteeri asetukset valmiit! Aloitetaan chat..."
+    }
+  },
+  "mysteryForm": {
+    "userRequestLabel": "Mitä haluat luoda",
+    "userRequestDescription": "Alkuperäinen pyyntösi aloitussivulta",
+    "themeLabel": "Teeman/ympäristön tiedot (valinnainen)",
+    "themePlaceholder": "Esim. aikakausi, tietyt ympäristötiedot, pakolliset asiat jne.",
+    "themeDescription": "Valitse tietty teema tai ympäristö murhamysteeriisi",
+    "playerCountLabel": "Kuinka monta pelaajaa osallistuu?",
+    "playerCountPlaceholder": "Valitse pelaajien määrä",
+    "playerCountItem": "{{count}} pelaajaa",
+    "playerCountDescription": "Valitse 4–32 pelaajaa murhamysteeriisi.",
+    "accompliceLabel": "Sisällytä rikoskumppanimekanismi",
+    "accompliceDescription": "Ihanteellinen peleihin, joissa on 10 tai enemmän pelaajia",
+    "scriptTypeLabel": "Käsikirjoituksen yksityiskohtien taso",
+    "scriptTypeFullLabel": "Täydelliset käsikirjoitukset – Täydellinen dialogi ja yksityiskohtaiset ohjeet",
+    "scriptTypePointFormLabel": "Pistemuoto – Avainkohdat ja tiivistelmät",
+    "scriptTypeBothLabel": "Molemmat muodot – Täydelliset käsikirjoitukset JA pistemuotoiset muistiinpanot",
+    "additionalDetailsLabel": "Lisätiedot (valinnainen)",
+    "additionalDetailsPlaceholder": "Mitkä tahansa erityisvaatimukset, erikoissäännöt tai lisäkonteksti mysteeriisi...",
+    "additionalDetailsDescription": "Anna lisätietoja tai erityistoiveita mysteeriisi",
+    "startChat": "Aloita chat tekoälyn kanssa",
+    "startingChat": "Aloitetaan chat..."
+  },
+  "supportPage": {
+    "title": "Tukikeskus",
+    "subtitle": "Löydä vastauksia usein kysyttyihin kysymyksiin, ota yhteyttä tukitiimiimme ja saat kaiken tarvittavan luodaksesi uskomattomia mysteerijuhlia.",
+    "tabs": {
+      "faqs": "Usein kysytyt kysymykset",
+      "contact": "Yhteystiedot"
+    },
+    "faqs": {
+      "title": "Usein kysytyt kysymykset",
+      "description": "Löydä vastauksia yleisiin kysymyksiin Mystery Makerista",
+      "categories": {
+        "aboutMysteryMaker": "Tietoa Mystery Makerista",
+        "gameMechanics": "Pelin mekaniikka",
+        "hostingPlanning": "Isännöinti ja suunnittelu",
+        "accountBilling": "Tili ja laskutus"
       },
-      "profile": {
-        "title": "Profiilitiedot",
-        "description": "Päivitä tilisi profiilitiedot",
-        "name": "Koko nimi",
-        "email": "Sähköposti",
-        "emailNote": "Sähköpostia ei voi muuttaa",
-        "saveButton": "Tallenna muutokset",
-        "saving": "Tallennetaan...",
-        "success": "Profiili päivitetty"
-      },
-      "security": {
-        "password": {
-          "title": "Vaihda salasana",
-          "description": "Päivitä salasanasi pitääksesi tilisi turvassa",
-          "currentPassword": "Nykyinen salasana",
-          "newPassword": "Uusi salasana",
-          "confirmPassword": "Vahvista uusi salasana",
-          "updateButton": "Päivitä salasana",
-          "updating": "Päivitetään...",
-          "success": "Salasana päivitetty"
+      "questions": {
+        "whatIsMysteryMaker": {
+          "question": "Mikä on Mystery Maker ja miten se toimii?",
+          "answer": "Mystery Maker on tekoälypohjainen alusta, joka luo mukautettuja murhamysteerejä juuri sinun toiveidesi mukaan. Jaat ainutlaatuisen visiosi – minkä tahansa teeman, hahmot tai ympäristön, jonka haluat – ja tekoälymme luo kaiken tarvitsemasi: hahmoprofiilit, vihjeet ja isännöintimateriaalit, jotka on räätälöity ainutlaatuisesti juhliisi."
         },
-        "deleteAccount": {
-          "title": "Poista tili",
-          "description": "Poista tilisi ja kaikki siihen liittyvät tiedot pysyvästi",
-          "warning": "Tätä toimintoa ei voi kumota. Kaikki mysteerisi ja tietosi poistetaan pysyvästi.",
-          "confirmText": "Kirjoita POISTA vahvistaaksesi",
-          "deleteButton": "Poista tili",
-          "deleting": "Poistetaan...",
-          "success": "Tili poistettu"
+        "creationProcess": {
+          "question": "Miten luomis- ja ostoprosessi toimii?",
+          "answer": "Se on helppoa! Ensin kuvailet ihanteellisen murhamysteerisi, ja luomme mukautetun esikatselun ilmaiseksi. Kun olet tyytyväinen mysteeriisi, ostat koko paketin hintaan 24,99 $. Saat välittömästi kaiken isännöintiin tarvittavan: yksityiskohtaiset hahmoprofiilit, isännöintioppaan ja kaikki pelimateriaalit."
+        },
+        "saveWork": {
+          "question": "Voinko tallentaa työni ja palata siihen myöhemmin?",
+          "answer": "Kyllä! Kaikki mukautetut mysteerisi tallennetaan tilillesi, joten voit palata ja muokata niitä milloin tahansa."
+        },
+        "replayable": {
+          "question": "Voiko näitä murhamysteerejä pelata uudelleen?",
+          "answer": "Ehdottomasti! Mysteereissämme on vaihtelevia elementtejä, joten jokainen peli tuntuu tuoreelta, jopa saman ryhmän kanssa. Voit isännöidä mukautettua mysteeriäsi niin monta kertaa kuin haluat."
+        },
+        "playerCount": {
+          "question": "Kuinka monta pelaajaa tarvitsen?",
+          "answer": "Järjestelmämme luo mysteerejä mihin tahansa ryhmäkokoon, jonka ilmoitat, intiimeistä 4-6 pelaajan tapaamisista suurempiin yli 15 pelaajan juhliin. Kerro vain, kuinka monta pelaajaa, niin suunnittelemme sen mukaisesti."
+        },
+        "modifyMystery": {
+          "question": "Voinko muuttaa mysteeriäni sen luomisen jälkeen?",
+          "answer": "Kyllä, ehdottomasti! Käytä muokkaustyökaluamme viimeistelläksesi ja mukauttaaksesi mysteeriäsi, kunnes se on täydellinen ryhmällesi. Muokkaa hahmoja, teemoja tai monimutkaisuutta milloin tahansa."
+        },
+        "lastMinuteChanges": {
+          "question": "Mitä jos minun täytyy lisätä tai poistaa pelaajia viime hetkellä?",
+          "answer": "Ei ongelmaa! Joustava järjestelmämme antaa sinun säätää pelaajien määrää jopa mysteerisi luomisen jälkeen. Tekoäly mukauttaa tarinan ja hahmot vastaamaan näitä muutoksia."
+        },
+        "whatIncluded": {
+          "question": "Mitä mukautettu mysteeripakettini sisältää?",
+          "answer": "Kaiken mitä tarvitset: kattavan isännöintioppaan vaiheittaisilla ohjeilla, yksityiskohtaiset hahmoprofiilit jokaiselle pelaajalle, vihjeet, todisteet ja kaikki pelimateriaalit. Ei ylimääräistä valmistelua tarvita."
+        },
+        "gameDuration": {
+          "question": "Kuinka kauan tyypillinen peli kestää?",
+          "answer": "Useimmat mysteerit kestävät 2-3 tuntia, mutta sinä asetat tahdin. Isännöintioppaassamme on ehdotuksia ajoituksesta, joita voit mukauttaa aikataulusi mukaan."
+        },
+        "themedMysteries": {
+          "question": "Tarjoatteko teemamysteerejä erikoistilaisuuksiin?",
+          "answer": "Luomme minkä tahansa teeman, jonka voit kuvitella! Klassisista 1920-luvun salakapoista avaruusasemiin tai satumaailmoihin – jaa visiosi, niin me herätämme sen eloon."
+        },
+        "ageRecommendation": {
+          "question": "Onko mysteereillenne ikäsuositusta?",
+          "answer": "Standardimysteerimme ovat ihanteellisia aikuisille ja teini-ikäisille (13+ vuotta). Voit myös pyytää perheystävällisiä teemoja luodessasi mysteeriäsi nuoremmille pelaajille."
+        },
+        "freePreview": {
+          "question": "Mitä ilmainen esikatselu sisältää?",
+          "answer": "Voit luoda rajattomasti ilmaisia mysteeriesikatseluita, mukaan lukien perusjuoni ja hahmokonseptit. Tämä antaa sinun tutustua eri ideoihin ennen ostamista."
+        },
+        "purchaseIncludes": {
+          "question": "Mitä saan, kun ostan mysteerin?",
+          "answer": "Hintaan 24,99 $ saat kaiken isännöintiin tarvittavan: kattavan isännöintioppaan, yksityikohtaiset hahmoprofiilit jokaiselle pelaajalle, vihjeet, todisteet ja kaikki peliin valmiit materiaalit."
+        },
+        "refund": {
+          "question": "Voinko saada hyvityksen, jos en ole tyytyväinen?",
+          "answer": "Ehdottomasti! Jos et ole täysin tyytyväinen ostokseesi, ota meihin yhteyttä 7 päivän kuluessa, niin annamme sinulle täyden hyvityksen, ilman kysymyksiä."
+        },
+        "gameDesignEngagement": {
+          "question": "Miten pelisi suunnittelu varmistaa, että kaikki pysyvät sitoutuneina?",
+          "answer": "Mysteerimme keskittyvät rikkaaseen hahmojen väliseen vuorovaikutukseen jäykkien juonilinjojen sijaan. Jokaisella hahmolla on yksityiskohtaiset taustat ja motivaatiot, jotka ohjaavat luonnollista pelaamista ja varmistavat, että kaikki pelaajat pysyvät aktiivisesti mukana koko kokemuksen ajan."
+        },
+        "dynamicMurderer": {
+          "question": "Miksi vihjeet eivät osoita tiettyä murhaajaa alusta alkaen?",
+          "answer": "Murhaaja määräytyy ensimmäisen kierroksen jälkeen pelin aikana paljastettujen vihjeiden perusteella. Tämä dynaaminen lähestymistapa tarkoittaa, että vihjeet rakentuvat asteittain, mikä tekee mysteeristä ratkaistavissa, vaikka joitakin yksityiskohtia jäisi huomaamatta juhlien tunnelmassa."
+        },
+        "flexiblePlayerCount": {
+          "question": "Mitä tapahtuu, jos joku ei voi tulla viime hetkellä?",
+          "answer": "Joustava suunnittelumme sopeutuu viime hetken muutoksiin. Koska peli ei ole riippuvainen siitä, että yksi hahmo pitää hallussaan kriittistä tietoa, voit säätää pelaajien määrää rikkomatta mysteeriä."
+        },
+        "characterFocused": {
+          "question": "Miksi hahmokeskeinen juonenkeskeisen sijaan?",
+          "answer": "Vuosien kokemus on opettanut meille, että liian tarkat vihjeet jäävät huomaamatta juhlissa. Hahmovetoinen lähestymistapamme tarkoittaa, että mysteeri kehittyy luonnollisesti vuorovaikutusten kautta."
         }
       }
     },
-    "mysteryCreation": {
-      "scriptType": {
-        "full": "täysi",
-        "pointForm": "pistemuotoinen",
-        "both": "molemmat (täysi ja pistemuotoinen)"
-      },
-      "sections": {
-        "premise": "Perusasetelma",
-        "victim": "Uhri",
-        "characterList": "Hahmoluettelo",
-        "players": "Pelaajat",
-        "murderMethod": "Murhamenetelmä"
-      },
-      "wizard": {
-        "title": "Luo mysteerisi",
-        "step1": {
-          "title": "Kerro meille visiosi",
-          "description": "Kuvaile ihanteellinen murhamysteerijuhla"
-        },
-        "step2": {
-          "title": "Tarkista ja viimeistele",
-          "description": "Täydennä mysteerisi tekoälyavustajamme avulla"
-        },
-        "step3": {
-          "title": "Täydellinen paketti",
-          "description": "Saat kaiken tarvittavan isännöintiin"
-        },
-        "prompt": {
-          "defaultStart": "Haluan luoda murhamysteerin",
-          "withTheme": "Teeman/ympäristön tulee olla {{theme}} {{playerCount}} pelaajalle skripteillä {{scriptType}}-muodossa",
-          "withoutTheme": "Tämä on {{playerCount}} pelaajalle skripteillä {{scriptType}}-muodossa",
-          "withAccomplice": "Sisällytä rikoskumppanimekanismi mysteeriin",
-          "withoutAccomplice": "Älä sisällytä rikoskumppanimekanismia mysteeriin",
-          "additionalDetails": "Lisätiedot: {{details}}"
-        }
-      },
-      "editor": {
-        "title": "Mysteeri-editori",
-        "characters": "Hahmot",
-        "story": "Tarina",
-        "clues": "Vihjeet",
-        "hostGuide": "Isännöintiopas",
-        "save": "Tallenna luonnos",
-        "publish": "Viimeistele mysteeri",
-        "saving": "Tallennetaan...",
-        "publishing": "Julkaistaan...",
-        "saved": "Luonnos tallennettu",
-        "published": "Mysteeri viimeistelty"
-      },
-      "guidance": {
-        "describe": "Kuvaile mysteerisi yksityiskohtaisesti; mitä tarkempi olet, sitä paremmin voimme luoda sen sinulle",
-        "examples": "Esimerkki: '1920-luvun salakapakan murhamysteeri 8 hahmolla, mukaan lukien jazzlaulaja, baarimikko ja gangsteripomo'",
-        "playerCount": "Kuinka monta pelaajaa osallistuu?",
-        "theme": "Mikä on ympäristö tai teema?",
-        "special": "Onko erityisvaatimuksia tai rajoituksia?",
-        "initialPrompt": {
-          "withTheme": "Luodaan murhamysteeri teemalla {{theme}}. Opasta minut vaihe vaiheelta tämän mysteerin luomisessa.",
-          "withoutTheme": "Luodaan murhamysteeri. Opasta minut vaihe vaiheelta tämän mysteerin luomisessa."
-        }
-      },
-      "editTitle": "Muokkaa mysteeriä",
-      "createTitle": "Luo uusi mysteeri",
+    "contact": {
+      "title": "Ota yhteyttä",
+      "description": "Tarvitsetko lisää apua? Olemme täällä auttaaksemme",
+      "intro": "Tukitiimimme on valmiina auttamaan sinua kaikissa kysymyksissä, joita sinulla saattaa olla täydellisen mysteerijuhlan luomisesta Mystery Makerilla.",
       "form": {
-        "description": "Täytä alla oleva lomake luodaksesi mukautetun murhamysteerisi"
+        "name": "Nimi",
+        "email": "Sähköposti",
+        "subject": "Aihe",
+        "message": "Viesti",
+        "namePlaceholder": "Nimesi",
+        "emailPlaceholder": "sinun.sähköposti@esimerkki.com",
+        "subjectPlaceholder": "Mistä viestissäsi on kyse?",
+        "messagePlaceholder": "Miten voimme auttaa sinua?",
+        "sendButton": "Lähetä viesti",
+        "sending": "Lähetetään...",
+        "success": "Kiitos viestistäsi! Palaamme asiaan 24 tunnin kuluessa.",
+        "error": "Viestin lähettäminen epäonnistui. Yritä uudelleen myöhemmin."
+      }
+    }
+  },
+  "chat": {
+    "title": "Murhamysteeri-luoja",
+    "public": "Julkinen",
+    "private": "Yksityinen",
+    "initialGreeting": "Hei! Olen tekoälykehitysavustajasi. Anna minun auttaa sinua luomaan murhamysteeri. Kuinka monta pelaajaa haluaisit murhamysteeriisi?",
+    "inputPlaceholder": "Kirjoita viestisi...",
+    "signInPrompt": "Kirjaudu sisään käyttääksesi yksityistä tilaa",
+    "errorResponse": "Minulla on tällä hetkellä vaikeuksia vastata. Yritä uudelleen.",
+    "errorResponseWithFallback": "Minulla on teknisiä vaikeuksia. Kuinka monta pelaajaa haluaisit murhamysteeriisi?",
+    "connectionErrorResponse": "Minulla on tällä hetkellä yhteysongelmia. Kuinka monta pelaajaa haluaisit murhamysteeriisi?",
+    "placeholder": "Jaa mysteeri-ideasi...",
+    "loadingMessages": "Ladataan vanhoja viestejä...",
+    "errors": {
+      "responseFailed": "Tekoälyvastausta ei voitu noutaa. Yritä uudelleen.",
+      "aiUnavailable": "Olen pahoillani, mutta minulla on tällä hetkellä vaikeuksia vastata. Yritä uudelleen hetken kuluttua."
+    }
+  },
+  "sendToGuests": {
+    "title": "Lähetä hahmo-ohjeet vieraillesi",
+    "description": "Syötä kunkin hahmon sähköpostiosoite lähettääksesi henkilökohtaiset ohjeet suoraan vieraillesi. Jokainen vieras saa vain oman hahmonsa tiedot.",
+    "status": {
+      "sent": "Lähetetty"
+    },
+    "emailPlaceholder": "vieras@esimerkki.com",
+    "buttons": {
+      "sending": "Lähetetään...",
+      "send": "Lähetä hahmo-ohjeet"
+    },
+    "errors": {
+      "noValidEmails": "Lisää vähintään yksi kelvollinen sähköpostiosoite",
+      "sendFailed": "Joidenkin sähköpostien lähetys epäonnistui. Yritä uudelleen."
+    },
+    "success": {
+      "sentCount": "Hahmo-ohjeet lähetetty {{count}} vieraalle"
+    }
+  },
+  "common": {
+    "buttons": {
+      "createNew": "Luo uusi mysteeri",
+      "getStarted": "Aloita",
+      "learnMore": "Lue lisää",
+      "tryNow": "Kokeile nyt",
+      "continue": "Jatka",
+      "cancel": "Peruuta",
+      "save": "Tallenna",
+      "delete": "Poista",
+      "edit": "Muokkaa",
+      "close": "Sulje",
+      "back": "Takaisin",
+      "next": "Seuraava",
+      "previous": "Edellinen",
+      "finish": "Valmis",
+      "submit": "Lähetä",
+      "confirm": "Vahvista",
+      "yes": "Kyllä",
+      "no": "Ei"
+    },
+    "labels": {
+      "loading": "Ladataan...",
+      "pleaseWait": "Odota hetki...",
+      "error": "Virhe",
+      "success": "Onnistui",
+      "warning": "Varoitus",
+      "info": "Tiedot",
+      "required": "Pakollinen",
+      "optional": "Valinnainen"
+    },
+    "messages": {
+      "welcome": "Tervetuloa!",
+      "thankYou": "Kiitos!",
+      "comingSoon": "Tulossa pian",
+      "notFound": "Ei löytynyt",
+      "somethingWentWrong": "Jokin meni vikaan",
+      "tryAgain": "Yritä uudelleen",
+      "noResultsFound": "Ei tuloksia",
+      "loadingContent": "Ladataan sisältöä...",
+      "savingChanges": "Tallennetaan muutoksia...",
+      "changesSuccess": "Muutokset tallennettu",
+      "changesCanceled": "Muutokset peruutettu",
+      "aiThinking": "Tekoäly miettii..."
+    },
+    "validation": {
+      "required": "Tämä kenttä on pakollinen",
+      "invalidEmail": "Anna kelvollinen sähköpostiosoite",
+      "passwordTooShort": "Salasanan on oltava vähintään 6 merkkiä pitkä",
+      "passwordMismatch": "Salasanat eivät täsmää",
+      "invalidFormat": "Virheellinen muoto",
+      "tooShort": "Liian lyhyt",
+      "tooLong": "Liian pitkä",
+      "invalidCharacters": "Sisältää virheellisiä merkkejä"
+    },
+    "states": {
+      "draft": "Luonnos",
+      "inProgress": "Käynnissä",
+      "completed": "Valmis",
+      "published": "Julkaistu",
+      "archived": "Arkistoitu",
+      "deleted": "Poistettu"
+    },
+    "modals": {
+      "confirmDelete": {
+        "title": "Vahvista poisto",
+        "message": "Oletko varma, että haluat poistaa tämän kohteen? Tätä toimintoa ei voi peruuttaa.",
+        "confirmButton": "Poista",
+        "cancelButton": "Peruuta"
+      },
+      "unsavedChanges": {
+        "title": "Tallentamattomat muutokset",
+        "message": "Sinulla on tallentamattomia muutoksia. Haluatko tallentaa ne ennen poistumista?",
+        "saveButton": "Tallenna muutokset",
+        "discardButton": "Hylkää muutokset",
+        "cancelButton": "Peruuta"
+      }
+    },
+    "notifications": {
+      "welcomeBack": "Tervetuloa takaisin!",
+      "signedOut": "Olet kirjautunut ulos",
+      "sessionExpired": "Istuntosi on vanhentunut. Kirjaudu sisään uudelleen.",
+      "connectionLost": "Yhteys katkesi. Yritetään uudelleen...",
+      "connectionRestored": "Yhteys palautettu",
+      "updateAvailable": "Päivitys saatavilla. Päivitä nähdäksesi sen.",
+      "offlineMode": "Olet tällä hetkellä offline-tilassa",
+      "deleteSuccess": "{{item}} poistettu",
+      "deleteFailed": "{{item}} poistaminen epäonnistui",
+      "archiveSuccess": "{{item}} arkistoitu",
+      "archiveFailed": "{{item}} arkistointi epäonnistui",
+      "updatedSuccess": "{{item}} päivitetty",
+      "updateFailed": "{{item}} päivittäminen epäonnistui"
+    }
+  },
+  "character": {
+    "detail": {
+      "description": "Hahmon kuvaus",
+      "background": "Tausta",
+      "relationships": "Suhteet",
+      "secrets": "Salaisuudet",
+      "whereabouts": "Missä olit murhan aikaan",
+      "introduction": "Johdanto",
+      "round1": "Kierros 1: Alustava tutkimus",
+      "round2": "Kierros 2: Syvemmät paljastukset",
+      "round3": "Kierros 3: Viimeiset vihjeet",
+      "finalStatement": "Lopullinen lausunto",
+      "questioningOptions": "Kuulusteluvaihtoehdot",
+      "askTarget": "Kysy {{target}}: \"{{question}}\""
+    },
+    "import": {
+      "title": "Mysteeri hahmot",
+      "description": "Hallinnoi murhamysteerisi hahmoja",
+      "importButton": "Tuo hahmot",
+      "loading": "Ladataan hahmoja...",
+      "noCharacters": "Ei hahmoja vielä",
+      "importPrompt": "Tuo hahmotiedot täyttääksesi murhamysteerisi.",
+      "foundCount": "{{count}} hahmoa löytyi tietokannasta",
+      "deleteConfirm": "Oletko varma, että haluat poistaa hahmon {{name}}?",
+      "deleteSuccess": "Hahmo poistettu: {{name}}",
+      "deleteFailed": "Hahmon poistaminen epäonnistui",
+      "refreshSuccess": "Hahmoluettelo päivitetty",
+      "refreshFailed": "Hahmotietojen päivittäminen epäonnistui",
+      "loadFailed": "Hahmotietojen lataaminen epäonnistui",
+      "table": {
+        "name": "Hahmon nimi",
+        "details": "Tiedot",
+        "scripts": "Käsikirjoitukset",
+        "actions": "Toiminnot",
+        "badges": {
+          "description": "Kuvaus",
+          "background": "Tausta",
+          "relationships": "Suhteet",
+          "secrets": "Salaisuudet",
+          "intro": "Johdanto",
+          "round1": "Kierros 1",
+          "round2": "Kierros 2",
+          "round3": "Kierros 3"
+        }
+      }
+    },
+    "access": {
+      "welcome": "Tervetuloa, {{name}}!",
+      "subtitle": "Tässä hahmo-oppaasi mysteeriin",
+      "loading": "Ladataan hahmoasi...",
+      "accessDenied": "Pääsy evätty",
+      "notFound": "Hahmomääritystä ei löytynyt.",
+      "guide": {
+        "yourCharacter": "{{name}} – Hahmosi",
+        "yourBackground": "Taustasi",
+        "yourSecret": "Salaisuutesi",
+        "introduction": "Johdanto",
+        "rumorsYouKnow": "Huhut, jotka tiedät",
+        "round1": "Kierros 1: Alkuperäinen lausunto",
+        "round2": "Kierros 2: Motiivit",
+        "round3": "Kierros 3: Menetelmä",
+        "questionsToAsk": "Kysymykset",
+        "ifInnocent": "Jos olet syytön:",
+        "ifGuilty": "Jos olet syyllinen:",
+        "ifAccomplice": "Jos olet rikoskumppani:"
+      }
+    },
+    "dialog": {
+      "title": "Tuo hahmotiedot",
+      "subtitle": "Liitä hahmotietosi alle:",
+      "pasteButton": "Liitä leikepöydältä",
+      "pasteSuccess": "Teksti liitetty leikepöydältä",
+      "pasteError": "Leikepöydälle ei päästy. Liitä manuaalisesti.",
+      "placeholder": "Liitä CHARACTER GUIDE -sisältö tähän...",
+      "instructions": "Hahmotietojen tulee sisältää osiot:",
+      "sections": [
+        "HAHMOKUVAUS",
+        "TAUSTA",
+        "SUHTEET",
+        "SALAISUUDET",
+        "MISSÄ OLIT",
+        "Kierroslausunnot (KIERROS 1, KIERROS 2 jne.)"
+      ],
+      "importButton": "Tuo hahmot",
+      "importing": "Tuodaan...",
+      "cancel": "Peruuta",
+      "enterData": "Anna tai liitä hahmotiedot",
+      "importSuccess": "Hahmot tuotu",
+      "importFailed": "Hahmotietojen tuonti epäonnistui",
+      "importError": "Odottamaton virhe tuonnin aikana"
+    },
+    "guestManager": {
+      "title": "Jaa hahmot vieraiden kanssa",
+      "subtitle": "Määritä vieras jokaiselle hahmolle ja lähetä sähköpostitse",
+      "table": {
+        "character": "Hahmo",
+        "guestName": "Vieraan nimi",
+        "email": "Sähköposti",
+        "action": "Toiminto"
+      },
+      "placeholders": {
+        "guestName": "Vieraan nimi",
+        "email": "vieras@esimerkki.com"
       },
       "buttons": {
-        "generateFullMystery": "Luo täydellinen mysteeri"
+        "edit": "Muokkaa",
+        "send": "Lähetä",
+        "sendAll": "Lähetä kaikki",
+        "close": "Sulje"
       },
-      "errors": {
-        "signInToSave": "Kirjaudu sisään tallentaaksesi mysteerisi",
-        "saveFailed": "Mysteerin tallennus epäonnistui",
-        "loadFailed": "Mysteerin lataus epäonnistui",
-        "loadMessagesFailed": "Chattiviestien lataus epäonnistui",
-        "loadConversationFailed": "Keskustelun lataus epäonnistui",
-        "initialPrompt": "Anna mysteerisi kehotus",
-        "saveMessageFailed": "Viestin tallennus epäonnistui"
-      },
-      "success": {
-        "setupComplete": "Mysteeri asetukset valmiit! Aloitetaan chat..."
-      }
-    },
-    "mysteryForm": {
-      "userRequestLabel": "Mitä haluat luoda",
-      "userRequestDescription": "Alkuperäinen pyyntösi aloitussivulta",
-      "themeLabel": "Teeman/ympäristön tiedot (valinnainen)",
-      "themePlaceholder": "Esim. aikakausi, tietyt ympäristötiedot, pakolliset asiat jne.",
-      "themeDescription": "Valitse tietty teema tai ympäristö murhamysteeriisi",
-      "playerCountLabel": "Kuinka monta pelaajaa osallistuu?",
-      "playerCountPlaceholder": "Valitse pelaajien määrä",
-      "playerCountItem": "{{count}} pelaajaa",
-      "playerCountDescription": "Valitse 4–32 pelaajaa murhamysteeriisi.",
-      "accompliceLabel": "Sisällytä rikoskumppanimekanismi",
-      "accompliceDescription": "Ihanteellinen peleihin, joissa on 10 tai enemmän pelaajia",
-      "scriptTypeLabel": "Käsikirjoituksen yksityiskohtien taso",
-      "scriptTypeFullLabel": "Täydelliset käsikirjoitukset – Täydellinen dialogi ja yksityiskohtaiset ohjeet",
-      "scriptTypePointFormLabel": "Pistemuoto – Avainkohdat ja tiivistelmät",
-      "scriptTypeBothLabel": "Molemmat muodot – Täydelliset käsikirjoitukset JA pistemuotoiset muistiinpanot",
-      "additionalDetailsLabel": "Lisätiedot (valinnainen)",
-      "additionalDetailsPlaceholder": "Mitkä tahansa erityisvaatimukset, erikoissäännöt tai lisäkonteksti mysteeriisi...",
-      "additionalDetailsDescription": "Anna lisätietoja tai erityistoiveita mysteeriisi",
-      "startChat": "Aloita chat tekoälyn kanssa",
-      "startingChat": "Aloitetaan chat..."
-    },
-    "supportPage": {
-      "title": "Tukikeskus",
-      "subtitle": "Löydä vastauksia usein kysyttyihin kysymyksiin, ota yhteyttä tukitiimiimme ja saat kaiken tarvittavan luodaksesi uskomattomia mysteerijuhlia.",
-      "tabs": {
-        "faqs": "Usein kysytyt kysymykset",
-        "contact": "Yhteystiedot"
-      },
-      "faqs": {
-        "title": "Usein kysytyt kysymykset",
-        "description": "Löydä vastauksia yleisiin kysymyksiin Mystery Makerista",
-        "categories": {
-          "aboutMysteryMaker": "Tietoa Mystery Makerista",
-          "gameMechanics": "Pelin mekaniikka",
-          "hostingPlanning": "Isännöinti ja suunnittelu",
-          "accountBilling": "Tili ja laskutus"
-        },
-        "questions": {
-          "whatIsMysteryMaker": {
-            "question": "Mikä on Mystery Maker ja miten se toimii?",
-            "answer": "Mystery Maker on tekoälypohjainen alusta, joka luo mukautettuja murhamysteerejä juuri sinun toiveidesi mukaan. Jaat ainutlaatuisen visiosi – minkä tahansa teeman, hahmot tai ympäristön, jonka haluat – ja tekoälymme luo kaiken tarvitsemasi: hahmoprofiilit, vihjeet ja isännöintimateriaalit, jotka on räätälöity ainutlaatuisesti juhliisi."
-          },
-          "creationProcess": {
-            "question": "Miten luomis- ja ostoprosessi toimii?",
-            "answer": "Se on helppoa! Ensin kuvailet ihanteellisen murhamysteerisi, ja luomme mukautetun esikatselun ilmaiseksi. Kun olet tyytyväinen mysteeriisi, ostat koko paketin hintaan 24,99 $. Saat välittömästi kaiken isännöintiin tarvittavan: yksityiskohtaiset hahmoprofiilit, isännöintioppaan ja kaikki pelimateriaalit."
-          },
-          "saveWork": {
-            "question": "Voinko tallentaa työni ja palata siihen myöhemmin?",
-            "answer": "Kyllä! Kaikki mukautetut mysteerisi tallennetaan tilillesi, joten voit palata ja muokata niitä milloin tahansa."
-          },
-          "replayable": {
-            "question": "Voiko näitä murhamysteerejä pelata uudelleen?",
-            "answer": "Ehdottomasti! Mysteereissämme on vaihtelevia elementtejä, joten jokainen peli tuntuu tuoreelta, jopa saman ryhmän kanssa. Voit isännöidä mukautettua mysteeriäsi niin monta kertaa kuin haluat."
-          },
-          "playerCount": {
-            "question": "Kuinka monta pelaajaa tarvitsen?",
-            "answer": "Järjestelmämme luo mysteerejä mihin tahansa ryhmäkokoon, jonka ilmoitat, intiimeistä 4-6 pelaajan tapaamisista suurempiin yli 15 pelaajan juhliin. Kerro vain, kuinka monta pelaajaa, niin suunnittelemme sen mukaisesti."
-          },
-          "modifyMystery": {
-            "question": "Voinko muuttaa mysteeriäni sen luomisen jälkeen?",
-            "answer": "Kyllä, ehdottomasti! Käytä muokkaustyökaluamme viimeistelläksesi ja mukauttaaksesi mysteeriäsi, kunnes se on täydellinen ryhmällesi. Muokkaa hahmoja, teemoja tai monimutkaisuutta milloin tahansa."
-          },
-          "lastMinuteChanges": {
-            "question": "Mitä jos minun täytyy lisätä tai poistaa pelaajia viime hetkellä?",
-            "answer": "Ei ongelmaa! Joustava järjestelmämme antaa sinun säätää pelaajien määrää jopa mysteerisi luomisen jälkeen. Tekoäly mukauttaa tarinan ja hahmot vastaamaan näitä muutoksia."
-          },
-          "whatIncluded": {
-            "question": "Mitä mukautettu mysteeripakettini sisältää?",
-            "answer": "Kaiken mitä tarvitset: kattavan isännöintioppaan vaiheittaisilla ohjeilla, yksityiskohtaiset hahmoprofiilit jokaiselle pelaajalle, vihjeet, todisteet ja kaikki pelimateriaalit. Ei ylimääräistä valmistelua tarvita."
-          },
-          "gameDuration": {
-            "question": "Kuinka kauan tyypillinen peli kestää?",
-            "answer": "Useimmat mysteerit kestävät 2-3 tuntia, mutta sinä asetat tahdin. Isännöintioppaassamme on ehdotuksia ajoituksesta, joita voit mukauttaa aikataulusi mukaan."
-          },
-          "themedMysteries": {
-            "question": "Tarjoatteko teemamysteerejä erikoistilaisuuksiin?",
-            "answer": "Luomme minkä tahansa teeman, jonka voit kuvitella! Klassisista 1920-luvun salakapoista avaruusasemiin tai satumaailmoihin – jaa visiosi, niin me herätämme sen eloon."
-          },
-          "ageRecommendation": {
-            "question": "Onko mysteereillenne ikäsuositusta?",
-            "answer": "Standardimysteerimme ovat ihanteellisia aikuisille ja teini-ikäisille (13+ vuotta). Voit myös pyytää perheystävällisiä teemoja luodessasi mysteeriäsi nuoremmille pelaajille."
-          },
-          "freePreview": {
-            "question": "Mitä ilmainen esikatselu sisältää?",
-            "answer": "Voit luoda rajattomasti ilmaisia mysteeriesikatseluita, mukaan lukien perusjuoni ja hahmokonseptit. Tämä antaa sinun tutustua eri ideoihin ennen ostamista."
-          },
-          "purchaseIncludes": {
-            "question": "Mitä saan, kun ostan mysteerin?",
-            "answer": "Hintaan 24,99 $ saat kaiken isännöintiin tarvittavan: kattavan isännöintioppaan, yksityikohtaiset hahmoprofiilit jokaiselle pelaajalle, vihjeet, todisteet ja kaikki peliin valmiit materiaalit."
-          },
-          "refund": {
-            "question": "Voinko saada hyvityksen, jos en ole tyytyväinen?",
-            "answer": "Ehdottomasti! Jos et ole täysin tyytyväinen ostokseesi, ota meihin yhteyttä 7 päivän kuluessa, niin annamme sinulle täyden hyvityksen, ilman kysymyksiä."
-          }
-        }
-      },
-      "contact": {
-        "title": "Ota yhteyttä",
-        "description": "Tarvitsetko lisää apua? Olemme täällä auttaaksemme",
-        "intro": "Tukitiimimme on valmiina auttamaan sinua kaikissa kysymyksissä, joita sinulla saattaa olla täydellisen mysteerijuhlan luomisesta Mystery Makerilla.",
-        "form": {
-          "name": "Nimi",
-          "email": "Sähköposti",
-          "subject": "Aihe",
-          "message": "Viesti",
-          "namePlaceholder": "Nimesi",
-          "emailPlaceholder": "sinun.sähköposti@esimerkki.com",
-          "subjectPlaceholder": "Mistä viestissäsi on kyse?",
-          "messagePlaceholder": "Miten voimme auttaa sinua?",
-          "sendButton": "Lähetä viesti",
-          "sending": "Lähetetään...",
-          "success": "Kiitos viestistäsi! Palaamme asiaan 24 tunnin kuluessa.",
-          "error": "Viestin lähettäminen epäonnistui. Yritä uudelleen myöhemmin."
-        }
-      }
-    },
-    "chat": {
-      "title": "Murhamysteeri-luoja",
-      "public": "Julkinen",
-      "private": "Yksityinen",
-      "initialGreeting": "Hei! Olen tekoälykehitysavustajasi. Anna minun auttaa sinua luomaan murhamysteeri. Kuinka monta pelaajaa haluaisit murhamysteeriisi?",
-      "inputPlaceholder": "Kirjoita viestisi...",
-      "signInPrompt": "Kirjaudu sisään käyttääksesi yksityistä tilaa",
-      "errorResponse": "Minulla on tällä hetkellä vaikeuksia vastata. Yritä uudelleen.",
-      "errorResponseWithFallback": "Minulla on teknisiä vaikeuksia. Kuinka monta pelaajaa haluaisit murhamysteeriisi?",
-      "connectionErrorResponse": "Minulla on tällä hetkellä yhteysongelmia. Kuinka monta pelaajaa haluaisit murhamysteeriisi?",
-      "placeholder": "Jaa mysteeri-ideasi...",
-      "loadingMessages": "Ladataan vanhoja viestejä...",
-      "errors": {
-        "responseFailed": "Tekoälyvastausta ei voitu noutaa. Yritä uudelleen.",
-        "aiUnavailable": "Olen pahoillani, mutta minulla on tällä hetkellä vaikeuksia vastata. Yritä uudelleen hetken kuluttua."
-      }
-    },
-    "sendToGuests": {
-      "title": "Lähetä hahmo-ohjeet vieraillesi",
-      "description": "Syötä kunkin hahmon sähköpostiosoite lähettääksesi henkilökohtaiset ohjeet suoraan vieraillesi. Jokainen vieras saa vain oman hahmonsa tiedot.",
       "status": {
         "sent": "Lähetetty"
       },
-      "emailPlaceholder": "vieras@esimerkki.com",
-      "buttons": {
-        "sending": "Lähetetään...",
-        "send": "Lähetä hahmo-ohjeet"
-      },
-      "errors": {
-        "noValidEmails": "Lisää vähintään yksi kelvollinen sähköpostiosoite",
-        "sendFailed": "Joidenkin sähköpostien lähetys epäonnistui. Yritä uudelleen."
-      },
-      "success": {
-        "sentCount": "Hahmo-ohjeet lähetetty {{count}} vieraalle"
+      "assignedCount": "{{count}} hahmoa määritetty",
+      "toasts": {
+        "characterSent": "Hahmo lähetetty käyttäjälle {{name}}!",
+        "sendFailed": "Hahmomäärityksen lähetys epäonnistui",
+        "loadFailed": "Olemassa olevien määritysten lataaminen epäonnistui",
+        "updateFailed": "Määrityksen päivittäminen epäonnistui",
+        "noValidAssignments": "Ei kelvollisia lähetettäviä määrityksiä",
+        "allSent": "{{count}} hahmomääritystä lähetetty!",
+        "sendSomeFailed": "Joidenkin määritysten lähetys epäonnistui"
       }
     },
-    "common": {
-      "buttons": {
-        "createNew": "Luo uusi mysteeri",
-        "getStarted": "Aloita",
-        "learnMore": "Lue lisää",
-        "tryNow": "Kokeile nyt",
-        "continue": "Jatka",
-        "cancel": "Peruuta",
-        "save": "Tallenna",
-        "delete": "Poista",
-        "edit": "Muokkaa",
-        "close": "Sulje",
-        "back": "Takaisin",
-        "next": "Seuraava",
-        "previous": "Edellinen",
-        "finish": "Valmis",
-        "submit": "Lähetä",
-        "confirm": "Vahvista",
-        "yes": "Kyllä",
-        "no": "Ei"
-      },
-      "labels": {
-        "loading": "Ladataan...",
-        "pleaseWait": "Odota hetki...",
-        "error": "Virhe",
-        "success": "Onnistui",
-        "warning": "Varoitus",
-        "info": "Tiedot",
-        "required": "Pakollinen",
-        "optional": "Valinnainen"
-      },
-      "messages": {
-        "welcome": "Tervetuloa!",
-        "thankYou": "Kiitos!",
-        "comingSoon": "Tulossa pian",
-        "notFound": "Ei löytynyt",
-        "somethingWentWrong": "Jokin meni vikaan",
-        "tryAgain": "Yritä uudelleen",
-        "noResultsFound": "Ei tuloksia",
-        "loadingContent": "Ladataan sisältöä...",
-        "savingChanges": "Tallennetaan muutoksia...",
-        "changesSuccess": "Muutokset tallennettu",
-        "changesCanceled": "Muutokset peruutettu",
-        "aiThinking": "Tekoäly miettii..."
-      },
-      "validation": {
-        "required": "Tämä kenttä on pakollinen",
-        "invalidEmail": "Anna kelvollinen sähköpostiosoite",
-        "passwordTooShort": "Salasanan on oltava vähintään 6 merkkiä pitkä",
-        "passwordMismatch": "Salasanat eivät täsmää",
-        "invalidFormat": "Virheellinen muoto",
-        "tooShort": "Liian lyhyt",
-        "tooLong": "Liian pitkä",
-        "invalidCharacters": "Sisältää virheellisiä merkkejä"
-      },
-      "states": {
-        "draft": "Luonnos",
-        "inProgress": "Käynnissä",
-        "completed": "Valmis",
-        "published": "Julkaistu",
-        "archived": "Arkistoitu",
-        "deleted": "Poistettu"
-      },
-      "modals": {
-        "confirmDelete": {
-          "title": "Vahvista poisto",
-          "message": "Oletko varma, että haluat poistaa tämän kohteen? Tätä toimintoa ei voi peruuttaa.",
-          "confirmButton": "Poista",
-          "cancelButton": "Peruuta"
-        },
-        "unsavedChanges": {
-          "title": "Tallentamattomat muutokset",
-          "message": "Sinulla on tallentamattomia muutoksia. Haluatko tallentaa ne ennen poistumista?",
-          "saveButton": "Tallenna muutokset",
-          "discardButton": "Hylkää muutokset",
-          "cancelButton": "Peruuta"
-        }
-      },
-      "notifications": {
-        "welcomeBack": "Tervetuloa takaisin!",
-        "signedOut": "Olet kirjautunut ulos",
-        "sessionExpired": "Istuntosi on vanhentunut. Kirjaudu sisään uudelleen.",
-        "connectionLost": "Yhteys katkesi. Yritetään uudelleen...",
-        "connectionRestored": "Yhteys palautettu",
-        "updateAvailable": "Päivitys saatavilla. Päivitä nähdäksesi sen.",
-        "offlineMode": "Olet tällä hetkellä offline-tilassa",
-        "deleteSuccess": "{{item}} poistettu",
-        "deleteFailed": "{{item}} poistaminen epäonnistui",
-        "archiveSuccess": "{{item}} arkistoitu",
-        "archiveFailed": "{{item}} arkistointi epäonnistui",
-        "updatedSuccess": "{{item}} päivitetty",
-        "updateFailed": "{{item}} päivittäminen epäonnistui"
-      }
-    },
-    "character": {
-      "detail": {
-        "description": "Hahmon kuvaus",
-        "background": "Tausta",
-        "relationships": "Suhteet",
-        "secrets": "Salaisuudet",
-        "whereabouts": "Missä olit murhan aikaan",
-        "introduction": "Johdanto",
-        "round1": "Kierros 1: Alustava tutkimus",
-        "round2": "Kierros 2: Syvemmät paljastukset",
-        "round3": "Kierros 3: Viimeiset vihjeet",
-        "finalStatement": "Lopullinen lausunto",
-        "questioningOptions": "Kuulusteluvaihtoehdot",
-        "askTarget": "Kysy {{target}}: \"{{question}}\""
-      },
-      "import": {
-        "title": "Mysteeri hahmot",
-        "description": "Hallinnoi murhamysteerisi hahmoja",
-        "importButton": "Tuo hahmot",
-        "loading": "Ladataan hahmoja...",
-        "noCharacters": "Ei hahmoja vielä",
-        "importPrompt": "Tuo hahmotiedot täyttääksesi murhamysteerisi.",
-        "foundCount": "{{count}} hahmoa löytyi tietokannasta",
-        "deleteConfirm": "Oletko varma, että haluat poistaa hahmon {{name}}?",
-        "deleteSuccess": "Hahmo poistettu: {{name}}",
-        "deleteFailed": "Hahmon poistaminen epäonnistui",
-        "refreshSuccess": "Hahmoluettelo päivitetty",
-        "refreshFailed": "Hahmotietojen päivittäminen epäonnistui",
-        "loadFailed": "Hahmotietojen lataaminen epäonnistui",
-        "table": {
-          "name": "Hahmon nimi",
-          "details": "Tiedot",
-          "scripts": "Käsikirjoitukset",
-          "actions": "Toiminnot",
-          "badges": {
-            "description": "Kuvaus",
-            "background": "Tausta",
-            "relationships": "Suhteet",
-            "secrets": "Salaisuudet",
-            "intro": "Johdanto",
-            "round1": "Kierros 1",
-            "round2": "Kierros 2",
-            "round3": "Kierros 3"
-          }
-        }
-      },
-      "access": {
-        "welcome": "Tervetuloa, {{name}}!",
-        "subtitle": "Tässä hahmo-oppaasi mysteeriin",
-        "loading": "Ladataan hahmoasi...",
-        "accessDenied": "Pääsy evätty",
-        "notFound": "Hahmomääritystä ei löytynyt.",
-        "guide": {
-          "yourCharacter": "{{name}} – Hahmosi",
-          "yourBackground": "Taustasi",
-          "yourSecret": "Salaisuutesi",
-          "introduction": "Johdanto",
-          "rumorsYouKnow": "Huhut, jotka tiedät",
-          "round1": "Kierros 1: Alkuperäinen lausunto",
-          "round2": "Kierros 2: Motiivit",
-          "round3": "Kierros 3: Menetelmä",
-          "questionsToAsk": "Kysymykset",
-          "ifInnocent": "Jos olet syytön:",
-          "ifGuilty": "Jos olet syyllinen:",
-          "ifAccomplice": "Jos olet rikoskumppani:"
-        }
-      },
-      "dialog": {
-        "title": "Tuo hahmotiedot",
-        "subtitle": "Liitä hahmotietosi alle:",
-        "pasteButton": "Liitä leikepöydältä",
-        "pasteSuccess": "Teksti liitetty leikepöydältä",
-        "pasteError": "Leikepöydälle ei päästy. Liitä manuaalisesti.",
-        "placeholder": "Liitä CHARACTER GUIDE -sisältö tähän...",
-        "instructions": "Hahmotietojen tulee sisältää osiot:",
-        "sections": [
-          "HAHMOKUVAUS",
-          "TAUSTA",
-          "SUHTEET",
-          "SALAISUUDET",
-          "MISSÄ OLIT",
-          "Kierroslausunnot (KIERROS 1, KIERROS 2 jne.)"
-        ],
-        "importButton": "Tuo hahmot",
-        "importing": "Tuodaan...",
-        "cancel": "Peruuta",
-        "enterData": "Anna tai liitä hahmotiedot",
-        "importSuccess": "Hahmot tuotu",
-        "importFailed": "Hahmotietojen tuonti epäonnistui",
-        "importError": "Odottamaton virhe tuonnin aikana"
-      },
-      "guestManager": {
-        "title": "Jaa hahmot vieraiden kanssa",
-        "subtitle": "Määritä vieras jokaiselle hahmolle ja lähetä sähköpostitse",
-        "table": {
-          "character": "Hahmo",
-          "guestName": "Vieraan nimi",
-          "email": "Sähköposti",
-          "action": "Toiminto"
-        },
-        "placeholders": {
-          "guestName": "Vieraan nimi",
-          "email": "vieras@esimerkki.com"
-        },
-        "buttons": {
-          "edit": "Muokkaa",
-          "send": "Lähetä",
-          "sendAll": "Lähetä kaikki",
-          "close": "Sulje"
-        },
-        "status": {
-          "sent": "Lähetetty"
-        },
-        "assignedCount": "{{count}} hahmoa määritetty",
-        "toasts": {
-          "characterSent": "Hahmo lähetetty käyttäjälle {{name}}!",
-          "sendFailed": "Hahmomäärityksen lähetys epäonnistui",
-          "loadFailed": "Olemassa olevien määritysten lataaminen epäonnistui",
-          "updateFailed": "Määrityksen päivittäminen epäonnistui",
-          "noValidAssignments": "Ei kelvollisia lähetettäviä määrityksiä",
-          "allSent": "{{count}} hahmomääritystä lähetetty!",
-          "sendSomeFailed": "Joidenkin määritysten lähetys epäonnistui"
-        }
-      },
-      "roles": {
-        "title": "Hahmojen roolit",
-        "description": "Määritä murhaajan rooli mysteeriisi",
-        "murderer": "Murhaaja",
-        "required": "Pakollinen",
-        "noneSelected": "Ei valittu",
-        "murdererDescription": "Hahmo, joka teki murhan",
-        "saveRoles": "Tallenna roolit",
-        "saving": "Tallennetaan...",
-        "saveSuccess": "Hahmojen roolit tallennettu",
-        "saveFailed": "Hahmojen roolien tallentaminen epäonnistui",
-        "loadFailed": "Hahmotietojen lataaminen epäonnistui"
-      }
-    },
-    "blog": {
+    "roles": {
+      "title": "Hahmojen roolit",
+      "description": "Määritä murhaajan rooli mysteeriisi",
+      "murderer": "Murhaaja",
+      "required": "Pakollinen",
+      "noneSelected": "Ei valittu",
+      "murdererDescription": "Hahmo, joka teki murhan",
+      "saveRoles": "Tallenna roolit",
+      "saving": "Tallennetaan...",
+      "saveSuccess": "Hahmojen roolit tallennettu",
+      "saveFailed": "Hahmojen roolien tallentaminen epäonnistui",
+      "loadFailed": "Hahmotietojen lataaminen epäonnistui"
+    }
+  },
+  "blog": {
     "title": "Murhamysteeri Blogi",
     "subtitle": "Vinkkejä, oppaita ja inspiraatiota seuraavaan mystery-juhlaan",
     "backToHome": "Takaisin Kotiin",
@@ -835,165 +851,165 @@
     "error": "Blogikirjoitusten lataaminen epäonnistui."
   },
   "purchase": {
-      "toasts": {
-        "success": "Osto valmis! Sinulla on nyt täysi pääsy tähän mysteeripakettiin.",
-        "cancel": "Osto peruutettu. Voit yrittää uudelleen, kun olet valmis.",
-        "loadFailed": "Mysteerin tietojen lataaminen epäonnistui.",
-        "notFound": "Mysteeriä ei löytynyt.",
-        "devPurchaseSim": "Simuloidaan ostoa kehitystilassa...",
-        "devPurchaseSuccess": "Osto simuloitu! Uudelleenohjataan paketin luontiin...",
-        "devPurchaseFailed": "Oston simulointi epäonnistui.",
-        "signInRequired": "Kirjaudu sisään ostaaksesi tämän mysteerin.",
-        "checkoutRedirect": "Uudelleenohjataan turvalliseen maksupalveluun...",
-        "checkoutFailed": "Uudelleenohjaus maksupalveluun epäonnistui. Yritä uudelleen.",
-        "genericError": "Virhe tapahtui mysteerin tietojen lataamisen aikana."
-      },
-      "title": "Viimeistele ostoksesi",
-      "subtitle": "Hanki täysi pääsy murhamysteeripakettiisi",
-      "package": {
-        "title": "Murhamysteeripaketti",
-        "description": "Kertaluonteinen osto, välitön pääsy",
-        "priceDescription": "Täydellinen murhamysteeripaketti kaikilla hahmomateriaaleilla, vihjeillä ja isännöintiohjeilla.",
-        "whatsIncluded": "Mitä sisältyy:",
-        "includes": [
-          "Täydelliset hahmoprofiilit kaikille epäillyille",
-          "Isännöintiopas vaiheittaisilla ohjeilla",
-          "Tulostettavat hahmolomakkeet",
-          "Todiste- ja vihjekortit",
-          "Tapahtumien aikajana",
-          "Paljastus-skripti",
-          "Kaikkien materiaalien PDF-lataukset"
-        ]
-      },
-      "buttons": {
-        "processing": "Käsitellään...",
-        "complete": "Suorita osto",
-        "backToDesign": "Takaisin mysteerin suunnitteluun"
-      },
-      "notes": {
-        "title": "Tärkeitä huomioita",
-        "items": [
-          "Tämä on kertaluonteinen osto tälle tietylle mysteeripaketille",
-          "Saat pysyvän käyttöoikeuden kaikkien materiaalien lataamiseen",
-          "Sisältö on tarkoitettu vain henkilökohtaiseen käyttöön, ei kaupalliseen jakeluun",
-          "Tarvitsetko apua? Ota yhteyttä tukeemme osoitteessa {{email}}"
-        ]
-      },
-      "preview": {
-        "defaultTitle": "Mukautettu murhamysteeri",
-        "characterPlaceholder": "Hahmotiedot paljastetaan täydessä paketissa.",
-        "characterPlaceholderFull": "Täysi hahmokuvaus saatavilla ostetussa paketissa.",
-        "evidencePlaceholder": "Todistetiedot saatavilla täydessä paketissa.",
-        "title": "Murhamysteeri esikatselu",
-        "playersLabel": "Pelaajat",
-        "playersCount": "{{count}} pelaajaa",
-        "unknownPlayers": "Tuntematon määrä pelaajia",
-        "storyTitle": "Tarinaesikatselu",
-        "unlockMessage": "Osta ja avaa koko mysteeripaketti, täydennettynä kaikilla hahmotiedoilla, vihjeillä ja materiaaleilla.",
-        "whatsIncluded": "Mitä koko paketti sisältää:",
-        "packageIncludes": [
-          "Yksityiskohtainen isännöintiopas täydellisillä asennusohjeilla",
-          "Hahmo-ohjeet jokaiselle pelaajalle",
-          "Todistekortit ja tulostettavat materiaalit",
-          "Täydellinen pelikäsikirjoitus ja aikajana"
-        ]
-      }
+    "toasts": {
+      "success": "Osto valmis! Sinulla on nyt täysi pääsy tähän mysteeripakettiin.",
+      "cancel": "Osto peruutettu. Voit yrittää uudelleen, kun olet valmis.",
+      "loadFailed": "Mysteerin tietojen lataaminen epäonnistui.",
+      "notFound": "Mysteeriä ei löytynyt.",
+      "devPurchaseSim": "Simuloidaan ostoa kehitystilassa...",
+      "devPurchaseSuccess": "Osto simuloitu! Uudelleenohjataan paketin luontiin...",
+      "devPurchaseFailed": "Oston simulointi epäonnistui.",
+      "signInRequired": "Kirjaudu sisään ostaaksesi tämän mysteerin.",
+      "checkoutRedirect": "Uudelleenohjataan turvalliseen maksupalveluun...",
+      "checkoutFailed": "Uudelleenohjaus maksupalveluun epäonnistui. Yritä uudelleen.",
+      "genericError": "Virhe tapahtui mysteerin tietojen lataamisen aikana."
     },
-    "mysteryPackage": {
-      "shareWithGuests": "Jaa vieraiden kanssa",
-      "tabs": {
-        "hostGuide": "Isännöintiopas",
-        "characters": "Hahmot ({{count}})",
-        "clues": "Vihjeet",
-        "inspector": "Tarkastaja-opas",
-        "relationships": "Suhteet"
-      },
-      "mobileTabs": {
-        "host": "Isäntä",
-        "characters": "Hahmot ({{count}})",
-        "clues": "Vihjeet",
-        "inspector": "Tarkastaja",
-        "relations": "Suhteet"
-      },
-      "loading": {
-        "generating": "Generoidaan...",
-        "generatingMessage": "Täysi mysteerisi generoidaan parhaillaan. Tämä prosessi on nyt käynnissä.<br />Tämä sivu päivittyy automaattisesti, kun mysteeri on valmis.",
-        "characters": "Ainutlaatuisten hahmoprofiilien kehittäminen taustoilla, motiiveilla ja salaisuuksilla mysteeriisi.",
-        "clues": "Todistekorttien, vihjeiden ja tutkintamateriaalien luominen, jotka edistävät mysteerin ratkaisua.",
-        "inspector": "Tarkastajan käsikirjoituksen ja tutkinnan aikajanan laatiminen ohjaamaan mysteerin ratkaisua.",
-        "matrix": "Hahmojen välisten suhdematriisin luominen, joka näyttää yhteydet, konfliktit ja piilotetut suhteet."
-      },
-      "placeholder": {
-        "title": "Valmis luomaan mysteerisi",
-        "description": "Napsauta alla olevaa painiketta aloittaaksesi koko mysteeripaketin ja kaiken siihen liittyvän materiaalin luomisen.",
-        "button": "Luo paketti",
-        "characters": "Hahmo-ohjeet ovat saatavilla, kun generointi on aloitettu.",
-        "clues": "Vihjekortit ovat saatavilla, kun generointi on aloitettu.",
-        "inspector": "Tarkastaja-opas on saatavilla, kun generointi on aloitettu.",
-        "matrix": "Suhdematriisi on saatavilla, kun generointi on aloitettu."
-      },
-      "matrix": {
-        "title": "Hahmojen välinen suhdematriisi"
-      }
+    "title": "Viimeistele ostoksesi",
+    "subtitle": "Hanki täysi pääsy murhamysteeripakettiisi",
+    "package": {
+      "title": "Murhamysteeripaketti",
+      "description": "Kertaluonteinen osto, välitön pääsy",
+      "priceDescription": "Täydellinen murhamysteeripaketti kaikilla hahmomateriaaleilla, vihjeillä ja isännöintiohjeilla.",
+      "whatsIncluded": "Mitä sisältyy:",
+      "includes": [
+        "Täydelliset hahmoprofiilit kaikille epäillyille",
+        "Isännöintiopas vaiheittaisilla ohjeilla",
+        "Tulostettavat hahmolomakkeet",
+        "Todiste- ja vihjekortit",
+        "Tapahtumien aikajana",
+        "Paljastus-skripti",
+        "Kaikkien materiaalien PDF-lataukset"
+      ]
     },
-    "chatbot": {
-      "toasts": {
-        "invalidId": "Virheellinen keskustelutunnus",
-        "loadFailed": "Vanhan keskustelusi lataaminen epäonnistui",
-        "offlineMode": "Käyttää offline-tilaa – jotkin toiminnot voivat olla rajoitettuja",
-        "requestError": "Pyyntöä ei voitu käsitellä",
-        "generationSuccess": "Mysteeri luotu!",
-        "urlUnavailable": "Chatbot-URL ei ole vielä saatavilla"
-      },
-      "welcomeMessage": "Tervetuloa Murhamysteeri-luoja! Kuvaile, minkälaisen mysteerin haluaisit luoda, tai pyydä minulta ehdotuksia.",
-      "newConversationTitle": "Uusi murhamysteeri",
-      "fallbackResponses": [
-        "Autan sinua mielelläni luomaan murhamysteerin. Minkä teeman tai ympäristön haluaisit mysteeriisi?",
-        "Se on hyvä valinta! Nyt mietitään uhria. Kuka on uhri?",
-        "Mielenkiintoista! Nyt tarvitsemme joitakin epäiltyjä. Voisitko kuvata 2-3 hahmoa, joilla voisi olla motiiveja tähän rikokseen?",
-        "Nämä ovat vakuuttavia epäiltyjä. Lisätään joitakin vihjeitä. Millaisia todisteita rikospaikalta voisi löytyä?",
-        "Mysteeriisi on muotoutumassa! Jotta voimme jatkaa tarinasi yksityiskohtien kehittämistä, mietitään, mitä muita elementtejä voisimme sisällyttää."
-      ],
-      "title": "Luo murhamysteerisi",
-      "buttons": {
-        "external": "Ulkoinen",
-        "openFull": "Avaa täysi chatbot",
-        "finalize": "Viimeistele",
-        "finalizeMystery": "Viimeistele mysteeri"
-      },
-      "creatorTitle": "Murhamysteeri-luoja",
-      "placeholder": "Kirjoita ideasi murhamysteeriin...",
-      "finalizePrompt": "Kun olet tyytyväinen mysteeriisi, viimeistele se jatkaaksesi."
+    "buttons": {
+      "processing": "Käsitellään...",
+      "complete": "Suorita osto",
+      "backToDesign": "Takaisin mysteerin suunnitteluun"
     },
-    "homeDashboard": {
-      "title": "Mysteeriesi",
-      "searchPlaceholder": "Hae mysteerejä...",
-      "loadMore": "Lataa lisää",
-      "loading": "Ladataan...",
-      "empty": {
-        "title": "Et ole vielä luonut mysteerejä",
-        "description": "Käytä yllä olevaa syöttölaatikkoa aloittaaksesi ensimmäisen murhamysteerisi luomisen!"
-      },
-      "errors": {
-        "loadFailed": "Joidenkin mysteerien lataus epäonnistui. Päivitä sivu."
-      }
+    "notes": {
+      "title": "Tärkeitä huomioita",
+      "items": [
+        "Tämä on kertaluonteinen osto tälle tietylle mysteeripaketille",
+        "Saat pysyvän käyttöoikeuden kaikkien materiaalien lataamiseen",
+        "Sisältö on tarkoitettu vain henkilökohtaiseen käyttöön, ei kaupalliseen jakeluun",
+        "Tarvitsetko apua? Ota yhteyttä tukeemme osoitteessa {{email}}"
+      ]
     },
-    "mysteryDashboard": {
-      "title": "Mysteeri-kojelaudan",
-      "description": "Hallinnoi luomiasi mysteerejä, aloita uusia tai tutustu esimerkkisisältöön.",
-      "tabs": {
-        "all": "Kaikki",
-        "drafts": "Luonnokset",
-        "purchased": "Ostetut",
-        "archived": "Arkistoidut"
-      }
+    "preview": {
+      "defaultTitle": "Mukautettu murhamysteeri",
+      "characterPlaceholder": "Hahmotiedot paljastetaan täydessä paketissa.",
+      "characterPlaceholderFull": "Täysi hahmokuvaus saatavilla ostetussa paketissa.",
+      "evidencePlaceholder": "Todistetiedot saatavilla täydessä paketissa.",
+      "title": "Murhamysteeri esikatselu",
+      "playersLabel": "Pelaajat",
+      "playersCount": "{{count}} pelaajaa",
+      "unknownPlayers": "Tuntematon määrä pelaajia",
+      "storyTitle": "Tarinaesikatselu",
+      "unlockMessage": "Osta ja avaa koko mysteeripaketti, täydennettynä kaikilla hahmotiedoilla, vihjeillä ja materiaaleilla.",
+      "whatsIncluded": "Mitä koko paketti sisältää:",
+      "packageIncludes": [
+        "Yksityiskohtainen isännöintiopas täydellisillä asennusohjeilla",
+        "Hahmo-ohjeet jokaiselle pelaajalle",
+        "Todistekortit ja tulostettavat materiaalit",
+        "Täydellinen pelikäsikirjoitus ja aikajana"
+      ]
+    }
+  },
+  "mysteryPackage": {
+    "shareWithGuests": "Jaa vieraiden kanssa",
+    "tabs": {
+      "hostGuide": "Isännöintiopas",
+      "characters": "Hahmot ({{count}})",
+      "clues": "Vihjeet",
+      "inspector": "Tarkastaja-opas",
+      "relationships": "Suhteet"
     },
-    "mysteryView": {
-      "timing": {
-        "small": "5-10 minuuttia",
-        "medium": "15-30 minuuttia",
-        "large": "30-45 minuuttia",
-        "xlarge": "45-60 minuuttia"
-      }
+    "mobileTabs": {
+      "host": "Isäntä",
+      "characters": "Hahmot ({{count}})",
+      "clues": "Vihjeet",
+      "inspector": "Tarkastaja",
+      "relations": "Suhteet"
+    },
+    "loading": {
+      "generating": "Generoidaan...",
+      "generatingMessage": "Täysi mysteerisi generoidaan parhaillaan. Tämä prosessi on nyt käynnissä.<br />Tämä sivu päivittyy automaattisesti, kun mysteeri on valmis.",
+      "characters": "Ainutlaatuisten hahmoprofiilien kehittäminen taustoilla, motiiveilla ja salaisuuksilla mysteeriisi.",
+      "clues": "Todistekorttien, vihjeiden ja tutkintamateriaalien luominen, jotka edistävät mysteerin ratkaisua.",
+      "inspector": "Tarkastajan käsikirjoituksen ja tutkinnan aikajanan laatiminen ohjaamaan mysteerin ratkaisua.",
+      "matrix": "Hahmojen välisten suhdematriisin luominen, joka näyttää yhteydet, konfliktit ja piilotetut suhteet."
+    },
+    "placeholder": {
+      "title": "Valmis luomaan mysteerisi",
+      "description": "Napsauta alla olevaa painiketta aloittaaksesi koko mysteeripaketin ja kaiken siihen liittyvän materiaalin luomisen.",
+      "button": "Luo paketti",
+      "characters": "Hahmo-ohjeet ovat saatavilla, kun generointi on aloitettu.",
+      "clues": "Vihjekortit ovat saatavilla, kun generointi on aloitettu.",
+      "inspector": "Tarkastaja-opas on saatavilla, kun generointi on aloitettu.",
+      "matrix": "Suhdematriisi on saatavilla, kun generointi on aloitettu."
+    },
+    "matrix": {
+      "title": "Hahmojen välinen suhdematriisi"
+    }
+  },
+  "chatbot": {
+    "toasts": {
+      "invalidId": "Virheellinen keskustelutunnus",
+      "loadFailed": "Vanhan keskustelusi lataaminen epäonnistui",
+      "offlineMode": "Käyttää offline-tilaa – jotkin toiminnot voivat olla rajoitettuja",
+      "requestError": "Pyyntöä ei voitu käsitellä",
+      "generationSuccess": "Mysteeri luotu!",
+      "urlUnavailable": "Chatbot-URL ei ole vielä saatavilla"
+    },
+    "welcomeMessage": "Tervetuloa Murhamysteeri-luoja! Kuvaile, minkälaisen mysteerin haluaisit luoda, tai pyydä minulta ehdotuksia.",
+    "newConversationTitle": "Uusi murhamysteeri",
+    "fallbackResponses": [
+      "Autan sinua mielelläni luomaan murhamysteerin. Minkä teeman tai ympäristön haluaisit mysteeriisi?",
+      "Se on hyvä valinta! Nyt mietitään uhria. Kuka on uhri?",
+      "Mielenkiintoista! Nyt tarvitsemme joitakin epäiltyjä. Voisitko kuvata 2-3 hahmoa, joilla voisi olla motiiveja tähän rikokseen?",
+      "Nämä ovat vakuuttavia epäiltyjä. Lisätään joitakin vihjeitä. Millaisia todisteita rikospaikalta voisi löytyä?",
+      "Mysteeriisi on muotoutumassa! Jotta voimme jatkaa tarinasi yksityiskohtien kehittämistä, mietitään, mitä muita elementtejä voisimme sisällyttää."
+    ],
+    "title": "Luo murhamysteerisi",
+    "buttons": {
+      "external": "Ulkoinen",
+      "openFull": "Avaa täysi chatbot",
+      "finalize": "Viimeistele",
+      "finalizeMystery": "Viimeistele mysteeri"
+    },
+    "creatorTitle": "Murhamysteeri-luoja",
+    "placeholder": "Kirjoita ideasi murhamysteeriin...",
+    "finalizePrompt": "Kun olet tyytyväinen mysteeriisi, viimeistele se jatkaaksesi."
+  },
+  "homeDashboard": {
+    "title": "Mysteeriesi",
+    "searchPlaceholder": "Hae mysteerejä...",
+    "loadMore": "Lataa lisää",
+    "loading": "Ladataan...",
+    "empty": {
+      "title": "Et ole vielä luonut mysteerejä",
+      "description": "Käytä yllä olevaa syöttölaatikkoa aloittaaksesi ensimmäisen murhamysteerisi luomisen!"
+    },
+    "errors": {
+      "loadFailed": "Joidenkin mysteerien lataus epäonnistui. Päivitä sivu."
+    }
+  },
+  "mysteryDashboard": {
+    "title": "Mysteeri-kojelaudan",
+    "description": "Hallinnoi luomiasi mysteerejä, aloita uusia tai tutustu esimerkkisisältöön.",
+    "tabs": {
+      "all": "Kaikki",
+      "drafts": "Luonnokset",
+      "purchased": "Ostetut",
+      "archived": "Arkistoidut"
+    }
+  },
+  "mysteryView": {
+    "timing": {
+      "small": "5-10 minuuttia",
+      "medium": "15-30 minuuttia",
+      "large": "30-45 minuuttia",
+      "xlarge": "45-60 minuuttia"
     }
   }
+}
