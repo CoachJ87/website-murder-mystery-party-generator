@@ -28,14 +28,21 @@ const Header = () => {
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation - Empty now that Support link is moved to the right */}
           <nav className="hidden md:flex items-center space-x-6">
-            {/* Navigation items can be added here if needed */}
+            {/* Navigation items can be added here if needed in the future */}
           </nav>
         </div>
 
-        {/* Auth Buttons and Language Switcher - Desktop */}
+        {/* Auth Buttons, Support Link and Language Switcher - Desktop */}
         <div className="hidden md:flex items-center space-x-4">
+          <Link
+            to="/support"
+            className="text-sm font-medium text-foreground hover:text-primary transition-colors no-underline"
+            aria-label={t('navigation.support')}
+          >
+            {t('navigation.support')}
+          </Link>
           <LanguageSwitcher />
           {isAuthenticated ? (
             <div className="flex items-center space-x-4">
@@ -85,6 +92,13 @@ const Header = () => {
           <div className="p-4 space-y-4">
             {/* Language Switcher in mobile menu */}
             <div className="flex justify-center">
+          <Link
+            to="/support"
+            className="text-sm font-medium text-foreground hover:text-primary transition-colors no-underline"
+            aria-label={t('navigation.support')}
+          >
+            {t('navigation.support')}
+          </Link>
               <LanguageSwitcher />
             </div>
             
