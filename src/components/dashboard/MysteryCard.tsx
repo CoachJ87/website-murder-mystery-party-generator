@@ -6,6 +6,17 @@ import { Eye, MessageSquare, Trash2, Users, Calendar } from "lucide-react";
 import { formatDate } from "@/utils/formatDate";
 import { useTranslation } from "react-i18next";
 
+const sanitizeTitle = (title: string): string => {
+  return title
+    .replace(/\*\*/g, '')  // Remove bold markers
+    .replace(/\*/g, '')    // Remove italic markers
+    .replace(/__/g, '')    // Remove alternate bold
+    .replace(/_/g, '')     // Remove alternate italic
+    .replace(/~~/g, '')    // Remove strikethrough
+    .replace(/`/g, '')     // Remove code markers
+    .trim();
+};
+
 interface MysteryCardProps {
   mystery: {
     id: string;
@@ -46,7 +57,7 @@ export default function MysteryCard({ mystery, onView, onEdit, onDelete }: Myste
       <CardHeader className="pb-3 flex-shrink-0">
         <div className="flex items-start justify-between gap-2">
           <CardTitle className="text-base sm:text-lg font-semibold line-clamp-2 flex-1">
-            {mystery.title}
+            {sanitizeTitle(mystery.title)}
           </CardTitle>
           <Badge className={`${getStatusColor(mystery.display_status)} text-xs px-2 py-1 flex-shrink-0`}>
             <span className="hidden sm:inline">{getStatusText(mystery.display_status)}</span>
