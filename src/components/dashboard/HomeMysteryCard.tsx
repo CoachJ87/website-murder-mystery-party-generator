@@ -31,8 +31,10 @@ export default function HomeMysteryCard({ mystery, onView, onEdit, onArchive, on
   const isGenerating = mystery.display_status === 'generating';
   
   const truncateTitle = (title: string, maxLength: number = 80) => {
-    if (title.length <= maxLength) return title;
-    return title.substring(0, maxLength) + "...";
+    // Strip markdown bold markers
+    const cleanTitle = title.replace(/\*\*/g, '');
+    if (cleanTitle.length <= maxLength) return cleanTitle;
+    return cleanTitle.substring(0, maxLength) + "...";
   };
 
   const handleAction = () => {

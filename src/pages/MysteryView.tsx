@@ -505,64 +505,8 @@ const MysteryView = () => {
     }
   }, [id, navigate, generationStatus?.status, fetchStructuredPackageData, debugLog, handleResumeGeneration, handleGeneratePackage]);
 
-  // Fixed auto-refresh polling with proper cleanup
-  useEffect(() => {
-    if (!id) return;
-
-    // Clear any existing interval
-    const clearPolling = () => {
-      if (pollingIntervalRef.current) {
-        console.log("🛑 [DEBUG] Clearing existing polling interval");
-        clearInterval(pollingIntervalRef.current);
-        pollingIntervalRef.current = null;
-      }
-    };
-
-    // Determine if we should be polling
-    const shouldPoll = (
-      (generationStatus?.status === 'in_progress') || 
-      (generating && !generationStatus) ||
-      (generating && generationStatus?.status !== 'completed' && generationStatus?.status !== 'failed')
-    );
-
-    console.log("🔍 [DEBUG] Polling decision:", {
-      shouldPoll,
-      generationStatus: generationStatus?.status,
-      generating,
-      hasInterval: !!pollingIntervalRef.current
-    });
-
-    if (shouldPoll && !pollingIntervalRef.current) {
-      console.log("▶️ [DEBUG] Starting auto-refresh polling (30s intervals)");
-      
-      // Start polling
-      pollingIntervalRef.current = setInterval(async () => {
-        console.log("🔄 [DEBUG] Polling tick - checking generation status");
-        
-        try {
-          const currentStatus = await checkGenerationStatus();
-          
-          // Stop polling if generation is complete or failed
-          if (currentStatus && (currentStatus.status === 'completed' || currentStatus.status === 'failed')) {
-            console.log(`✅ [DEBUG] Generation finished with status: ${currentStatus.status} - stopping polling`);
-            clearPolling();
-          }
-        } catch (error) {
-          console.error("❌ [DEBUG] Error during polling tick:", error);
-        }
-      }, 30000); // 30-second intervals
-      
-    } else if (!shouldPoll && pollingIntervalRef.current) {
-      console.log("⏹️ [DEBUG] Stopping polling - conditions no longer met");
-      clearPolling();
-    }
-
-    // Cleanup function
-    return () => {
-      console.log("🧹 [DEBUG] useEffect cleanup - clearing polling interval");
-      clearPolling();
-    };
-  }, [id, generationStatus?.status, generating, checkGenerationStatus]);
+  // Polling has been removed in favor of Supabase Realtime subscriptions
+  // for more efficient and immediate updates
 
   // NEW: Realtime subscription for instant updates
   useEffect(() => {

@@ -41,7 +41,9 @@ export const extractTitleFromMessages = (messages: any[]) => {
 };
 
 export const formatTitle = (title: string) => {
-  return title
+  // First strip markdown bold markers
+  const cleanTitle = title.replace(/\*\*/g, '');
+  return cleanTitle
     .trim()
     .split(' ')
     .map(word => {

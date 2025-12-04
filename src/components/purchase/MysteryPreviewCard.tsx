@@ -32,7 +32,7 @@ const MysteryPreviewCard = ({ mystery, parsedDetails }: MysteryPreviewCardProps)
     )}>
       <CardHeader className={cn(isMobile && "p-4 pb-3")}>
         <CardTitle className={cn(isMobile ? "text-lg" : "text-xl")}>
-          {mystery.title}
+          {mystery.title.replace(/\*\*/g, '')}
         </CardTitle>
         <CardDescription className={cn(isMobile && "text-sm")}>
           {t('purchase.preview.title')}
