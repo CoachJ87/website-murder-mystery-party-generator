@@ -455,6 +455,11 @@
     "additionalDetailsLabel": "追加の詳細（オプション）",
     "additionalDetailsPlaceholder": "ミステリーの特定の要件、特別なルール、または追加のコンテキスト...",
     "additionalDetailsDescription": "ミステリーの追加の詳細または特別なリクエストを提供してください",
+    "mysteryStyleLabel": "ミステリースタイル",
+    "mysteryStyleCharacterLabel": "キャラクターベース（即興）",
+    "mysteryStyleCharacterDescription": "誰でも殺人犯になる可能性があります - ゲーム中にランダムに選ばれます。キャラクターを演じて楽しむことに集中してください。",
+    "mysteryStyleDetectiveLabel": "探偵スタイル（クラシック）",
+    "mysteryStyleDetectiveDescription": "一人のプレイヤーが最初から密かに殺人犯です。他のプレイヤーは手がかりを通じて事件を解決するために協力します。",
     "startChat": "AIチャットを開始",
     "startingChat": "チャットを開始中..."
   },

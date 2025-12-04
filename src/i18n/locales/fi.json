@@ -455,6 +455,11 @@
     "additionalDetailsLabel": "Lisätiedot (valinnainen)",
     "additionalDetailsPlaceholder": "Mitkä tahansa erityisvaatimukset, erikoissäännöt tai lisäkonteksti mysteeriisi...",
     "additionalDetailsDescription": "Anna lisätietoja tai erityistoiveita mysteeriisi",
+    "mysteryStyleLabel": "Mysteerin Tyyli",
+    "mysteryStyleCharacterLabel": "Hahmopohjainen (Improvisaatio)",
+    "mysteryStyleCharacterDescription": "Kuka tahansa voi olla murhaaja - valitaan satunnaisesti pelin aikana. Keskity hahmoosi ja pidä hauskaa.",
+    "mysteryStyleDetectiveLabel": "Etsivä-Tyyli (Klassinen)",
+    "mysteryStyleDetectiveDescription": "Yksi pelaaja on salaa murhaaja alusta alkaen. Muut työskentelevät yhdessä ratkaistakseen tapauksen vihjeiden avulla.",
     "startChat": "Aloita chat tekoälyn kanssa",
     "startingChat": "Aloitetaan chat..."
   },

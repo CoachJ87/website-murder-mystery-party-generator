@@ -455,6 +455,11 @@
     "additionalDetailsLabel": "Aanvullende Details (Optioneel)",
     "additionalDetailsPlaceholder": "Eventuele specifieke vereisten, speciale regels of aanvullende context voor uw mysterie...",
     "additionalDetailsDescription": "Geef eventuele extra details of speciale verzoeken voor uw mysterie op",
+    "mysteryStyleLabel": "Mysterie Stijl",
+    "mysteryStyleCharacterLabel": "Karaktergebaseerd (Improvisatie)",
+    "mysteryStyleCharacterDescription": "Iedereen kan de moordenaar zijn - willekeurig gekozen tijdens het spel. Focus op je personage en heb plezier.",
+    "mysteryStyleDetectiveLabel": "Detective Stijl (Klassiek)",
+    "mysteryStyleDetectiveDescription": "Een speler is vanaf het begin stiekem de moordenaar. Anderen werken samen om de zaak op te lossen aan de hand van aanwijzingen.",
     "startChat": "Start AI Chat",
     "startingChat": "Chat starten..."
   },

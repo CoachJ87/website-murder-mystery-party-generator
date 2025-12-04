@@ -35,7 +35,7 @@ serve(async (req) => {
     // Retrieve conversation data with user_id and messages
     const { data: conversation, error: conversationError } = await supabase
       .from("conversations")
-      .select("*, messages(*), user_id, title, theme, player_count, script_type, has_accomplice")
+      .select("*, messages(*), user_id, title, theme, player_count, script_type, mystery_style, has_accomplice")
       .eq("id", conversationId)
       .single();
 
@@ -108,6 +108,7 @@ serve(async (req) => {
       theme: conversation.theme || null,
       scriptType: conversation.script_type || 'full',
       hasAccomplice: conversation.has_accomplice || false,
+      mysteryStyle: conversation.mystery_style || 'character',
       testMode,
       conversationContent
     };

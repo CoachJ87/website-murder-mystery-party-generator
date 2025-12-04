@@ -455,6 +455,11 @@
     "additionalDetailsLabel": "Detalles Adicionales (Opcional)",
     "additionalDetailsPlaceholder": "Cualquier requisito específico, reglas especiales o contexto adicional para tu misterio...",
     "additionalDetailsDescription": "Proporciona cualquier detalle adicional o solicitud especial para tu misterio",
+    "mysteryStyleLabel": "Estilo del Misterio",
+    "mysteryStyleCharacterLabel": "Basado en Personajes",
+    "mysteryStyleCharacterDescription": "Cualquiera podría ser el asesino - se elige al azar durante el juego. Concéntrate en interpretar tu personaje y divertirte.",
+    "mysteryStyleDetectiveLabel": "Estilo Detective",
+    "mysteryStyleDetectiveDescription": "Un jugador es secretamente el asesino desde el principio. Los demás trabajan juntos para resolver el caso mediante pistas.",
     "startChat": "Iniciar Chat con IA",
     "startingChat": "Iniciando Chat..."
   },

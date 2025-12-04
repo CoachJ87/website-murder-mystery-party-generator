@@ -455,6 +455,11 @@
     "additionalDetailsLabel": "其他详情（可选）",
     "additionalDetailsPlaceholder": "您谜团的任何特定要求、特殊规则或其他背景信息...",
     "additionalDetailsDescription": "提供您的谜团的任何其他详细信息或特殊要求",
+    "mysteryStyleLabel": "谜题风格",
+    "mysteryStyleCharacterLabel": "角色扮演（即兴）",
+    "mysteryStyleCharacterDescription": "任何人都可能是凶手 - 在游戏过程中随机选择。专注于扮演你的角色并享受乐趣。",
+    "mysteryStyleDetectiveLabel": "侦探风格（经典）",
+    "mysteryStyleDetectiveDescription": "一名玩家从一开始就秘密地是凶手。其他人通过线索一起合作破案。",
     "startChat": "开始与AI聊天",
     "startingChat": "正在启动聊天..."
   },

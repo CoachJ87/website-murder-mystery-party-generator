@@ -455,6 +455,11 @@
     "additionalDetailsLabel": "Additional Details (Optional)",
     "additionalDetailsPlaceholder": "Any specific requirements, special rules, or additional context for your mystery...",
     "additionalDetailsDescription": "Provide any extra details or special requests for your mystery",
+    "mysteryStyleLabel": "Mystery Style",
+    "mysteryStyleCharacterLabel": "Character-Based",
+    "mysteryStyleCharacterDescription": "Everyone could be the murderer - randomly chosen during the game. Focus on playing your character and having fun.",
+    "mysteryStyleDetectiveLabel": "Detective-Style",
+    "mysteryStyleDetectiveDescription": "One player is secretly the murderer from the start. Others work together to solve the case through clues.",
     "startChat": "Start AI Chat",
     "startingChat": "Starting Chat..."
   },

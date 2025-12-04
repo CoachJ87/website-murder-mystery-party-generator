@@ -61,7 +61,7 @@ const MysteryCreation = () => {
         try {
             const { data, error } = await supabase
                 .from("conversations")
-                .select("theme, player_count, script_type, has_accomplice, additional_details, title")
+                .select("theme, player_count, script_type, mystery_style, has_accomplice, additional_details, title")
                 .eq("id", mysteryId)
                 .single();
 
@@ -76,6 +76,7 @@ const MysteryCreation = () => {
                     theme: data.theme || "",
                     playerCount: data.player_count || 6,
                     scriptType: data.script_type || "full",
+                    mysteryStyle: data.mystery_style || "character",
                     hasAccomplice: data.has_accomplice || false,
                     additionalDetails: data.additional_details || ""
                 };
@@ -163,6 +164,7 @@ const MysteryCreation = () => {
                         theme: data.theme || null,
                         player_count: data.playerCount || 6,
                         script_type: data.scriptType || 'full',
+                        mystery_style: data.mysteryStyle || 'character',
                         has_accomplice: data.hasAccomplice || false,
                         additional_details: data.additionalDetails || null,
                         display_status: "draft",
@@ -192,6 +194,7 @@ const MysteryCreation = () => {
                         theme: data.theme || null,
                         player_count: data.playerCount || 6,
                         script_type: data.scriptType || 'full',
+                        mystery_style: data.mysteryStyle || 'character',
                         has_accomplice: data.hasAccomplice || false,
                         additional_details: data.additionalDetails || null,
                         updated_at: new Date().toISOString()

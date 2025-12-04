@@ -455,6 +455,11 @@
     "additionalDetailsLabel": "추가 세부정보 (선택사항)",
     "additionalDetailsPlaceholder": "미스터리에 대한 특정 요구사항, 특별한 규칙 또는 추가 컨텍스트...",
     "additionalDetailsDescription": "미스터리에 대한 추가 세부정보 또는 특별한 요청을 제공하세요",
+    "mysteryStyleLabel": "미스터리 스타일",
+    "mysteryStyleCharacterLabel": "캐릭터 기반 (즉흥)",
+    "mysteryStyleCharacterDescription": "누구나 살인자가 될 수 있습니다 - 게임 중에 무작위로 선택됩니다. 캐릭터 연기와 재미에 집중하세요.",
+    "mysteryStyleDetectiveLabel": "탐정 스타일 (클래식)",
+    "mysteryStyleDetectiveDescription": "한 플레이어가 처음부터 비밀리에 살인자입니다. 다른 플레이어들은 단서를 통해 사건을 해결하기 위해 협력합니다.",
     "startChat": "AI 채팅 시작",
     "startingChat": "채팅 시작 중..."
   },

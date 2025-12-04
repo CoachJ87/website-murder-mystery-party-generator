@@ -455,6 +455,11 @@
     "additionalDetailsLabel": "Additional Details (Optional)",
     "additionalDetailsPlaceholder": "Any specific requirements, special rules, or additional context for your mystery...",
     "additionalDetailsDescription": "Provide any extra details or special requests for your mystery",
+    "mysteryStyleLabel": "Mystery Style",
+    "mysteryStyleCharacterLabel": "Karakterbaseret (Improvisation)",
+    "mysteryStyleCharacterDescription": "Enhver kan være morderen - tilfældigt valgt under spillet. Fokuser på at spille din rolle og ha' det sjovt.",
+    "mysteryStyleDetectiveLabel": "Detektivstil (Klassisk)",
+    "mysteryStyleDetectiveDescription": "En spiller er hemmeligt morderen fra starten. De andre arbejder sammen for at løse sagen gennem ledetråde.",
     "startChat": "Start AI Chat",
     "startingChat": "Starting Chat..."
   },

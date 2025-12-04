@@ -455,6 +455,11 @@
     "additionalDetailsLabel": "Additional Details (Optional)",
     "additionalDetailsPlaceholder": "Any specific requirements, special rules, or additional context for your mystery...",
     "additionalDetailsDescription": "Provide any extra details or special requests for your mystery",
+    "mysteryStyleLabel": "Mysteriestil",
+    "mysteryStyleCharacterLabel": "Karaktersbaserad (Improvisation)",
+    "mysteryStyleCharacterDescription": "Vem som helst kan vara mördaren - slumpmässigt vald under spelet. Fokusera på att spela din roll och ha kul.",
+    "mysteryStyleDetectiveLabel": "Detektivstil (Klassisk)",
+    "mysteryStyleDetectiveDescription": "En spelare är hemlig mördare från början. De andra samarbetar för att lösa fallet genom ledtrådar.",
     "startChat": "Start AI Chat",
     "startingChat": "Starting Chat..."
   },

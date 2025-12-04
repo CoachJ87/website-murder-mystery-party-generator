@@ -455,6 +455,11 @@
     "additionalDetailsLabel": "Détails supplémentaires (facultatif)",
     "additionalDetailsPlaceholder": "Toutes exigences spéciales, règles supplémentaires ou contexte supplémentaire pour votre mystère...",
     "additionalDetailsDescription": "Fournissez des détails supplémentaires ou des demandes spéciales pour votre mystère",
+    "mysteryStyleLabel": "Style du Mystère",
+    "mysteryStyleCharacterLabel": "Basé sur les Personnages",
+    "mysteryStyleCharacterDescription": "N'importe qui pourrait être le meurtrier - choisi au hasard pendant le jeu. Concentrez-vous sur votre personnage et amusez-vous.",
+    "mysteryStyleDetectiveLabel": "Style Détective",
+    "mysteryStyleDetectiveDescription": "Un joueur est secrètement le meurtrier dès le départ. Les autres travaillent ensemble pour résoudre l'affaire grâce aux indices.",
     "startChat": "Commencer le chat avec l'IA",
     "startingChat": "Démarrage du chat..."
   },
