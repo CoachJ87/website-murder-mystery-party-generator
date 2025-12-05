@@ -194,10 +194,11 @@ const MysteryView = () => {
     const aiGeneratedTitle = extractedTitle();
     
     // Fallback hierarchy: AI title → conversation.title → theme → "Mystery Package"
-    return aiGeneratedTitle || 
-           mystery?.title || 
-           mystery?.mystery_data?.theme || 
-           "Mystery Package";
+    const title = aiGeneratedTitle || 
+                 mystery?.title || 
+                 mystery?.mystery_data?.theme || 
+                 "Mystery Package";
+    return title.replace(/\*\*/g, '');
   }, [extractedTitle, mystery]);
 
   // Save extracted title to database when available
