@@ -459,7 +459,7 @@
     "mysteryStyleCharacterLabel": "Basé sur les Personnages",
     "mysteryStyleCharacterDescription": "N'importe qui pourrait être le meurtrier - choisi au hasard pendant le jeu. Concentrez-vous sur votre personnage et amusez-vous.",
     "mysteryStyleDetectiveLabel": "Style Détective",
-    "mysteryStyleDetectiveDescription": "Un joueur est secrètement le meurtrier dès le départ. Les autres travaillent ensemble pour résoudre l'affaire grâce aux indices.",
+    "mysteryStyleDetectiveDescription": "Vous connaissez le tueur dès le départ. Vous jouez le détective, guidant les joueurs avec des indices vers la solution.",
     "startChat": "Commencer le chat avec l'IA",
     "startingChat": "Démarrage du chat..."
   },

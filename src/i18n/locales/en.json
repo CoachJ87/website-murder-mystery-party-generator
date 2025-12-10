@@ -457,9 +457,9 @@
     "additionalDetailsDescription": "Provide any extra details or special requests for your mystery",
     "mysteryStyleLabel": "Mystery Style",
     "mysteryStyleCharacterLabel": "Character-Based",
-    "mysteryStyleCharacterDescription": "Everyone could be the murderer - randomly chosen during the game. Focus on playing your character and having fun.",
+    "mysteryStyleCharacterDescription": "Murderer revealed mid-game by random draw - even the host can be surprised! Host can play as a suspect or narrate from the sidelines.",
     "mysteryStyleDetectiveLabel": "Detective-Style",
-    "mysteryStyleDetectiveDescription": "One player is secretly the murderer from the start. Others work together to solve the case through clues.",
+    "mysteryStyleDetectiveDescription": "You know the killer from the start. You play the detective, guiding players with clues and hints toward the solution.",
     "startChat": "Start AI Chat",
     "startingChat": "Starting Chat..."
   },

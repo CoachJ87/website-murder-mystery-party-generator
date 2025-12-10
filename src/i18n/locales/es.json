@@ -457,9 +457,9 @@
     "additionalDetailsDescription": "Proporciona cualquier detalle adicional o solicitud especial para tu misterio",
     "mysteryStyleLabel": "Estilo del Misterio",
     "mysteryStyleCharacterLabel": "Basado en Personajes",
-    "mysteryStyleCharacterDescription": "Cualquiera podría ser el asesino - se elige al azar durante el juego. Concéntrate en interpretar tu personaje y divertirte.",
+    "mysteryStyleCharacterDescription": "El asesino se revela a mitad del juego por sorteo - ¡incluso el anfitrión puede sorprenderse! El anfitrión puede jugar como sospechoso o narrar desde afuera.",
     "mysteryStyleDetectiveLabel": "Estilo Detective",
-    "mysteryStyleDetectiveDescription": "Un jugador es secretamente el asesino desde el principio. Los demás trabajan juntos para resolver el caso mediante pistas.",
+    "mysteryStyleDetectiveDescription": "Conoces al asesino desde el inicio. Juegas como detective, guiando a los jugadores con pistas hacia la solución.",
     "startChat": "Iniciar Chat con IA",
     "startingChat": "Iniciando Chat..."
   },

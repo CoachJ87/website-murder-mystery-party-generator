@@ -457,9 +457,9 @@
     "additionalDetailsDescription": "Geef eventuele extra details of speciale verzoeken voor uw mysterie op",
     "mysteryStyleLabel": "Mysterie Stijl",
     "mysteryStyleCharacterLabel": "Karaktergebaseerd (Improvisatie)",
-    "mysteryStyleCharacterDescription": "Iedereen kan de moordenaar zijn - willekeurig gekozen tijdens het spel. Focus op je personage en heb plezier.",
+    "mysteryStyleCharacterDescription": "De moordenaar wordt halverwege het spel onthuld door loting - zelfs de gastheer kan verrast worden! De gastheer kan meespelen als verdachte of vanaf de zijlijn vertellen.",
     "mysteryStyleDetectiveLabel": "Detective Stijl (Klassiek)",
-    "mysteryStyleDetectiveDescription": "Een speler is vanaf het begin stiekem de moordenaar. Anderen werken samen om de zaak op te lossen aan de hand van aanwijzingen.",
+    "mysteryStyleDetectiveDescription": "Je kent de moordenaar vanaf het begin. Je speelt de detective en leidt spelers met aanwijzingen naar de oplossing.",
     "startChat": "Start AI Chat",
     "startingChat": "Chat starten..."
   },

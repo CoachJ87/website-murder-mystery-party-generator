@@ -178,7 +178,7 @@ const MysteryForm = ({
                     <div className="flex flex-col">
                       <Label htmlFor="character" className="text-sm sm:text-base leading-5 cursor-pointer font-medium flex items-center gap-2">
                         {t('mysteryForm.mysteryStyleCharacterLabel')}
-                        <span className="text-xs bg-green-100 text-green-800 px-1.5 py-0.5 rounded font-medium">Replayable</span>
+                        
                       </Label>
                       <span className="text-xs sm:text-sm text-muted-foreground">
                         {t('mysteryForm.mysteryStyleCharacterDescription')}
@@ -190,7 +190,7 @@ const MysteryForm = ({
                     <div className="flex flex-col">
                       <Label htmlFor="detective" className="text-sm sm:text-base leading-5 cursor-pointer font-medium flex items-center gap-2">
                         {t('mysteryForm.mysteryStyleDetectiveLabel')}
-                        <span className="text-xs bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-medium">Beta</span>
+                        
                       </Label>
                       <span className="text-xs sm:text-sm text-muted-foreground">
                         {t('mysteryForm.mysteryStyleDetectiveDescription')}

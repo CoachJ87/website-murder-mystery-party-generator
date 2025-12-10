@@ -457,9 +457,9 @@
     "additionalDetailsDescription": "ミステリーの追加の詳細または特別なリクエストを提供してください",
     "mysteryStyleLabel": "ミステリースタイル",
     "mysteryStyleCharacterLabel": "キャラクターベース（即興）",
-    "mysteryStyleCharacterDescription": "誰でも殺人犯になる可能性があります - ゲーム中にランダムに選ばれます。キャラクターを演じて楽しむことに集中してください。",
+    "mysteryStyleCharacterDescription": "犯人はゲーム中盤にくじ引きで明かされます - ホストも驚くかも！ホストは容疑者として参加するか、ナレーターとして進行できます。",
     "mysteryStyleDetectiveLabel": "探偵スタイル（クラシック）",
-    "mysteryStyleDetectiveDescription": "一人のプレイヤーが最初から密かに殺人犯です。他のプレイヤーは手がかりを通じて事件を解決するために協力します。",
+    "mysteryStyleDetectiveDescription": "最初から犯人を知っています。探偵役として、手がかりでプレイヤーを解決へ導きます。",
     "startChat": "AIチャットを開始",
     "startingChat": "チャットを開始中..."
   },
