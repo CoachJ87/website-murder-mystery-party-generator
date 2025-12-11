@@ -457,9 +457,9 @@
     "additionalDetailsDescription": "ミステリーの追加の詳細または特別なリクエストを提供してください",
     "mysteryStyleLabel": "ミステリースタイル",
     "mysteryStyleCharacterLabel": "キャラクターベース（即興）",
-    "mysteryStyleCharacterDescription": "犯人はゲーム中盤にくじ引きで明かされます - ホストも驚くかも！ホストは容疑者として参加するか、ナレーターとして進行できます。",
+    "mysteryStyleCharacterDescription": "犯人はゲーム中盤にくじ引きで選ばれます。ホストは容疑者または探偵として参加できます。",
     "mysteryStyleDetectiveLabel": "探偵スタイル（クラシック）",
-    "mysteryStyleDetectiveDescription": "最初から犯人を知っています。探偵役として、手がかりでプレイヤーを解決へ導きます。",
+    "mysteryStyleDetectiveDescription": "ホストは最初から犯人を知っており、探偵役として手がかりでプレイヤーを解決へ導きます。",
     "startChat": "AIチャットを開始",
     "startingChat": "チャットを開始中..."
   },

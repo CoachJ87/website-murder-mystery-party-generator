@@ -457,9 +457,9 @@
     "additionalDetailsDescription": "Fournissez des détails supplémentaires ou des demandes spéciales pour votre mystère",
     "mysteryStyleLabel": "Style du Mystère",
     "mysteryStyleCharacterLabel": "Basé sur les Personnages",
-    "mysteryStyleCharacterDescription": "N'importe qui pourrait être le meurtrier - choisi au hasard pendant le jeu. Concentrez-vous sur votre personnage et amusez-vous.",
+    "mysteryStyleCharacterDescription": "Le meurtrier est sélectionné en cours de jeu par tirage au sort. L'hôte peut jouer en tant que suspect ou en tant que détective.",
     "mysteryStyleDetectiveLabel": "Style Détective",
-    "mysteryStyleDetectiveDescription": "Vous connaissez le tueur dès le départ. Vous jouez le détective, guidant les joueurs avec des indices vers la solution.",
+    "mysteryStyleDetectiveDescription": "L'hôte connaît le tueur dès le départ et joue le détective, guidant les joueurs avec des indices vers la solution.",
     "startChat": "Commencer le chat avec l'IA",
     "startingChat": "Démarrage du chat..."
   },

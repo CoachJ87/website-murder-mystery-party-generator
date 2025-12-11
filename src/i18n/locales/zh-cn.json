@@ -457,9 +457,9 @@
     "additionalDetailsDescription": "提供您的谜团的任何其他详细信息或特殊要求",
     "mysteryStyleLabel": "谜题风格",
     "mysteryStyleCharacterLabel": "角色扮演（即兴）",
-    "mysteryStyleCharacterDescription": "凶手在游戏中途通过抽签揭晓 - 连主持人都可能惊讶！主持人可以作为嫌疑人参与或在旁边叙述。",
+    "mysteryStyleCharacterDescription": "凶手在游戏中途通过抽签选定。主持人可以作为嫌疑人或侦探参与。",
     "mysteryStyleDetectiveLabel": "侦探风格（经典）",
-    "mysteryStyleDetectiveDescription": "你从一开始就知道凶手是谁。你扮演侦探，用线索引导玩家找到答案。",
+    "mysteryStyleDetectiveDescription": "主持人从一开始就知道凶手是谁，并扮演侦探，用线索引导玩家找到答案。",
     "startChat": "开始与AI聊天",
     "startingChat": "正在启动聊天..."
   },

@@ -457,9 +457,9 @@
     "additionalDetailsDescription": "Provide any extra details or special requests for your mystery",
     "mysteryStyleLabel": "Mystery Style",
     "mysteryStyleCharacterLabel": "Character-Based",
-    "mysteryStyleCharacterDescription": "Murderer revealed mid-game by random draw - even the host can be surprised! Host can play as a suspect or narrate from the sidelines.",
+    "mysteryStyleCharacterDescription": "Murderer selected mid-game by random draw. Host can play as a suspect or as the detective.",
     "mysteryStyleDetectiveLabel": "Detective-Style",
-    "mysteryStyleDetectiveDescription": "You know the killer from the start. You play the detective, guiding players with clues and hints toward the solution.",
+    "mysteryStyleDetectiveDescription": "The host knows the killer from the start and plays the detective, guiding players with clues and hints toward the solution.",
     "startChat": "Start AI Chat",
     "startingChat": "Starting Chat..."
   },

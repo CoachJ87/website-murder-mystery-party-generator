@@ -457,9 +457,9 @@
     "additionalDetailsDescription": "Fornisci dettagli aggiuntivi o richieste speciali per il tuo mistero",
     "mysteryStyleLabel": "Stile del Mistero",
     "mysteryStyleCharacterLabel": "Basato sui Personaggi (Improvvisazione)",
-    "mysteryStyleCharacterDescription": "L'assassino viene rivelato a metà gioco tramite sorteggio - anche l'host può essere sorpreso! L'host può giocare come sospettato o narrare da fuori.",
+    "mysteryStyleCharacterDescription": "L'assassino viene selezionato a metà gioco tramite sorteggio. L'host può giocare come sospettato o come detective.",
     "mysteryStyleDetectiveLabel": "Stile Investigativo (Classico)",
-    "mysteryStyleDetectiveDescription": "Conosci l'assassino dall'inizio. Giochi come detective, guidando i giocatori con indizi verso la soluzione.",
+    "mysteryStyleDetectiveDescription": "L'host conosce l'assassino dall'inizio e gioca come detective, guidando i giocatori con indizi verso la soluzione.",
     "startChat": "Avvia chat con AI",
     "startingChat": "Avvio chat..."
   },

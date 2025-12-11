@@ -457,9 +457,9 @@
     "additionalDetailsDescription": "미스터리에 대한 추가 세부정보 또는 특별한 요청을 제공하세요",
     "mysteryStyleLabel": "미스터리 스타일",
     "mysteryStyleCharacterLabel": "캐릭터 기반 (즉흥)",
-    "mysteryStyleCharacterDescription": "범인은 게임 중반에 무작위 추첨으로 공개됩니다 - 호스트도 놀랄 수 있어요! 호스트는 용의자로 참여하거나 옆에서 진행할 수 있습니다.",
+    "mysteryStyleCharacterDescription": "범인은 게임 중반에 무작위 추첨으로 선정됩니다. 호스트는 용의자 또는 탐정으로 참여할 수 있습니다.",
     "mysteryStyleDetectiveLabel": "탐정 스타일 (클래식)",
-    "mysteryStyleDetectiveDescription": "처음부터 범인을 알고 있습니다. 탐정 역할로 단서를 통해 플레이어들을 해결책으로 안내합니다.",
+    "mysteryStyleDetectiveDescription": "호스트는 처음부터 범인을 알고 있으며 탐정 역할로 단서를 통해 플레이어들을 해결책으로 안내합니다.",
     "startChat": "AI 채팅 시작",
     "startingChat": "채팅 시작 중..."
   },

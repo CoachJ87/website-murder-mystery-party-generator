@@ -457,9 +457,9 @@
     "additionalDetailsDescription": "Geben Sie zusätzliche Details oder spezielle Anfragen für Ihr Mysterium an",
     "mysteryStyleLabel": "Mysterium-Stil",
     "mysteryStyleCharacterLabel": "Charakterbasiert",
-    "mysteryStyleCharacterDescription": "Der Mörder wird mitten im Spiel per Zufallslos enthüllt - selbst der Gastgeber kann überrascht werden! Der Gastgeber kann als Verdächtiger mitspielen oder von der Seite erzählen.",
+    "mysteryStyleCharacterDescription": "Der Mörder wird mitten im Spiel per Zufallslos ausgewählt. Der Gastgeber kann als Verdächtiger oder als Detektiv spielen.",
     "mysteryStyleDetectiveLabel": "Detektiv-Stil",
-    "mysteryStyleDetectiveDescription": "Du kennst den Mörder von Anfang an. Du spielst den Detektiv und führst die Spieler mit Hinweisen zur Lösung.",
+    "mysteryStyleDetectiveDescription": "Der Gastgeber kennt den Mörder von Anfang an und spielt den Detektiv, der die Spieler mit Hinweisen zur Lösung führt.",
     "startChat": "Chat mit KI starten",
     "startingChat": "Chat wird gestartet..."
   },

@@ -457,9 +457,9 @@
     "additionalDetailsDescription": "Provide any extra details or special requests for your mystery",
     "mysteryStyleLabel": "Mystery Style",
     "mysteryStyleCharacterLabel": "Karakterbaseret (Improvisation)",
-    "mysteryStyleCharacterDescription": "Morderen afsløres midt i spillet ved lodtrækning - selv værten kan blive overrasket! Værten kan spille som mistænkt eller fortælle fra sidelinjen.",
+    "mysteryStyleCharacterDescription": "Morderen udvælges midt i spillet ved lodtrækning. Værten kan spille som mistænkt eller som detektiven.",
     "mysteryStyleDetectiveLabel": "Detektivstil (Klassisk)",
-    "mysteryStyleDetectiveDescription": "Du kender morderen fra starten. Du spiller detektiven og guider spillerne med spor mod løsningen.",
+    "mysteryStyleDetectiveDescription": "Værten kender morderen fra starten og spiller detektiven, der guider spillerne med spor mod løsningen.",
     "startChat": "Start AI Chat",
     "startingChat": "Starting Chat..."
   },
