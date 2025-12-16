@@ -461,7 +461,7 @@ const MysteryPackageTabView = React.memo(({
             isMobile && "text-sm"
           )}>
             {hostGuide ? (
-              <div className={cn("prose prose-slate max-w-none", isMobile && "prose-sm")}>
+              <div className={cn("prose prose-slate max-w-none overflow-x-auto", isMobile && "prose-sm")}>
                 <ReactMarkdown>{hostGuide}</ReactMarkdown>
               </div>
             ) : isGenerating ? (
@@ -537,7 +537,7 @@ const MysteryPackageTabView = React.memo(({
                           "text-foreground",
                           isMobile && "text-sm"
                         )}>
-                          <div className={cn("prose prose-slate max-w-none", isMobile && "prose-sm")}>
+                          <div className={cn("prose prose-slate max-w-none overflow-x-auto", isMobile && "prose-sm")}>
                             <ReactMarkdown>{characterGuideContent}</ReactMarkdown>
                           </div>
                         </AccordionContent>
@@ -573,7 +573,7 @@ const MysteryPackageTabView = React.memo(({
             isMobile && "text-sm"
           )}>
             {evidenceCards ? (
-              <div className={cn("prose prose-slate max-w-none", isMobile && "prose-sm")}>
+              <div className={cn("prose prose-slate max-w-none overflow-x-auto", isMobile && "prose-sm")}>
                 <ReactMarkdown>{evidenceCards}</ReactMarkdown>
               </div>
             ) : isGenerating ? (
@@ -603,7 +603,7 @@ const MysteryPackageTabView = React.memo(({
             isMobile && "text-sm"
           )}>
             {detectiveScript ? (
-              <div className={cn("prose prose-slate max-w-none", isMobile && "prose-sm")}>
+              <div className={cn("prose prose-slate max-w-none overflow-x-auto", isMobile && "prose-sm")}>
                 <ReactMarkdown>{detectiveScript}</ReactMarkdown>
               </div>
             ) : isGenerating ? (

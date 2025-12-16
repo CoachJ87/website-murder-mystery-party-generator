@@ -794,7 +794,7 @@ const MysteryView = () => {
                 <span>Current Step</span>
               </div>
               <p className={cn(
-                "text-muted-foreground",
+                "text-muted-foreground break-words",
                 isMobile && "text-xs leading-relaxed"
               )}>
                 {generationStatus.currentStep}

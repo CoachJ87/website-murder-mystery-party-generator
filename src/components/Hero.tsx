@@ -172,7 +172,7 @@ const Hero = () => {
               className="rounded-full px-3 sm:px-4 md:px-6 border-border/50 bg-card/30 backdrop-blur-sm text-xs sm:text-sm h-8 sm:h-9 md:h-10 font-inter"
               onClick={() => handleThemeSelect(theme.prompt)}
             >
-              <span className="truncate max-w-[120px] sm:max-w-none">{t(theme.name)}</span>
+              <span className="truncate max-w-[140px] xs:max-w-[160px] sm:max-w-none">{t(theme.name)}</span>
               <ArrowRight className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
             </Button>
           ))}

@@ -119,8 +119,8 @@ const MysteryChatPage = () => {
         <div className="min-h-screen flex flex-col bg-muted">
             <Header />
             <main className={cn(
-                "flex-1 pb-32", // Add padding at the bottom for fixed elements
-                isMobile ? "pt-2 px-3" : "pt-4 px-4"
+                "flex-1", // Padding handled by chat component
+                isMobile ? "pt-2 px-3 pb-24" : "pt-4 px-4 pb-32"
             )}>
                 <div className={cn(
                     "mx-auto",

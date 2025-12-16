@@ -1,43 +1,98 @@
 export const extractTitleFromMessages = (messages: any[]) => {
   if (!messages || messages.length === 0) return null;
-  
+
   const filteredMessages = messages.filter(message => {
     const content = (message.content || "").toLowerCase();
     return !(
-      content.includes("initial questions") || 
-      content.includes("clarification") || 
-      content.includes("# questions") || 
+      content.includes("initial questions") ||
+      content.includes("clarification") ||
+      content.includes("# questions") ||
       content.includes("## questions")
     );
   });
-  
-  // Updated regex patterns to better capture titles with apostrophes and special characters
-  const titlePattern = /#\s*["']?([^"'\n#]*(?:[''][^"'\n#]*)*)["']?(?:\s*-\s*A\s+MURDER\s+MYSTERY)?/i;
-  const alternativeTitlePattern = /title:\s*["']?([^"'\n]*(?:[''][^"'\n]*)*)["']?/i;
-  const quotedTitlePattern = /"([^"]*(?:[''][^"]*)*)"\s*(?:-\s*A\s+MURDER\s+MYSTERY)?/i;
-  
+
+  // Primary pattern: # TITLE (most reliable - this is how Claude formats titles)
+  const headerTitlePattern = /^#\s+(?:\*\*)?([A-Z][A-Za-z0-9\s:'\-']+?)(?:\*\*)?$/m;
+
+  // Secondary patterns (fallbacks)
+  const titleLabelPattern = /title:\s*["']?([^"'\n]+)["']?/i;
+  const boldTitlePattern = /\*\*([A-Z][A-Za-z0-9\s:'\-']+?)\*\*/;
+
+  // FIRST PASS: Look for # headers only (most reliable indicator of actual title)
   for (const message of filteredMessages) {
     if (message.role === 'assistant' || message.is_ai) {
       const content = message.content || '';
-      
-      const titleMatch = content.match(titlePattern);
-      if (titleMatch && titleMatch[1] && titleMatch[1].trim()) {
-        return formatTitle(titleMatch[1]);
-      }
-      
-      const quotedMatch = content.match(quotedTitlePattern);
-      if (quotedMatch && quotedMatch[1] && quotedMatch[1].trim()) {
-        return formatTitle(quotedMatch[1]);
-      }
-      
-      const altMatch = content.match(alternativeTitlePattern);
-      if (altMatch && altMatch[1] && altMatch[1].trim()) {
-        return formatTitle(altMatch[1]);
+
+      const headerMatch = content.match(headerTitlePattern);
+      if (headerMatch && headerMatch[1] && headerMatch[1].trim()) {
+        const title = headerMatch[1].trim();
+        // Validate it looks like a title (not a section header like "Questions" or "Character 1")
+        if (!isLikelySectionHeader(title)) {
+          return formatTitle(title);
+        }
       }
     }
   }
-  
+
+  // SECOND PASS: Look for "Title:" label pattern
+  for (const message of filteredMessages) {
+    if (message.role === 'assistant' || message.is_ai) {
+      const content = message.content || '';
+
+      const titleMatch = content.match(titleLabelPattern);
+      if (titleMatch && titleMatch[1] && titleMatch[1].trim()) {
+        const title = titleMatch[1].trim();
+        if (!isLikelySectionHeader(title)) {
+          return formatTitle(title);
+        }
+      }
+    }
+  }
+
+  // THIRD PASS: Look for bold text that looks like a title (usually early in message)
+  for (const message of filteredMessages) {
+    if (message.role === 'assistant' || message.is_ai) {
+      const content = message.content || '';
+
+      // Only check first 500 chars to avoid grabbing random bold text
+      const firstPart = content.substring(0, 500);
+      const boldMatch = firstPart.match(boldTitlePattern);
+      if (boldMatch && boldMatch[1] && boldMatch[1].trim()) {
+        const title = boldMatch[1].trim();
+        if (!isLikelySectionHeader(title) && looksLikeTitle(title)) {
+          return formatTitle(title);
+        }
+      }
+    }
+  }
+
   return null;
+};
+
+// Check if text is likely a section header rather than a mystery title
+const isLikelySectionHeader = (text: string): boolean => {
+  const sectionHeaders = [
+    'questions', 'character', 'background', 'round', 'evidence',
+    'clues', 'motives', 'relationships', 'introduction', 'overview',
+    'instructions', 'setup', 'premise', 'victim', 'suspect', 'detective',
+    'for example', 'example'
+  ];
+  const lower = text.toLowerCase();
+  return sectionHeaders.some(header => lower.startsWith(header) || lower === header);
+};
+
+// Check if text looks like a mystery title
+const looksLikeTitle = (text: string): boolean => {
+  // Titles usually have multiple words and contain murder/mystery/death keywords
+  // Or are formatted like "The Something Something"
+  const words = text.split(/\s+/);
+  if (words.length < 2 || words.length > 10) return false;
+
+  const lower = text.toLowerCase();
+  const titleKeywords = ['murder', 'mystery', 'death', 'deadly', 'blood', 'killer', 'crime'];
+  const startsWithThe = lower.startsWith('the ') || lower.startsWith('a ');
+
+  return titleKeywords.some(kw => lower.includes(kw)) || startsWithThe;
 };
 
 export const formatTitle = (title: string) => {
@@ -49,22 +104,17 @@ export const formatTitle = (title: string) => {
     .map(word => {
       // Handle words with apostrophes - don't capitalize after apostrophes
       if (word.includes("'") || word.includes("'")) {
-        // Split by apostrophe, capitalize first part, keep rest as is for contractions
         const parts = word.split(/([''])/);
         return parts.map((part, index) => {
           if (index === 0) {
-            // Capitalize first part
             return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
           } else if (part === "'" || part === "'") {
-            // Keep apostrophe as is
             return part;
           } else {
-            // Don't capitalize after apostrophe for contractions like "s", "t", "re"
             return part.toLowerCase();
           }
         }).join('');
       }
-      // Regular word capitalization
       return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
     })
     .join(' ');
