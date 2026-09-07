@@ -93,3 +93,24 @@ The tempting fix was the small one: hand-edit two lines of a paying customer's p
 The more interesting question was whether to widen one RPC or all eight. The argument for one: minimal diff, and `self_directed_question` is the only class with an auto-repair, so the other seven would only change *reporting*, not healing. The argument for eight, which won: the reporting change is itself valuable — the four hold-only classes are precisely the ones needing a human, and the old filter made a gate-held package invisible to the health check that would tell a human it exists. A gate that hides its own casualties is worse than no gate.
 
 Worth naming plainly: this bug was introduced by the immediately preceding commit and shipped with a written justification that was never executed. The ADR-0053 carve-out reads as a factual claim about live behaviour ("is fixed post-completion by the live ADR-0047 worker") but was in fact an inference from the worker's *existence*, not a check of whether it could reach a `needs_review` row. It is the same shape as the May 2026 filter/extractor regex mismatch: two predicates that must agree about the same concept, changed one at a time. The generalisable lesson is in the Consequences follow-up — when one component's output state feeds another's input filter, that agreement deserves an assertion, not prose.
+
+## Addendum (2026-09-07): the fix regressed silently for a month, found via a routine purchase sweep, re-applied
+
+A New-Purchase Coherence Sweep (ADR-0103) on package `323e0cc7-801f-4d0e-b35c-69e36ebc4dfc` ("Blood Moon Requiem", paid, conversation `488f078b-349d-4066-9be8-18d3c50d03c9`) hit the exact deadlock this ADR already fixed once:
+
+```sql
+select package_completion_blocking_defects(mp.*) from mystery_packages mp
+where mp.id = '323e0cc7-801f-4d0e-b35c-69e36ebc4dfc';
+-- {"self_directed_question.Sable/Saben Crimson"}
+
+select * from list_packages_with_self_directed_questions('2026-09-01');
+-- (0 rows)
+```
+
+Root cause: `supabase/migrations/20260810_add_is_test_flag_and_harden_health_check_detectors.sql` — shipped eight days after this ADR, to add an `is_test` filter to the health-check detectors — recreated all eight of these functions with hand-written `CREATE OR REPLACE FUNCTION` bodies instead of the programmatic `pg_get_functiondef()`-based rewrite this ADR's own migration used. Whoever wrote it (a past instance of this same assistant, per git history) started from a stale pre-widening snapshot of each function, so the `is_test` filter landed correctly but the `needs_review` widening silently vanished from all eight — live in production for exactly one month before this sweep caught it. `list_packages_with_unresolved_victim_name` (added later, ADR-0107) was untouched by that migration and correctly still includes `needs_review` — it's the only one of the health-check detectors that stayed correct, and served as the tell that the other eight had drifted.
+
+Only one package had actually fallen into the gap by the time this was found (the twin failure ADR-0055 warned about — `self_directed_question` is the one class with a real auto-repair, so it's also the one class where the deadlock is externally visible via a stuck customer package rather than just a silent reporting gap).
+
+**Fix:** re-ran this ADR's exact migration pattern (`supabase/migrations/20260907_restore_adr0055_needs_review_widening.sql`) — same programmatic `pg_get_functiondef()` string-replace plus a hard count assertion, run again from scratch against whatever currently matches the narrow predicate rather than a hand-picked function list. Deliberately excludes `list_packages_with_unconfessed_culprit`: created 2026-08-08, after this ADR shipped, never part of the original eight, and its `completed`-only scope is that detector's own deliberate design (a final-statement check that only makes sense once generation is fully done) rather than a casualty of this regression. Verified the assertion still lands on exactly 8. Then invoked `auto-remediate-packages` scoped to `{classes: ["self_directed_questions"], only_needs_review: true}` (free, deterministic, no LLM calls) to fix the one stranded package immediately rather than waiting for the next cron cycle; confirmed `package_completion_blocking_defects()` returned `NULL` and `heal_completed_packages()` promoted it to `completed` within the next 2-minute cron tick.
+
+**Follow-up not addressed here, same gap this ADR already flagged once:** nothing asserts that these two predicates (the gate's held-state and the detectors' visible-state) stay in agreement, so a future hand-transcribed `CREATE OR REPLACE FUNCTION` on any of these eight can reintroduce this exact regression a third time with no test to catch it. Worth a disposable-row or static-SQL-text test asserting all eight (minus `list_packages_with_unconfessed_culprit`) match `status IN (..., 'needs_review')`, but that's a separate piece of work from this fix.
