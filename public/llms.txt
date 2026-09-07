@@ -2,7 +2,7 @@
 
 > Mystery Maker is an AI-powered murder mystery party generator and comprehensive content resource. This site offers custom murder mystery party scripts, themes, hosting guides, and troubleshooting help for parties of any size, theme, or audience.
 
-This index organizes 290 published guides by topic cluster. All guides are available in 13 languages (EN, ES, FR, DE, IT, DA, FI, NL, SV, PT, KO, JA, ZH-CN) at `/{lang}/blog/{slug}` — the EN versions are listed below.
+This index organizes 291 published guides by topic cluster. All guides are available in 13 languages (EN, ES, FR, DE, IT, DA, FI, NL, SV, PT, KO, JA, ZH-CN) at `/{lang}/blog/{slug}` — the EN versions are listed below.
 
 **Generator**: [Create a custom murder mystery party](https://www.mysterymaker.party/)
 **Blog index**: [All published posts](https://www.mysterymaker.party/blog)
@@ -117,6 +117,7 @@ This index organizes 290 published guides by topic cluster. All guides are avail
 - [Nightclub Murder Mystery Party Planning: Dance Into Danger](https://www.mysterymaker.party/blog/nightclub-murder-mystery-party-planning-dance-into-danger): Dance into danger with pulsing nightclub murder mystery parties featuring DJs, dancers, and after-dark drama.
 - [Personalized Murder Mystery Party Using AI](https://www.mysterymaker.party/blog/personalized-murder-mystery-party-using-ai): How to create a personalized murder mystery party using AI with real guest names, inside jokes and custom themes. Why personalization transforms it.
 - [Psychologist Murder Mystery Themes](https://www.mysterymaker.party/blog/psychologist-murder-mystery-themes-mind-games-psychological-profiling): Murder mystery themes with psychologist characters: behavior analysis, killer profiling and therapy ethics fuel the case.
+- [Scientist Murder Mystery Themes](https://www.mysterymaker.party/blog/scientist-murder-mystery-themes-laboratory-crimes-research-rivalries): Murder mystery themes with scientist characters: research ethics, lab accidents and academic competition fuel the investigation.
 - [Ski Lodge Murder Mystery Party Planning](https://www.mysterymaker.party/blog/ski-lodge-murder-mystery-party-planning-alpine-adventures-with-cozy-winter-danger): Hit the slopes of danger with cozy ski lodge murder mystery parties featuring winter sports and mountain isolation.
 - [Summer Murder Mystery Party Ideas](https://www.mysterymaker.party/blog/summer-murder-mystery-party-ideas): Summer murder mystery party ideas with outdoor themes, pool parties, BBQ whodunits, and heat-friendly mystery formats for warm-weather entertaining.
 - [True Crime Inspired Murder Mystery Parties](https://www.mysterymaker.party/blog/true-crime-inspired-murder-mystery-themes): Build a true crime inspired murder mystery party with forensic evidence, serial-style storytelling, and case structures drawn from famous investigations.
