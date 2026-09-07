@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-07
+
+### Fix: "Murder In The Majlis" sweep found a stray trailing quote mark in 2 characters' guilty confessions ([ADR-0103](docs/adr/0103-new-purchase-coherence-sweep-ritual.md) Addendum 24)
+
+Routine New-Purchase sweep (package `a49181e0-a49f-499e-b491-98732799887d`). All automated detectors and manual cross-checks (victim name, detective script, all 6 characters' full content) came back clean except one small generation artifact: Hessa Al Nuaimi's and Latifa Al Qassimi's `reveal_confession_guilty` text each ended with an unpaired trailing single-quote character with no matching opening quote in the field. Fixed via a direct SQL update on the 2 affected rows; re-verified all detectors and `package_completion_blocking_defects()` clean afterward.
+
 ## 2026-09-06
 
 ### Fix: closed both deferred `master_context` items — backfilled 3 stale packages, hardened `regenerate-child-content`'s verify gate against removed-character leaks ([ADR-0088](docs/adr/0088-guest-dropout-multi-character-and-reassignment.md) Addendum, 2026-09-06)
