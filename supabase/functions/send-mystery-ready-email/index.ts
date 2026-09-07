@@ -103,7 +103,7 @@ serve(async (req) => {
             Hi ${userName}, great news! Your murder mystery "${mysteryTitle}" is ready and waiting for you.
           </p>
           <div style="text-align: center; margin: 35px 0;">
-            <a href="https://www.mysterymaker.party/mystery/${pkg.id}" style="display: inline-block; background: #C81400; color: #F5F0E8; padding: 16px 40px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">
+            <a href="https://www.mysterymaker.party/mystery/${pkg.conversation_id}" style="display: inline-block; background: #C81400; color: #F5F0E8; padding: 16px 40px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">
               View Your Mystery
             </a>
           </div>

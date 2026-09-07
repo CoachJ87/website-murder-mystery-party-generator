@@ -98,6 +98,51 @@ This is a different failure shape from Addendum 2's timing bug (Parent checking 
 
 **Fixed:** `ALTER TRIGGER trg_notify_package_ready ON public.mystery_packages RENAME TO trg_z_notify_package_ready;` — pure rename, zero logic change. New alphabetical order: `trg_00_normalize_generation_status` → `trg_validate_package_characters` → `trg_z_notify_package_ready` → `trg_zz_maintain_needs_review_at`. `notify_package_ready()` now always reads `NEW.generation_status` *after* validation has had its chance to correct it — for a package validation flips to `needs_review`, the trigger's own condition (`= 'completed'`) now correctly evaluates false and no email fires; for a genuinely complete package, validation leaves `NEW.generation_status` unchanged and the email fires exactly as before. Applied directly via the Supabase Management API's `/database/query` endpoint (same method as [ADR-0103](0103-new-purchase-coherence-sweep-ritual.md) Addendum 11's migration, using the CLI's keychain-stored access token). Verified via `pg_trigger` that the new order is correct. Not re-tested with a live purchase (a pure trigger rename with no logic change doesn't carry the same regression risk as the Parent57 blueprint change earlier in this ADR did — watch the next few purchases' `ready_email_sent_at` vs `generation_completed_at` gap as informal confirmation instead of spending on a controlled test).
 
+## Addendum 4 (2026-09-07): the email's CTA link used the wrong ID from launch — every send 404'd
+
+Reported by customer Hannah Winter (`hannah.winter.uk@gmail.com`, "The Person Who Died Wasn't A Stranger," conversation `425fdbd5-5430-4f1b-a3fd-eb6e150d980b`): clicking the link in her "ready" email returned "page not found."
+
+**Root cause:** `send-mystery-ready-email/index.ts` built the CTA as `https://www.mysterymaker.party/mystery/${pkg.id}` — `pkg.id` being `mystery_packages.id`. But the frontend route `/mystery/:id` (`App.tsx` → `MysteryView.tsx`) queries the `conversations` table by that `:id` param; it has always expected a `conversation_id`, never a package ID. Confirmed via SQL that `mystery_packages.id` and `mystery_packages.conversation_id` are distinct UUIDs on every row, with no exceptions — this was never a coincidental match that broke, it never worked. The bug has existed in this function since it was written for this ADR's original implementation (2026-08-23) and was never caught by the two live-purchase test runs in Addenda 1/2, because those tests verified email delivery and generation completeness, not that the emailed link actually resolved.
+
+**Scope, confirmed via SQL (`ready_email_sent_at IS NOT NULL`):** 27 total sends since 2026-08-23, 25 real customers (2 were Jonathan's own `TEST — ADR-0106 Parent57/58 Verification` packages). Every single one got a dead link. Unknown how many actually needed it vs. reached their mystery another way first (the Stripe purchase-confirmation email sent at checkout, `stripe-webhook/index.ts`, correctly links by `conversationId` and goes out earlier than this one) — no way to reconstruct click-through from here.
+
+Affected packages (`package_id` / `conversation_id` / title / email / `ready_email_sent_at`):
+| conversation_id | title | email | sent_at (UTC) |
+|---|---|---|---|
+| `3e627233-69a1-48e4-97dc-325217ecdf21` | Murder In Paradise: Death At Coral Cove Resort | lukenskatie@gmail.com | 2026-08-24 02:21 |
+| `624ad4af-3b5b-43d8-8f25-7df919ef153f` | Operation: Thirty & Murdery | juergensjaclyn@gmail.com | 2026-08-25 13:09 |
+| `f9bf07b5-1a11-491f-8b38-96d85785f7f4` | The Vanishing Of Lady Bovine | nsmith1420@yahoo.com | 2026-08-25 22:13 |
+| `43af40e9-6e16-45ff-9eac-ef012f44c97f` | Smells Like Murder: A Grunge Era Conspiracy | juliakjekaripidis333@gmail.com | 2026-08-27 01:33 |
+| `6a807757-e94c-4525-a05d-485d03bb168e` | De Bittere Verjaardag: Moord In Villa Limoncello | rsappel17@gmail.com | 2026-08-28 17:18 |
+| `4ea732b6-a3c7-4460-90ce-37f0d6ca60be` | Love Island Season 8 Reunion Murder Mystery | saanchijain04@gmail.com | 2026-08-29 15:05 |
+| `47c53461-699e-4041-be02-1ef787218933` | Casa Ferrel | romanelegoaster@gmail.com | 2026-08-30 12:09 |
+| `cb044fc0-5ef9-423a-ac01-6dff0f36cb0d` | The Cookie, The Crown, And The Jester's Heart | stasa.student@gmail.com | 2026-08-30 18:42 |
+| `7ba1372d-9f16-4b21-a107-c0194370218d` | The Workshop Of St. Nick | alana.stevens122@gmail.com | 2026-08-31 08:36 |
+| `425fdbd5-5430-4f1b-a3fd-eb6e150d980b` | The Person Who Died Wasn't A Stranger | hannah.winter.uk@gmail.com | 2026-08-31 15:49 |
+| `90d993ad-2ccc-40d4-bd21-70d40844dcb5` | Ashes At Camp Whispering Pine | jslines12@gmail.com | 2026-09-01 17:59 |
+| `d5d66a5b-95b2-468d-83fa-d285d044673c` | Tod Auf Der Alm 3000 | marina@tedxklagenfurt.com | 2026-09-01 20:50 |
+| `4bc145d4-d708-4e0c-9658-8464cdc58879` | Elementary, My Dear Cadaver | 90.c.e.bentley@gmail.com | 2026-09-01 20:58 |
+| `9b821518-4a1e-48eb-a53a-5897d36f7992` | Dead Man's Hand: A Golden Gulch Mystery | phattgurll77@gmail.com | 2026-09-02 13:12 |
+| `c2a6c0fd-d06d-49ff-9e61-5c43e342d612` | Bloodline: The Last Check-In | chehab.lana@gmail.com | 2026-09-02 20:10 |
+| `51da817d-a9c0-4950-94d8-52c03d41d932` | Blood, Dust & Dead Man's Hand | dhr148@gmail.com | 2026-09-02 21:47 |
+| `867524d2-ea95-4567-a918-18bada6595ce` | The Final Cut | rierieriep33@gmail.com | 2026-09-04 06:04 |
+| `bf336652-6bff-40de-83ca-836e24470c4e` | The Hollingsworth Estate | shaun_heaviside1@yahoo.co.uk | 2026-09-04 16:26 |
+| `11610ef0-bade-4a88-926f-679c381a03ef` | Lethal Mutations: Death At The Helix Institute | jdnekritz@optonline.net | 2026-09-04 20:07 |
+| `97115032-8948-4810-a8ca-3a09c9a30ea1` | Murder At The Golden Feather Awards | raegendschott@gmail.com | 2026-09-04 20:24 |
+| `9b067932-2840-439f-a11d-df83381f5ee1` | Dirty Martini, Deadly Party: Faith's Last Birthday Bash | faithmarieshipman@gmail.com | 2026-09-05 02:38 |
+| `a3c58f9a-368e-4fca-ab32-3b87e37925bd` | The Oath And The Poisoned Cup | jackrhodes11@live.com.au | 2026-09-05 16:01 |
+| `deb9c01f-b3fb-4cfb-a1f5-6d9791ead895` | The Masque Of Midnight Manor | cosmicmatul1475@gmail.com | 2026-09-06 03:10 |
+| `e826a708-824c-49b6-858d-82f24106ef73` | Murder In The Majlis | shammaalmarri10@gmail.com | 2026-09-06 18:46 |
+| `488f078b-349d-4066-9be8-18d3c50d03c9` | Blood Moon Requiem | brennagillmann@gmail.com | 2026-09-07 07:36 |
+
+Every one of these customers has a paid, complete package sitting behind the correct URL `https://www.mysterymaker.party/mystery/<conversation_id>` (the `conversation_id` column above) — the content itself was never affected, only this one email's link. Whether to proactively reach any of the other 24 is Jonathan's call, not made here; deliberately not auto-emailed (this codebase doesn't automate customer-facing sends outside existing transactional pipelines).
+
+**Fixed:** `pkg.conversation_id` (already fetched in the existing query, just never used for the link) replaces `pkg.id` in the `<a href>`. Deployed to `supabase/functions/send-mystery-ready-email/index.ts`, `verify_jwt` preserved `true`, confirmed live via `get_edge_function` diff against the intended source. Grepped every other edge function for the same `mystery/${pkg...}` / `mystery/${package...}` shape — no other occurrences of this mistake found.
+
+**Not fixed here, flagged as a gap:** the two live-purchase test runs in Addenda 1/2 verified the email sent and the package completed, but neither one actually clicked the link — a "does the emailed URL 200" check would have caught this at launch. No test infrastructure change made; noting it so the next new-email-with-a-link ADR doesn't skip that check.
+
+**Key files touched by this addendum:** `supabase/functions/send-mystery-ready-email/index.ts` (v2 → v3).
+
 ## Key files
 
 - `supabase/migrations/20260823_ready_email_single_source_of_truth.sql` — new column, trigger function, trigger
