@@ -2,6 +2,23 @@
 
 ## 2026-09-07
 
+### SEO: ADR-0046 canonical consolidation confirmed working (3rd read) — closed out, plus 5 internal-link insertions from this week's digest
+
+Re-ran `node scripts/backfillSeoHistory.mjs jul2026_custom_page_canonicalization` with a full 30/30-day post-window (the 08-14 and 08-31 reads were both thin). Homepage position on both head terms improved again — "custom murder mystery game" 9.9→5.2, "custom murder mystery party" 14.0→5.3 — and the one loose end from the 08-31 read (the "game" query's custom-page impressions weren't falling yet) resolved: custom-page impressions are now declining on both terms (79→48, 122→30). Three consecutive reads all point the same direction; called it closed rather than scheduling a fourth. Full numbers and page-level breakdown: [ADR-0046](docs/adr/0046-en-custom-page-canonical-to-homepage.md) Addendum (2026-09-07). Retired the now-resolved reminder from `scripts/generateSeoDigest.mjs`'s `REMINDERS` array.
+
+Guardrail (Italian corporate query, ADR-0020/0040) remains clean with respect to this ADR. Its separate, already-closed impression collapse (`00_INBOX/italian-corporate-query-impression-collapse-2026-08-31-mystery-maker.md`) is now a flat zero every day since 2026-07-14 — added a corroborating dated update to that note, didn't reopen it (2026-09-01's demand-side-collapse verdict still holds).
+
+Cross-checked today's digest's 5 suggested internal links against live content and prior sessions' work before touching anything: 3 of the 5 already existed (`free-murder-mystery-games-printable` → homepage, `ai-murder-mystery-generator-complete-guide` → homepage, `best-murder-mystery-party-games-review` → the printable hub — the middle one was explicitly skipped as a duplicate back on 2026-08-24). The suggested fr/da authority links for the printable pages already exist in `cross_link_map.json` and are already baked into 3 posts' draft content in each language — but all 6 source posts (3 fr, 3 da) are still unpublished drafts, so no authority is flowing yet. Not a link-writing gap; flagging as a publish-queue question instead of forcing anything live.
+
+Shipped the 5 links that were genuinely missing, via `cross_link_map.json` (new `insertions` entries, `target_page: "/"` for homepage links per the ADR-0023 convention) plus a surgical, verified Supabase `UPDATE` per row (not a full `backfill-crosslinks` run):
+- `murder-mystery-party-character-ideas` → homepage (`/`), anchor "custom murder mystery game" (had no homepage link at all).
+- `murder-mystery-party-clue-ideas` → homepage (`/`), anchor "custom murder mystery game" (same).
+- `what-do-you-need-for-a-murder-mystery-party` → `free-murder-mystery-games-printable`, anchor "printable murder mystery game".
+- `what-do-you-need-for-a-murder-mystery-party` → `murder-mystery-party-script-template-guide`, anchor "murder mystery party script template" (2 new insertions on this one post).
+- `how-to-write-murder-mystery-characters` → `murder-mystery-party-script-template-guide`, anchor "murder mystery party script template".
+
+Not done: publishing the 6 stuck fr/da drafts (out of scope — that's the daily publish-queue's call, not a link-authoring one).
+
 ### Fix: "your mystery is ready" email has linked to the wrong ID since it launched — every send 404'd ([ADR-0106](docs/adr/0106-single-source-of-truth-ready-notification.md) Addendum 4)
 
 Hannah Winter reported the link in her "ready" email 404'd. `send-mystery-ready-email/index.ts` built the CTA link as `/mystery/${pkg.id}` (the `mystery_packages.id`), but the frontend route `/mystery/:id` (`MysteryView.tsx`) resolves `:id` against the `conversations` table — `mystery_packages.id` and `conversations.id` are always different UUIDs. Every "ready" email sent since this function's launch (ADR-0106, 2026-08-23) has linked to a nonexistent conversation ID. 25 real customers (2 more sends were Jonathan's own test packages) got a broken link; unclear how many actually needed it vs. found their mystery another way (dashboard, or the earlier Stripe purchase-confirmation email, which correctly links by `conversation_id`).

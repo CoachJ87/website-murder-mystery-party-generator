@@ -51397,6 +51397,11 @@
         "target_slug": "murder-mystery-party-script-template-guide",
         "match_text": "A single-page character sheet with background, personality, three key relationships, and one secret works better than five-page backstories that guests won't fully absorb.",
         "replacement": "A single-page character sheet with background, personality, three key relationships, and one secret works better than five-page backstories that guests won't fully absorb — our [murder mystery script templates](/blog/murder-mystery-party-script-template-guide) breakdown shows exactly what to include."
+      },
+      {
+        "target_page": "/",
+        "match_text": "When you build your mystery in MysteryMaker, the character generation doesn't just populate roles.",
+        "replacement": "When you build your [custom murder mystery game](/) in MysteryMaker, the character generation doesn't just populate roles."
       }
     ],
     "lang_insertions": {
@@ -51757,6 +51762,11 @@
       {
         "match_text": "what they see and discovering",
         "replacement": "[what they see and discovering](/blog/antique-shop-murder-mystery-party-guide-discover-deadly-treasures-and-secrets)"
+      },
+      {
+        "target_page": "/",
+        "match_text": "When you're using MysteryMaker, this work is partially done for you.",
+        "replacement": "When you're building a [custom murder mystery game](/) using MysteryMaker, this work is partially done for you."
       }
     ],
     "lang_insertions": {
@@ -94976,6 +94986,11 @@
       {
         "match_text": "most murder mystery character sheets",
         "replacement": "[most murder mystery character sheets](/blog/antique-shop-murder-mystery-party-guide-discover-deadly-treasures-and-secrets)"
+      },
+      {
+        "target_slug": "murder-mystery-party-script-template-guide",
+        "match_text": "The host has enough to manage with pacing, clue delivery, and keeping the mystery on track.",
+        "replacement": "The host has enough to manage with pacing, clue delivery, and keeping the mystery on track — a [murder mystery party script template](/blog/murder-mystery-party-script-template-guide) helps here."
       }
     ],
     "lang_insertions": {
@@ -152947,6 +152962,16 @@
       {
         "match_text": "You can DIY this with",
         "replacement": "[You can DIY this with](/blog/antique-shop-murder-mystery-party-guide-discover-deadly-treasures-and-secrets)"
+      },
+      {
+        "target_slug": "free-murder-mystery-games-printable",
+        "match_text": "a free game you found online, or something you wrote yourself",
+        "replacement": "a [printable murder mystery game](/blog/free-murder-mystery-games-printable) you found online, or something you wrote yourself"
+      },
+      {
+        "target_slug": "murder-mystery-party-script-template-guide",
+        "match_text": "and a host script tracking timing across phases",
+        "replacement": "and a [murder mystery party script template](/blog/murder-mystery-party-script-template-guide) tracking timing across phases"
       }
     ],
     "lang_insertions": {

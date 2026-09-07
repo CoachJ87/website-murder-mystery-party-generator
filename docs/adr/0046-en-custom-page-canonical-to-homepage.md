@@ -159,3 +159,46 @@ the EN-only constraint the brief set.
   [ADR-0040](0040-both-landing-angles-per-language.md) (localized landing angles — the
   non-EN cluster this change deliberately protects).
 - (vault copy) [[01_Projects/Mystery-Maker]]
+
+## Addendum (2026-09-07) — monitoring closed: consolidation confirmed, no escalation needed
+
+Third and final ground-truth re-measurement (`node scripts/backfillSeoHistory.mjs
+jul2026_custom_page_canonicalization`, 30/30 post-days — the first two reads,
+2026-08-14 and 2026-08-31, were thin windows). Trend across all three reads,
+page-level (dimensions=['page'], filtered per query):
+
+| | Baseline (28d ending 07-26) | 08-31 read | 09-07 read (this one) |
+|---|---|---|---|
+| "custom murder mystery game" — homepage pos | 9.9 | 6.5 | **5.2** |
+| "…game" — custom page impressions | 79 | 80 (flagged "not falling yet") | **48 (now falling)** |
+| "custom murder mystery party" — homepage pos | 14.0 | 6.8 | **5.3** |
+| "…party" — custom page impressions | 122 | 58 | **30** |
+
+The one open item from the 08-31 read — the "game" query's custom-page impressions
+weren't falling yet, so that term's consolidation looked mixed — has resolved: both
+head terms are now consolidating cleanly (homepage position improving, custom page's
+impressions on both terms declining) and both are within one spot of page-1's top 5.
+
+**Verdict:** consolidation happened and is still strengthening three reads in a row.
+The homepage's remaining gap to top-5 is authority, not copy, exactly as this ADR
+originally diagnosed — no title/meta/H1 rewrite is warranted (H1 decision already
+closed 2026-08-31, see CHANGELOG). **No escalation to a 301 is warranted** — reverse
+this call only if the trend reverses, which it has not done across three consecutive
+reads spanning six weeks.
+
+**Guardrail:** the Italian corporate query (ADR-0020/0040, baseline ~pos 3) remains
+unaffected by this ADR specifically — no hreflang-cluster fallout. Its own,
+separately-tracked regression (impression collapse starting 2026-07-14, three weeks
+before this ADR shipped) has worsened to a flat zero impressions/day since; see
+`00_INBOX/italian-corporate-query-impression-collapse-2026-08-31-mystery-maker.md`
+(updated same date as this addendum) — unrelated to this ADR, not root-caused yet.
+
+**Action taken alongside this measurement:** the weekly digest's linked action item 2
+("1-2 contextual internal links to the homepage from high-authority posts") was
+already satisfied by prior sessions (`free-murder-mystery-games-printable` and
+`ai-murder-mystery-generator-complete-guide` both already link to `/`); this session
+added 2 more from posts that had none (`murder-mystery-party-character-ideas`,
+`murder-mystery-party-clue-ideas`) — see CHANGELOG 2026-09-07.
+
+The self-expiring reminder in `scripts/generateSeoDigest.mjs` REMINDERS is retired as
+of this addendum (monitoring window closed, not superseded).

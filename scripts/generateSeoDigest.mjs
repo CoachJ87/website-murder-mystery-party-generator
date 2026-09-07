@@ -124,77 +124,18 @@ Keep it skimmable. No preamble before the first <h2>. No closing sign-off.
 // paste-ready prompt that re-derives from ground truth. Delete an entry once acted
 // on, or let it lapse after `end` (inclusive). Dates are 'YYYY-MM-DD' (UTC).
 const REMINDERS = [
-  {
-    // Follow-up on ADR-0046 (2026-07-27): we CANONICALED the EN
-    // /custom-murder-mystery-party page to the homepage and reverted the 4552cb4
-    // keyword-stuffing, because GSC (page-level, 28d) showed the homepage OWNS the
-    // head terms — "custom murder mystery game" homepage pos 9.6 (6 clk) vs custom
-    // pos 50.5 (0 clk); "custom murder mystery party" homepage pos 13.9 vs custom
-    // pos 66.7 — while the custom page earned ~1 click / 90 days. This SUPERSEDES
-    // the earlier "did the custom-page rewrite work" reminder: the custom page is
-    // no longer meant to rank for these terms; the HOMEPAGE is. Measure whether the
-    // consolidation took and whether the homepage's next lever is authority/links
-    // (NOT copy — the homepage title already leads with the terms and must keep its
-    // "| Mystery Maker" brand suffix, ADR-0024). Also re-check the Italian corporate
-    // query (~pos 3) for hreflang-cluster fallout, since we left hreflang emission
-    // untouched. Window ~4 weeks post-deploy; covers Aug 24/31 + Sep 7/14/21.
-    //
-    // UPDATE 2026-08-14 (ADR-0084): scripts/backfillSeoHistory.mjs now automates
-    // the head-term pre/post pull for this exact ADR (named-query mode, seeded
-    // with this intervention). A first thin-window run (11 of the wanted 30 post-
-    // days, since so little time had passed) came back cautiously positive: avg
-    // position 12→11.6, "custom murder mystery" 6.3→2.7, "custom murder mystery
-    // party" 14.5→13, "custom murder mystery game" 10.1→11.1 (slightly worse).
-    // Small numbers, not proof yet — the point of this reminder window is to
-    // re-run it once the full 30-day post-window exists for a firmer read.
-    //
-    // UPDATE 2026-08-24: action item 2 above (contextual homepage links from
-    // high-authority posts) partially actioned ahead of the window firing —
-    // `ai-generated-murder-mystery-vs-prewritten-kits` now links to `/` with
-    // anchor "custom murder mystery party" (cross_link_map.json + live
-    // Supabase write, see CHANGELOG same date). `free-murder-mystery-games-
-    // printable` already had a homepage link from earlier work. Still open:
-    // whether more posts should link the homepage, and the actual position
-    // read once this window's full post-data exists.
-    //
-    // RESULT 2026-08-31 (fuller window, 28 of 30 wanted post-days — still
-    // THIN but close): avg position across the 3 named queries 12 → 6.6
-    // (vs. the 2026-08-14 thin read's 12 → 11.6). All three individually
-    // improved: "custom murder mystery game" 10.1→6.5, "custom murder
-    // mystery party" 14.5→7.2, "custom murder mystery" 6.3→2.9. Went beyond
-    // the script's named-query totals and pulled GSC page-level breakdowns
-    // (homepage vs. the custom page) directly: for "party" the consolidation
-    // signal is clean (homepage 13.9→6.8, custom page's impressions fell
-    // 111→58). For "game" it's mixed — homepage improved (9.5→6.5) but the
-    // custom page's impressions did NOT fall (78→80, plus its first click)
-    // — the canonical isn't fully suppressing this term's signal yet. Both
-    // head terms are now in the 6-7 position band, real progress toward top
-    // 5. Italian guardrail query unaffected by this ADR specifically (~pos
-    // 2 held), though a real separate ~85-90% impression collapse on that
-    // query was found starting 2026-07-08 (predates this ADR by 3 weeks) —
-    // filed as its own open item, see CHANGELOG/vault 2026-08-31. Homepage H1
-    // reminder below: Jonathan's call was to leave it as-is. Worth one more
-    // read once a true full 30-day window exists, mainly to see if the
-    // "game" query's partial consolidation is just crawl lag or persistent.
-    start: '2026-08-24',
-    end: '2026-09-21',
-    title: 'Measure the ADR-0046 canonical consolidation — did the homepage take the "custom murder mystery" head terms?',
-    body:
-      'On <strong>2026-07-27</strong> (ADR-0046) we <strong>canonicaled the EN /custom-murder-mystery-party page ' +
-      'to the homepage</strong> and reverted its keyword-stuffing, because the homepage already owns the head terms ' +
-      '(<strong>custom murder mystery game</strong> homepage pos 9.6 vs custom pos 50.5; ' +
-      '<strong>custom murder mystery party</strong> homepage pos 13.9 vs custom pos 66.7) and the custom page earned ' +
-      '~1 click / 90 days. A first thin-window automated read on 2026-08-14 (only 11 of the wanted 30 post-days ' +
-      'available) was cautiously positive — avg position 12→11.6 — but too small to trust yet. Paste the prompt ' +
-      'below into a fresh chat once this window has more data behind it.',
-    prompt: `Measure whether the 2026-07-27 ADR-0046 consolidation worked: we set rel=canonical from the EN /custom-murder-mystery-party page to the homepage and reverted its keyword-stuffing, to consolidate the "custom murder mystery party/game" intent onto the homepage (which already ranks and converts for it). Re-derive everything fresh; assume problems, default to flagging; do NOT trust this note's numbers, including the ones from the 2026-08-14 thin-window run below.
-
-0. RUN THE AUTOMATED BACKFILL FIRST: \`node scripts/backfillSeoHistory.mjs jul2026_custom_page_canonicalization\` (needs SUPABASE_URL/SUPABASE_SERVICE_KEY env vars, see script header). It pulls a fresh pre/post GSC read for the 3 named queries + GA4 AI-referral traffic, normalizes for window length (don't trust raw click/impression sums if it logs a THIN warning — use the printed per-day rates), and persists the result to \`seo_performance_snapshots\` (source='backfill', intervention_name='jul2026_custom_page_canonicalization'). A first thin-window run on 2026-08-14 (11 of 30 wanted post-days) came back: avg position 12→11.6 ("custom murder mystery" 6.3→2.7, "custom murder mystery party" 14.5→13, "custom murder mystery game" 10.1→11.1 slightly worse), clicks/day and impressions/day both up. Treat that as a prior, not a conclusion — this run should have a much fuller post-window.
-1. HEAD TERMS — homepage vs custom page. Queries: "custom murder mystery game" and "custom murder mystery party". Pull the page-level breakdown (dimensions ['page'] filtered to each query) for the homepage https://www.mysterymaker.party/ and https://www.mysterymaker.party/custom-murder-mystery-party/ . Baseline (28d ending 2026-07-26): game → homepage pos 9.6 / custom pos 50.5; party → homepage pos 13.9 / custom pos 66.7. Compare vs the latest window: did the homepage's position improve, and did the custom page's impressions on these terms FALL (the sign the canonical consolidated)? If the custom page is still accruing impressions/ranking for them, the canonical may not be honored — check GSC's URL Inspection / canonical report and flag it.
-2. Separate the two questions. (a) Consolidation: is Google crediting the homepage, not the custom page? (b) Homepage progress: did it break into the top 5, or is it stuck at ~9-14? If stuck, the lever is AUTHORITY/LINKS, not copy — do NOT recommend a homepage title/meta rewrite (the title already leads with "Custom Murder Mystery Party Kits" and must keep the "| Mystery Maker" brand suffix per ADR-0024). Propose 1-2 contextual internal links to the HOMEPAGE using "custom murder mystery game/party" anchor text from high-authority related posts (e.g. /blog/free-murder-mystery-games-printable/), added to cross_link_map.json AND applied to the live EN blog_posts.content (ADR-0026 protects it from re-sync).
-3. GUARDRAIL — non-EN cluster. We deliberately left hreflang emission untouched (EN is x-default/hub of the 13-lang cluster; repointing it would edit the 12 non-EN pages and risk the Italian ranking). Re-pull the Italian corporate query (the ADR-0020/0040 money query, baseline ~pos 3) and confirm it did NOT drop. If it wobbled, that's hreflang-cluster fallout — flag it and consider whether the EN canonical needs a cleaner hreflang design.
-4. Verdict: did the consolidation happen (homepage credited, custom page's head-term impressions faded)? Is the homepage head-term ranking improving? Is the remaining gap a copy problem or an authority problem? If authority, the fix is links to the homepage, not another rewrite. If the homepage still hasn't moved after this window, consider escalating the custom page from rel=canonical to a 301.`,
-  },
+  // RETIRED 2026-09-07: the ADR-0046 canonical-consolidation reminder that lived
+  // here is closed out. Third ground-truth read (30/30 post-days, no longer thin)
+  // confirmed the consolidation is working and still strengthening: homepage pos
+  // "custom murder mystery game" 9.9→5.2, "custom murder mystery party" 14.0→5.3,
+  // custom page's impressions on both terms now falling. The one loose end from
+  // the 2026-08-31 read (the "game" query's custom-page impressions weren't
+  // falling yet) resolved this read. Italian guardrail clean w.r.t. this ADR
+  // (its separate, already-closed impression-collapse issue is unrelated and
+  // predates ADR-0046 by 3 weeks). Full verdict: docs/adr/0046-en-custom-page-
+  // canonical-to-homepage.md Addendum (2026-09-07). Not re-adding this reminder —
+  // revisit only if the trend reverses, which would be a new incident, not a
+  // continuation of this one.
   {
     // Second measurement of the Night of Mystery comparison post, published
     // 2026-07-22 in all 13 languages to intercept the buyer-intent query
