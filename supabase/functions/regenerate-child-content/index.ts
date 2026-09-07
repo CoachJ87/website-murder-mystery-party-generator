@@ -233,10 +233,10 @@ The output is what players READ. Do NOT include meta-instructions like "CRITICAL
 
 const CRITICAL_JSON_RULES = `<critical_json_rules>
 1. Output a SINGLE valid JSON object. No markdown wrapper, no commentary before or after.
-2. Use SINGLE QUOTES for any quoted text inside string values (dialogue, attributions, etc.). NEVER use unescaped double quotes inside string values — they break JSON parsing.
+2. Some fields wrap quoted text in SINGLE QUOTES per their own schema template below (e.g. rumors, round*_questions, and any other field whose template literally shows '...' around the text you write) — for those, open the quote AND close it with a single quote. NEVER use unescaped double quotes inside string values — they break JSON parsing. Most other fields (backgrounds, introductions, guilty/innocent/accomplice scripts, confessions) are plain prose per their schema template with NO surrounding quote marks at all — do NOT add an opening or trailing quote mark to these; a lone trailing apostrophe with nothing to pair it with is a bug, not a stylistic flourish.
 3. Apostrophes inside string values are PLAIN characters. DO NOT escape them with a backslash. Write \`That's\` not \`That\\'s\`. The sequence \\' is invalid JSON and breaks the parser. ONLY backslash escapes valid in JSON: \\", \\\\, \\n, \\t. Nothing else.
-4. NEVER write '' (two apostrophes in a row) at the end of a quoted phrase.
-5. Before emitting, scan every string value for: unescaped ", the sequence \\', and the sequence ''. Fix all three.
+4. NEVER write '' (two apostrophes in a row) at the end of a quoted phrase, and never leave a single unpaired trailing quote mark on a field whose schema template shows it as unquoted prose.
+5. Before emitting, scan every string value for: unescaped ", the sequence \\', the sequence '', and — on any field whose schema template is unquoted prose — a trailing apostrophe with no matching opening one. Fix all of these.
 6. Verify the closing } and the final closing " on the last field are present and matched.
 </critical_json_rules>`;
 

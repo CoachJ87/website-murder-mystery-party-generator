@@ -12,6 +12,12 @@ Fixed via a new migration (`20260907_restore_adr0055_needs_review_widening.sql`)
 
 Routine New-Purchase sweep (package `a49181e0-a49f-499e-b491-98732799887d`). All automated detectors and manual cross-checks (victim name, detective script, all 6 characters' full content) came back clean except one small generation artifact: Hessa Al Nuaimi's and Latifa Al Qassimi's `reveal_confession_guilty` text each ended with an unpaired trailing single-quote character with no matching opening quote in the field. Fixed via a direct SQL update on the 2 affected rows; re-verified all detectors and `package_completion_blocking_defects()` clean afterward.
 
+### Fix: hardened `regenerate-child-content`'s `CRITICAL_JSON_RULES` prompt against the Addendum 24 trailing-quote bug, root cause not just data ([ADR-0103](docs/adr/0103-new-purchase-coherence-sweep-ritual.md) Addendum 26)
+
+Follow-up to Addendum 24, which fixed the 2 affected rows via direct SQL but left the generation-time cause untouched. The old rule 2 told the model to use single quotes for "any quoted text inside string values" — true for `rumors`/`round*_questions` (whose schema template literally wraps the field in `'...'`), but wrong for prose fields like `reveal_confession_guilty`/backgrounds/confessions, which the schema template shows as plain unquoted monologue. The model was generalizing the instruction across both, sometimes leaving a lone trailing apostrophe on a field that was never supposed to be quoted at all.
+
+Reworded rule 2 to make the single-quote convention conditional on the field's own schema template rather than a blanket instruction, and added an explicit "unpaired trailing quote mark on an unquoted-prose field is a bug" callout to rules 4/5's self-check pass. Deployed to `supabase/functions/regenerate-child-content/index.ts`; confirmed live via `get_edge_function` (old blanket wording absent, new conditional wording present).
+
 ## 2026-09-06
 
 ### Fix: closed both deferred `master_context` items — backfilled 3 stale packages, hardened `regenerate-child-content`'s verify gate against removed-character leaks ([ADR-0088](docs/adr/0088-guest-dropout-multi-character-and-reassignment.md) Addendum, 2026-09-06)

@@ -416,6 +416,12 @@ This defect class has a known, free, deterministic auto-fix (ADR-0047/0055's `au
 
 **Why this belongs in both ADRs:** the customer-facing symptom and its correct diagnosis (a real leaked chain-of-thought, not a false alarm) is a coherence-sweep finding: ADR-0103. The mechanism that stranded it — a shared status predicate silently drifting out of sync between the gate and the worker that heals it — is ADR-0055's problem domain, recurring for the second time in the same shape. Recording once each, cross-linked, rather than duplicating the technical account.
 
+## Addendum 26 (2026-09-07): closed Addendum 24's open root cause — hardened `regenerate-child-content`'s JSON rules against the trailing-quote bug, not just the 2 rows
+
+Addendum 24 fixed the 2 affected rows via direct SQL but explicitly left the generation-time cause untouched ("worth having a name for if it recurs"). Root cause: `CRITICAL_JSON_RULES`' rule 2 told the model to wrap "any quoted text inside string values" in single quotes — correct for `rumors`/`round*_questions`, whose schema template literally shows `'...'` around the text, but wrong for prose fields like `reveal_confession_guilty` and backgrounds/confessions, whose schema template shows plain unquoted monologue. The model generalized the instruction across both field types, occasionally leaving a lone trailing apostrophe on a field that was never supposed to be quoted at all — exactly the Hessa Al Nuaimi / Latifa Al Qassimi shape.
+
+Reworded rule 2 to make the single-quote convention conditional on the field's own schema template rather than a blanket instruction, and extended rules 4/5's self-check pass to explicitly flag an unpaired trailing quote mark on an unquoted-prose field as a bug. Deployed to `supabase/functions/regenerate-child-content/index.ts`; confirmed live via `get_edge_function` (old blanket wording absent, new conditional wording present). Not independently re-verified against a fresh live generation yet — this closes the prompt-level root cause but the actual recurrence rate (zero vs. reduced vs. unchanged) is still an open question for the next sweep that happens to touch a package this pipeline regenerated.
+
 ## Key files
 
 - `CLAUDE.md` — the `sweep` shorthand command definition
