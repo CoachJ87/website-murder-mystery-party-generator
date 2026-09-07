@@ -2,7 +2,7 @@
 
 > Mystery Maker is an AI-powered murder mystery party generator and comprehensive content resource. This site offers custom murder mystery party scripts, themes, hosting guides, and troubleshooting help for parties of any size, theme, or audience.
 
-This index organizes 291 published guides by topic cluster. All guides are available in 13 languages (EN, ES, FR, DE, IT, DA, FI, NL, SV, PT, KO, JA, ZH-CN) at `/{lang}/blog/{slug}` — the EN versions are listed below.
+This index organizes 293 published guides by topic cluster. All guides are available in 13 languages (EN, ES, FR, DE, IT, DA, FI, NL, SV, PT, KO, JA, ZH-CN) at `/{lang}/blog/{slug}` — the EN versions are listed below.
 
 **Generator**: [Create a custom murder mystery party](https://www.mysterymaker.party/)
 **Blog index**: [All published posts](https://www.mysterymaker.party/blog)
@@ -247,6 +247,7 @@ This index organizes 291 published guides by topic cluster. All guides are avail
 
 ## Logistics (Food, Costumes, Decor, Invitations)
 
+- [Are Murder Mystery Parties Appropriate for Kids?](https://www.mysterymaker.party/blog/are-murder-mystery-parties-appropriate-for-kids): Are murder mysteries safe for kids? Age-appropriate guidelines, how to adapt games, and which versions actually work.
 - [Free Murder Mystery Games & Printables: What Works](https://www.mysterymaker.party/blog/free-murder-mystery-games-printable): Honest guide to free printable murder mystery games: where free printables and templates actually work, their real limits, and when a paid or custom kit is wort
 - [How to Host a Rockstar Murder Mystery Party](https://www.mysterymaker.party/blog/how-to-host-a-rockstar-murder-mystery-party-music-industry-mysteries-with-backstage-drama): Rock and roll all night while solving murders in music industry mystery parties featuring bands and backstage drama.
 - [Murder Mystery Party Cleanup Guide](https://www.mysterymaker.party/blog/murder-mystery-party-cleanup-guide): Cleanup strategies for murder mystery parties. Pre-party prep, prop organization, reusable vs disposable, and post-event timelines for stress-free hosting.
@@ -262,6 +263,7 @@ This index organizes 291 published guides by topic cluster. All guides are avail
 - [Murder Mystery Party Script Template](https://www.mysterymaker.party/blog/murder-mystery-party-script-template-guide): Murder mystery script template guide: essential components like character guides, host guides, clue cards, timeline, and solution documentation.
 - [Murder Mystery Party Seating Arrangement](https://www.mysterymaker.party/blog/murder-mystery-party-seating-arrangement-guide): Strategic seating arrangements for murder mystery parties. How to seat suspects near each other, manage friend groups, and maximize clue exchange.
 - [Murder Mystery Party With Costumes: Complete Guide](https://www.mysterymaker.party/blog/murder-mystery-party-with-costumes-guide): Complete costume guide for murder mystery parties. DIY and purchased options by theme, coordination, and sourcing strategies.
+- [Real Estate Agent Murder Mystery Themes](https://www.mysterymaker.party/blog/real-estate-agent-murder-mystery-themes-property-secrets-housing-scandals): Murder mystery themes with real estate agent characters: property sales, neighborhood secrets and housing disputes drive the investigation.
 
 ## Character & Role Guides
 
