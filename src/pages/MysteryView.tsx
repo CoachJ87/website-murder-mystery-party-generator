@@ -46,6 +46,16 @@ interface MysteryPackageData {
 // While needs_review is younger than this, the warning is suppressed.
 const NEEDS_REVIEW_SILENT_WINDOW_MS = 10 * 60 * 1000;
 
+// Window during which generation_status can flip to 'completed' before every
+// requested character's row has actually landed (ADR-0103 Addendum 29 — async
+// child writers outside this app's own gating). Longest observed real gap was
+// ~3 hours on a 30-character package; this only widens the destination of an
+// already-legitimate "still finalizing" screen for fresh generations, so a
+// generous cushion is cheap. Only applied while a package is this recently
+// started — older packages (which may have since been legitimately reduced by
+// Remove-a-Character, ADR-0036) are never blocked by a stale character count.
+const CHARACTER_COUNT_GATE_WINDOW_MS = 4 * 60 * 60 * 1000;
+
 // Generation timing scales with cast size (ADR-0043 follow-up). A 32-player
 // package legitimately takes ~17 min, so the old flat 15-min client timeout
 // false-alarmed on large jobs — firing notify-generation-issue and showing the
@@ -102,6 +112,17 @@ const MysteryView = () => {
     const ageMs = Date.now() - new Date(ts).getTime();
     return ageMs < NEEDS_REVIEW_SILENT_WINDOW_MS;
   }, [generationStatus?.status, packageData?.needs_review_at]);
+
+  // No `startedAt` (older packages predating this field, or ones already
+  // stably completed) is treated as OUT of the window — same fail-open
+  // principle as needsReviewWithinWindow above, so a legitimately-adapted or
+  // just-old package is never permanently blocked by a stale character count.
+  const generationRecentlyStarted = useMemo(() => {
+    const ts = generationStatus?.startedAt;
+    if (!ts) return false;
+    const ageMs = Date.now() - new Date(ts).getTime();
+    return ageMs < CHARACTER_COUNT_GATE_WINDOW_MS;
+  }, [generationStatus?.startedAt]);
 
   const debugLog = useCallback((message: string, data?: any) => {
     if (!DEBUG_MODE) return;
@@ -1158,20 +1179,6 @@ const MysteryView = () => {
       );
     }
 
-    // Compute character generation progress for the live count.
-    // extracted_characters is set early in the parent flow; mystery_characters rows
-    // arrive as children complete. Falls back to player_count if extracted not yet set.
-    let charactersExpected = 0;
-    if (packageData?.extracted_characters) {
-      try {
-        const extracted = typeof packageData.extracted_characters === 'string'
-          ? JSON.parse(packageData.extracted_characters)
-          : packageData.extracted_characters;
-        if (Array.isArray(extracted)) charactersExpected = extracted.length;
-      } catch { /* fall back below */ }
-    }
-    if (charactersExpected === 0) charactersExpected = mystery?.player_count || 0;
-
     // Pass real DB content signals to GenerationProgress so it derives a
     // realistic progress that ticks gradually as content lands — instead of
     // trusting generation_status.progress which can jump to 100 prematurely.
@@ -1215,6 +1222,42 @@ const MysteryView = () => {
     );
   }
 
+  // Compute character generation progress for the live count.
+  // extracted_characters is set early in the parent flow; mystery_characters rows
+  // arrive as children complete. Falls back to player_count if extracted not yet set.
+  let charactersExpected = 0;
+  if (packageData?.extracted_characters) {
+    try {
+      const extracted = typeof packageData.extracted_characters === 'string'
+        ? JSON.parse(packageData.extracted_characters)
+        : packageData.extracted_characters;
+      if (Array.isArray(extracted)) charactersExpected = extracted.length;
+    } catch { /* fall back below */ }
+  }
+  if (charactersExpected === 0) charactersExpected = mystery?.player_count || 0;
+  // extracted_characters has a known history of over-counting (roster-parsing
+  // bugs — ADR-0068/0069/0110/0120). player_count is the stable, customer-set
+  // ceiling a real roster should never exceed, so cap the gate's target at it —
+  // otherwise an already-complete, already-paid package whose extracted list
+  // over-counted would get stuck behind the progress screen forever, since
+  // characters.length can never reach an inflated target.
+  const characterGateTarget = mystery?.player_count
+    ? Math.min(charactersExpected, mystery.player_count)
+    : charactersExpected;
+  // A generation_status of 'completed'/'needs_review' can land before every
+  // requested character's row has actually been written (async child writers
+  // outside this app's own gating — see ADR-0103 Addendum 29). Requiring the
+  // roster to actually match the (capped) expected count, not just be
+  // non-empty, is what decides whether the finished tab view or the progress
+  // screen renders — but only while generation is recent (see
+  // generationRecentlyStarted above), so an older package that has since been
+  // legitimately reduced (Remove-a-Character) or is simply stale data is
+  // never permanently blocked by this check.
+  const allExpectedCharactersPresent =
+    characterGateTarget === 0 ||
+    characters.length >= characterGateTarget ||
+    !generationRecentlyStarted;
+
   // Log debug info for tab visibility
   if ((mystery?.is_paid || generationStatus?.status === 'completed' ||
       (!generating && !generationStatus && packageData && packageData.gameOverview &&
@@ -1225,7 +1268,9 @@ const MysteryView = () => {
       hasPackageData: !!packageData,
       hasGameOverview: !!packageData?.gameOverview,
       hasHostGuide: !!packageData?.hostGuide,
-      charactersCount: characters.length
+      charactersCount: characters.length,
+      charactersExpected,
+      allExpectedCharactersPresent
     });
   }
 
@@ -1280,12 +1325,15 @@ const MysteryView = () => {
               `needsReviewWithinWindow` is true, the building screen renders
               instead (see the branch below), so a customer is never shown
               content that might still be a defect the self-heal loop is
-              actively repairing. */}
+              actively repairing. Requiring `allExpectedCharactersPresent`
+              (not just characters.length > 0) closes the gap where
+              generation_status flips to 'completed' before every requested
+              character's row has actually landed — ADR-0103 Addendum 29. */}
           {((((generationStatus?.status === 'completed' ||
                (generationStatus?.status === 'needs_review' && !needsReviewWithinWindow))
-              && characters.length > 0
+              && allExpectedCharactersPresent
               && !!packageData?.evidenceCards && !!packageData?.detectiveScript) ||
-             (!generating && !generationStatus && packageData?.gameOverview && characters.length > 0))) ? (
+             (!generating && !generationStatus && packageData?.gameOverview && allExpectedCharactersPresent))) ? (
             <MysteryPackageTabView
               packageContent={packageContent || ""}
               mysteryTitle={getMysteryTitle()}
@@ -1316,7 +1364,7 @@ const MysteryView = () => {
             (generationStatus?.status === 'in_progress' ||
              needsReviewWithinWindow ||
              (generationStatus?.status === 'completed' &&
-              (characters.length === 0 || !packageData?.evidenceCards || !packageData?.detectiveScript)))
+              (!allExpectedCharactersPresent || !packageData?.evidenceCards || !packageData?.detectiveScript)))
               ? renderGenerationProgress() : (
               <Card className={cn(
                 "mb-6",
