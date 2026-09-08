@@ -2,7 +2,7 @@
 
 > Mystery Maker is an AI-powered murder mystery party generator and comprehensive content resource. This site offers custom murder mystery party scripts, themes, hosting guides, and troubleshooting help for parties of any size, theme, or audience.
 
-This index organizes 293 published guides by topic cluster. All guides are available in 13 languages (EN, ES, FR, DE, IT, DA, FI, NL, SV, PT, KO, JA, ZH-CN) at `/{lang}/blog/{slug}` — the EN versions are listed below.
+This index organizes 294 published guides by topic cluster. All guides are available in 13 languages (EN, ES, FR, DE, IT, DA, FI, NL, SV, PT, KO, JA, ZH-CN) at `/{lang}/blog/{slug}` — the EN versions are listed below.
 
 **Generator**: [Create a custom murder mystery party](https://www.mysterymaker.party/)
 **Blog index**: [All published posts](https://www.mysterymaker.party/blog)
@@ -218,6 +218,7 @@ This index organizes 293 published guides by topic cluster. All guides are avail
 ## Rules & Planning
 
 - [Antique Shop Murder Mystery Party Guide](https://www.mysterymaker.party/blog/antique-shop-murder-mystery-party-guide-discover-deadly-treasures-and-secrets): Discover deadly treasures with antique shop murder mystery parties featuring collectors, dealers, and valuable secrets.
+- [Are Murder Mystery Parties Actually Fun?](https://www.mysterymaker.party/blog/are-murder-mystery-parties-fun): Murder mystery parties work because they merge social interaction with narrative stakes. See why 65% prefer experiential events.
 - [How to Host an Art Deco Murder Mystery Party](https://www.mysterymaker.party/blog/art-deco-murder-mystery-party-guide): Host an Art Deco murder mystery party set on a luxury liner or grand hotel with geometric glamour, 1920s-30s sophistication, and visual spectacle.
 - [Broadway Theater Murder Mystery Party Guide](https://www.mysterymaker.party/blog/broadway-theater-murder-mystery-party-guide-the-show-must-go-on): Take center stage with dramatic Broadway theater murder mystery parties featuring actors, directors, and backstage betrayals.
 - [Country Club Murder Mystery Party Guide](https://www.mysterymaker.party/blog/country-club-murder-mystery-party-guide-tee-off-into-trouble-and-social-intrigue): Tee off into trouble with exclusive country club murder mystery parties featuring members, staff, and social climbing.
