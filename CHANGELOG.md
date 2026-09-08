@@ -2,6 +2,12 @@
 
 ## 2026-09-08
 
+### Fix: `generation_completed_at` could be stamped by a premature completion attempt and never corrected
+
+Follow-up to today's earlier reveal-gate fix. `validate_package_characters()` already re-validates `generation_status` on every transition into `completed` (ADR-0108) and correctly demotes a premature attempt to `needs_review` — but it never touched `generation_completed_at`, so whichever caller set that column on the premature attempt left a stale timestamp in the row even after the real completion happened later. Confirmed via logs on Nathan Dubois's package: the column read `21:33:32`, but the actual completion (logged "promoted from needs_review to completed") happened at `21:52:00`, 19 minutes and 3 characters later.
+
+No code currently reads this column's *value* (only null/not-null, confirmed by grep) so this had zero live customer impact — shipped as cheap insurance rather than an urgent fix, and deliberately scoped to not require a Make.com blueprint audit to find the actual premature writer. Fix: the trigger's already-existing validated-clean branch now stamps `generation_completed_at := now()` itself, overriding whatever any caller set — closes the gap regardless of which system performs the write, same philosophy as ADR-0108's original fix to this function. Verified in a rolled-back transaction against Nathan's real package: forced a stale `2020-01-01` value through a fake re-completion, confirmed the trigger overwrote it with a fresh timestamp, confirmed the rollback left production data untouched.
+
 ### Fix: two characters missing their accomplice-branch content on paid, completed packages + closed the detection gap that let it ship unalerted
 
 Sweep on a same-day purchase ("The Gods Must Be Gossiping: Murder At Aphrodite's Birthday Bash") found character Pan/Pandora missing all 5 accomplice-branch fields (`round2/3/4_accomplice`, `final_accomplice`, `reveal_confession_accomplice`, prose + pointform) while all 16 other characters had them fully populated — a ~1-in-17 chance the host would draw that player into the accomplice slip at the table with nothing to read them. Fixed via `regenerate-child-content` + `generate-pointform-summaries`, re-verified clean.
