@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-09-08
+
+### Fix: GSC sitemap-submission has failed on every publish since launch (4 months) — root-caused, double-slash bug fixed, permission fix requires Jonathan
+
+Investigated the GSC sitemap-submission failure surfaced yesterday's publish run. Checked every retained GH Actions log for `submit-sitemap-gsc.mjs` (08-24 through 09-07 across `publish-daily-blog.yml` and `publish-specific-slugs.yml` — earlier logs are past GitHub's retention window): identical `insufficient permission` error on every single run. Traced back to the feature's launch commit (`dd79c8d`, 2026-05-09) — this has never once succeeded, silently swallowed by `continue-on-error: true` for 4 months.
+
+Root cause: the service account (`claude-analytics-reader@mystery-maker-analytics.iam.gserviceaccount.com`) is shared with the readonly GSC/GA4 pulls, which only need `webmasters.readonly` scope and work fine. Sitemap *submission* needs Full User or Owner access in Search Console's Users and permissions — given the account's own name, it was almost certainly only ever added as Restricted (read-only), and nobody elevated it when the submission feature was built on the same credential.
+
+Fixed a real secondary bug found along the way: `SITEMAP_URL` was built as `${SITE_URL}/sitemap.xml`, and the workflow passes `GSC_SITE_URL` with a trailing slash, producing a literal double-slash URL (`https://www.mysterymaker.party//sitemap.xml`, visible in every failed run's log) — harmless while submission never got past the permission check, but would have silently defeated the fix once permissions were corrected. Now strips the trailing slash before concatenating.
+
+Not fixable via code — the actual permission grant needs Jonathan: Search Console → the `mysterymaker.party` (www) property → Settings → Users and permissions → set `claude-analytics-reader@...` to Full. Vault note updated with the full investigation: `00_INBOX/gsc-sitemap-submission-permission-error-2026-09-07-mystery-maker.md`.
+
 ## 2026-09-07
 
 ### SEO: ADR-0046 canonical consolidation confirmed working (3rd read) — closed out, plus 5 internal-link insertions from this week's digest

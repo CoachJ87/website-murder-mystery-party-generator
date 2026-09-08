@@ -25,7 +25,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const SITE_URL = process.env.GSC_SITE_URL || 'https://mysterymaker.party';
-const SITEMAP_URL = process.env.GSC_SITEMAP_URL || `${SITE_URL}/sitemap.xml`;
+const SITEMAP_URL = process.env.GSC_SITEMAP_URL || `${SITE_URL.replace(/\/$/, '')}/sitemap.xml`;
 const LOCAL_CREDS_PATH = join(__dirname, '../.google-search-console-credentials.json');
 
 async function loadCredentials() {
