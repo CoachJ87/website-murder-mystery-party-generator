@@ -26,7 +26,7 @@ Fixed by gating on `characters.length >= characterGateTarget` instead, reusing t
 - `characterGateTarget` caps the expected count at `player_count` — `extracted_characters` has a known history of over-counting (ADR-0068/0069/0110/0120) and comparing against its raw length would have permanently stuck any already-complete package whose extraction inflated the count (found one live: 14 actual == player_count, but extracted_characters said 18).
 - The stricter check only applies while `generation_started_at` is within a 4-hour window (`generationRecentlyStarted`) — older packages that have since been legitimately reduced via Remove-a-Character (ADR-0036, e.g. "Whispers From The Void" at 9/10 by design) or are just stale historical data are never blocked by it.
 
-### Fix: GSC sitemap-submission has failed on every publish since launch (4 months) — root-caused, double-slash bug fixed, permission fix requires Jonathan
+### Fix: GSC sitemap-submission double-slash bug fixed; earlier "needs a permission grant" claim was wrong
 
 Investigated the GSC sitemap-submission failure surfaced yesterday's publish run. Checked every retained GH Actions log for `submit-sitemap-gsc.mjs` (08-24 through 09-07 across `publish-daily-blog.yml` and `publish-specific-slugs.yml` — earlier logs are past GitHub's retention window): identical `insufficient permission` error on every single run. Traced back to the feature's launch commit (`dd79c8d`, 2026-05-09) — this has never once succeeded, silently swallowed by `continue-on-error: true` for 4 months.
 
@@ -34,7 +34,7 @@ Root cause: the service account (`claude-analytics-reader@mystery-maker-analytic
 
 Fixed a real secondary bug found along the way: `SITEMAP_URL` was built as `${SITE_URL}/sitemap.xml`, and the workflow passes `GSC_SITE_URL` with a trailing slash, producing a literal double-slash URL (`https://www.mysterymaker.party//sitemap.xml`, visible in every failed run's log) — harmless while submission never got past the permission check, but would have silently defeated the fix once permissions were corrected. Now strips the trailing slash before concatenating.
 
-Not fixable via code — the actual permission grant needs Jonathan: Search Console → the `mysterymaker.party` (www) property → Settings → Users and permissions → set `claude-analytics-reader@...` to Full. Vault note updated with the full investigation: `00_INBOX/gsc-sitemap-submission-permission-error-2026-09-07-mystery-maker.md`.
+**Correction, same day:** claimed above that the service account needed to be elevated to Full — Jonathan said it already was. Should have verified via the API before asserting that; didn't. Actually checked: `searchconsole.sites.list()` returns `{"siteUrl": "https://www.mysterymaker.party/", "permissionLevel": "siteFullUser"}` right now, and running `submit-sitemap-gsc.mjs` locally (with the corrected double-slash fix + the correct `GSC_SITE_URL`) succeeds: `✅ Sitemap submitted successfully.` So the permission-grant theory doesn't hold up — either it was elevated recently and the historical CI failures (confirmed 08-24→09-07) are real-but-now-resolved, or something else changed. Didn't force a live CI test (would require dispatching `publish-daily-blog.yml`, which publishes a real new post as a side effect) — tomorrow's 09:17 UTC scheduled run is the actual confirmation point. Full trail: `00_INBOX/gsc-sitemap-submission-permission-error-2026-09-07-mystery-maker.md`.
 
 ## 2026-09-07
 
