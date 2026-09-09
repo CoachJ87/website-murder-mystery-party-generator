@@ -259,6 +259,60 @@ Context (re-derive from ground truth, don't trust this note alone): the H1 lives
 2. Weigh the case for changing the H1: would surfacing "custom" in the H1 plausibly help ranking/relevance on top of what the title/meta already do, or is that redundant once title/meta already lead with it? Consider whether an H1 change risks anything (brand voice, existing A/B assumptions, the "Create Murder Mystery Parties in Minutes" phrasing possibly targeting a different, broader intent than "custom").
 3. If a change looks worth it, propose exact new H1 copy (a few options) rather than assuming any one direction. If not, say so plainly and close this out — don't manufacture a change for its own sake.`,
   },
+  {
+    // Published 2026-09-05 (de) through 2026-09-08 (zh-cn/ko/ja + the remaining
+    // 8: es/fr/it/pt/nl/da/sv/fi) — a new "meta" content type, distinct from the
+    // ~40-190-per-locale templated murder-mystery-specific posts. All 12 non-EN
+    // locales share one slug, alternative-party-ideas-by-culture, each with
+    // GENUINELY DIFFERENT hand/agent-researched content (not translations of
+    // each other) positioning a custom murder mystery as one honest option
+    // among real local alternatives — cross-linked via hreflang on the shared
+    // slug (confirmed working: de page correctly links all 11 other locales).
+    // No EN version exists by design.
+    //
+    // Inserted directly into Supabase (status='published') OUTSIDE the normal
+    // blog_map.xlsx / pick-next-draft.mjs pipeline, since this was one-off
+    // hand-vetted content, not a templated topic. That matters for this
+    // check: the normal daily-publish pipeline auto-applies cross-links from
+    // OTHER posts to a newly-published slug (apply-crosslinks.mjs) as part of
+    // its own publish step. This post never went through that step, so as far
+    // as I know it likely has ZERO inbound internal links from any of the
+    // other ~190-per-locale posts — re-derive and confirm, don't assume either
+    // way. If true, that's a real authority/discovery gap worth closing
+    // (candidate targets: the "themed-party-ideas-for-adults" post in each
+    // locale, and any escape-room/format-comparison posts, are natural
+    // linking sources — but confirm via the actual cross_link_map.json /
+    // content, don't just guess).
+    //
+    // Deploy + prerender confirmed live and correct at time of publish (all
+    // 12 URLs returned HTTP 200 with correct title/meta/hreflang after
+    // deploy.yml run 34276296170). IndexNow (Bing) accepted all 12 URLs same
+    // day. GSC sitemap ping was attempted but failed locally on a permission
+    // error (likely wrong local credential, not a live problem — see vault
+    // note) — Google's own indexing timeline was never independently confirmed.
+    start: '2026-09-23',
+    end: '2026-10-07',
+    title: 'Check indexing/early ranking on the new "alternative party ideas by culture" post series (12 locales)',
+    body:
+      'Twelve non-EN locale versions of a new post type (real per-culture alternative-party-format comparisons, custom ' +
+      'murder mystery positioned honestly alongside local alternatives) went live 2026-09-05 to 2026-09-08, all sharing ' +
+      'the slug <code>alternative-party-ideas-by-culture</code>. IndexNow (Bing) accepted all 12 URLs immediately, but ' +
+      'Google indexing was never independently confirmed — GSC sitemap submission failed locally on a credential error. ' +
+      'This was also inserted outside the normal publish pipeline, so it may have zero inbound internal links from other ' +
+      'posts (the pipeline\'s auto-cross-linking step never ran for it). Two weeks is enough time to check indexing ' +
+      'status properly; enough for early ranking signal is a stretch but worth a first look.',
+    prompt: `Check indexing and any early ranking/traffic signal for the new "alternative party ideas by culture" post series, and check whether it has any inbound internal links. Re-derive everything from ground truth (Supabase, GSC, GA4, live site) — do not trust this note's dates or claims, they are priors only.
+
+0. GROUND TRUTH ON WHAT WAS PUBLISHED: query Supabase blog_posts where slug='alternative-party-ideas-by-culture' — confirm which languages exist, their actual published_at timestamps, and status. Prior claims to verify: 12 locales (de, es, fr, it, pt, nl, da, sv, fi, ko, ja, zh-cn), published 2026-09-05 (de) to 2026-09-08 (the rest), all status='published', no 'en' row exists (by design).
+
+1. INDEXING STATUS (primary goal — 2 weeks is enough time for this even if not for ranking): for each of the 12 locale URLs (https://www.mysterymaker.party/{lang}/blog/alternative-party-ideas-by-culture/), use the GSC URL Inspection API to check indexing status. Report how many of the 12 are indexed vs. not, and for any not indexed, what reason GSC gives (crawled-not-indexed, discovered-not-indexed, etc.).
+
+2. INTERNAL LINKS CHECK: this post was inserted directly into Supabase, bypassing the normal daily-publish pipeline's apply-crosslinks.mjs step (which auto-links newly-published slugs from other posts per cross_link_map.json). Check whether alternative-party-ideas-by-culture actually has any inbound internal links from other blog posts in any locale — grep the live prerendered HTML of a sample of other posts per locale, or check cross_link_map.json for whether this slug appears as a link target anywhere. If it has zero or near-zero inbound internal links, flag that plainly as a likely reason for slow indexing/authority, and suggest 2-3 natural linking candidates per locale (e.g. that locale's "themed party ideas" or escape-room comparison post) rather than proposing a blanket fix.
+
+3. EARLY SIGNAL (bonus, don't over-read into 2-3 weeks of data): pull GSC performance data (impressions/clicks/position) for each of the 12 URLs since publish. Also check GA4 for any sessions landing on these URLs, and note the traffic source (organic search, direct, referral — especially any AI-answer-engine referral pattern if that's tracked). Given the short window, frame any numbers as "too early to be conclusive" rather than a verdict — the goal here is confirming discovery is happening, not judging whether the content strategy worked.
+
+4. VERDICT: is this series being discovered and indexed normally, or is something (missing internal links, a crawl issue, the rot-signal-style gate that gap-checks other locales) holding it back? If discovery looks fine, say so plainly and don't manufacture concern. If not, be specific about which locales and why.`,
+  },
 ];
 
 // Safety net: neutralise any literal HTML tags the model leaves inside <pre>
