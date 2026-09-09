@@ -28,6 +28,10 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
  *   game_overview_victim_mismatch   regenerate-parent-content game_overview
  *   identity_contamination          DELEGATE to regenerate-child-content
  *   slip_culprit_leak               DELEGATE to regenerate-child-content
+ *   missing_role_branch_content     DELEGATE to regenerate-child-content, one
+ *                                   call per character with that character's
+ *                                   own precise missing-field list (ADR-0103
+ *                                   Addendum 36)
  *
  * ADR-0061 (2026-08-02): identity_contamination and slip_culprit_leak used to
  * be escalate-only ("child-generated, judgment-heavy, no safe deterministic
@@ -122,7 +126,8 @@ type DefectClass =
   | "template_artifact"
   | "game_overview_victim_mismatch"
   | "identity_contamination"
-  | "slip_culprit_leak";
+  | "slip_culprit_leak"
+  | "missing_role_branch_content";
 
 /**
  * ADR-0061: the delegated meta_text_leak fallback (character-scope artifacts
@@ -143,6 +148,7 @@ const DETECTOR_RPC: Record<DefectClass, string> = {
   game_overview_victim_mismatch: "list_packages_with_victim_mismatch",
   identity_contamination: "list_packages_with_identity_conflicts",
   slip_culprit_leak: "list_packages_with_slip_culprit_leak",
+  missing_role_branch_content: "list_packages_with_missing_role_branch_content",
 };
 
 // ---------------------------------------------------------------------------
@@ -832,7 +838,7 @@ const DELEGATE_DEFAULT_FIELDS: Record<"identity_contamination" | "slip_culprit_l
 
 async function delegateToRegenerator(
   ctx: RunCtx,
-  hint: "identity_contamination" | "slip_culprit_leak" | "meta_text_leak",
+  hint: "identity_contamination" | "slip_culprit_leak" | "meta_text_leak" | "missing_role_branch_content",
   packageId: string,
   characterNames: string[],
   fields: string[],
@@ -1060,6 +1066,21 @@ async function handleSlipCulpritLeak(ctx: RunCtx, row: Record<string, unknown>):
     ctx, "slip_culprit_leak", packageId, characters,
     DELEGATE_DEFAULT_FIELDS.slip_culprit_leak,
   );
+}
+
+/** ADR-0103 Addendum 36: missing_role_branch_content — delegated whole to
+ *  regenerate-child-content, one row per character. Unlike identity_
+ *  contamination/slip_culprit_leak, this detector's own row already names the
+ *  exact missing fields for THIS character (list_packages_with_missing_role_
+ *  branch_content's peer-existence gate), so there's no DELEGATE_DEFAULT_FIELDS
+ *  entry to seed from and no auto-widening needed — the fields list is passed
+ *  through as-is. */
+async function handleMissingRoleBranchContent(ctx: RunCtx, row: Record<string, unknown>): Promise<void> {
+  const packageId = row.package_id as string;
+  const characterName = row.character_name as string;
+  const fields = (row.fields as string[]) ?? [];
+  if (!characterName || fields.length === 0) return;
+  await delegateToRegenerator(ctx, "missing_role_branch_content", packageId, [characterName], fields);
 }
 
 const PACKAGE_ARTIFACT_FIELDS = [
@@ -1422,6 +1443,14 @@ serve(async (req) => {
     if (shouldRun("slip_culprit_leak")) {
       for (const row of await filterNeedsReview(await callDetector(DETECTOR_RPC.slip_culprit_leak, sinceIso))) {
         await handleSlipCulpritLeak(ctx, row);
+      }
+    }
+
+    // 4b. missing_role_branch_content — delegated to regenerate-child-content
+    //    (ADR-0103 Addendum 36; previously alert-only since Addendum 31).
+    if (shouldRun("missing_role_branch_content")) {
+      for (const row of await filterNeedsReview(await callDetector(DETECTOR_RPC.missing_role_branch_content, sinceIso))) {
+        await handleMissingRoleBranchContent(ctx, row);
       }
     }
 
