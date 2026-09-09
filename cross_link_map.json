@@ -98979,6 +98979,11 @@
           "target_slug": "diy-murder-mystery-vs-store-bought-kits",
           "match_text": "partie du mystère",
           "replacement": "[partie du mystère](/fr/blog/diy-murder-mystery-vs-store-bought-kits)"
+        },
+        {
+          "target_slug": "alternative-party-ideas-by-culture",
+          "match_text": "Les kits hybrides varient largement dépendant de comment ils équilibrent les deux éléments.",
+          "replacement": "Les kits hybrides varient largement dépendant de comment ils équilibrent les deux éléments. Pour voir comment d'autres groupes en France choisissent entre différents formats de soirée, consultez notre [comparaison d'idées de soirée selon la culture](/fr/blog/alternative-party-ideas-by-culture)."
         }
       ],
       "de": [
@@ -99006,6 +99011,11 @@
           "target_slug": "diy-murder-mystery-vs-store-bought-kits",
           "match_text": "- Sie wollen verschiedene",
           "replacement": "[- Sie wollen verschiedene](/de/blog/diy-murder-mystery-vs-store-bought-kits)"
+        },
+        {
+          "target_slug": "alternative-party-ideas-by-culture",
+          "match_text": "Hybrid-Kits variieren weit, je nachdem wie sie beides balancieren.",
+          "replacement": "Hybrid-Kits variieren weit, je nachdem wie sie beides balancieren. Wenn Sie sehen möchten, wie andere in Deutschland zwischen verschiedenen Party-Formaten wählen, lesen Sie unseren [Vergleich von Party-Ideen im Kulturvergleich](/de/blog/alternative-party-ideas-by-culture)."
         }
       ],
       "it": [
@@ -99033,6 +99043,11 @@
           "target_slug": "diy-murder-mystery-vs-store-bought-kits",
           "match_text": "chiedendo una stanza con un tema",
           "replacement": "[chiedendo una stanza con un tema](/it/blog/diy-murder-mystery-vs-store-bought-kits)"
+        },
+        {
+          "target_slug": "alternative-party-ideas-by-culture",
+          "match_text": "I kit ibridi variano ampiamente dipendendo da come equilibrano entrambi elementi.",
+          "replacement": "I kit ibridi variano ampiamente dipendendo da come equilibrano entrambi elementi. Se vuoi vedere come altri gruppi in Italia scelgono tra diversi format di serata, leggi il nostro [confronto di idee per feste su base culturale](/it/blog/alternative-party-ideas-by-culture)."
         }
       ],
       "da": [
@@ -99060,6 +99075,11 @@
           "target_slug": "diy-murder-mystery-vs-store-bought-kits",
           "match_text": "om sociale dynamikker",
           "replacement": "[om sociale dynamikker](/da/blog/diy-murder-mystery-vs-store-bought-kits)"
+        },
+        {
+          "target_slug": "alternative-party-ideas-by-culture",
+          "match_text": "Hybridkits varierer meget afhængigt af, hvordan de balancerer begge elementer.",
+          "replacement": "Hybridkits varierer meget afhængigt af, hvordan de balancerer begge elementer. Vil du se, hvordan andre danskere vælger mellem forskellige festformater, kan du læse vores [sammenligning af festidéer på tværs af kulturer](/da/blog/alternative-party-ideas-by-culture)."
         }
       ],
       "fi": [
@@ -99087,6 +99107,11 @@
           "target_slug": "diy-murder-mystery-vs-store-bought-kits",
           "match_text": "Kuilu tulee ilmeiseksi, kun harkitset",
           "replacement": "[Kuilu tulee ilmeiseksi, kun harkitset](/fi/blog/diy-murder-mystery-vs-store-bought-kits)"
+        },
+        {
+          "target_slug": "alternative-party-ideas-by-culture",
+          "match_text": "Hybridi-kitit vaihtelevat suuresti sen mukaan, kuinka ne tasapainottavat molemmat elementit.",
+          "replacement": "Hybridi-kitit vaihtelevat suuresti sen mukaan, kuinka ne tasapainottavat molemmat elementit. Jos haluat nähdä, miten muut Suomessa valitsevat eri juhlamuotojen välillä, lue [kulttuurikohtainen vertailumme juhlaideoista](/fi/blog/alternative-party-ideas-by-culture)."
         }
       ],
       "nl": [
@@ -99114,6 +99139,11 @@
           "target_slug": "diy-murder-mystery-vs-store-bought-kits",
           "match_text": "hoe veel personen",
           "replacement": "[hoe veel personen](/nl/blog/diy-murder-mystery-vs-store-bought-kits)"
+        },
+        {
+          "target_slug": "alternative-party-ideas-by-culture",
+          "match_text": "Hybride kits variëren breed afhankelijk van hoe zij beide elementen balanceren.",
+          "replacement": "Hybride kits variëren breed afhankelijk van hoe zij beide elementen balanceren. Wil je zien hoe andere groepen in Nederland kiezen tussen verschillende feestformats, bekijk dan onze [vergelijking van feestideeën per cultuur](/nl/blog/alternative-party-ideas-by-culture)."
         }
       ],
       "sv": [
@@ -99141,6 +99171,11 @@
           "target_slug": "diy-murder-mystery-vs-store-bought-kits",
           "match_text": "Den förvirringen är verklig, eftersom kategorin",
           "replacement": "[Den förvirringen är verklig, eftersom kategorin](/sv/blog/diy-murder-mystery-vs-store-bought-kits)"
+        },
+        {
+          "target_slug": "alternative-party-ideas-by-culture",
+          "match_text": "Hybridkit varierar kraftigt beroende på hur de balanserar båda elementen.",
+          "replacement": "Hybridkit varierar kraftigt beroende på hur de balanserar båda elementen. Om du vill se hur andra grupper i Sverige väljer mellan olika festformat, läs vår [jämförelse av festidéer utifrån kultur](/sv/blog/alternative-party-ideas-by-culture)."
         }
       ],
       "pt": [
@@ -99168,6 +99203,11 @@
           "target_slug": "diy-murder-mystery-vs-store-bought-kits",
           "match_text": "em casa populares",
           "replacement": "[em casa populares](/pt/blog/diy-murder-mystery-vs-store-bought-kits)"
+        },
+        {
+          "target_slug": "alternative-party-ideas-by-culture",
+          "match_text": "Kits híbridos variam amplamente dependendo de como eles equilibram ambos os elementos.",
+          "replacement": "Kits híbridos variam amplamente dependendo de como eles equilibram ambos os elementos. Se quiser ver como outros grupos em Portugal escolhem entre diferentes formatos de festa, veja a nossa [comparação de ideias de festa por cultura](/pt/blog/alternative-party-ideas-by-culture)."
         }
       ],
       "ko": [
@@ -99195,6 +99235,11 @@
           "target_slug": "diy-murder-mystery-vs-store-bought-kits",
           "match_text": "- 모두의 목표가 지",
           "replacement": "[- 모두의 목표가 지](/ko/blog/diy-murder-mystery-vs-store-bought-kits)"
+        },
+        {
+          "target_slug": "alternative-party-ideas-by-culture",
+          "match_text": "온라인 머더 미스터리는 소회의실 기능을 활용해 비공개 대화와 심문을 구현한다.",
+          "replacement": "온라인 머더 미스터리는 소회의실 기능을 활용해 비공개 대화와 심문을 구현한다. 한국의 다른 모임들이 어떤 방식을 선택하는지 궁금하다면, [문화별 모임 아이디어 비교](/ko/blog/alternative-party-ideas-by-culture)도 확인해보세요."
         }
       ],
       "ja": [
@@ -99222,6 +99267,11 @@
           "target_slug": "diy-murder-mystery-vs-store-bought-kits",
           "match_text": "いてるのか？謎を解いて犯人を見つける部屋",
           "replacement": "[いてるのか？謎を解いて犯人を見つける部屋](/ja/blog/diy-murder-mystery-vs-store-bought-kits)"
+        },
+        {
+          "target_slug": "alternative-party-ideas-by-culture",
+          "match_text": "ハイブリッド大きく異なり両メカニクス平衡性依存。",
+          "replacement": "ハイブリッド大きく異なり両メカニクス平衡性依存。日本で他のグループがどのように集まり方を選んでいるか知りたい方は、[文化別パーティーアイデア比較](/ja/blog/alternative-party-ideas-by-culture)もご覧ください。"
         }
       ],
       "zh-cn": [
@@ -99249,6 +99299,11 @@
           "target_slug": "diy-murder-mystery-vs-store-bought-kits",
           "match_text": "- 允许玩家在角色内即兴表演而无需遵循剧本",
           "replacement": "[- 允许玩家在角色内即兴表演而无需遵循剧本](/zh-cn/blog/diy-murder-mystery-vs-store-bought-kits)"
+        },
+        {
+          "target_slug": "alternative-party-ideas-by-culture",
+          "match_text": "选择一个与你的团体风格相符的活动形式，其余的细节自然会水到渠成。",
+          "replacement": "选择一个与你的团体风格相符的活动形式，其余的细节自然会水到渠成。如果你想看看不同文化背景下的人们如何选择聚会方式，欢迎阅读我们的[各国聚会方式对比](/zh-cn/blog/alternative-party-ideas-by-culture)。"
         }
       ],
       "es": [
@@ -99276,6 +99331,11 @@
           "target_slug": "diy-murder-mystery-vs-store-bought-kits",
           "match_text": "las compañías comenzaron a vender kits de",
           "replacement": "[las compañías comenzaron a vender kits de](/es/blog/diy-murder-mystery-vs-store-bought-kits)"
+        },
+        {
+          "target_slug": "alternative-party-ideas-by-culture",
+          "match_text": "Los kits híbridos varían ampliamente dependiendo en cómo balancean ambos elementos.",
+          "replacement": "Los kits híbridos varían ampliamente dependiendo en cómo balancean ambos elementos. Si quieres ver cómo otros grupos en España eligen entre distintos formatos de fiesta, consulta nuestra [comparación de ideas de fiesta según la cultura](/es/blog/alternative-party-ideas-by-culture)."
         }
       ]
     }
