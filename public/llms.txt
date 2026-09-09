@@ -2,7 +2,7 @@
 
 > Mystery Maker is an AI-powered murder mystery party generator and comprehensive content resource. This site offers custom murder mystery party scripts, themes, hosting guides, and troubleshooting help for parties of any size, theme, or audience.
 
-This index organizes 295 published guides by topic cluster. All guides are available in 13 languages (EN, ES, FR, DE, IT, DA, FI, NL, SV, PT, KO, JA, ZH-CN) at `/{lang}/blog/{slug}` — the EN versions are listed below.
+This index organizes 296 published guides by topic cluster. All guides are available in 13 languages (EN, ES, FR, DE, IT, DA, FI, NL, SV, PT, KO, JA, ZH-CN) at `/{lang}/blog/{slug}` — the EN versions are listed below.
 
 **Generator**: [Create a custom murder mystery party](https://www.mysterymaker.party/)
 **Blog index**: [All published posts](https://www.mysterymaker.party/blog)
@@ -76,6 +76,7 @@ This index organizes 295 published guides by topic cluster. All guides are avail
 - [The Best Apps and Tools for Hosting Murder Mystery Parties](https://www.mysterymaker.party/blog/best-murder-mystery-party-apps-tools): Best apps and tools for murder mystery parties. Mystery generators, timers, sound effects, music playlists, and digital planning tools for hosting.
 - [The Podcasts That'll Make You a Better Mystery Host](https://www.mysterymaker.party/blog/best-murder-mystery-podcasts-for-inspiration): Best murder mystery podcasts for party planning: Serial, My Favorite Murder, Within the Wires teach hosting skills and structure your event.
 - [What You're Really Watching When You Watch a Mystery Show](https://www.mysterymaker.party/blog/best-murder-mystery-tv-shows-movies-inspiration): Learn how to use TV shows and movies like Knives Out and Only Murders in the Building as party inspiration and structure your mystery.
+- [Best Party Games for Groups of 10 People (Tested and Ranked)](https://www.mysterymaker.party/blog/best-party-games-for-groups-of-10): The best party games for groups of exactly 10 people. From murder mysteries to team games to social deduction, find the right game for your group size.
 - [Blackmailer Murder Mystery Themes](https://www.mysterymaker.party/blog/blackmailer-murder-mystery-themes-extortion-secrets-deadly-silence): Murder mystery themes with blackmailer characters — extortion plots, weaponized secrets, and the kind of victims people aren't sad to see disappear.
 - [Bollywood Murder Mystery Party Guide](https://www.mysterymaker.party/blog/bollywood-murder-mystery-party-guide): Create a Bollywood murder mystery party with dramatic reveals, colorful costumes, dance sequences, and musical elements for epic entertainment.
 - [How to Host a Cold War Spy Murder Mystery](https://www.mysterymaker.party/blog/cold-war-spy-murder-mystery-party-guide): Host a Cold War spy murder mystery with double agents, coded messages, and Berlin Wall intrigue. Characters, espionage mechanics, and full hosting guide.
