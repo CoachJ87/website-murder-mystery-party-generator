@@ -19,7 +19,19 @@ export interface StoredAttribution {
   utm_content?: string;
   landing_referrer?: string;
   landing_page?: string;
+  landing_device?: string;
   captured_at: string;
+}
+
+// Same mobile/tablet/desktop split Google Ads/GA4 report on, so device-level
+// findings (e.g. "mobile converts, desktop doesn't") are comparable across
+// both without translating buckets.
+function detectDevice(): "mobile" | "tablet" | "desktop" {
+  if (typeof navigator === "undefined") return "desktop";
+  const ua = navigator.userAgent;
+  if (/iPad|Android(?!.*Mobile)/i.test(ua)) return "tablet";
+  if (/Mobi|iPhone|Android/i.test(ua)) return "mobile";
+  return "desktop";
 }
 
 const isInternalReferrer = (referrer: string): boolean => {
@@ -66,6 +78,7 @@ export function captureLandingAttribution(): void {
       ...incomingUtms,
       landing_referrer: isExternalReferrer ? referrer : undefined,
       landing_page: window.location.pathname + window.location.search,
+      landing_device: detectDevice(),
       captured_at: new Date().toISOString(),
     };
 
@@ -99,7 +112,7 @@ export async function persistAttributionToProfile(userId: string): Promise<void>
     const { data: profile } = await supabase
       .from("profiles")
       .select(
-        "utm_source, utm_medium, utm_campaign, utm_term, utm_content, landing_referrer, landing_page"
+        "utm_source, utm_medium, utm_campaign, utm_term, utm_content, landing_referrer, landing_page, landing_device"
       )
       .eq("id", userId)
       .maybeSingle();
@@ -113,6 +126,7 @@ export async function persistAttributionToProfile(userId: string): Promise<void>
       "utm_content",
       "landing_referrer",
       "landing_page",
+      "landing_device",
     ];
     for (const field of fields) {
       const incoming = stored[field];

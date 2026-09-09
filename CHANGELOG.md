@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-09
+
+### Feature: capture device type (mobile/tablet/desktop) at first landing for attribution
+Added alongside the existing UTM/referrer attribution capture (`src/lib/attribution.ts`), same first-touch-only persistence pattern (`profiles.landing_device`, never overwritten once set). Motivated by the first Google Ads campaign: Ads' own device segment showed 5/5 confirmed conversions on mobile and 0/28 on desktop, directly contradicting the assumption that purchases skew desktop, but there was no way to check that pattern against organic/non-Ads traffic since no device data was stored anywhere. Uses the same mobile/tablet/desktop split Google Ads/GA4 report on (`/iPad|Android(?!.*Mobile)/` → tablet, `/Mobi|iPhone|Android/` → mobile, else desktop) so findings are directly comparable. New migration `20260909120000_add_landing_device_to_profiles.sql`. No retroactive backfill possible, no device signal exists for past leads/purchases.
+
 ## 2026-09-08
 
 ### Fix: `generation_completed_at` could be stamped by a premature completion attempt and never corrected
