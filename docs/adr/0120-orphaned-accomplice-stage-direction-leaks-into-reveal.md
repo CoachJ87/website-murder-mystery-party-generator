@@ -103,3 +103,22 @@ Reading all 7 `character`-style, `has_accomplice=true` packages individually (no
 - `temp-files/MM Live - Parent65 (Character Style Accomplice Beat Fix).blueprint.json` / `temp-files/build-parent-v65.py` — drafted fix for `character`-style routes, not yet imported
 - Remediated directly: `mystery_packages.detective_script` for the 10 packages in the table above
 - Not remediated, separate issue: "Operation: Thirty & Murdery" (`b8428a57-1c2b-4bf1-881c-98c8436be6a9`) `missing_round_content.Cypress/Celine Beaumont`
+
+## Addendum 2 (2026-09-10): swept the remaining ~19-20 of the original 30-package corpus never individually checked — found and fixed one live instance this ADR's own per-package pass had missed
+
+Part of a broader audit (ADR-0103 Addendum 38) of items deferred under the old "wait for a 2nd occurrence" policy that the new impact/cost framework calls for finishing now — this one was cheap to complete: the original anchored regex (`\[if[^\]]{0,80}accomplice[^\]]{0,120}\]`) was already proven correct, it just needed to be re-run (case-insensitively — the first attempt used the case-sensitive `~` operator and silently matched nothing, caught and corrected before trusting a "clean" result) against the ~19-20 packages Addendum 1 never got to.
+
+**Result: one real, live, unfixed instance — "Operation: Thirty & Murdery" itself, the same package Addendum 1's table lists as already remediated.** It has a SECOND leaked bracket of a different shape than the one Addendum 1 fixed: `*[If there is an accomplice — host: reveal the player who drew the ACCOMPLICE slip, and briefly connect their own motive to how they helped cover the crime, in your own words.]*`, sitting between the murderer's confession cue and the accomplice's own `**[ACCOMPLICE PLAYER'S NAME]**` fill-in slot — this is the "mechanism 1" conditional-instruction-prefix leak this ADR's own Context section describes (distinct from "mechanism 2," the simpler trailing-bracket shape Addendum 1's per-package pass searched for and fixed). Addendum 1's remediation only touched the exact `*[If there is an accomplice: the accomplice (player) reads their confession aloud.]*` substring; this package's mechanism-1 leak used different wording ("host: reveal the player who drew the ACCOMPLICE slip...") and was never matched or noticed.
+
+**Fixed the same way as every other mechanism-1 leak this ADR has handled:** stripped the leftover conditional prefix ("If there is an accomplice — "), leaving a clean declarative host instruction that matches the style of every sibling stage-direction already correct in the same document (e.g. "*[Host: reveal the player who drew the GUILTY slip. Say their name here.]*"). Confirmed `**[ACCOMPLICE PLAYER'S NAME]**` immediately after is the legitimate slip-style host-fill-in convention (Addendum 1's own established exception), not touched. Re-verified: the anchored regex no longer matches this package's `detective_script`.
+
+**The other ~24 packages checked: all clean.** No further live instances of either bracket shape.
+
+**A separate, older, structurally different anomaly surfaced during this sweep, not fixed here.** 7 packages in the has_accomplice-mismatch corpus (2025-08-11 through 2025-11-23, `is_test=false`) have `detective_script IS NULL`; 5 of those 7 also have `game_overview IS NULL` and `host_guide IS NULL` despite `generation_status='completed'` — essentially empty packages marked complete, from roughly 10-14 months before this project's active detector/sweep infrastructure existed (the earliest tracked incidents in memory start ~April 2026). This doesn't match the accomplice-bracket-leak shape at all (there's no `detective_script` text to leak a bracket into) and looks like a different, much older generation-pipeline gap. Not investigated further — flagged as a separate open item (`00_INBOX/deferred-bug-audit-2026-09-10-mystery-maker.md` in the vault) rather than folded into this ADR's scope.
+
+**Not done:** the `has_accomplice` backfill question Addendum 1 left open (whether to correct the DB flag for the full 30-package corpus, not just the 11-then-10 confirmed-real ones) is still not decided — this pass confirmed content correctness, not the flag itself.
+
+## Key files (Addendum 2)
+
+- Remediated directly: `mystery_packages.detective_script` for "Operation: Thirty & Murdery" (`b8428a57-1c2b-4bf1-881c-98c8436be6a9`) — the second, previously-missed bracket
+- Flagged, not remediated: 7 packages with `detective_script IS NULL` (5 also missing `game_overview`/`host_guide`) — see vault note above
