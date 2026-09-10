@@ -1,10 +1,11 @@
 # Site health status
 
-_Last checked: 2026-09-10 04:50 UTC (runs every 6 hours; see .github/workflows/health-check.yml)_
+_Last checked: 2026-09-10 11:27 UTC (runs every 6 hours; see .github/workflows/health-check.yml)_
 
 ## ⚠️ Problems found
 
 - 🔴 1 package(s) whose delivered character count doesn't match their approved concept snapshot: Terminus 13 [approved=14, actual=15]
+- 🔴 1 package(s) whose approved concept message looks truncated, with a matching shortfall in delivered characters: Terminus 13 [header=28, delivered=15]
 
 | Check | Result |
 |---|---|
@@ -22,3 +23,4 @@ _Last checked: 2026-09-10 04:50 UTC (runs every 6 hours; see .github/workflows/h
 | Roster-count mismatches — escalate only (30 days) | 1 |
 | Final-statement confession leaks — escalate only (30 days) | 0 |
 | Unconfessed detective-style culprits — escalate only (30 days) | 0 |
+| Truncated concept messages — escalate only (30 days) | 1 |
