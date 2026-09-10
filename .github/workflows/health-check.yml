@@ -43,6 +43,22 @@
 #      means the package ships with no scripted solution at all. Heuristic,
 #      documented false-positive rate (see the detector migration). Excludes
 #      is_test packages. ESCALATE-ONLY.
+#   15. Truncated concept messages (ADR-0103 Addendum 37, "Terminus 13"
+#      incident): a customer's approved concept message can state a roster
+#      total in its own header ("Character List (28 players)") while the
+#      body below it only lists a fraction that many names — the reply got
+#      cut off mid-list by mystery-ai's max_tokens ceiling before the
+#      customer approved and purchased. Root cause is fixed at the source
+#      (mystery-ai now retries once on stop_reason: 'max_tokens'); this is
+#      the backstop for messages already in the database from before that
+#      fix, and for the rare reply that still truncates after the one
+#      bounded retry. Only fires when the ACTUAL delivered character count
+#      is also meaningfully short of the header's stated count — see
+#      scripts/detect-truncated-concept-messages.mjs's header comment for why
+#      a stated-count mismatch alone isn't enough (the "Velvet Viper" stale-
+#      snapshot false positive it was built to exclude). ESCALATE-ONLY: like
+#      check 12, a mismatch means the delivered cast doesn't match what the
+#      customer approved — not something to guess-fix automatically.
 #
 # On failure: opens (or comments on) a GitHub issue labelled `health-alert`.
 # Always: writes monitoring/health-status.md and commits it if changed.
@@ -331,6 +347,24 @@ jobs:
             fi
           fi
 
+          # 15. Truncated concept messages (ADR-0103 Addendum 37 detector).
+          # Re-parses each paid completed package's approved concept snapshot
+          # with the SHIPPED extractRosterFromMessage/extractStatedRosterCount
+          # (scripts/detect-truncated-concept-messages.mjs) and compares the
+          # message's own stated header count against both what's parseable
+          # AND what actually got delivered. Same 30-day rolling window as
+          # checks 5-14. ESCALATE-ONLY.
+          TRUNC=$(node scripts/detect-truncated-concept-messages.mjs "--since=${THIRTY_D_AGO}" --json 2>/tmp/trunc-err.log || echo "QUERY_FAILED")
+          if [ "$TRUNC" = "QUERY_FAILED" ]; then
+            PROBLEMS="${PROBLEMS}- 🟠 Could not run the truncated-concept-message detector: $(tr '\n' ' ' < /tmp/trunc-err.log)\n"
+            TRUNC_COUNT="?"
+          else
+            TRUNC_COUNT=$(echo "$TRUNC" | jq 'length')
+            if [ "$TRUNC_COUNT" -gt 0 ]; then
+              PROBLEMS="${PROBLEMS}- 🔴 ${TRUNC_COUNT} package(s) whose approved concept message looks truncated, with a matching shortfall in delivered characters: $(echo "$TRUNC" | jq -r '[.[] | "\(.title) [header=\(.stated_roster_count), delivered=\(.actual_character_count)]"] | join("; ")')\n"
+            fi
+          fi
+
           # Write status file
           mkdir -p monitoring
           {
@@ -362,6 +396,7 @@ jobs:
             echo "| Roster-count mismatches — escalate only (30 days) | ${ROSTER_COUNT} |"
             echo "| Final-statement confession leaks — escalate only (30 days) | ${FSCL_COUNT} |"
             echo "| Unconfessed detective-style culprits — escalate only (30 days) | ${UCC_COUNT} |"
+            echo "| Truncated concept messages — escalate only (30 days) | ${TRUNC_COUNT} |"
           } > monitoring/health-status.md
 
           if [ -n "$PROBLEMS" ]; then

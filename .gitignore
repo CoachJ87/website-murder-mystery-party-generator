@@ -73,6 +73,7 @@ Blog Database - Master.csv
 !scripts/fix-dead-targets.mjs
 !scripts/surface-crosslink-review.mjs
 !scripts/detect-roster-mismatches.mjs
+!scripts/detect-truncated-concept-messages.mjs
 !scripts/pinterest/**/*.mjs
 *.sql
 !supabase/migrations/*.sql

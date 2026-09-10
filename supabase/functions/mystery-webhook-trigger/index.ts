@@ -132,6 +132,15 @@ const sectionHeaderRegex = new RegExp(
   `^#{2,3}\\s+(?:${headerAlternatives})(?:\\s*\\(\\d+\\s+.+?\\))?[:\\s]*$`, 'im'
 );
 
+// Same header, but capturing the stated count (e.g. "Character List (28
+// players)" -> 28) instead of just matching its presence. Used only by
+// `extractStatedRosterCount` below — kept separate from `sectionHeaderRegex`
+// so that regex stays exactly what it was (ADR-0057: don't grow the one
+// "does this look like a roster header" predicate extra responsibilities).
+const sectionHeaderCountRegex = new RegExp(
+  `^#{2,3}\\s+(?:${headerAlternatives})\\s*\\((\\d+)\\s+.+?\\)`, 'im'
+);
+
 // Pattern for numbered character lines (multiple formats):
 // 1. **Name** - Description  (bold with dash)
 // 1. **Name**: Description   (bold with colon)
@@ -242,6 +251,24 @@ function extractRosterFromMessage(content: string): ExtractedCharacter[] {
   flush();
 
   return found.size >= MIN_ROSTER_SIZE ? Array.from(found.values()) : [];
+}
+
+/**
+ * ADR-0103 Addendum 37 (2026-09-10): what count does this message's OWN header
+ * claim (e.g. "## Character List (28 players)" -> 28)? Independent of what
+ * `extractRosterFromMessage` can actually parse out of the body below that
+ * header - the two can disagree when the reply got cut off mid-list (hits
+ * `stop_reason: 'max_tokens'` in mystery-ai, now mitigated at the source with
+ * one bounded continuation call, see that function's comment) and the header
+ * line itself (written first, before the model started listing names) still
+ * states the original, larger, intended total. Returns null when the message
+ * has no such header or the header carries no explicit count - this is a
+ * corroborating signal for `scripts/detect-truncated-concept-messages.mjs`,
+ * not a replacement for the roster parse itself.
+ */
+function extractStatedRosterCount(content: string): number | null {
+  const match = content.match(sectionHeaderCountRegex);
+  return match ? parseInt(match[1], 10) : null;
 }
 
 /**

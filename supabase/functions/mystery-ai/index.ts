@@ -610,47 +610,88 @@ IMPORTANT: Always end your response by asking if the concept works for them. Men
       content: msg.content || ''
     })).filter(msg => msg.content.trim() !== '');
 
-    const anthropicResponse = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': anthropicApiKey,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-5',
-        max_tokens: 2000,
-        // Sonnet 5 removed temperature/top_p/top_k (400 if sent) and runs
-        // adaptive thinking by default unless explicitly disabled. This is a
-        // fast conversational concept chat with strict format instructions,
-        // not a reasoning task, so thinking is turned off to keep latency/cost
-        // and response shape matching the prior sonnet-4-5 behavior.
-        thinking: { type: 'disabled' },
-        // Automatic prompt caching: caches the system prompt + growing
-        // conversation history so each follow-up turn reads the prefix from
-        // cache (~90% cheaper, faster TTFT) instead of reprocessing it. The
-        // breakpoint auto-advances as the conversation grows. Hits only while
-        // systemPrompt is byte-identical turn-to-turn (i.e. the stable
-        // refinement phase); branch changes to systemPrompt cost one miss.
-        cache_control: { type: 'ephemeral' },
-        system: systemPrompt,
-        messages: anthropicMessages
-      })
-    });
+    async function callAnthropic(msgs: typeof anthropicMessages) {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': anthropicApiKey,
+          'anthropic-version': '2023-06-01'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-5',
+          // Raised from 2000 (2026-09-10): 2000 was never a deliberate budget
+          // for this prompt, just a value carried forward unexamined through
+          // every model swap since the original 3.5-sonnet integration. It's
+          // genuinely too low for a large roster reply (25+ characters with
+          // faction breakdowns) — see the stop_reason handling below for what
+          // happens on the rare reply that still exceeds even this. Raising
+          // the cap costs nothing unless a reply actually needs the tokens.
+          max_tokens: 4000,
+          // Sonnet 5 removed temperature/top_p/top_k (400 if sent) and runs
+          // adaptive thinking by default unless explicitly disabled. This is a
+          // fast conversational concept chat with strict format instructions,
+          // not a reasoning task, so thinking is turned off to keep latency/cost
+          // and response shape matching the prior sonnet-4-5 behavior.
+          thinking: { type: 'disabled' },
+          // Automatic prompt caching: caches the system prompt + growing
+          // conversation history so each follow-up turn reads the prefix from
+          // cache (~90% cheaper, faster TTFT) instead of reprocessing it. The
+          // breakpoint auto-advances as the conversation grows. Hits only while
+          // systemPrompt is byte-identical turn-to-turn (i.e. the stable
+          // refinement phase); branch changes to systemPrompt cost one miss.
+          cache_control: { type: 'ephemeral' },
+          system: systemPrompt,
+          messages: msgs
+        })
+      });
 
-    if (!anthropicResponse.ok) {
-      const errorText = await anthropicResponse.text();
-      console.error(`Anthropic API error ${anthropicResponse.status}: ${errorText}`);
-      throw new Error(`Anthropic API error: ${anthropicResponse.status} - ${errorText}`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`Anthropic API error ${response.status}: ${errorText}`);
+        throw new Error(`Anthropic API error: ${response.status} - ${errorText}`);
+      }
+      return response.json();
     }
 
-    const data = await anthropicResponse.json();
+    const data = await callAnthropic(anthropicMessages);
     // Find the text block explicitly rather than assuming content[0] — with
     // thinking enabled (even briefly, or if the disabled flag above is ever
     // removed) a thinking block can precede the text block in content[].
-    const assistantMessage = data.content?.find((b: { type: string }) => b.type === 'text')?.text;
+    let assistantMessage = data.content?.find((b: { type: string }) => b.type === 'text')?.text;
     if (!assistantMessage) {
       throw new Error('No content in response from Anthropic API');
+    }
+
+    // ADR-0103 Addendum 37 (2026-09-10): a customer's 28-character concept
+    // reply hit this exact max_tokens ceiling and got cut off mid-word. The
+    // truncated reply was saved and displayed as-is, the customer approved it
+    // and purchased 5 minutes later, and generation silently produced a
+    // 15-character package from the incomplete list (one character built
+    // from the truncated fragment itself, with a broken half-written name).
+    // stop_reason tells us definitively when a reply was cut off for hitting
+    // the token budget (as opposed to the model naturally finishing) — fixing
+    // it here, before a truncated reply is ever shown to the customer or
+    // approved, is cheaper and more reliable than trying to detect a
+    // truncated roster after the fact downstream.
+    if (data.stop_reason === 'max_tokens') {
+      console.warn('[Truncation] Assistant reply hit max_tokens — requesting one continuation');
+      const continuation = await callAnthropic([
+        ...anthropicMessages,
+        { role: 'assistant', content: assistantMessage },
+        { role: 'user', content: 'Continue exactly where you left off. Do not repeat any earlier part of your reply, add an introduction, or restart any list numbering — just continue the unfinished sentence or item and everything after it.' },
+      ]);
+      const continuationText = continuation.content?.find((b: { type: string }) => b.type === 'text')?.text;
+      if (continuationText) {
+        assistantMessage += continuationText;
+      } else {
+        console.error('[Truncation] Continuation call returned no text — keeping the truncated reply');
+      }
+      // Deliberately only one continuation attempt: bounds cost per message,
+      // and a reply still truncating after a second full max_tokens budget
+      // (~100+ characters) is rare enough that the generation-time safety net
+      // (list_packages_with_truncated_concept_snapshot, same addendum) is the
+      // right place to catch it, not an unbounded retry loop here.
     }
 
     return new Response(JSON.stringify({
