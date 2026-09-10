@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-10
+
+### Fix: truncated LLM reply left a broken character name in a live paid package — "Terminus 13"
+New-purchase coherence sweep (ADR-0103) on 3 same-day purchases, paired with a GitHub health-check roster-count-mismatch alert on Terminus 13 (`approved=14, actual=15`). Traced to the customer's own concept-approval message getting cut off mid-word by the LLM's output limit at `"15. **Scavenger Row/R"` — no continuation followed (it was the conversation's last turn before purchase, 5 minutes later). The pipeline generated a 15th character straight from the truncated line: `character_name = 'Scavenger Row/R'`, a broken half-written dual-name with no surname. That character's other fields (`background`, `introduction`, `description`) were otherwise complete and well-written, consistently using "Row" as the working name — only `character_name` and one `**Name:**` header embedded in `background` carried the truncation forward. Confirmed no other field in the package (other characters' text, `game_overview`, `detective_script`, `host_guide`, `evidence_cards`, `materials`) referenced the broken name. Fixed via plain SQL text update (no Anthropic call): `character_name` → `Scavenger Row/Robin Teague`, same rename applied inside `background`'s header line.
+
+Left open: the customer asked for 28 players three times in conversation, but `conversations.player_count` (and the generated package) is 15 — the same still-open `player_count`-goes-stale gap as [[project_stale_snapshot_never_recaptures]], compounded by the truncation cutting the concept short near that same count. Completing the roster to 28 would need a real Anthropic spend and likely customer contact to confirm intent, so left as a decision point for Jonathan rather than assumed. The other two purchases swept clean (The Last Caravan Of Riften, Murder At The Rhinestone Rodeo) — all named + broader detector suite, manual victim-name cross-checks, and manual secret/background reads all clean. ADR-0103 Addendum 37.
+
 ## 2026-09-09
 
 ### Feature: `missing_role_branch_content` now self-heals via auto-remediate-packages instead of alert-only
